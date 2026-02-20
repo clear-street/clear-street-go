@@ -7,14 +7,15 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stainless-sdks/clear-street-go"
 	"github.com/stainless-sdks/clear-street-go/internal/testutil"
 	"github.com/stainless-sdks/clear-street-go/option"
 )
 
-func TestActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendar(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+func TestActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendarWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -27,8 +28,8 @@ func TestActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendar(t *
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Active.V1.Calendars.MergersAcquisitions.GetMergersAndAcquisitionsCalendar(context.TODO(), clearstreet.ActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendarParams{
-		FromDate: "from_date",
-		ToDate:   "to_date",
+		From: clearstreet.Time(time.Now()),
+		To:   clearstreet.Time(time.Now()),
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

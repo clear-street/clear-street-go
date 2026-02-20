@@ -27,11 +27,12 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1AccountService] method instead.
 type ActiveV1AccountService struct {
-	Options   []option.RequestOption
-	Balances  ActiveV1AccountBalanceService
-	Locates   ActiveV1AccountLocateService
-	Orders    ActiveV1AccountOrderService
-	Positions ActiveV1AccountPositionService
+	Options          []option.RequestOption
+	Balances         ActiveV1AccountBalanceService
+	Locates          ActiveV1AccountLocateService
+	Orders           ActiveV1AccountOrderService
+	PortfolioHistory ActiveV1AccountPortfolioHistoryService
+	Positions        ActiveV1AccountPositionService
 }
 
 // NewActiveV1AccountService generates a new service that applies the given options
@@ -43,6 +44,7 @@ func NewActiveV1AccountService(opts ...option.RequestOption) (r ActiveV1AccountS
 	r.Balances = NewActiveV1AccountBalanceService(opts...)
 	r.Locates = NewActiveV1AccountLocateService(opts...)
 	r.Orders = NewActiveV1AccountOrderService(opts...)
+	r.PortfolioHistory = NewActiveV1AccountPortfolioHistoryService(opts...)
 	r.Positions = NewActiveV1AccountPositionService(opts...)
 	return
 }
@@ -201,6 +203,8 @@ const (
 // combining data from execution reports, order status queries, and parent/child
 // tracking.
 type Order struct {
+	// Client-provided unique identifier for this order
+	ID string `json:"id,required"`
 	// Account placing the order
 	AccountID int64 `json:"account_id,required"`
 	// Timestamp when order was created (UTC)
@@ -209,11 +213,10 @@ type Order struct {
 	FilledQuantity string `json:"filled_quantity,required"`
 	// Remaining unfilled quantity
 	LeavesQuantity string `json:"leaves_quantity,required"`
-	// Client-provided unique identifier for this order
-	OrderID string `json:"order_id,required"`
 	// Type of order (MARKET, LIMIT, etc.)
 	//
-	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "OTHER".
+	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
+	// "TRAILING_STOP_LIMIT", "OTHER".
 	OrderType OrderType `json:"order_type,required"`
 	// Total order quantity
 	Quantity string `json:"quantity,required"`
@@ -222,7 +225,14 @@ type Order struct {
 	SecurityID string `json:"security_id,required"`
 	// The source of the security identifier
 	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "OTHER".
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
 	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
 	// Type of security
 	//
@@ -258,38 +268,55 @@ type Order struct {
 	// Timestamp when the order will expire (UTC). Present when time_in_force is
 	// GOOD_TILL_DATE.
 	ExpiresAt time.Time `json:"expires_at,nullable" format:"date-time"`
+	// Limit offset for trailing stop-limit orders (signed)
+	LimitOffset string `json:"limit_offset,nullable"`
 	// Limit price (for LIMIT and STOP_LIMIT orders)
 	LimitPrice string `json:"limit_price,nullable"`
 	// Stop price (for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price,nullable"`
 	// Execution strategy for this order
 	Strategy OrderStrategyUnion `json:"strategy,nullable"`
+	// Trailing offset amount for trailing orders
+	TrailingOffsetAmt string `json:"trailing_offset_amt,nullable"`
+	// Trailing offset type for trailing orders
+	//
+	// Any of "PRICE", "PERCENT_BPS".
+	TrailingOffsetAmtType TrailingOffsetType `json:"trailing_offset_amt_type,nullable"`
+	// Trailing watermark price for trailing orders
+	TrailingWatermarkPx string `json:"trailing_watermark_px,nullable"`
+	// Trailing watermark timestamp for trailing orders
+	TrailingWatermarkTs time.Time `json:"trailing_watermark_ts,nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AccountID        respjson.Field
-		CreatedAt        respjson.Field
-		FilledQuantity   respjson.Field
-		LeavesQuantity   respjson.Field
-		OrderID          respjson.Field
-		OrderType        respjson.Field
-		Quantity         respjson.Field
-		SecurityID       respjson.Field
-		SecurityIDSource respjson.Field
-		SecurityType     respjson.Field
-		Side             respjson.Field
-		Status           respjson.Field
-		Symbol           respjson.Field
-		TimeInForce      respjson.Field
-		UpdatedAt        respjson.Field
-		Venue            respjson.Field
-		AverageFillPrice respjson.Field
-		Details          respjson.Field
-		ExpiresAt        respjson.Field
-		LimitPrice       respjson.Field
-		StopPrice        respjson.Field
-		Strategy         respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
+		ID                    respjson.Field
+		AccountID             respjson.Field
+		CreatedAt             respjson.Field
+		FilledQuantity        respjson.Field
+		LeavesQuantity        respjson.Field
+		OrderType             respjson.Field
+		Quantity              respjson.Field
+		SecurityID            respjson.Field
+		SecurityIDSource      respjson.Field
+		SecurityType          respjson.Field
+		Side                  respjson.Field
+		Status                respjson.Field
+		Symbol                respjson.Field
+		TimeInForce           respjson.Field
+		UpdatedAt             respjson.Field
+		Venue                 respjson.Field
+		AverageFillPrice      respjson.Field
+		Details               respjson.Field
+		ExpiresAt             respjson.Field
+		LimitOffset           respjson.Field
+		LimitPrice            respjson.Field
+		StopPrice             respjson.Field
+		Strategy              respjson.Field
+		TrailingOffsetAmt     respjson.Field
+		TrailingOffsetAmtType respjson.Field
+		TrailingWatermarkPx   respjson.Field
+		TrailingWatermarkTs   respjson.Field
+		ExtraFields           map[string]respjson.Field
+		raw                   string
 	} `json:"-"`
 }
 

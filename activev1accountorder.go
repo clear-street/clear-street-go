@@ -58,7 +58,7 @@ func (r *ActiveV1AccountOrderService) CancelOrder(ctx context.Context, orderID s
 		err = errors.New("missing required order_id parameter")
 		return
 	}
-	path := fmt.Sprintf("active/v1/accounts/%v/orders/%s", body.AccountID, orderID)
+	path := fmt.Sprintf("active/v1/accounts/%v/orders/%s", body.AccountID, url.PathEscape(orderID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return
 }
@@ -70,7 +70,7 @@ func (r *ActiveV1AccountOrderService) GetOrderByID(ctx context.Context, orderID 
 		err = errors.New("missing required order_id parameter")
 		return
 	}
-	path := fmt.Sprintf("active/v1/accounts/%v/orders/%s", query.AccountID, orderID)
+	path := fmt.Sprintf("active/v1/accounts/%v/orders/%s", query.AccountID, url.PathEscape(orderID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
@@ -90,7 +90,7 @@ func (r *ActiveV1AccountOrderService) ReplaceOrder(ctx context.Context, orderID 
 		err = errors.New("missing required order_id parameter")
 		return
 	}
-	path := fmt.Sprintf("active/v1/accounts/%v/orders/%s", params.AccountID, orderID)
+	path := fmt.Sprintf("active/v1/accounts/%v/orders/%s", params.AccountID, url.PathEscape(orderID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
 	return
 }
@@ -106,9 +106,9 @@ func (r *ActiveV1AccountOrderService) SubmitOrders(ctx context.Context, accountI
 // Arrival Price strategy
 type ApStrategy struct {
 	// Maximum percentage of market volume to participate in (0-100)
-	MaxPercent int64 `json:"max_percent,nullable"`
+	MaxPercent APIDecimal64 `json:"max_percent,nullable"`
 	// Minimum percentage of market volume to participate in (0-100)
-	MinPercent int64 `json:"min_percent,nullable"`
+	MinPercent APIDecimal64 `json:"min_percent,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		MaxPercent  respjson.Field
@@ -137,9 +137,9 @@ func (r ApStrategy) ToParam() ApStrategyParam {
 // Arrival Price strategy
 type ApStrategyParam struct {
 	// Maximum percentage of market volume to participate in (0-100)
-	MaxPercent param.Opt[int64] `json:"max_percent,omitzero"`
+	MaxPercent param.Opt[APIDecimal64] `json:"max_percent,omitzero"`
 	// Minimum percentage of market volume to participate in (0-100)
-	MinPercent param.Opt[int64] `json:"min_percent,omitzero"`
+	MinPercent param.Opt[APIDecimal64] `json:"min_percent,omitzero"`
 	BaseStrategyParams
 }
 
@@ -150,6 +150,8 @@ func (r ApStrategyParam) MarshalJSON() (data []byte, err error) {
 	}
 	return param.MarshalObject(r, shadow{&r, false})
 }
+
+type APIDecimal64 = string
 
 // Base parameters common to most algorithmic strategies
 type BaseStrategyParamsResp struct {
@@ -210,7 +212,7 @@ func (r *BaseStrategyParams) UnmarshalJSON(data []byte) error {
 // Dark Pool strategy
 type DarkStrategy struct {
 	// Maximum percentage of market volume to participate in (0-100)
-	MaxPercent int64 `json:"max_percent,nullable"`
+	MaxPercent APIDecimal64 `json:"max_percent,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		MaxPercent  respjson.Field
@@ -238,7 +240,7 @@ func (r DarkStrategy) ToParam() DarkStrategyParam {
 // Dark Pool strategy
 type DarkStrategyParam struct {
 	// Maximum percentage of market volume to participate in (0-100)
-	MaxPercent param.Opt[int64] `json:"max_percent,omitzero"`
+	MaxPercent param.Opt[APIDecimal64] `json:"max_percent,omitzero"`
 	BaseStrategyParams
 }
 
@@ -250,32 +252,10 @@ func (r DarkStrategyParam) MarshalJSON() (data []byte, err error) {
 	return param.MarshalObject(r, shadow{&r, false})
 }
 
-// Destination exchange for DMA orders (Market Identifier Code)
-type Destination string
-
-const (
-	DestinationArcx Destination = "ARCX"
-	DestinationBats Destination = "BATS"
-	DestinationBaty Destination = "BATY"
-	DestinationEdga Destination = "EDGA"
-	DestinationEdgx Destination = "EDGX"
-	DestinationEprl Destination = "EPRL"
-	DestinationIexg Destination = "IEXG"
-	DestinationMemx Destination = "MEMX"
-	DestinationXase Destination = "XASE"
-	DestinationXbos Destination = "XBOS"
-	DestinationXcis Destination = "XCIS"
-	DestinationXnms Destination = "XNMS"
-	DestinationXnys Destination = "XNYS"
-)
-
 // Direct Market Access strategy
 type DmaStrategy struct {
 	// Destination exchange (MIC code)
-	//
-	// Any of "ARCX", "BATS", "BATY", "EDGA", "EDGX", "EPRL", "IEXG", "MEMX", "XASE",
-	// "XBOS", "XCIS", "XNMS", "XNYS".
-	Destination Destination `json:"destination,required"`
+	Destination string `json:"destination,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Destination respjson.Field
@@ -304,10 +284,7 @@ func (r DmaStrategy) ToParam() DmaStrategyParam {
 // The property Destination is required.
 type DmaStrategyParam struct {
 	// Destination exchange (MIC code)
-	//
-	// Any of "ARCX", "BATS", "BATY", "EDGA", "EDGX", "EPRL", "IEXG", "MEMX", "XASE",
-	// "XBOS", "XCIS", "XNMS", "XNYS".
-	Destination Destination `json:"destination,omitzero,required"`
+	Destination string `json:"destination,required"`
 	paramObj
 }
 
@@ -349,14 +326,16 @@ type OrderStrategyUnion struct {
 	EndAt   time.Time `json:"end_at"`
 	StartAt time.Time `json:"start_at"`
 	// This field is from variant [OrderStrategySor].
-	Urgency    Urgency `json:"urgency"`
-	Type       string  `json:"type"`
-	MaxPercent int64   `json:"max_percent"`
-	MinPercent int64   `json:"min_percent"`
+	Urgency Urgency `json:"urgency"`
+	Type    string  `json:"type"`
+	// This field is from variant [OrderStrategyVwap].
+	MaxPercent APIDecimal64 `json:"max_percent"`
+	// This field is from variant [OrderStrategyVwap].
+	MinPercent APIDecimal64 `json:"min_percent"`
 	// This field is from variant [OrderStrategyPov].
-	TargetPercent int64 `json:"target_percent"`
+	TargetPercent APIDecimal64 `json:"target_percent"`
 	// This field is from variant [OrderStrategyDma].
-	Destination Destination `json:"destination"`
+	Destination string `json:"destination"`
 	JSON        struct {
 		EndAt         respjson.Field
 		StartAt       respjson.Field
@@ -578,7 +557,7 @@ func OrderStrategyParamOfAp(type_ string) OrderStrategyUnionParam {
 	return OrderStrategyUnionParam{OfAp: &variant}
 }
 
-func OrderStrategyParamOfPov(targetPercent int64, type_ string) OrderStrategyUnionParam {
+func OrderStrategyParamOfPov(targetPercent APIDecimal64, type_ string) OrderStrategyUnionParam {
 	var variant OrderStrategyPovParam
 	variant.TargetPercent = targetPercent
 	variant.Type = type_
@@ -591,7 +570,7 @@ func OrderStrategyParamOfDark(type_ string) OrderStrategyUnionParam {
 	return OrderStrategyUnionParam{OfDark: &variant}
 }
 
-func OrderStrategyParamOfDma(destination Destination, type_ string) OrderStrategyUnionParam {
+func OrderStrategyParamOfDma(destination string, type_ string) OrderStrategyUnionParam {
 	var variant OrderStrategyDmaParam
 	variant.Destination = destination
 	variant.Type = type_
@@ -623,141 +602,6 @@ func (u OrderStrategyUnionParam) MarshalJSON() ([]byte, error) {
 }
 func (u *OrderStrategyUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
-}
-
-func (u *OrderStrategyUnionParam) asAny() any {
-	if !param.IsOmitted(u.OfSor) {
-		return u.OfSor
-	} else if !param.IsOmitted(u.OfVwap) {
-		return u.OfVwap
-	} else if !param.IsOmitted(u.OfTwap) {
-		return u.OfTwap
-	} else if !param.IsOmitted(u.OfAp) {
-		return u.OfAp
-	} else if !param.IsOmitted(u.OfPov) {
-		return u.OfPov
-	} else if !param.IsOmitted(u.OfDark) {
-		return u.OfDark
-	} else if !param.IsOmitted(u.OfDma) {
-		return u.OfDma
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u OrderStrategyUnionParam) GetTargetPercent() *int64 {
-	if vt := u.OfPov; vt != nil {
-		return &vt.TargetPercent
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u OrderStrategyUnionParam) GetDestination() *string {
-	if vt := u.OfDma; vt != nil {
-		return (*string)(&vt.Destination)
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u OrderStrategyUnionParam) GetUrgency() *string {
-	if vt := u.OfSor; vt != nil {
-		return (*string)(&vt.Urgency)
-	} else if vt := u.OfVwap; vt != nil {
-		return (*string)(&vt.Urgency)
-	} else if vt := u.OfTwap; vt != nil {
-		return (*string)(&vt.Urgency)
-	} else if vt := u.OfAp; vt != nil {
-		return (*string)(&vt.Urgency)
-	} else if vt := u.OfPov; vt != nil {
-		return (*string)(&vt.Urgency)
-	} else if vt := u.OfDark; vt != nil {
-		return (*string)(&vt.Urgency)
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u OrderStrategyUnionParam) GetType() *string {
-	if vt := u.OfSor; vt != nil {
-		return (*string)(&vt.Type)
-	} else if vt := u.OfVwap; vt != nil {
-		return (*string)(&vt.Type)
-	} else if vt := u.OfTwap; vt != nil {
-		return (*string)(&vt.Type)
-	} else if vt := u.OfAp; vt != nil {
-		return (*string)(&vt.Type)
-	} else if vt := u.OfPov; vt != nil {
-		return (*string)(&vt.Type)
-	} else if vt := u.OfDark; vt != nil {
-		return (*string)(&vt.Type)
-	} else if vt := u.OfDma; vt != nil {
-		return (*string)(&vt.Type)
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u OrderStrategyUnionParam) GetMaxPercent() *int64 {
-	if vt := u.OfVwap; vt != nil && vt.MaxPercent.Valid() {
-		return &vt.MaxPercent.Value
-	} else if vt := u.OfTwap; vt != nil && vt.MaxPercent.Valid() {
-		return &vt.MaxPercent.Value
-	} else if vt := u.OfAp; vt != nil && vt.MaxPercent.Valid() {
-		return &vt.MaxPercent.Value
-	} else if vt := u.OfDark; vt != nil && vt.MaxPercent.Valid() {
-		return &vt.MaxPercent.Value
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's property, if present.
-func (u OrderStrategyUnionParam) GetMinPercent() *int64 {
-	if vt := u.OfVwap; vt != nil && vt.MinPercent.Valid() {
-		return &vt.MinPercent.Value
-	} else if vt := u.OfTwap; vt != nil && vt.MinPercent.Valid() {
-		return &vt.MinPercent.Value
-	} else if vt := u.OfAp; vt != nil && vt.MinPercent.Valid() {
-		return &vt.MinPercent.Value
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's EndAt property, if present.
-func (u OrderStrategyUnionParam) GetEndAt() *time.Time {
-	if vt := u.OfSor; vt != nil && vt.EndAt.Valid() {
-		return &vt.EndAt.Value
-	} else if vt := u.OfVwap; vt != nil && vt.EndAt.Valid() {
-		return &vt.EndAt.Value
-	} else if vt := u.OfTwap; vt != nil && vt.EndAt.Valid() {
-		return &vt.EndAt.Value
-	} else if vt := u.OfAp; vt != nil && vt.EndAt.Valid() {
-		return &vt.EndAt.Value
-	} else if vt := u.OfPov; vt != nil && vt.EndAt.Valid() {
-		return &vt.EndAt.Value
-	} else if vt := u.OfDark; vt != nil && vt.EndAt.Valid() {
-		return &vt.EndAt.Value
-	}
-	return nil
-}
-
-// Returns a pointer to the underlying variant's StartAt property, if present.
-func (u OrderStrategyUnionParam) GetStartAt() *time.Time {
-	if vt := u.OfSor; vt != nil && vt.StartAt.Valid() {
-		return &vt.StartAt.Value
-	} else if vt := u.OfVwap; vt != nil && vt.StartAt.Valid() {
-		return &vt.StartAt.Value
-	} else if vt := u.OfTwap; vt != nil && vt.StartAt.Valid() {
-		return &vt.StartAt.Value
-	} else if vt := u.OfAp; vt != nil && vt.StartAt.Valid() {
-		return &vt.StartAt.Value
-	} else if vt := u.OfPov; vt != nil && vt.StartAt.Valid() {
-		return &vt.StartAt.Value
-	} else if vt := u.OfDark; vt != nil && vt.StartAt.Valid() {
-		return &vt.StartAt.Value
-	}
-	return nil
 }
 
 // Smart Order Router (default) - routes to best available venue
@@ -862,17 +706,19 @@ func (r OrderStrategyDmaParam) MarshalJSON() (data []byte, err error) {
 type OrderType string
 
 const (
-	OrderTypeMarket    OrderType = "MARKET"
-	OrderTypeLimit     OrderType = "LIMIT"
-	OrderTypeStop      OrderType = "STOP"
-	OrderTypeStopLimit OrderType = "STOP_LIMIT"
-	OrderTypeOther     OrderType = "OTHER"
+	OrderTypeMarket            OrderType = "MARKET"
+	OrderTypeLimit             OrderType = "LIMIT"
+	OrderTypeStop              OrderType = "STOP"
+	OrderTypeStopLimit         OrderType = "STOP_LIMIT"
+	OrderTypeTrailingStop      OrderType = "TRAILING_STOP"
+	OrderTypeTrailingStopLimit OrderType = "TRAILING_STOP_LIMIT"
+	OrderTypeOther             OrderType = "OTHER"
 )
 
 // Percentage of Volume strategy
 type PovStrategy struct {
 	// Target percentage of market volume to participate in (0-100)
-	TargetPercent int64 `json:"target_percent,required"`
+	TargetPercent APIDecimal64 `json:"target_percent,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		TargetPercent respjson.Field
@@ -900,7 +746,7 @@ func (r PovStrategy) ToParam() PovStrategyParam {
 // Percentage of Volume strategy
 type PovStrategyParam struct {
 	// Target percentage of market volume to participate in (0-100)
-	TargetPercent int64 `json:"target_percent,required"`
+	TargetPercent APIDecimal64 `json:"target_percent,required"`
 	BaseStrategyParams
 }
 
@@ -995,12 +841,20 @@ const (
 	TimeInForceOther               TimeInForce = "OTHER"
 )
 
+// Trailing offset type for trailing stop orders.
+type TrailingOffsetType string
+
+const (
+	TrailingOffsetTypePrice      TrailingOffsetType = "PRICE"
+	TrailingOffsetTypePercentBps TrailingOffsetType = "PERCENT_BPS"
+)
+
 // Time Weighted Average Price strategy
 type TwapStrategy struct {
 	// Maximum percentage of market volume to participate in (0-50)
-	MaxPercent int64 `json:"max_percent,nullable"`
+	MaxPercent APIDecimal64 `json:"max_percent,nullable"`
 	// Minimum percentage of market volume to participate in (0-100)
-	MinPercent int64 `json:"min_percent,nullable"`
+	MinPercent APIDecimal64 `json:"min_percent,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		MaxPercent  respjson.Field
@@ -1029,9 +883,9 @@ func (r TwapStrategy) ToParam() TwapStrategyParam {
 // Time Weighted Average Price strategy
 type TwapStrategyParam struct {
 	// Maximum percentage of market volume to participate in (0-50)
-	MaxPercent param.Opt[int64] `json:"max_percent,omitzero"`
+	MaxPercent param.Opt[APIDecimal64] `json:"max_percent,omitzero"`
 	// Minimum percentage of market volume to participate in (0-100)
-	MinPercent param.Opt[int64] `json:"min_percent,omitzero"`
+	MinPercent param.Opt[APIDecimal64] `json:"min_percent,omitzero"`
 	BaseStrategyParams
 }
 
@@ -1057,9 +911,9 @@ const (
 // Volume Weighted Average Price strategy
 type VwapStrategy struct {
 	// Maximum percentage of market volume to participate in (0-50)
-	MaxPercent int64 `json:"max_percent,nullable"`
+	MaxPercent APIDecimal64 `json:"max_percent,nullable"`
 	// Minimum percentage of market volume to participate in (0-100)
-	MinPercent int64 `json:"min_percent,nullable"`
+	MinPercent APIDecimal64 `json:"min_percent,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		MaxPercent  respjson.Field
@@ -1088,9 +942,9 @@ func (r VwapStrategy) ToParam() VwapStrategyParam {
 // Volume Weighted Average Price strategy
 type VwapStrategyParam struct {
 	// Maximum percentage of market volume to participate in (0-50)
-	MaxPercent param.Opt[int64] `json:"max_percent,omitzero"`
+	MaxPercent param.Opt[APIDecimal64] `json:"max_percent,omitzero"`
 	// Minimum percentage of market volume to participate in (0-100)
-	MinPercent param.Opt[int64] `json:"min_percent,omitzero"`
+	MinPercent param.Opt[APIDecimal64] `json:"min_percent,omitzero"`
 	BaseStrategyParams
 }
 
@@ -1220,26 +1074,35 @@ func (r *ActiveV1AccountOrderSubmitOrdersResponse) UnmarshalJSON(data []byte) er
 }
 
 type ActiveV1AccountOrderCancelAllOrdersParams struct {
-	// Filter by security identifier (e.g., CUSIP, ISIN). Must be provided with
-	// security_id_source.
-	SecurityID param.Opt[string] `query:"security_id,omitzero" json:"-"`
-	// Type of security identifier. Must be provided with security_id.
+	// Filter by security ID(s). Accepts single value or indexed array.
 	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "OTHER".
-	SecurityIDSource SecurityIDSource `query:"security_id_source,omitzero" json:"-"`
+	// Examples:
+	//
+	// - Single: `security_id=037833100`
+	// - Multiple: `security_id[0]=037833100&security_id[1]=594918104`
+	SecurityID []string `query:"security_id,omitzero" json:"-"`
+	// Source(s) for the security ID filter. Must match the count and order of
+	// security_id.
+	//
+	// Examples:
+	//
+	// - Single: `security_id_source=CUSIP`
+	// - Multiple: `security_id_source[0]=CUSIP&security_id_source[1]=FIGI`
+	SecurityIDSource []string `query:"security_id_source,omitzero" json:"-"`
 	// Filter by security type (e.g., COMMON_STOCK, OPTION)
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `query:"security_type,omitzero" json:"-"`
+	SecurityType ActiveV1AccountOrderCancelAllOrdersParamsSecurityType `query:"security_type,omitzero" json:"-"`
 	// Filter by order side (BUY or SELL)
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side Side `query:"side,omitzero" json:"-"`
+	Side ActiveV1AccountOrderCancelAllOrdersParamsSide `query:"side,omitzero" json:"-"`
 	// Filter by order type (e.g., MARKET, LIMIT)
 	//
-	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "OTHER".
-	Type OrderType `query:"type,omitzero" json:"-"`
+	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
+	// "TRAILING_STOP_LIMIT", "OTHER".
+	Type ActiveV1AccountOrderCancelAllOrdersParamsType `query:"type,omitzero" json:"-"`
 	paramObj
 }
 
@@ -1251,6 +1114,43 @@ func (r ActiveV1AccountOrderCancelAllOrdersParams) URLQuery() (v url.Values, err
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter by security type (e.g., COMMON_STOCK, OPTION)
+type ActiveV1AccountOrderCancelAllOrdersParamsSecurityType string
+
+const (
+	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeCommonStock    ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "COMMON_STOCK"
+	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypePreferredStock ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "PREFERRED_STOCK"
+	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeCorporateBond  ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "CORPORATE_BOND"
+	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeOption         ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "OPTION"
+	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeFuture         ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "FUTURE"
+	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeWarrant        ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "WARRANT"
+	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeCash           ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "CASH"
+	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeOther          ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "OTHER"
+)
+
+// Filter by order side (BUY or SELL)
+type ActiveV1AccountOrderCancelAllOrdersParamsSide string
+
+const (
+	ActiveV1AccountOrderCancelAllOrdersParamsSideBuy       ActiveV1AccountOrderCancelAllOrdersParamsSide = "BUY"
+	ActiveV1AccountOrderCancelAllOrdersParamsSideSell      ActiveV1AccountOrderCancelAllOrdersParamsSide = "SELL"
+	ActiveV1AccountOrderCancelAllOrdersParamsSideSellShort ActiveV1AccountOrderCancelAllOrdersParamsSide = "SELL_SHORT"
+	ActiveV1AccountOrderCancelAllOrdersParamsSideOther     ActiveV1AccountOrderCancelAllOrdersParamsSide = "OTHER"
+)
+
+// Filter by order type (e.g., MARKET, LIMIT)
+type ActiveV1AccountOrderCancelAllOrdersParamsType string
+
+const (
+	ActiveV1AccountOrderCancelAllOrdersParamsTypeMarket            ActiveV1AccountOrderCancelAllOrdersParamsType = "MARKET"
+	ActiveV1AccountOrderCancelAllOrdersParamsTypeLimit             ActiveV1AccountOrderCancelAllOrdersParamsType = "LIMIT"
+	ActiveV1AccountOrderCancelAllOrdersParamsTypeStop              ActiveV1AccountOrderCancelAllOrdersParamsType = "STOP"
+	ActiveV1AccountOrderCancelAllOrdersParamsTypeStopLimit         ActiveV1AccountOrderCancelAllOrdersParamsType = "STOP_LIMIT"
+	ActiveV1AccountOrderCancelAllOrdersParamsTypeTrailingStop      ActiveV1AccountOrderCancelAllOrdersParamsType = "TRAILING_STOP"
+	ActiveV1AccountOrderCancelAllOrdersParamsTypeTrailingStopLimit ActiveV1AccountOrderCancelAllOrdersParamsType = "TRAILING_STOP_LIMIT"
+	ActiveV1AccountOrderCancelAllOrdersParamsTypeOther             ActiveV1AccountOrderCancelAllOrdersParamsType = "OTHER"
+)
 
 type ActiveV1AccountOrderCancelOrderParams struct {
 	AccountID int64 `path:"account_id,required" json:"-"`
@@ -1264,34 +1164,43 @@ type ActiveV1AccountOrderGetOrderByIDParams struct {
 
 type ActiveV1AccountOrderGetOrdersParams struct {
 	// The start date and time for the query range, inclusive (ISO 8601 format)
-	From string `query:"from,required" json:"-"`
-	// The end date and time for the query range, inclusive (ISO 8601 format)
-	To string `query:"to,required" json:"-"`
+	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
 	// The number of items to return per page (only used when page_token is not
 	// provided)
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next page of results. Contains encoded pagination state
 	// (limit + offset). When provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
-	// Filter by security ID
-	SecurityID param.Opt[string] `query:"security_id,omitzero" json:"-"`
 	// Filter by symbol
 	Symbol param.Opt[string] `query:"symbol,omitzero" json:"-"`
-	// Source for the security ID filter
+	// The end date and time for the query range, inclusive (ISO 8601 format)
+	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
+	// Filter by security ID(s). Accepts single value or indexed array.
 	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "OTHER".
-	SecurityIDSource SecurityIDSource `query:"security_id_source,omitzero" json:"-"`
+	// Examples:
+	//
+	// - Single: `security_id=037833100`
+	// - Multiple: `security_id[0]=037833100&security_id[1]=594918104`
+	SecurityID []string `query:"security_id,omitzero" json:"-"`
+	// Source(s) for the security ID filter. Must match the count and order of
+	// security_id.
+	//
+	// Examples:
+	//
+	// - Single: `security_id_source=CUSIP`
+	// - Multiple: `security_id_source[0]=CUSIP&security_id_source[1]=FIGI`
+	SecurityIDSource []string `query:"security_id_source,omitzero" json:"-"`
 	// Security type filter (e.g., COMMON_STOCK, PREFERRED_STOCK)
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `query:"security_type,omitzero" json:"-"`
+	SecurityType ActiveV1AccountOrderGetOrdersParamsSecurityType `query:"security_type,omitzero" json:"-"`
 	// Filter by order status
 	//
 	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
 	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
 	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
-	Status OrderStatus `query:"status,omitzero" json:"-"`
+	Status ActiveV1AccountOrderGetOrdersParamsStatus `query:"status,omitzero" json:"-"`
 	paramObj
 }
 
@@ -1303,6 +1212,41 @@ func (r ActiveV1AccountOrderGetOrdersParams) URLQuery() (v url.Values, err error
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Security type filter (e.g., COMMON_STOCK, PREFERRED_STOCK)
+type ActiveV1AccountOrderGetOrdersParamsSecurityType string
+
+const (
+	ActiveV1AccountOrderGetOrdersParamsSecurityTypeCommonStock    ActiveV1AccountOrderGetOrdersParamsSecurityType = "COMMON_STOCK"
+	ActiveV1AccountOrderGetOrdersParamsSecurityTypePreferredStock ActiveV1AccountOrderGetOrdersParamsSecurityType = "PREFERRED_STOCK"
+	ActiveV1AccountOrderGetOrdersParamsSecurityTypeCorporateBond  ActiveV1AccountOrderGetOrdersParamsSecurityType = "CORPORATE_BOND"
+	ActiveV1AccountOrderGetOrdersParamsSecurityTypeOption         ActiveV1AccountOrderGetOrdersParamsSecurityType = "OPTION"
+	ActiveV1AccountOrderGetOrdersParamsSecurityTypeFuture         ActiveV1AccountOrderGetOrdersParamsSecurityType = "FUTURE"
+	ActiveV1AccountOrderGetOrdersParamsSecurityTypeWarrant        ActiveV1AccountOrderGetOrdersParamsSecurityType = "WARRANT"
+	ActiveV1AccountOrderGetOrdersParamsSecurityTypeCash           ActiveV1AccountOrderGetOrdersParamsSecurityType = "CASH"
+	ActiveV1AccountOrderGetOrdersParamsSecurityTypeOther          ActiveV1AccountOrderGetOrdersParamsSecurityType = "OTHER"
+)
+
+// Filter by order status
+type ActiveV1AccountOrderGetOrdersParamsStatus string
+
+const (
+	ActiveV1AccountOrderGetOrdersParamsStatusPendingNew      ActiveV1AccountOrderGetOrdersParamsStatus = "PENDING_NEW"
+	ActiveV1AccountOrderGetOrdersParamsStatusNew             ActiveV1AccountOrderGetOrdersParamsStatus = "NEW"
+	ActiveV1AccountOrderGetOrdersParamsStatusPartiallyFilled ActiveV1AccountOrderGetOrdersParamsStatus = "PARTIALLY_FILLED"
+	ActiveV1AccountOrderGetOrdersParamsStatusFilled          ActiveV1AccountOrderGetOrdersParamsStatus = "FILLED"
+	ActiveV1AccountOrderGetOrdersParamsStatusCanceled        ActiveV1AccountOrderGetOrdersParamsStatus = "CANCELED"
+	ActiveV1AccountOrderGetOrdersParamsStatusRejected        ActiveV1AccountOrderGetOrdersParamsStatus = "REJECTED"
+	ActiveV1AccountOrderGetOrdersParamsStatusExpired         ActiveV1AccountOrderGetOrdersParamsStatus = "EXPIRED"
+	ActiveV1AccountOrderGetOrdersParamsStatusPendingCancel   ActiveV1AccountOrderGetOrdersParamsStatus = "PENDING_CANCEL"
+	ActiveV1AccountOrderGetOrdersParamsStatusPendingReplace  ActiveV1AccountOrderGetOrdersParamsStatus = "PENDING_REPLACE"
+	ActiveV1AccountOrderGetOrdersParamsStatusReplaced        ActiveV1AccountOrderGetOrdersParamsStatus = "REPLACED"
+	ActiveV1AccountOrderGetOrdersParamsStatusDoneForDay      ActiveV1AccountOrderGetOrdersParamsStatus = "DONE_FOR_DAY"
+	ActiveV1AccountOrderGetOrdersParamsStatusStopped         ActiveV1AccountOrderGetOrdersParamsStatus = "STOPPED"
+	ActiveV1AccountOrderGetOrdersParamsStatusSuspended       ActiveV1AccountOrderGetOrdersParamsStatus = "SUSPENDED"
+	ActiveV1AccountOrderGetOrdersParamsStatusCalculated      ActiveV1AccountOrderGetOrdersParamsStatus = "CALCULATED"
+	ActiveV1AccountOrderGetOrdersParamsStatusOther           ActiveV1AccountOrderGetOrdersParamsStatus = "OTHER"
+)
 
 type ActiveV1AccountOrderReplaceOrderParams struct {
 	AccountID int64 `path:"account_id,required" json:"-"`
@@ -1343,14 +1287,13 @@ func (r *ActiveV1AccountOrderSubmitOrdersParams) UnmarshalJSON(data []byte) erro
 
 // Request to submit a new order (PlaceOrderRequest from spec)
 //
-// The properties OrderID, OrderType, Quantity, SecurityType, Side, TimeInForce are
+// The properties OrderType, Quantity, SecurityType, Side, TimeInForce are
 // required.
 type ActiveV1AccountOrderSubmitOrdersParamsBody struct {
-	// Client-provided unique ID (idempotency). Required to be unique per account.
-	OrderID string `json:"order_id,required"`
 	// Type of order
 	//
-	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "OTHER".
+	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
+	// "TRAILING_STOP_LIMIT", "OTHER".
 	OrderType OrderType `json:"order_type,omitzero,required"`
 	// Quantity to trade. For COMMON_STOCK: shares (may be fractional if supported).
 	// For OPTION (single-leg): contracts (must be an integer)
@@ -1370,12 +1313,17 @@ type ActiveV1AccountOrderSubmitOrdersParamsBody struct {
 	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
 	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
 	TimeInForce TimeInForce `json:"time_in_force,omitzero,required"`
+	// Optional client-provided unique ID (idempotency). Required to be unique per
+	// account.
+	ID param.Opt[string] `json:"id,omitzero"`
 	// The timestamp when the order should expire (UTC). Required when time_in_force is
 	// GOOD_TILL_DATE.
 	ExpireAt param.Opt[time.Time] `json:"expire_at,omitzero" format:"date-time"`
 	// Allow trading outside regular trading hours. Some brokers disallow options
 	// outside RTH.
 	ExtendedHours param.Opt[bool] `json:"extended_hours,omitzero"`
+	// Limit offset for trailing stop-limit orders (signed)
+	LimitOffset param.Opt[string] `json:"limit_offset,omitzero"`
 	// Limit price (required for LIMIT and STOP_LIMIT orders)
 	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
 	// Unique identifier for the instrument (CMS/CUSIP/ISIN/FIGI for equities or option
@@ -1388,9 +1336,8 @@ type ActiveV1AccountOrderSubmitOrdersParamsBody struct {
 	// security_id, the system will derive security_id and source based on
 	// security_type (CMS for equities, OPRA for options).
 	Symbol param.Opt[string] `json:"symbol,omitzero"`
-	// Execution venue to route the order to. If not specified, the system will choose
-	// the best venue.
-	Venue param.Opt[string] `json:"venue,omitzero"`
+	// Trailing offset amount (required for trailing orders)
+	TrailingOffsetAmt param.Opt[string] `json:"trailing_offset_amt,omitzero"`
 	// Required when security_type is OPTION. Specifies whether the order opens or
 	// closes a position.
 	//
@@ -1398,10 +1345,21 @@ type ActiveV1AccountOrderSubmitOrdersParamsBody struct {
 	PositionEffect string `json:"position_effect,omitzero"`
 	// The source of the security identifier. Required if security_id is provided.
 	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "OTHER".
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
 	SecurityIDSource SecurityIDSource `json:"security_id_source,omitzero"`
 	// Execution strategy/router. Defaults to SOR where applicable.
 	Strategy OrderStrategyUnionParam `json:"strategy,omitzero"`
+	// Trailing offset type (PRICE or PERCENT_BPS)
+	//
+	// Any of "PRICE", "PERCENT_BPS".
+	TrailingOffsetAmtType TrailingOffsetType `json:"trailing_offset_amt_type,omitzero"`
 	paramObj
 }
 

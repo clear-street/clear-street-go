@@ -13,8 +13,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/option"
 )
 
-func TestActiveV1InstrumentNewsGetInstrumentNews(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+func TestActiveV1IrisFeedbackNewFeedbackWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -26,15 +26,14 @@ func TestActiveV1InstrumentNewsGetInstrumentNews(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Instruments.News.GetInstrumentNews(
-		context.TODO(),
-		"security_id",
-		clearstreet.ActiveV1InstrumentNewsGetInstrumentNewsParams{
-			SecurityIDSource: clearstreet.SecurityIDSourceCms,
-			FromDate:         "from_date",
-			ToDate:           "to_date",
-		},
-	)
+	_, err := client.Active.V1.Iris.Feedback.NewFeedback(context.TODO(), clearstreet.ActiveV1IrisFeedbackNewFeedbackParams{
+		AccountID: "account_id",
+		MessageID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		Score:     0,
+		ThreadID:  "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		Comment:   clearstreet.String("comment"),
+		Metadata:  map[string]any{},
+	})
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {

@@ -16,8 +16,8 @@ type paramObj = param.APIObject
 
 // A direct mapping of tonic::Status, for use in HTTP responses.
 type APIError struct {
-	// The error code is used to identify the nature of the error. It corresponds to a
-	// gRPC status code.
+	// The error code is used to identify the nature of the error. It corresponds to an
+	// HTTP status code.
 	Code int64 `json:"code,required"`
 	// A human-readable message providing more details about the error.
 	Message string `json:"message,required"`
@@ -70,19 +70,22 @@ type ResponseMetadata struct {
 	NextPageToken string `json:"next_page_token,nullable" format:"byte"`
 	// Pagination. Included if this was a GET (list) response
 	PageNumber int64 `json:"page_number,nullable"`
+	// Base64URL-encoded pagination token containing limit and offset
+	PreviousPageToken string `json:"previous_page_token,nullable" format:"byte"`
 	// Total number of items available (not just in this page).
 	TotalItems int64 `json:"total_items,nullable"`
 	// Total number of pages available.
 	TotalPages int64 `json:"total_pages,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		RequestID     respjson.Field
-		NextPageToken respjson.Field
-		PageNumber    respjson.Field
-		TotalItems    respjson.Field
-		TotalPages    respjson.Field
-		ExtraFields   map[string]respjson.Field
-		raw           string
+		RequestID         respjson.Field
+		NextPageToken     respjson.Field
+		PageNumber        respjson.Field
+		PreviousPageToken respjson.Field
+		TotalItems        respjson.Field
+		TotalPages        respjson.Field
+		ExtraFields       map[string]respjson.Field
+		raw               string
 	} `json:"-"`
 }
 

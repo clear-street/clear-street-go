@@ -45,7 +45,7 @@ func (r *ActiveV1AssistantPromptService) GetPromptResult(ctx context.Context, id
 		err = errors.New("missing required id parameter")
 		return
 	}
-	path := fmt.Sprintf("active/v1/assistant/prompts/%s", id)
+	path := fmt.Sprintf("active/v1/assistant/prompts/%s", url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return
 }

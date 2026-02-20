@@ -47,16 +47,45 @@ func (r *ActiveV1ScreenerService) GetScreener(ctx context.Context, query ActiveV
 
 // An instrument returned by the screener
 type ScreenerItem struct {
+	// The count of buy analyst ratings
+	BuyRatings int64 `json:"buy_ratings,required"`
+	// The count of hold analyst ratings
+	HoldRatings int64 `json:"hold_ratings,required"`
 	// The latest price for the instrument
 	Price string `json:"price,required"`
 	// The identifier for the instrument
 	SecurityID string `json:"security_id,required"`
 	// The source of the security identifier
-	SecurityIDSource string `json:"security_id_source,required"`
+	//
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
+	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	// The count of sell analyst ratings
+	SellRatings int64 `json:"sell_ratings,required"`
+	// The count of strong buy analyst ratings
+	StrongBuyRatings int64 `json:"strong_buy_ratings,required"`
+	// The count of strong sell analyst ratings
+	StrongSellRatings int64 `json:"strong_sell_ratings,required"`
 	// The trading symbol for the instrument
 	Symbol string `json:"symbol,required"`
-	// The latest trading volume for the instrument
-	Volume string `json:"volume,required"`
+	// The total count of analyst ratings
+	TotalRatings int64 `json:"total_ratings,required"`
+	// The consensus analyst price target
+	ConsensusPriceTarget string `json:"consensus_price_target,nullable"`
+	// The highest analyst price target
+	ConsensusPriceTargetHigh string `json:"consensus_price_target_high,nullable"`
+	// The lowest analyst price target
+	ConsensusPriceTargetLow string `json:"consensus_price_target_low,nullable"`
+	// The consensus analyst rating
+	//
+	// Any of "STRONG_BUY", "BUY", "HOLD", "SELL", "STRONG_SELL".
+	ConsensusRating AnalystRating `json:"consensus_rating,nullable"`
 	// The ISO country code of the instrument's issue
 	CountryOfIssue string `json:"country_of_issue,nullable"`
 	// A detailed description of the instrument or company
@@ -73,6 +102,8 @@ type ScreenerItem struct {
 	Name string `json:"name,nullable"`
 	// The percent change from previous close to current price
 	PercentChange string `json:"percent_change,nullable"`
+	// The previous day's closing price
+	PrevDayClose string `json:"prev_day_close,nullable"`
 	// The business sector of the instrument's issuer
 	Sector string `json:"sector,nullable"`
 	// The type of security
@@ -87,33 +118,46 @@ type ScreenerItem struct {
 	TtmPriceToEarnings string `json:"ttm_price_to_earnings,nullable"`
 	// The MIC code of the primary listing venue
 	Venue string `json:"venue,nullable"`
+	// The latest trading volume for the instrument
+	Volume string `json:"volume,nullable"`
 	// The average trading volume over the past week
 	WeekAvgVolume string `json:"week_avg_volume,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Price               respjson.Field
-		SecurityID          respjson.Field
-		SecurityIDSource    respjson.Field
-		Symbol              respjson.Field
-		Volume              respjson.Field
-		CountryOfIssue      respjson.Field
-		Description         respjson.Field
-		Industry            respjson.Field
-		ListDate            respjson.Field
-		MarketCap           respjson.Field
-		MonthAvgVolume      respjson.Field
-		Name                respjson.Field
-		PercentChange       respjson.Field
-		Sector              respjson.Field
-		SecurityType        respjson.Field
-		TtmDebtToEquity     respjson.Field
-		TtmDividendYield    respjson.Field
-		TtmEarningsPerShare respjson.Field
-		TtmPriceToEarnings  respjson.Field
-		Venue               respjson.Field
-		WeekAvgVolume       respjson.Field
-		ExtraFields         map[string]respjson.Field
-		raw                 string
+		BuyRatings               respjson.Field
+		HoldRatings              respjson.Field
+		Price                    respjson.Field
+		SecurityID               respjson.Field
+		SecurityIDSource         respjson.Field
+		SellRatings              respjson.Field
+		StrongBuyRatings         respjson.Field
+		StrongSellRatings        respjson.Field
+		Symbol                   respjson.Field
+		TotalRatings             respjson.Field
+		ConsensusPriceTarget     respjson.Field
+		ConsensusPriceTargetHigh respjson.Field
+		ConsensusPriceTargetLow  respjson.Field
+		ConsensusRating          respjson.Field
+		CountryOfIssue           respjson.Field
+		Description              respjson.Field
+		Industry                 respjson.Field
+		ListDate                 respjson.Field
+		MarketCap                respjson.Field
+		MonthAvgVolume           respjson.Field
+		Name                     respjson.Field
+		PercentChange            respjson.Field
+		PrevDayClose             respjson.Field
+		Sector                   respjson.Field
+		SecurityType             respjson.Field
+		TtmDebtToEquity          respjson.Field
+		TtmDividendYield         respjson.Field
+		TtmEarningsPerShare      respjson.Field
+		TtmPriceToEarnings       respjson.Field
+		Venue                    respjson.Field
+		Volume                   respjson.Field
+		WeekAvgVolume            respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
 	} `json:"-"`
 }
 

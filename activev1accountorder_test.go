@@ -15,7 +15,7 @@ import (
 )
 
 func TestActiveV1AccountOrderCancelAllOrdersWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -31,11 +31,11 @@ func TestActiveV1AccountOrderCancelAllOrdersWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.ActiveV1AccountOrderCancelAllOrdersParams{
-			SecurityID:       clearstreet.String("security_id"),
-			SecurityIDSource: clearstreet.SecurityIDSourceCms,
-			SecurityType:     clearstreet.SecurityTypeCommonStock,
-			Side:             clearstreet.SideBuy,
-			Type:             clearstreet.OrderTypeMarket,
+			SecurityID:       []string{"string"},
+			SecurityIDSource: []string{"string"},
+			SecurityType:     clearstreet.ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeCommonStock,
+			Side:             clearstreet.ActiveV1AccountOrderCancelAllOrdersParamsSideBuy,
+			Type:             clearstreet.ActiveV1AccountOrderCancelAllOrdersParamsTypeMarket,
 		},
 	)
 	if err != nil {
@@ -48,7 +48,7 @@ func TestActiveV1AccountOrderCancelAllOrdersWithOptionalParams(t *testing.T) {
 }
 
 func TestActiveV1AccountOrderCancelOrder(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -77,7 +77,7 @@ func TestActiveV1AccountOrderCancelOrder(t *testing.T) {
 }
 
 func TestActiveV1AccountOrderGetOrderByID(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -106,7 +106,7 @@ func TestActiveV1AccountOrderGetOrderByID(t *testing.T) {
 }
 
 func TestActiveV1AccountOrderGetOrdersWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -122,15 +122,15 @@ func TestActiveV1AccountOrderGetOrdersWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.ActiveV1AccountOrderGetOrdersParams{
-			From:             "from",
-			To:               "to",
+			From:             clearstreet.Time(time.Now()),
 			PageSize:         clearstreet.Int(1),
 			PageToken:        clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
-			SecurityID:       clearstreet.String("security_id"),
-			SecurityIDSource: clearstreet.SecurityIDSourceCms,
-			SecurityType:     clearstreet.SecurityTypeCommonStock,
-			Status:           clearstreet.OrderStatusPendingNew,
+			SecurityID:       []string{"string"},
+			SecurityIDSource: []string{"string"},
+			SecurityType:     clearstreet.ActiveV1AccountOrderGetOrdersParamsSecurityTypeCommonStock,
+			Status:           clearstreet.ActiveV1AccountOrderGetOrdersParamsStatusPendingNew,
 			Symbol:           clearstreet.String("symbol"),
+			To:               clearstreet.Time(time.Now()),
 		},
 	)
 	if err != nil {
@@ -143,7 +143,7 @@ func TestActiveV1AccountOrderGetOrdersWithOptionalParams(t *testing.T) {
 }
 
 func TestActiveV1AccountOrderReplaceOrderWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -176,7 +176,7 @@ func TestActiveV1AccountOrderReplaceOrderWithOptionalParams(t *testing.T) {
 }
 
 func TestActiveV1AccountOrderSubmitOrders(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -193,14 +193,15 @@ func TestActiveV1AccountOrderSubmitOrders(t *testing.T) {
 		0,
 		clearstreet.ActiveV1AccountOrderSubmitOrdersParams{
 			Body: []clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBody{{
-				OrderID:          "my-ref-id-20251001-002",
 				OrderType:        clearstreet.OrderTypeLimit,
 				Quantity:         "25",
 				SecurityType:     clearstreet.SecurityTypeCommonStock,
 				Side:             clearstreet.SideBuy,
 				TimeInForce:      clearstreet.TimeInForceDay,
+				ID:               clearstreet.String("my-ref-id-20251001-002"),
 				ExpireAt:         clearstreet.Time(time.Now()),
 				ExtendedHours:    clearstreet.Bool(true),
+				LimitOffset:      clearstreet.String("0.10"),
 				LimitPrice:       clearstreet.String("140.50"),
 				PositionEffect:   "OPEN",
 				SecurityID:       clearstreet.String("AAPL"),
@@ -216,8 +217,9 @@ func TestActiveV1AccountOrderSubmitOrders(t *testing.T) {
 						Type: "SOR",
 					},
 				},
-				Symbol: clearstreet.String("AAPL"),
-				Venue:  clearstreet.String("CDRG"),
+				Symbol:                clearstreet.String("AAPL"),
+				TrailingOffsetAmt:     clearstreet.String("1.25"),
+				TrailingOffsetAmtType: clearstreet.TrailingOffsetTypePrice,
 			}},
 		},
 	)

@@ -45,8 +45,16 @@ func (r *ActiveV1AccountPositionService) ClosePosition(ctx context.Context, secu
 		err = errors.New("missing required security_id parameter")
 		return
 	}
-	path := fmt.Sprintf("active/v1/accounts/%v/positions/%v/%s", params.AccountID, params.SecurityIDSource, securityID)
+	path := fmt.Sprintf("active/v1/accounts/%v/positions/%v/%s", params.AccountID, params.SecurityIDSource, url.PathEscape(securityID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, params, &res, opts...)
+	return
+}
+
+// Closes all positions for the specified trading account.
+func (r *ActiveV1AccountPositionService) ClosePositions(ctx context.Context, accountID int64, body ActiveV1AccountPositionClosePositionsParams, opts ...option.RequestOption) (res *ActiveV1AccountPositionClosePositionsResponse, err error) {
+	opts = slices.Concat(r.Options, opts)
+	path := fmt.Sprintf("active/v1/accounts/%v/positions", accountID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
 	return
 }
 
@@ -81,11 +89,18 @@ type Position struct {
 	// identifies one or more financial instruments.
 	SecurityID string `json:"security_id,required"`
 	// The source of the security identifier
-	SecurityIDSource string `json:"security_id_source,required"`
+	//
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
+	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
 	// The trading symbol for the instrument
 	Symbol string `json:"symbol,required"`
-	// The MIC code of the primary listing venue
-	Venue string `json:"venue,required"`
 	// The average price paid per share or contract for this position
 	AvgPrice string `json:"avg_price,nullable"`
 	// The closing price used to value the position for the last trading day
@@ -110,7 +125,6 @@ type Position struct {
 		SecurityID         respjson.Field
 		SecurityIDSource   respjson.Field
 		Symbol             respjson.Field
-		Venue              respjson.Field
 		AvgPrice           respjson.Field
 		ClosingPrice       respjson.Field
 		CostBasis          respjson.Field
@@ -159,6 +173,23 @@ func (r *ActiveV1AccountPositionClosePositionResponse) UnmarshalJSON(data []byte
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type ActiveV1AccountPositionClosePositionsResponse struct {
+	Data OrderList `json:"data,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r ActiveV1AccountPositionClosePositionsResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1AccountPositionClosePositionsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ActiveV1AccountPositionGetPositionsResponse struct {
 	Data PositionList `json:"data,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -180,24 +211,38 @@ type ActiveV1AccountPositionClosePositionParams struct {
 	AccountID int64 `path:"account_id,required" json:"-"`
 	// Security identifier source
 	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "OTHER".
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
 	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero,required" json:"-"`
-	// The number of items to return per page (only used when page_token is not
-	// provided)
-	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
-	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
+	CancelOrders     param.Opt[bool]  `json:"cancel_orders,omitzero"`
 	paramObj
 }
 
-// URLQuery serializes [ActiveV1AccountPositionClosePositionParams]'s query
-// parameters as `url.Values`.
-func (r ActiveV1AccountPositionClosePositionParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
+func (r ActiveV1AccountPositionClosePositionParams) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1AccountPositionClosePositionParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1AccountPositionClosePositionParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ActiveV1AccountPositionClosePositionsParams struct {
+	CancelOrders param.Opt[bool] `json:"cancel_orders,omitzero"`
+	paramObj
+}
+
+func (r ActiveV1AccountPositionClosePositionsParams) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1AccountPositionClosePositionsParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1AccountPositionClosePositionsParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type ActiveV1AccountPositionGetPositionsParams struct {
@@ -207,6 +252,30 @@ type ActiveV1AccountPositionGetPositionsParams struct {
 	// Token for retrieving the next page of results. Contains encoded pagination state
 	// (limit + offset). When provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
+	// Filter by security ID(s). Accepts single value or indexed array.
+	//
+	// Examples:
+	//
+	// - Single: `security_id=037833100`
+	// - Multiple: `security_id[0]=037833100&security_id[1]=594918104`
+	SecurityID []string `query:"security_id,omitzero" json:"-"`
+	// Source(s) for the security ID filter. Must match the count and order of
+	// security_id.
+	//
+	// Examples:
+	//
+	// - Single: `security_id_source=CUSIP`
+	// - Multiple: `security_id_source[0]=CUSIP&security_id_source[1]=FIGI`
+	SecurityIDSource []string `query:"security_id_source,omitzero" json:"-"`
+	// Field to sort by
+	//
+	// Any of "SYMBOL", "INSTRUMENT_TYPE", "QUANTITY", "MARKET_VALUE", "POSITION_TYPE",
+	// "UNREALIZED_PNL", "DAILY_UNREALIZED_PNL".
+	SortBy ActiveV1AccountPositionGetPositionsParamsSortBy `query:"sort_by,omitzero" json:"-"`
+	// Sort direction
+	//
+	// Any of "ASC", "DESC".
+	SortDirection ActiveV1AccountPositionGetPositionsParamsSortDirection `query:"sort_direction,omitzero" json:"-"`
 	paramObj
 }
 
@@ -218,3 +287,24 @@ func (r ActiveV1AccountPositionGetPositionsParams) URLQuery() (v url.Values, err
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Field to sort by
+type ActiveV1AccountPositionGetPositionsParamsSortBy string
+
+const (
+	ActiveV1AccountPositionGetPositionsParamsSortBySymbol             ActiveV1AccountPositionGetPositionsParamsSortBy = "SYMBOL"
+	ActiveV1AccountPositionGetPositionsParamsSortByInstrumentType     ActiveV1AccountPositionGetPositionsParamsSortBy = "INSTRUMENT_TYPE"
+	ActiveV1AccountPositionGetPositionsParamsSortByQuantity           ActiveV1AccountPositionGetPositionsParamsSortBy = "QUANTITY"
+	ActiveV1AccountPositionGetPositionsParamsSortByMarketValue        ActiveV1AccountPositionGetPositionsParamsSortBy = "MARKET_VALUE"
+	ActiveV1AccountPositionGetPositionsParamsSortByPositionType       ActiveV1AccountPositionGetPositionsParamsSortBy = "POSITION_TYPE"
+	ActiveV1AccountPositionGetPositionsParamsSortByUnrealizedPnl      ActiveV1AccountPositionGetPositionsParamsSortBy = "UNREALIZED_PNL"
+	ActiveV1AccountPositionGetPositionsParamsSortByDailyUnrealizedPnl ActiveV1AccountPositionGetPositionsParamsSortBy = "DAILY_UNREALIZED_PNL"
+)
+
+// Sort direction
+type ActiveV1AccountPositionGetPositionsParamsSortDirection string
+
+const (
+	ActiveV1AccountPositionGetPositionsParamsSortDirectionAsc  ActiveV1AccountPositionGetPositionsParamsSortDirection = "ASC"
+	ActiveV1AccountPositionGetPositionsParamsSortDirectionDesc ActiveV1AccountPositionGetPositionsParamsSortDirection = "DESC"
+)
