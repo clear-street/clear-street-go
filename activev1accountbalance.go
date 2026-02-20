@@ -115,6 +115,8 @@ type RegTBalance struct {
 	MarginExcess string `json:"margin_excess,required"`
 	// Applied multiplier for margin calculations.
 	Multiplier string `json:"multiplier,required"`
+	// Notional exposure from open risk-increasing orders.
+	OpenOrderNotionalValue string `json:"open_order_notional_value,required"`
 	// Regulation T buying power.
 	RegtBuyingPower string `json:"regt_buying_power,required"`
 	// The amount of cash that is settled and available for withdrawal or trading
@@ -153,6 +155,7 @@ type RegTBalance struct {
 		MaintenanceMargin        respjson.Field
 		MarginExcess             respjson.Field
 		Multiplier               respjson.Field
+		OpenOrderNotionalValue   respjson.Field
 		RegtBuyingPower          respjson.Field
 		SettledCash              respjson.Field
 		ShortMarketValue         respjson.Field

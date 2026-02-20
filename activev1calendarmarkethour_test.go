@@ -14,7 +14,7 @@ import (
 )
 
 func TestActiveV1CalendarMarketHourGetMarketHoursCalendarWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -27,8 +27,8 @@ func TestActiveV1CalendarMarketHourGetMarketHoursCalendarWithOptionalParams(t *t
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Active.V1.Calendars.MarketHours.GetMarketHoursCalendar(context.TODO(), clearstreet.ActiveV1CalendarMarketHourGetMarketHoursCalendarParams{
-		Date:  "date",
-		Venue: clearstreet.String("venue"),
+		Date:   "date",
+		Market: clearstreet.ActiveV1CalendarMarketHourGetMarketHoursCalendarParamsMarketUsEquities,
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

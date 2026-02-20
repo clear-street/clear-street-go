@@ -15,6 +15,7 @@ import (
 	"github.com/stainless-sdks/clear-street-go/internal/apiquery"
 	"github.com/stainless-sdks/clear-street-go/internal/requestconfig"
 	"github.com/stainless-sdks/clear-street-go/option"
+	"github.com/stainless-sdks/clear-street-go/packages/param"
 	"github.com/stainless-sdks/clear-street-go/packages/respjson"
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
@@ -46,7 +47,7 @@ func (r *ActiveV1InstrumentAnalystReportingService) GetInstrumentAnalystConsensu
 		err = errors.New("missing required security_id parameter")
 		return
 	}
-	path := fmt.Sprintf("active/v1/instruments/%v/%s/analyst-reporting", params.SecurityIDSource, securityID)
+	path := fmt.Sprintf("active/v1/instruments/%v/%s/analyst-reporting", params.SecurityIDSource, url.PathEscape(securityID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return
 }
@@ -97,13 +98,13 @@ type InstrumentAnalystConsensus struct {
 	// The date the consensus snapshot was generated
 	Date time.Time `json:"date,required" format:"date"`
 	// Count of individual analyst recommendations by category
-	Distribution AnalystDistribution `json:"distribution,required"`
+	Distribution AnalystDistribution `json:"distribution,nullable"`
 	// Aggregated analyst price target statistics
-	PriceTarget PriceTarget `json:"price_target,required"`
+	PriceTarget PriceTarget `json:"price_target,nullable"`
 	// Consensus analyst rating
 	//
 	// Any of "STRONG_BUY", "BUY", "HOLD", "SELL", "STRONG_SELL".
-	Rating AnalystRating `json:"rating,required"`
+	Rating AnalystRating `json:"rating,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date         respjson.Field
@@ -171,12 +172,19 @@ func (r *ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusResponse
 type ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusParams struct {
 	// Security identifier source
 	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "OTHER".
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
 	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero,required" json:"-"`
 	// The start date for the query range, inclusive (YYYY-MM-DD)
-	FromDate string `query:"from_date,required" json:"-"`
+	From param.Opt[time.Time] `query:"from,omitzero" format:"date" json:"-"`
 	// The end date for the query range, inclusive (YYYY-MM-DD)
-	ToDate string `query:"to_date,required" json:"-"`
+	To param.Opt[time.Time] `query:"to,omitzero" format:"date" json:"-"`
 	paramObj
 }
 

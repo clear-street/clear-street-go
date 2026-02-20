@@ -14,7 +14,7 @@ import (
 )
 
 func TestActiveV1InstrumentGetInstrumentByID(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -43,7 +43,7 @@ func TestActiveV1InstrumentGetInstrumentByID(t *testing.T) {
 }
 
 func TestActiveV1InstrumentGetInstrumentsWithOptionalParams(t *testing.T) {
-	t.Skip("Prism tests are disabled")
+	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -65,7 +65,9 @@ func TestActiveV1InstrumentGetInstrumentsWithOptionalParams(t *testing.T) {
 		IsThresholdSecurity: clearstreet.Bool(true),
 		PageSize:            clearstreet.Int(1),
 		PageToken:           clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
-		SecurityType:        clearstreet.SecurityTypeCommonStock,
+		SecurityID:          []string{"string"},
+		SecurityIDSource:    []string{"string"},
+		SecurityType:        clearstreet.ActiveV1InstrumentGetInstrumentsParamsSecurityTypeCommonStock,
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

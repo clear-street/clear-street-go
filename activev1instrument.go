@@ -30,7 +30,6 @@ type ActiveV1InstrumentService struct {
 	Options          []option.RequestOption
 	AnalystReporting ActiveV1InstrumentAnalystReportingService
 	Events           ActiveV1InstrumentEventService
-	News             ActiveV1InstrumentNewsService
 	Reporting        ActiveV1InstrumentReportingService
 	Venues           ActiveV1InstrumentVenueService
 }
@@ -43,7 +42,6 @@ func NewActiveV1InstrumentService(opts ...option.RequestOption) (r ActiveV1Instr
 	r.Options = opts
 	r.AnalystReporting = NewActiveV1InstrumentAnalystReportingService(opts...)
 	r.Events = NewActiveV1InstrumentEventService(opts...)
-	r.News = NewActiveV1InstrumentNewsService(opts...)
 	r.Reporting = NewActiveV1InstrumentReportingService(opts...)
 	r.Venues = NewActiveV1InstrumentVenueService(opts...)
 	return
@@ -56,7 +54,7 @@ func (r *ActiveV1InstrumentService) GetInstrumentByID(ctx context.Context, secur
 		err = errors.New("missing required security_id parameter")
 		return
 	}
-	path := fmt.Sprintf("active/v1/instruments/%v/%s", query.SecurityIDSource, securityID)
+	path := fmt.Sprintf("active/v1/instruments/%v/%s", query.SecurityIDSource, url.PathEscape(securityID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return
 }
@@ -99,8 +97,6 @@ type Instrument struct {
 	// A cap on how much of your equity you can put into a single symbol on the long
 	// side
 	LongConcentrationLimit string `json:"long_concentration_limit,nullable"`
-	// The percent of a long position's value you must post as margin
-	LongMarginRate string `json:"long_margin_rate,nullable"`
 	// The total market capitalization
 	MarketCap string `json:"market_cap,nullable"`
 	// The closing price from the previous trading day
@@ -114,8 +110,6 @@ type Instrument struct {
 	// A cap on how much of your equity you can allocate to a single symbol on the
 	// short side
 	ShortConcentrationLimit string `json:"short_concentration_limit,nullable"`
-	// The percent of a short position's value you must post as margin
-	ShortMarginRate string `json:"short_margin_rate,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AvailableToBorrow       respjson.Field
@@ -131,14 +125,12 @@ type Instrument struct {
 		ListDate                respjson.Field
 		LogoURL                 respjson.Field
 		LongConcentrationLimit  respjson.Field
-		LongMarginRate          respjson.Field
 		MarketCap               respjson.Field
 		PreviousClose           respjson.Field
 		PriceToEarnings         respjson.Field
 		Quote                   respjson.Field
 		Sector                  respjson.Field
 		ShortConcentrationLimit respjson.Field
-		ShortMarginRate         respjson.Field
 		ExtraFields             map[string]respjson.Field
 		raw                     string
 	} `json:"-"`
@@ -151,9 +143,9 @@ func (r *Instrument) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Represents a tradable financial instrument, as a more concise item listing only
-// key fields.
 type InstrumentCore struct {
+	// Unique instrument identifier
+	ID string `json:"id,required" format:"uuid"`
 	// The ISO country code of the instrument's issue
 	CountryOfIssue string `json:"country_of_issue,required"`
 	// The ISO currency code in which the instrument is traded
@@ -170,16 +162,35 @@ type InstrumentCore struct {
 	IsShortProhibited bool `json:"is_short_prohibited,required"`
 	// Indicates if the instrument is on the Regulation SHO Threshold Security List
 	IsThresholdSecurity bool `json:"is_threshold_security,required"`
-	// A unique Clear Street identifier for the instrument
-	SecurityID string `json:"security_id,required"`
-	// The source system for the security identifier
+	// Deprecated. Use `security_ids`.
 	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "OTHER".
+	// A primary security identifier for this instrument.
+	//
+	// Deprecated: deprecated
+	SecurityID string `json:"security_id,required"`
+	// Deprecated. Use `security_ids`.
+	//
+	// The source for `security_id`.
+	//
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
 	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	// All known security identifiers for this instrument
+	SecurityIDs []InstrumentSecurityID `json:"security_ids,required"`
 	// The trading symbol for the instrument
 	Symbol string `json:"symbol,required"`
 	// The MIC code of the primary listing venue
 	Venue string `json:"venue,required"`
+	// The expiration date for options instruments
+	Expiry time.Time `json:"expiry,nullable" format:"date"`
+	// The percent of a long position's value you must post as margin
+	LongMarginRate string `json:"long_margin_rate,nullable"`
 	// The full name of the instrument or its issuer
 	Name string `json:"name,nullable"`
 	// The type of security (e.g., Common Stock, ETF)
@@ -187,8 +198,13 @@ type InstrumentCore struct {
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
 	SecurityType SecurityType `json:"security_type,nullable"`
+	// The percent of a short position's value you must post as margin
+	ShortMarginRate string `json:"short_margin_rate,nullable"`
+	// The strike price for options instruments
+	StrikePrice string `json:"strike_price,nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		ID                  respjson.Field
 		CountryOfIssue      respjson.Field
 		Currency            respjson.Field
 		EasyToBorrow        respjson.Field
@@ -199,10 +215,15 @@ type InstrumentCore struct {
 		IsThresholdSecurity respjson.Field
 		SecurityID          respjson.Field
 		SecurityIDSource    respjson.Field
+		SecurityIDs         respjson.Field
 		Symbol              respjson.Field
 		Venue               respjson.Field
+		Expiry              respjson.Field
+		LongMarginRate      respjson.Field
 		Name                respjson.Field
 		SecurityType        respjson.Field
+		ShortMarginRate     respjson.Field
+		StrikePrice         respjson.Field
 		ExtraFields         map[string]respjson.Field
 		raw                 string
 	} `json:"-"`
@@ -215,6 +236,42 @@ func (r *InstrumentCore) UnmarshalJSON(data []byte) error {
 }
 
 type InstrumentCoreList []InstrumentCore
+
+// Represents instrument earnings data
+type InstrumentEarnings struct {
+	// The date when the earnings report was published
+	Date time.Time `json:"date,required" format:"date"`
+	// The actual earnings per share (EPS) for the period
+	EpsActual string `json:"eps_actual,nullable"`
+	// The estimated earnings per share (EPS) for the period
+	EpsEstimate string `json:"eps_estimate,nullable"`
+	// The percentage difference between actual and estimated EPS
+	EpsSurprisePercent string `json:"eps_surprise_percent,nullable"`
+	// The actual total revenue for the period
+	RevenueActual string `json:"revenue_actual,nullable"`
+	// The estimated total revenue for the period
+	RevenueEstimate string `json:"revenue_estimate,nullable"`
+	// The percentage difference between actual and estimated revenue
+	RevenueSurprisePercent string `json:"revenue_surprise_percent,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Date                   respjson.Field
+		EpsActual              respjson.Field
+		EpsEstimate            respjson.Field
+		EpsSurprisePercent     respjson.Field
+		RevenueActual          respjson.Field
+		RevenueEstimate        respjson.Field
+		RevenueSurprisePercent respjson.Field
+		ExtraFields            map[string]respjson.Field
+		raw                    string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r InstrumentEarnings) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentEarnings) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Real-time market quote data for a specific instrument
 type InstrumentQuote struct {
@@ -243,6 +300,37 @@ type InstrumentQuote struct {
 // Returns the unmodified JSON received from the API
 func (r InstrumentQuote) RawJSON() string { return r.JSON.raw }
 func (r *InstrumentQuote) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Represents a tradable financial instrument, as a more concise item listing only
+// key fields.
+type InstrumentSecurityID struct {
+	// The identifier for the instrument
+	SecurityID string `json:"security_id,required"`
+	// The source system for the security identifier
+	//
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
+	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		SecurityID       respjson.Field
+		SecurityIDSource respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r InstrumentSecurityID) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentSecurityID) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -284,7 +372,14 @@ func (r *ActiveV1InstrumentGetInstrumentsResponse) UnmarshalJSON(data []byte) er
 type ActiveV1InstrumentGetInstrumentByIDParams struct {
 	// Security identifier source
 	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "OTHER".
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
 	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero,required" json:"-"`
 	paramObj
 }
@@ -292,8 +387,7 @@ type ActiveV1InstrumentGetInstrumentByIDParams struct {
 type ActiveV1InstrumentGetInstrumentsParams struct {
 	// Filter by easy to borrow status
 	EasyToBorrow param.Opt[bool] `query:"easy_to_borrow,omitzero" json:"-"`
-	// Filter IDs to those containing this substring. For options, this is required and
-	// is used to filter exclusively to the underlying symbol.
+	// Filter IDs to those containing this substring. For options, this is required.
 	IDFilter param.Opt[string] `query:"id_filter,omitzero" json:"-"`
 	// Filter by liquidation only status
 	IsLiquidationOnly param.Opt[bool] `query:"is_liquidation_only,omitzero" json:"-"`
@@ -301,7 +395,7 @@ type ActiveV1InstrumentGetInstrumentsParams struct {
 	IsMarginable param.Opt[bool] `query:"is_marginable,omitzero" json:"-"`
 	// Filter by restricted status
 	IsRestricted param.Opt[bool] `query:"is_restricted,omitzero" json:"-"`
-	// filter by short prohibited status
+	// Filter by short prohibited status
 	IsShortProhibited param.Opt[bool] `query:"is_short_prohibited,omitzero" json:"-"`
 	// Filter by threshold security status
 	IsThresholdSecurity param.Opt[bool] `query:"is_threshold_security,omitzero" json:"-"`
@@ -311,11 +405,26 @@ type ActiveV1InstrumentGetInstrumentsParams struct {
 	// Token for retrieving the next page of results. Contains encoded pagination state
 	// (limit + offset). When provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
-	// Filter by security type, required and defaults to `COMMON_STOCK`
+	// Filter by security ID(s). Accepts single value or indexed array.
+	//
+	// Examples:
+	//
+	// - Single: `security_id=037833100`
+	// - Multiple: `security_id[0]=037833100&security_id[1]=594918104`
+	SecurityID []string `query:"security_id,omitzero" json:"-"`
+	// Source(s) for the security ID filter. Must match the count and order of
+	// security_id.
+	//
+	// Examples:
+	//
+	// - Single: `security_id_source=CUSIP`
+	// - Multiple: `security_id_source[0]=CUSIP&security_id_source[1]=FIGI`
+	SecurityIDSource []string `query:"security_id_source,omitzero" json:"-"`
+	// Filter by security type, required and defaults to COMMON_STOCK
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `query:"security_type,omitzero" json:"-"`
+	SecurityType ActiveV1InstrumentGetInstrumentsParamsSecurityType `query:"security_type,omitzero" json:"-"`
 	paramObj
 }
 
@@ -327,3 +436,17 @@ func (r ActiveV1InstrumentGetInstrumentsParams) URLQuery() (v url.Values, err er
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter by security type, required and defaults to COMMON_STOCK
+type ActiveV1InstrumentGetInstrumentsParamsSecurityType string
+
+const (
+	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeCommonStock    ActiveV1InstrumentGetInstrumentsParamsSecurityType = "COMMON_STOCK"
+	ActiveV1InstrumentGetInstrumentsParamsSecurityTypePreferredStock ActiveV1InstrumentGetInstrumentsParamsSecurityType = "PREFERRED_STOCK"
+	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeCorporateBond  ActiveV1InstrumentGetInstrumentsParamsSecurityType = "CORPORATE_BOND"
+	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeOption         ActiveV1InstrumentGetInstrumentsParamsSecurityType = "OPTION"
+	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeFuture         ActiveV1InstrumentGetInstrumentsParamsSecurityType = "FUTURE"
+	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeWarrant        ActiveV1InstrumentGetInstrumentsParamsSecurityType = "WARRANT"
+	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeCash           ActiveV1InstrumentGetInstrumentsParamsSecurityType = "CASH"
+	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeOther          ActiveV1InstrumentGetInstrumentsParamsSecurityType = "OTHER"
+)

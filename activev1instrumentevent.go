@@ -15,6 +15,7 @@ import (
 	"github.com/stainless-sdks/clear-street-go/internal/apiquery"
 	"github.com/stainless-sdks/clear-street-go/internal/requestconfig"
 	"github.com/stainless-sdks/clear-street-go/option"
+	"github.com/stainless-sdks/clear-street-go/packages/param"
 	"github.com/stainless-sdks/clear-street-go/packages/respjson"
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
@@ -38,58 +39,293 @@ func NewActiveV1InstrumentEventService(opts ...option.RequestOption) (r ActiveV1
 	return
 }
 
-// Retrieves corporate events (dividends, splits, etc.) for an instrument.
+// Retrieves all instrument events grouped by date.
+func (r *ActiveV1InstrumentEventService) GetAllInstrumentEvents(ctx context.Context, query ActiveV1InstrumentEventGetAllInstrumentEventsParams, opts ...option.RequestOption) (res *ActiveV1InstrumentEventGetAllInstrumentEventsResponse, err error) {
+	opts = slices.Concat(r.Options, opts)
+	path := "active/v1/instruments/events"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return
+}
+
+// Retrieves corporate events (dividends, splits, etc.) for an instrument, grouped
+// by event type.
+//
+// Date range defaults:
+//
+// - `from_date`: today - 365 days
+// - `to_date`: today + 60 days
 func (r *ActiveV1InstrumentEventService) GetInstrumentEvents(ctx context.Context, securityID string, params ActiveV1InstrumentEventGetInstrumentEventsParams, opts ...option.RequestOption) (res *ActiveV1InstrumentEventGetInstrumentEventsResponse, err error) {
 	opts = slices.Concat(r.Options, opts)
 	if securityID == "" {
 		err = errors.New("missing required security_id parameter")
 		return
 	}
-	path := fmt.Sprintf("active/v1/instruments/%v/%s/events", params.SecurityIDSource, securityID)
+	path := fmt.Sprintf("active/v1/instruments/%v/%s/events", params.SecurityIDSource, url.PathEscape(securityID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return
 }
 
-// Represents an instrument event (dividends, splits, etc.)
-type InstrumentEvent struct {
-	// The date of the event
-	Date time.Time `json:"date,required" format:"date"`
-	// A brief description of the event
-	Description string `json:"description,required"`
-	// The type of event
-	//
-	// Any of "EARNINGS", "DIVIDEND", "SPLIT", "MERGER_ACQUISITION".
-	EventType InstrumentEventEventType `json:"event_type,required"`
+// All-events payload grouped by date.
+type InstrumentAllEventsData struct {
+	// Events grouped by date in descending order.
+	EventDates []InstrumentEventsByDate `json:"event_dates,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Date        respjson.Field
-		Description respjson.Field
-		EventType   respjson.Field
+		EventDates  respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
 
 // Returns the unmodified JSON received from the API
-func (r InstrumentEvent) RawJSON() string { return r.JSON.raw }
-func (r *InstrumentEvent) UnmarshalJSON(data []byte) error {
+func (r InstrumentAllEventsData) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentAllEventsData) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// The type of event
-type InstrumentEventEventType string
+// Represents a dividend event for an instrument
+type InstrumentDividendEvent struct {
+	// The adjusted dividend amount accounting for any splits.
+	AdjustedDividendAmount string `json:"adjusted_dividend_amount,required"`
+	// The day the stock starts trading without the right to receive that dividend.
+	ExDate time.Time `json:"ex_date,required" format:"date"`
+	// The declaration date of the dividend
+	DeclarationDate time.Time `json:"declaration_date,nullable" format:"date"`
+	// The dividend amount per share.
+	DividendAmount string `json:"dividend_amount,nullable"`
+	// The dividend yield as a percentage of the stock price.
+	DividendYield string `json:"dividend_yield,nullable"`
+	// The frequency of the dividend payments (e.g., "Quarterly", "Annual").
+	Frequency string `json:"frequency,nullable"`
+	// The payment date is the date on which a declared stock dividend is scheduled to
+	// be paid.
+	PaymentDate time.Time `json:"payment_date,nullable" format:"date"`
+	// The record date, set by a company's board of directors, is when a company
+	// compiles a list of shareholders of the stock for which it has declared a
+	// dividend.
+	RecordDate time.Time `json:"record_date,nullable" format:"date"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AdjustedDividendAmount respjson.Field
+		ExDate                 respjson.Field
+		DeclarationDate        respjson.Field
+		DividendAmount         respjson.Field
+		DividendYield          respjson.Field
+		Frequency              respjson.Field
+		PaymentDate            respjson.Field
+		RecordDate             respjson.Field
+		ExtraFields            map[string]respjson.Field
+		raw                    string
+	} `json:"-"`
+}
 
-const (
-	InstrumentEventEventTypeEarnings          InstrumentEventEventType = "EARNINGS"
-	InstrumentEventEventTypeDividend          InstrumentEventEventType = "DIVIDEND"
-	InstrumentEventEventTypeSplit             InstrumentEventEventType = "SPLIT"
-	InstrumentEventEventTypeMergerAcquisition InstrumentEventEventType = "MERGER_ACQUISITION"
-)
+// Returns the unmodified JSON received from the API
+func (r InstrumentDividendEvent) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentDividendEvent) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
-type InstrumentEventList []InstrumentEvent
+// Instrument events for a single date.
+type InstrumentEventsByDate struct {
+	// Event date.
+	Date time.Time `json:"date,required" format:"date"`
+	// Flat event envelopes for this date.
+	Events []InstrumentEventsByDateEvent `json:"events,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Date        respjson.Field
+		Events      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r InstrumentEventsByDate) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentEventsByDate) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Unified envelope for the all-events response.
+type InstrumentEventsByDateEvent struct {
+	// Security identifier for the event.
+	SecurityID string `json:"security_id,required"`
+	// Security identifier source for the event.
+	//
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
+	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	// Symbol associated with the event.
+	Symbol string `json:"symbol,required"`
+	// Event type discriminator.
+	//
+	// Any of "EARNINGS", "DIVIDEND", "STOCK_SPLIT", "IPO".
+	Type string `json:"type,required"`
+	// Dividend payload when type is DIVIDEND.
+	DividendEventData InstrumentDividendEvent `json:"dividend_event_data,nullable"`
+	// Earnings payload when type is EARNINGS.
+	EarningsEventData InstrumentEarnings `json:"earnings_event_data,nullable"`
+	// OEMS instrument identifier, when the instrument is found in the instrument
+	// cache.
+	InstrumentID string `json:"instrument_id,nullable" format:"uuid"`
+	// IPO payload when type is IPO.
+	IpoEventData InstrumentEventsByDateEventIpoEventData `json:"ipo_event_data,nullable"`
+	// Instrument name associated with the event, when available.
+	Name string `json:"name,nullable"`
+	// Stock split payload when type is STOCK_SPLIT.
+	StockSplitEventData InstrumentSplitEvent `json:"stock_split_event_data,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		SecurityID          respjson.Field
+		SecurityIDSource    respjson.Field
+		Symbol              respjson.Field
+		Type                respjson.Field
+		DividendEventData   respjson.Field
+		EarningsEventData   respjson.Field
+		InstrumentID        respjson.Field
+		IpoEventData        respjson.Field
+		Name                respjson.Field
+		StockSplitEventData respjson.Field
+		ExtraFields         map[string]respjson.Field
+		raw                 string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r InstrumentEventsByDateEvent) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentEventsByDateEvent) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// IPO payload when type is IPO.
+type InstrumentEventsByDateEventIpoEventData struct {
+	// IPO action.
+	Actions string `json:"actions,nullable"`
+	// IPO announced timestamp.
+	AnnouncedAt time.Time `json:"announced_at,nullable" format:"date-time"`
+	// IPO company name.
+	Company string `json:"company,nullable"`
+	// IPO exchange.
+	Exchange string `json:"exchange,nullable"`
+	// IPO market cap.
+	MarketCap string `json:"market_cap,nullable"`
+	// IPO price range.
+	PriceRange string `json:"price_range,nullable"`
+	// IPO shares offered.
+	Shares string `json:"shares,nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Actions     respjson.Field
+		AnnouncedAt respjson.Field
+		Company     respjson.Field
+		Exchange    respjson.Field
+		MarketCap   respjson.Field
+		PriceRange  respjson.Field
+		Shares      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r InstrumentEventsByDateEventIpoEventData) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentEventsByDateEventIpoEventData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Grouped instrument events by type
+type InstrumentEventsData struct {
+	// Dividend distribution events
+	Dividends []InstrumentDividendEvent `json:"dividends,required"`
+	// Earnings announcement events
+	Earnings []InstrumentEarnings `json:"earnings,required"`
+	// The security ID from the request
+	SecurityID string `json:"security_id,required"`
+	// The security ID source from the request
+	//
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
+	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	// Stock split events
+	Splits []InstrumentSplitEvent `json:"splits,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Dividends        respjson.Field
+		Earnings         respjson.Field
+		SecurityID       respjson.Field
+		SecurityIDSource respjson.Field
+		Splits           respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r InstrumentEventsData) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentEventsData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Represents a stock split event for an instrument
+type InstrumentSplitEvent struct {
+	// The date of the stock split
+	Date time.Time `json:"date,required" format:"date"`
+	// The denominator of the split ratio
+	Denominator string `json:"denominator,required"`
+	// The numerator of the split ratio
+	Numerator string `json:"numerator,required"`
+	// The type of stock split (e.g., "stock-split", "stock-dividend", "bonus-issue")
+	SplitType string `json:"split_type,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Date        respjson.Field
+		Denominator respjson.Field
+		Numerator   respjson.Field
+		SplitType   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r InstrumentSplitEvent) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentSplitEvent) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ActiveV1InstrumentEventGetAllInstrumentEventsResponse struct {
+	// All-events payload grouped by date.
+	Data InstrumentAllEventsData `json:"data,required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r ActiveV1InstrumentEventGetAllInstrumentEventsResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1InstrumentEventGetAllInstrumentEventsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type ActiveV1InstrumentEventGetInstrumentEventsResponse struct {
-	Data InstrumentEventList `json:"data,required"`
+	// Grouped instrument events by type
+	Data InstrumentEventsData `json:"data,required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -105,15 +341,62 @@ func (r *ActiveV1InstrumentEventGetInstrumentEventsResponse) UnmarshalJSON(data 
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type ActiveV1InstrumentEventGetAllInstrumentEventsParams struct {
+	// The start date for the query range, inclusive (YYYY-MM-DD).
+	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
+	// The end date for the query range, inclusive (YYYY-MM-DD).
+	ToDate param.Opt[string] `query:"to_date,omitzero" json:"-"`
+	// Filter by event type(s). Comma-delimited list. Example:
+	// `event_types=EARNINGS,IPO`.
+	//
+	// Any of "EARNINGS", "DIVIDEND", "STOCK_SPLIT", "IPO".
+	EventTypes []string `query:"event_types,omitzero" json:"-"`
+	// Filter by OEMS instrument ID(s). Comma-delimited list of UUIDs. Example:
+	// `instrument_ids=550e8400-e29b-41d4-a716-446655440000`.
+	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	// Filter by security ID(s). Accepts single value or indexed array.
+	//
+	// Examples:
+	//
+	// - Single: `security_id=037833100`
+	// - Multiple: `security_id[0]=037833100&security_id[1]=594918104`
+	SecurityID []string `query:"security_id,omitzero" json:"-"`
+	// Source(s) for the security ID filter. Must match the count and order of
+	// security_id.
+	//
+	// Examples:
+	//
+	// - Single: `security_id_source=CUSIP`
+	// - Multiple: `security_id_source[0]=CUSIP&security_id_source[1]=FIGI`
+	SecurityIDSource []string `query:"security_id_source,omitzero" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [ActiveV1InstrumentEventGetAllInstrumentEventsParams]'s
+// query parameters as `url.Values`.
+func (r ActiveV1InstrumentEventGetAllInstrumentEventsParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
 type ActiveV1InstrumentEventGetInstrumentEventsParams struct {
 	// Security identifier source
 	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "OTHER".
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
 	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero,required" json:"-"`
-	// The start date for the query range, inclusive (YYYY-MM-DD)
-	FromDate string `query:"from_date,required" json:"-"`
-	// The end date for the query range, inclusive (YYYY-MM-DD)
-	ToDate string `query:"to_date,required" json:"-"`
+	// The start date for the query range, inclusive (YYYY-MM-DD).
+	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
+	// The end date for the query range, inclusive (YYYY-MM-DD).
+	ToDate param.Opt[string] `query:"to_date,omitzero" json:"-"`
 	paramObj
 }
 

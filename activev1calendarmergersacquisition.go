@@ -13,6 +13,7 @@ import (
 	"github.com/stainless-sdks/clear-street-go/internal/apiquery"
 	"github.com/stainless-sdks/clear-street-go/internal/requestconfig"
 	"github.com/stainless-sdks/clear-street-go/option"
+	"github.com/stainless-sdks/clear-street-go/packages/param"
 	"github.com/stainless-sdks/clear-street-go/packages/respjson"
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
@@ -107,9 +108,9 @@ func (r *ActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendarResp
 
 type ActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendarParams struct {
 	// The start date for the query range, inclusive (YYYY-MM-DD)
-	FromDate string `query:"from_date,required" json:"-"`
+	From param.Opt[time.Time] `query:"from,omitzero" format:"date" json:"-"`
 	// The end date for the query range, inclusive (YYYY-MM-DD)
-	ToDate string `query:"to_date,required" json:"-"`
+	To param.Opt[time.Time] `query:"to,omitzero" format:"date" json:"-"`
 	paramObj
 }
 
