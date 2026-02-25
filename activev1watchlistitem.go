@@ -68,7 +68,7 @@ func (r *ActiveV1WatchlistItemService) DeleteWatchlistItem(ctx context.Context, 
 // Response data for adding a watchlist item
 type AddWatchlistItemData struct {
 	// ID of the created item
-	ItemID string `json:"item_id,required" format:"uuid"`
+	ItemID string `json:"item_id" api:"required" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ItemID      respjson.Field
@@ -85,7 +85,7 @@ func (r *AddWatchlistItemData) UnmarshalJSON(data []byte) error {
 
 type ActiveV1WatchlistItemAddWatchlistItemResponse struct {
 	// Response data for adding a watchlist item
-	Data AddWatchlistItemData `json:"data,required"`
+	Data AddWatchlistItemData `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -129,6 +129,6 @@ func (r *ActiveV1WatchlistItemAddWatchlistItemParams) UnmarshalJSON(data []byte)
 }
 
 type ActiveV1WatchlistItemDeleteWatchlistItemParams struct {
-	WatchlistID string `path:"watchlist_id,required" format:"uuid" json:"-"`
+	WatchlistID string `path:"watchlist_id" api:"required" format:"uuid" json:"-"`
 	paramObj
 }

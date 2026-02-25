@@ -53,7 +53,7 @@ func (r *ActiveV1InstrumentReportingService) GetInstrumentReporting(ctx context.
 
 type ActiveV1InstrumentReportingGetInstrumentReportingResponse struct {
 	// Represents instrument earnings data
-	Data InstrumentEarnings `json:"data,required"`
+	Data InstrumentEarnings `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -82,7 +82,7 @@ type ActiveV1InstrumentReportingGetInstrumentReportingParams struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero,required" json:"-"`
+	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero" api:"required" json:"-"`
 	// The start date for the query range, inclusive (YYYY-MM-DD)
 	From param.Opt[time.Time] `query:"from,omitzero" format:"date" json:"-"`
 	// The end date for the query range, inclusive (YYYY-MM-DD)

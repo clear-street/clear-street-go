@@ -70,46 +70,46 @@ func (r *ActiveV1InstrumentService) GetInstruments(ctx context.Context, query Ac
 // Represents a tradable financial instrument, including supplemental information
 type Instrument struct {
 	// The number of shares currently available to borrow
-	AvailableToBorrow int64 `json:"available_to_borrow,nullable"`
+	AvailableToBorrow int64 `json:"available_to_borrow" api:"nullable"`
 	// The average daily trading volume over the past 30 days
-	AverageVolume int64 `json:"average_volume,nullable"`
+	AverageVolume int64 `json:"average_volume" api:"nullable"`
 	// The beta value, measuring the instrument's volatility relative to the overall
 	// market
-	Beta string `json:"beta,nullable"`
+	Beta string `json:"beta" api:"nullable"`
 	// The fee associated with borrowing the instrument, expressed as a decimal
-	BorrowFee string `json:"borrow_fee,nullable"`
+	BorrowFee string `json:"borrow_fee" api:"nullable"`
 	// A detailed description of the instrument or company
-	Description string `json:"description,nullable"`
+	Description string `json:"description" api:"nullable"`
 	// The trailing twelve months (TTM) dividend yield
-	DividendYield string `json:"dividend_yield,nullable"`
+	DividendYield string `json:"dividend_yield" api:"nullable"`
 	// The trailing twelve months (TTM) earnings per share
-	EarningsPerShare string `json:"earnings_per_share,nullable"`
+	EarningsPerShare string `json:"earnings_per_share" api:"nullable"`
 	// The highest price over the last 52 weeks
-	FiftyTwoWeekHigh string `json:"fifty_two_week_high,nullable"`
+	FiftyTwoWeekHigh string `json:"fifty_two_week_high" api:"nullable"`
 	// The lowest price over the last 52 weeks
-	FiftyTwoWeekLow string `json:"fifty_two_week_low,nullable"`
+	FiftyTwoWeekLow string `json:"fifty_two_week_low" api:"nullable"`
 	// The specific industry of the instrument's issuer
-	Industry string `json:"industry,nullable"`
+	Industry string `json:"industry" api:"nullable"`
 	// The date the instrument was first listed
-	ListDate time.Time `json:"list_date,nullable" format:"date"`
+	ListDate time.Time `json:"list_date" api:"nullable" format:"date"`
 	// URL to a representative logo image for the instrument or issuer
-	LogoURL string `json:"logo_url,nullable"`
+	LogoURL string `json:"logo_url" api:"nullable"`
 	// A cap on how much of your equity you can put into a single symbol on the long
 	// side
-	LongConcentrationLimit string `json:"long_concentration_limit,nullable"`
+	LongConcentrationLimit string `json:"long_concentration_limit" api:"nullable"`
 	// The total market capitalization
-	MarketCap string `json:"market_cap,nullable"`
+	MarketCap string `json:"market_cap" api:"nullable"`
 	// The closing price from the previous trading day
-	PreviousClose string `json:"previous_close,nullable"`
+	PreviousClose string `json:"previous_close" api:"nullable"`
 	// The price-to-earnings (P/E) ratio for the trailing twelve months (TTM)
-	PriceToEarnings string `json:"price_to_earnings,nullable"`
+	PriceToEarnings string `json:"price_to_earnings" api:"nullable"`
 	// Real-time market quote data for the instrument
-	Quote InstrumentQuote `json:"quote,nullable"`
+	Quote InstrumentQuote `json:"quote" api:"nullable"`
 	// The business sector of the instrument's issuer
-	Sector string `json:"sector,nullable"`
+	Sector string `json:"sector" api:"nullable"`
 	// A cap on how much of your equity you can allocate to a single symbol on the
 	// short side
-	ShortConcentrationLimit string `json:"short_concentration_limit,nullable"`
+	ShortConcentrationLimit string `json:"short_concentration_limit" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AvailableToBorrow       respjson.Field
@@ -145,29 +145,29 @@ func (r *Instrument) UnmarshalJSON(data []byte) error {
 
 type InstrumentCore struct {
 	// Unique instrument identifier
-	ID string `json:"id,required" format:"uuid"`
+	ID string `json:"id" api:"required" format:"uuid"`
 	// The ISO country code of the instrument's issue
-	CountryOfIssue string `json:"country_of_issue,required"`
+	CountryOfIssue string `json:"country_of_issue" api:"required"`
 	// The ISO currency code in which the instrument is traded
-	Currency string `json:"currency,required"`
+	Currency string `json:"currency" api:"required"`
 	// Indicates if the instrument is classified as Easy-To-Borrow
-	EasyToBorrow bool `json:"easy_to_borrow,required"`
+	EasyToBorrow bool `json:"easy_to_borrow" api:"required"`
 	// Indicates if the instrument is liquidation only and cannot be bought
-	IsLiquidationOnly bool `json:"is_liquidation_only,required"`
+	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Indicates if the instrument is marginable
-	IsMarginable bool `json:"is_marginable,required"`
+	IsMarginable bool `json:"is_marginable" api:"required"`
 	// Indicates if the instrument is restricted from trading
-	IsRestricted bool `json:"is_restricted,required"`
+	IsRestricted bool `json:"is_restricted" api:"required"`
 	// Indicates if short selling is prohibited for the instrument
-	IsShortProhibited bool `json:"is_short_prohibited,required"`
+	IsShortProhibited bool `json:"is_short_prohibited" api:"required"`
 	// Indicates if the instrument is on the Regulation SHO Threshold Security List
-	IsThresholdSecurity bool `json:"is_threshold_security,required"`
+	IsThresholdSecurity bool `json:"is_threshold_security" api:"required"`
 	// Deprecated. Use `security_ids`.
 	//
 	// A primary security identifier for this instrument.
 	//
 	// Deprecated: deprecated
-	SecurityID string `json:"security_id,required"`
+	SecurityID string `json:"security_id" api:"required"`
 	// Deprecated. Use `security_ids`.
 	//
 	// The source for `security_id`.
@@ -180,28 +180,28 @@ type InstrumentCore struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
 	// All known security identifiers for this instrument
-	SecurityIDs []InstrumentSecurityID `json:"security_ids,required"`
+	SecurityIDs []InstrumentSecurityID `json:"security_ids" api:"required"`
 	// The trading symbol for the instrument
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// The MIC code of the primary listing venue
-	Venue string `json:"venue,required"`
+	Venue string `json:"venue" api:"required"`
 	// The expiration date for options instruments
-	Expiry time.Time `json:"expiry,nullable" format:"date"`
+	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The percent of a long position's value you must post as margin
-	LongMarginRate string `json:"long_margin_rate,nullable"`
+	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
 	// The full name of the instrument or its issuer
-	Name string `json:"name,nullable"`
+	Name string `json:"name" api:"nullable"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `json:"security_type,nullable"`
+	SecurityType SecurityType `json:"security_type" api:"nullable"`
 	// The percent of a short position's value you must post as margin
-	ShortMarginRate string `json:"short_margin_rate,nullable"`
+	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
 	// The strike price for options instruments
-	StrikePrice string `json:"strike_price,nullable"`
+	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                  respjson.Field
@@ -240,19 +240,19 @@ type InstrumentCoreList []InstrumentCore
 // Represents instrument earnings data
 type InstrumentEarnings struct {
 	// The date when the earnings report was published
-	Date time.Time `json:"date,required" format:"date"`
+	Date time.Time `json:"date" api:"required" format:"date"`
 	// The actual earnings per share (EPS) for the period
-	EpsActual string `json:"eps_actual,nullable"`
+	EpsActual string `json:"eps_actual" api:"nullable"`
 	// The estimated earnings per share (EPS) for the period
-	EpsEstimate string `json:"eps_estimate,nullable"`
+	EpsEstimate string `json:"eps_estimate" api:"nullable"`
 	// The percentage difference between actual and estimated EPS
-	EpsSurprisePercent string `json:"eps_surprise_percent,nullable"`
+	EpsSurprisePercent string `json:"eps_surprise_percent" api:"nullable"`
 	// The actual total revenue for the period
-	RevenueActual string `json:"revenue_actual,nullable"`
+	RevenueActual string `json:"revenue_actual" api:"nullable"`
 	// The estimated total revenue for the period
-	RevenueEstimate string `json:"revenue_estimate,nullable"`
+	RevenueEstimate string `json:"revenue_estimate" api:"nullable"`
 	// The percentage difference between actual and estimated revenue
-	RevenueSurprisePercent string `json:"revenue_surprise_percent,nullable"`
+	RevenueSurprisePercent string `json:"revenue_surprise_percent" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date                   respjson.Field
@@ -276,15 +276,15 @@ func (r *InstrumentEarnings) UnmarshalJSON(data []byte) error {
 // Real-time market quote data for a specific instrument
 type InstrumentQuote struct {
 	// The highest trade price during the current trading day
-	High string `json:"high,required"`
+	High string `json:"high" api:"required"`
 	// The most recent trade price
-	LastPrice string `json:"last_price,required"`
+	LastPrice string `json:"last_price" api:"required"`
 	// The lowest trade price during the current trading day
-	Low string `json:"low,required"`
+	Low string `json:"low" api:"required"`
 	// The opening price for the current trading day
-	Open string `json:"open,required"`
+	Open string `json:"open" api:"required"`
 	// The total number of shares traded during the current trading day
-	Volume int64 `json:"volume,required"`
+	Volume int64 `json:"volume" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		High        respjson.Field
@@ -307,7 +307,7 @@ func (r *InstrumentQuote) UnmarshalJSON(data []byte) error {
 // key fields.
 type InstrumentSecurityID struct {
 	// The identifier for the instrument
-	SecurityID string `json:"security_id,required"`
+	SecurityID string `json:"security_id" api:"required"`
 	// The source system for the security identifier
 	//
 	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
@@ -318,7 +318,7 @@ type InstrumentSecurityID struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		SecurityID       respjson.Field
@@ -336,7 +336,7 @@ func (r *InstrumentSecurityID) UnmarshalJSON(data []byte) error {
 
 type ActiveV1InstrumentGetInstrumentByIDResponse struct {
 	// Represents a tradable financial instrument, including supplemental information
-	Data Instrument `json:"data,required"`
+	Data Instrument `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -353,7 +353,7 @@ func (r *ActiveV1InstrumentGetInstrumentByIDResponse) UnmarshalJSON(data []byte)
 }
 
 type ActiveV1InstrumentGetInstrumentsResponse struct {
-	Data InstrumentCoreList `json:"data,required"`
+	Data InstrumentCoreList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -380,7 +380,7 @@ type ActiveV1InstrumentGetInstrumentByIDParams struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero,required" json:"-"`
+	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero" api:"required" json:"-"`
 	paramObj
 }
 

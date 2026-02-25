@@ -47,17 +47,17 @@ func (r *ActiveV1MarketDataSnapshotService) GetSnapshots(ctx context.Context, qu
 // Market data snapshot for a single security.
 type MarketDataSnapshot struct {
 	// OEMS instrument identifier.
-	InstrumentID string `json:"instrument_id,required"`
+	InstrumentID string `json:"instrument_id" api:"required"`
 	// Display symbol for the security.
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// Most recent quote if available.
-	LastQuote MarketDataSnapshotLastQuote `json:"last_quote,nullable"`
+	LastQuote MarketDataSnapshotLastQuote `json:"last_quote" api:"nullable"`
 	// Most recent last-sale trade if available.
-	LastTrade MarketDataSnapshotLastTrade `json:"last_trade,nullable"`
+	LastTrade MarketDataSnapshotLastTrade `json:"last_trade" api:"nullable"`
 	// Security name if available.
-	Name string `json:"name,nullable"`
+	Name string `json:"name" api:"nullable"`
 	// Session metrics computed from previous close and last trade, if available.
-	Session MarketDataSnapshotSession `json:"session,nullable"`
+	Session MarketDataSnapshotSession `json:"session" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		InstrumentID respjson.Field
@@ -80,15 +80,15 @@ func (r *MarketDataSnapshot) UnmarshalJSON(data []byte) error {
 // Most recent quote if available.
 type MarketDataSnapshotLastQuote struct {
 	// Current best ask.
-	Ask string `json:"ask,required"`
+	Ask string `json:"ask" api:"required"`
 	// Current best bid.
-	Bid string `json:"bid,required"`
+	Bid string `json:"bid" api:"required"`
 	// Midpoint of bid and ask.
-	Midpoint string `json:"midpoint,required"`
+	Midpoint string `json:"midpoint" api:"required"`
 	// Size at the best ask, in shares.
-	AskSize int64 `json:"ask_size,nullable"`
+	AskSize int64 `json:"ask_size" api:"nullable"`
 	// Size at the best bid, in shares.
-	BidSize int64 `json:"bid_size,nullable"`
+	BidSize int64 `json:"bid_size" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Ask         respjson.Field
@@ -110,7 +110,7 @@ func (r *MarketDataSnapshotLastQuote) UnmarshalJSON(data []byte) error {
 // Most recent last-sale trade if available.
 type MarketDataSnapshotLastTrade struct {
 	// Most recent last-sale eligible trade price.
-	Price string `json:"price,required"`
+	Price string `json:"price" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Price       respjson.Field
@@ -128,11 +128,11 @@ func (r *MarketDataSnapshotLastTrade) UnmarshalJSON(data []byte) error {
 // Session metrics computed from previous close and last trade, if available.
 type MarketDataSnapshotSession struct {
 	// Absolute change from previous close to last trade.
-	Change string `json:"change,required"`
+	Change string `json:"change" api:"required"`
 	// Percent change from previous close to last trade.
-	ChangePercent string `json:"change_percent,required"`
+	ChangePercent string `json:"change_percent" api:"required"`
 	// Previous session close price.
-	PreviousClose string `json:"previous_close,required"`
+	PreviousClose string `json:"previous_close" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Change        respjson.Field
@@ -152,7 +152,7 @@ func (r *MarketDataSnapshotSession) UnmarshalJSON(data []byte) error {
 type MarketDataSnapshotList []MarketDataSnapshot
 
 type ActiveV1MarketDataSnapshotGetSnapshotsResponse struct {
-	Data MarketDataSnapshotList `json:"data,required"`
+	Data MarketDataSnapshotList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

@@ -49,21 +49,21 @@ func (r *ActiveV1CalendarMergersAcquisitionService) GetMergersAndAcquisitionsCal
 // Represents a merger or acquisition event
 type MergersAcquisitionsEvent struct {
 	// The symbol of the acquiring company
-	AcquirerSymbol string `json:"acquirer_symbol,required"`
+	AcquirerSymbol string `json:"acquirer_symbol" api:"required"`
 	// The symbol of the target company being acquired
-	TargetSymbol string `json:"target_symbol,required"`
+	TargetSymbol string `json:"target_symbol" api:"required"`
 	// The date of the transaction
-	TransactionDate time.Time `json:"transaction_date,required" format:"date"`
+	TransactionDate time.Time `json:"transaction_date" api:"required" format:"date"`
 	// The timestamp when the merger or acquisition was accepted in UTC
-	AcceptedAt time.Time `json:"accepted_at,nullable" format:"date-time"`
+	AcceptedAt time.Time `json:"accepted_at" api:"nullable" format:"date-time"`
 	// The CIK of the acquiring company
-	AcquirerCik string `json:"acquirer_cik,nullable"`
+	AcquirerCik string `json:"acquirer_cik" api:"nullable"`
 	// The name of the acquiring company
-	AcquirerName string `json:"acquirer_name,nullable"`
+	AcquirerName string `json:"acquirer_name" api:"nullable"`
 	// A URL link to more details about the merger or acquisition
-	Link string `json:"link,nullable"`
+	Link string `json:"link" api:"nullable"`
 	// The CIK of the target company
-	TargetCik string `json:"target_cik,nullable"`
+	TargetCik string `json:"target_cik" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AcquirerSymbol  respjson.Field
@@ -88,7 +88,7 @@ func (r *MergersAcquisitionsEvent) UnmarshalJSON(data []byte) error {
 type MergersAcquisitionsEventList []MergersAcquisitionsEvent
 
 type ActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendarResponse struct {
-	Data MergersAcquisitionsEventList `json:"data,required"`
+	Data MergersAcquisitionsEventList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

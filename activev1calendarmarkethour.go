@@ -49,23 +49,23 @@ func (r *ActiveV1CalendarMarketHourService) GetMarketHoursCalendar(ctx context.C
 // Comprehensive market hours information for a specific market and date
 type MarketHoursDetail struct {
 	// Current time in market timezone with offset
-	CurrentTime time.Time `json:"current_time,required" format:"date-time"`
+	CurrentTime time.Time `json:"current_time" api:"required" format:"date-time"`
 	// The date for which market hours are provided
-	Date time.Time `json:"date,required" format:"date"`
+	Date time.Time `json:"date" api:"required" format:"date"`
 	// Market type identifier
 	//
 	// Any of "us_equities", "us_options".
-	Market MarketHoursDetailMarket `json:"market,required"`
+	Market MarketHoursDetailMarket `json:"market" api:"required"`
 	// Human-readable market name
-	MarketName string `json:"market_name,required"`
+	MarketName string `json:"market_name" api:"required"`
 	// Next trading day's session schedules (without time_until fields)
-	NextSessions MarketHoursDetailNextSessions `json:"next_sessions,required"`
+	NextSessions MarketHoursDetailNextSessions `json:"next_sessions" api:"required"`
 	// Market status information
-	Status MarketHoursDetailStatus `json:"status,required"`
+	Status MarketHoursDetailStatus `json:"status" api:"required"`
 	// IANA timezone identifier for the market
-	Timezone string `json:"timezone,required"`
+	Timezone string `json:"timezone" api:"required"`
 	// Trading session schedules for the requested date with time_until fields
-	TodaySessions MarketHoursDetailTodaySessions `json:"today_sessions,required"`
+	TodaySessions MarketHoursDetailTodaySessions `json:"today_sessions" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		CurrentTime   respjson.Field
@@ -98,11 +98,11 @@ const (
 // Next trading day's session schedules (without time_until fields)
 type MarketHoursDetailNextSessions struct {
 	// After-hours session schedule, null if not available
-	AfterHours MarketHoursDetailNextSessionsAfterHours `json:"after_hours,nullable"`
+	AfterHours MarketHoursDetailNextSessionsAfterHours `json:"after_hours" api:"nullable"`
 	// Pre-market session schedule, null if not available
-	PreMarket MarketHoursDetailNextSessionsPreMarket `json:"pre_market,nullable"`
+	PreMarket MarketHoursDetailNextSessionsPreMarket `json:"pre_market" api:"nullable"`
 	// Regular trading session schedule, null if holiday/weekend
-	Regular MarketHoursDetailNextSessionsRegular `json:"regular,nullable"`
+	Regular MarketHoursDetailNextSessionsRegular `json:"regular" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AfterHours  respjson.Field
@@ -122,14 +122,14 @@ func (r *MarketHoursDetailNextSessions) UnmarshalJSON(data []byte) error {
 // After-hours session schedule, null if not available
 type MarketHoursDetailNextSessionsAfterHours struct {
 	// Session close timestamp with timezone offset
-	Close time.Time `json:"close,required" format:"date-time"`
+	Close time.Time `json:"close" api:"required" format:"date-time"`
 	// Session open timestamp with timezone offset
-	Open time.Time `json:"open,required" format:"date-time"`
+	Open time.Time `json:"open" api:"required" format:"date-time"`
 	// ISO 8601 duration until session closes. Null if session is not currently open.
-	TimeUntilClose string `json:"time_until_close,nullable" format:"duration"`
+	TimeUntilClose string `json:"time_until_close" api:"nullable" format:"duration"`
 	// ISO 8601 duration until session opens. Null if session has already started or
 	// closed.
-	TimeUntilOpen string `json:"time_until_open,nullable" format:"duration"`
+	TimeUntilOpen string `json:"time_until_open" api:"nullable" format:"duration"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Close          respjson.Field
@@ -150,14 +150,14 @@ func (r *MarketHoursDetailNextSessionsAfterHours) UnmarshalJSON(data []byte) err
 // Pre-market session schedule, null if not available
 type MarketHoursDetailNextSessionsPreMarket struct {
 	// Session close timestamp with timezone offset
-	Close time.Time `json:"close,required" format:"date-time"`
+	Close time.Time `json:"close" api:"required" format:"date-time"`
 	// Session open timestamp with timezone offset
-	Open time.Time `json:"open,required" format:"date-time"`
+	Open time.Time `json:"open" api:"required" format:"date-time"`
 	// ISO 8601 duration until session closes. Null if session is not currently open.
-	TimeUntilClose string `json:"time_until_close,nullable" format:"duration"`
+	TimeUntilClose string `json:"time_until_close" api:"nullable" format:"duration"`
 	// ISO 8601 duration until session opens. Null if session has already started or
 	// closed.
-	TimeUntilOpen string `json:"time_until_open,nullable" format:"duration"`
+	TimeUntilOpen string `json:"time_until_open" api:"nullable" format:"duration"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Close          respjson.Field
@@ -178,14 +178,14 @@ func (r *MarketHoursDetailNextSessionsPreMarket) UnmarshalJSON(data []byte) erro
 // Regular trading session schedule, null if holiday/weekend
 type MarketHoursDetailNextSessionsRegular struct {
 	// Session close timestamp with timezone offset
-	Close time.Time `json:"close,required" format:"date-time"`
+	Close time.Time `json:"close" api:"required" format:"date-time"`
 	// Session open timestamp with timezone offset
-	Open time.Time `json:"open,required" format:"date-time"`
+	Open time.Time `json:"open" api:"required" format:"date-time"`
 	// ISO 8601 duration until session closes. Null if session is not currently open.
-	TimeUntilClose string `json:"time_until_close,nullable" format:"duration"`
+	TimeUntilClose string `json:"time_until_close" api:"nullable" format:"duration"`
 	// ISO 8601 duration until session opens. Null if session has already started or
 	// closed.
-	TimeUntilOpen string `json:"time_until_open,nullable" format:"duration"`
+	TimeUntilOpen string `json:"time_until_open" api:"nullable" format:"duration"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Close          respjson.Field
@@ -208,13 +208,13 @@ type MarketHoursDetailStatus struct {
 	// The type of trading day
 	//
 	// Any of "TRADING_DAY", "EARLY_CLOSE", "HOLIDAY", "WEEKEND".
-	DayType string `json:"day_type,required"`
+	DayType string `json:"day_type" api:"required"`
 	// Whether the market is currently open (real-time)
-	IsOpen bool `json:"is_open,required"`
+	IsOpen bool `json:"is_open" api:"required"`
 	// Current session type if market is open, null if closed
 	//
 	// Any of "pre_market", "regular", "after_hours".
-	CurrentSession string `json:"current_session,nullable"`
+	CurrentSession string `json:"current_session" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		DayType        respjson.Field
@@ -234,11 +234,11 @@ func (r *MarketHoursDetailStatus) UnmarshalJSON(data []byte) error {
 // Trading session schedules for the requested date with time_until fields
 type MarketHoursDetailTodaySessions struct {
 	// After-hours session schedule, null if not available
-	AfterHours MarketHoursDetailTodaySessionsAfterHours `json:"after_hours,nullable"`
+	AfterHours MarketHoursDetailTodaySessionsAfterHours `json:"after_hours" api:"nullable"`
 	// Pre-market session schedule, null if not available
-	PreMarket MarketHoursDetailTodaySessionsPreMarket `json:"pre_market,nullable"`
+	PreMarket MarketHoursDetailTodaySessionsPreMarket `json:"pre_market" api:"nullable"`
 	// Regular trading session schedule, null if holiday/weekend
-	Regular MarketHoursDetailTodaySessionsRegular `json:"regular,nullable"`
+	Regular MarketHoursDetailTodaySessionsRegular `json:"regular" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AfterHours  respjson.Field
@@ -258,14 +258,14 @@ func (r *MarketHoursDetailTodaySessions) UnmarshalJSON(data []byte) error {
 // After-hours session schedule, null if not available
 type MarketHoursDetailTodaySessionsAfterHours struct {
 	// Session close timestamp with timezone offset
-	Close time.Time `json:"close,required" format:"date-time"`
+	Close time.Time `json:"close" api:"required" format:"date-time"`
 	// Session open timestamp with timezone offset
-	Open time.Time `json:"open,required" format:"date-time"`
+	Open time.Time `json:"open" api:"required" format:"date-time"`
 	// ISO 8601 duration until session closes. Null if session is not currently open.
-	TimeUntilClose string `json:"time_until_close,nullable" format:"duration"`
+	TimeUntilClose string `json:"time_until_close" api:"nullable" format:"duration"`
 	// ISO 8601 duration until session opens. Null if session has already started or
 	// closed.
-	TimeUntilOpen string `json:"time_until_open,nullable" format:"duration"`
+	TimeUntilOpen string `json:"time_until_open" api:"nullable" format:"duration"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Close          respjson.Field
@@ -286,14 +286,14 @@ func (r *MarketHoursDetailTodaySessionsAfterHours) UnmarshalJSON(data []byte) er
 // Pre-market session schedule, null if not available
 type MarketHoursDetailTodaySessionsPreMarket struct {
 	// Session close timestamp with timezone offset
-	Close time.Time `json:"close,required" format:"date-time"`
+	Close time.Time `json:"close" api:"required" format:"date-time"`
 	// Session open timestamp with timezone offset
-	Open time.Time `json:"open,required" format:"date-time"`
+	Open time.Time `json:"open" api:"required" format:"date-time"`
 	// ISO 8601 duration until session closes. Null if session is not currently open.
-	TimeUntilClose string `json:"time_until_close,nullable" format:"duration"`
+	TimeUntilClose string `json:"time_until_close" api:"nullable" format:"duration"`
 	// ISO 8601 duration until session opens. Null if session has already started or
 	// closed.
-	TimeUntilOpen string `json:"time_until_open,nullable" format:"duration"`
+	TimeUntilOpen string `json:"time_until_open" api:"nullable" format:"duration"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Close          respjson.Field
@@ -314,14 +314,14 @@ func (r *MarketHoursDetailTodaySessionsPreMarket) UnmarshalJSON(data []byte) err
 // Regular trading session schedule, null if holiday/weekend
 type MarketHoursDetailTodaySessionsRegular struct {
 	// Session close timestamp with timezone offset
-	Close time.Time `json:"close,required" format:"date-time"`
+	Close time.Time `json:"close" api:"required" format:"date-time"`
 	// Session open timestamp with timezone offset
-	Open time.Time `json:"open,required" format:"date-time"`
+	Open time.Time `json:"open" api:"required" format:"date-time"`
 	// ISO 8601 duration until session closes. Null if session is not currently open.
-	TimeUntilClose string `json:"time_until_close,nullable" format:"duration"`
+	TimeUntilClose string `json:"time_until_close" api:"nullable" format:"duration"`
 	// ISO 8601 duration until session opens. Null if session has already started or
 	// closed.
-	TimeUntilOpen string `json:"time_until_open,nullable" format:"duration"`
+	TimeUntilOpen string `json:"time_until_open" api:"nullable" format:"duration"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Close          respjson.Field
@@ -342,7 +342,7 @@ func (r *MarketHoursDetailTodaySessionsRegular) UnmarshalJSON(data []byte) error
 type MarketHoursDetailList []MarketHoursDetail
 
 type ActiveV1CalendarMarketHourGetMarketHoursCalendarResponse struct {
-	Data MarketHoursDetailList `json:"data,required"`
+	Data MarketHoursDetailList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -360,7 +360,7 @@ func (r *ActiveV1CalendarMarketHourGetMarketHoursCalendarResponse) UnmarshalJSON
 
 type ActiveV1CalendarMarketHourGetMarketHoursCalendarParams struct {
 	// The date to query market hours for (YYYY-MM-DD). Defaults to today.
-	Date string `query:"date,required" json:"-"`
+	Date string `query:"date" api:"required" json:"-"`
 	// Market type to query (us_equities, us_options). If omitted, returns all markets.
 	//
 	// Any of "us_equities", "us_options".

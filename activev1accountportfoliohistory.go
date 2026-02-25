@@ -46,7 +46,7 @@ func (r *ActiveV1AccountPortfolioHistoryService) GetPortfolioHistory(ctx context
 }
 
 type PortfolioHistoryResponse struct {
-	Segments []PortfolioHistorySegment `json:"segments,required"`
+	Segments []PortfolioHistorySegment `json:"segments" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Segments    respjson.Field
@@ -63,30 +63,30 @@ func (r *PortfolioHistoryResponse) UnmarshalJSON(data []byte) error {
 
 type PortfolioHistorySegment struct {
 	// The date for this segment
-	Date time.Time `json:"date,required" format:"date"`
+	Date time.Time `json:"date" api:"required" format:"date"`
 	// The equity at the end of the trading day.
-	EndingEquity string `json:"ending_equity,required"`
+	EndingEquity string `json:"ending_equity" api:"required"`
 	// Sum of the profit and loss realized from position closing trading activity.
-	RealizedPnl string `json:"realized_pnl,required"`
+	RealizedPnl string `json:"realized_pnl" api:"required"`
 	// The equity at the start of the trading day.
-	StartingEquity string `json:"starting_equity,required"`
+	StartingEquity string `json:"starting_equity" api:"required"`
 	// Sum of the profit and loss from market changes.
-	UnrealizedPnl string `json:"unrealized_pnl,required"`
+	UnrealizedPnl string `json:"unrealized_pnl" api:"required"`
 	// Amount bought MTM
-	BoughtNotional string `json:"bought_notional,nullable"`
+	BoughtNotional string `json:"bought_notional" api:"nullable"`
 	// Quantity bought MTM
-	BoughtQuantity string `json:"bought_quantity,nullable"`
+	BoughtQuantity string `json:"bought_quantity" api:"nullable"`
 	// Sum of the profit and loss from intraday trading activities for the trading day.
-	DayPnl string `json:"day_pnl,nullable"`
+	DayPnl string `json:"day_pnl" api:"nullable"`
 	// P&L after netting all realized and unrealized P&L, adjustments, dividends,
 	// change in accruals, income and expenses
-	NetPnl string `json:"net_pnl,nullable"`
+	NetPnl string `json:"net_pnl" api:"nullable"`
 	// Sum of the profit and loss from the previous trading day.
-	PositionPnl string `json:"position_pnl,nullable"`
+	PositionPnl string `json:"position_pnl" api:"nullable"`
 	// Amount sold MTM
-	SoldNotional string `json:"sold_notional,nullable"`
+	SoldNotional string `json:"sold_notional" api:"nullable"`
 	// Quantity sold MTM
-	SoldQuantity string `json:"sold_quantity,nullable"`
+	SoldQuantity string `json:"sold_quantity" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date           respjson.Field
@@ -113,7 +113,7 @@ func (r *PortfolioHistorySegment) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1AccountPortfolioHistoryGetPortfolioHistoryResponse struct {
-	Data PortfolioHistoryResponse `json:"data,required"`
+	Data PortfolioHistoryResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -132,8 +132,8 @@ func (r *ActiveV1AccountPortfolioHistoryGetPortfolioHistoryResponse) UnmarshalJS
 }
 
 type ActiveV1AccountPortfolioHistoryGetPortfolioHistoryParams struct {
-	EndDate   time.Time `query:"end_date,required" format:"date" json:"-"`
-	StartDate time.Time `query:"start_date,required" format:"date" json:"-"`
+	EndDate   time.Time `query:"end_date" api:"required" format:"date" json:"-"`
+	StartDate time.Time `query:"start_date" api:"required" format:"date" json:"-"`
 	paramObj
 }
 

@@ -69,25 +69,25 @@ func (r *ActiveV1AccountPositionService) GetPositions(ctx context.Context, accou
 // Represents a holding of a particular instrument in an account
 type Position struct {
 	// The account this position belongs to
-	AccountID int64 `json:"account_id,required"`
+	AccountID int64 `json:"account_id" api:"required"`
 	// The quantity of a position that is free to be operated on.
-	AvailableQuantity string `json:"available_quantity,required"`
+	AvailableQuantity string `json:"available_quantity" api:"required"`
 	// Type of security
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
-	InstrumentType SecurityType `json:"instrument_type,required"`
+	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// The current market value of the position
-	MarketValue string `json:"market_value,required"`
+	MarketValue string `json:"market_value" api:"required"`
 	// The type of position
 	//
 	// Any of "LONG", "SHORT", "LONG_CALL", "SHORT_CALL", "LONG_PUT", "SHORT_PUT".
-	PositionType PositionPositionType `json:"position_type,required"`
+	PositionType PositionPositionType `json:"position_type" api:"required"`
 	// The number of shares or contracts. Can be positive (long) or negative (short)
-	Quantity string `json:"quantity,required"`
+	Quantity string `json:"quantity" api:"required"`
 	// An identifier for the instrument which, when paired with `security_id_source`,
 	// identifies one or more financial instruments.
-	SecurityID string `json:"security_id,required"`
+	SecurityID string `json:"security_id" api:"required"`
 	// The source of the security identifier
 	//
 	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
@@ -98,22 +98,22 @@ type Position struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
 	// The trading symbol for the instrument
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// The average price paid per share or contract for this position
-	AvgPrice string `json:"avg_price,nullable"`
+	AvgPrice string `json:"avg_price" api:"nullable"`
 	// The closing price used to value the position for the last trading day
-	ClosingPrice string `json:"closing_price,nullable"`
+	ClosingPrice string `json:"closing_price" api:"nullable"`
 	// The total cost basis for this position
-	CostBasis string `json:"cost_basis,nullable"`
+	CostBasis string `json:"cost_basis" api:"nullable"`
 	// The unrealized profit or loss for this position relative to the previous close
-	DailyUnrealizedPnl string `json:"daily_unrealized_pnl,nullable"`
+	DailyUnrealizedPnl string `json:"daily_unrealized_pnl" api:"nullable"`
 	// The current market price of the instrument
-	MarketPrice string `json:"market_price,nullable"`
+	MarketPrice string `json:"market_price" api:"nullable"`
 	// The total unrealized profit or loss for this position based on current market
 	// value
-	UnrealizedPnl string `json:"unrealized_pnl,nullable"`
+	UnrealizedPnl string `json:"unrealized_pnl" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AccountID          respjson.Field
@@ -157,7 +157,7 @@ const (
 type PositionList []Position
 
 type ActiveV1AccountPositionClosePositionResponse struct {
-	Data OrderList `json:"data,required"`
+	Data OrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -174,7 +174,7 @@ func (r *ActiveV1AccountPositionClosePositionResponse) UnmarshalJSON(data []byte
 }
 
 type ActiveV1AccountPositionClosePositionsResponse struct {
-	Data OrderList `json:"data,required"`
+	Data OrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -191,7 +191,7 @@ func (r *ActiveV1AccountPositionClosePositionsResponse) UnmarshalJSON(data []byt
 }
 
 type ActiveV1AccountPositionGetPositionsResponse struct {
-	Data PositionList `json:"data,required"`
+	Data PositionList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -208,7 +208,7 @@ func (r *ActiveV1AccountPositionGetPositionsResponse) UnmarshalJSON(data []byte)
 }
 
 type ActiveV1AccountPositionClosePositionParams struct {
-	AccountID int64 `path:"account_id,required" json:"-"`
+	AccountID int64 `path:"account_id" api:"required" json:"-"`
 	// Security identifier source
 	//
 	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
@@ -219,7 +219,7 @@ type ActiveV1AccountPositionClosePositionParams struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero,required" json:"-"`
+	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero" api:"required" json:"-"`
 	CancelOrders     param.Opt[bool]  `json:"cancel_orders,omitzero"`
 	paramObj
 }

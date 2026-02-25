@@ -49,25 +49,25 @@ func (r *ActiveV1NewsService) GetNews(ctx context.Context, query ActiveV1NewsGet
 // A single news item and its associated instruments.
 type NewsItem struct {
 	// Instruments associated with this news item.
-	Instruments []NewsItemInstrument `json:"instruments,required"`
+	Instruments []NewsItemInstrument `json:"instruments" api:"required"`
 	// Classification of the item.
 	//
 	// Any of "NEWS", "PRESS_RELEASE".
-	NewsType NewsItemNewsType `json:"news_type,required"`
+	NewsType NewsItemNewsType `json:"news_type" api:"required"`
 	// The published date/time of the article in UTC.
-	PublishedAt time.Time `json:"published_at,required" format:"date-time"`
+	PublishedAt time.Time `json:"published_at" api:"required" format:"date-time"`
 	// The publisher or newswire source.
-	Publisher string `json:"publisher,required"`
+	Publisher string `json:"publisher" api:"required"`
 	// The headline/title of the article.
-	Title string `json:"title,required"`
+	Title string `json:"title" api:"required"`
 	// Canonical URL to the full article.
-	URL string `json:"url,required"`
+	URL string `json:"url" api:"required"`
 	// URL of an associated image if provided by the source.
-	ImageURL string `json:"image_url,nullable"`
+	ImageURL string `json:"image_url" api:"nullable"`
 	// The primary domain/site of the publisher.
-	Site string `json:"site,nullable"`
+	Site string `json:"site" api:"nullable"`
 	// The full or excerpted article body.
-	Text string `json:"text,nullable"`
+	Text string `json:"text" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Instruments respjson.Field
@@ -93,7 +93,7 @@ func (r *NewsItem) UnmarshalJSON(data []byte) error {
 // Instrument associated with a news item.
 type NewsItemInstrument struct {
 	// Security identifier value.
-	SecurityID string `json:"security_id,required"`
+	SecurityID string `json:"security_id" api:"required"`
 	// Security identifier source.
 	//
 	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
@@ -104,13 +104,13 @@ type NewsItemInstrument struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
 	// OEMS instrument UUID, if available from instrument cache enrichment.
-	InstrumentID string `json:"instrument_id,nullable" format:"uuid"`
+	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
 	// Instrument name/description, if available from instrument cache enrichment.
-	Name string `json:"name,nullable"`
+	Name string `json:"name" api:"nullable"`
 	// Trading symbol, if available from instrument cache enrichment.
-	Symbol string `json:"symbol,nullable"`
+	Symbol string `json:"symbol" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		SecurityID       respjson.Field
@@ -140,7 +140,7 @@ const (
 type NewsItemList []NewsItem
 
 type ActiveV1NewsGetNewsResponse struct {
-	Data NewsItemList `json:"data,required"`
+	Data NewsItemList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

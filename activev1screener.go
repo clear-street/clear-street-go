@@ -48,13 +48,13 @@ func (r *ActiveV1ScreenerService) GetScreener(ctx context.Context, query ActiveV
 // An instrument returned by the screener
 type ScreenerItem struct {
 	// The count of buy analyst ratings
-	BuyRatings int64 `json:"buy_ratings,required"`
+	BuyRatings int64 `json:"buy_ratings" api:"required"`
 	// The count of hold analyst ratings
-	HoldRatings int64 `json:"hold_ratings,required"`
+	HoldRatings int64 `json:"hold_ratings" api:"required"`
 	// The latest price for the instrument
-	Price string `json:"price,required"`
+	Price string `json:"price" api:"required"`
 	// The identifier for the instrument
-	SecurityID string `json:"security_id,required"`
+	SecurityID string `json:"security_id" api:"required"`
 	// The source of the security identifier
 	//
 	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
@@ -65,63 +65,63 @@ type ScreenerItem struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
 	// The count of sell analyst ratings
-	SellRatings int64 `json:"sell_ratings,required"`
+	SellRatings int64 `json:"sell_ratings" api:"required"`
 	// The count of strong buy analyst ratings
-	StrongBuyRatings int64 `json:"strong_buy_ratings,required"`
+	StrongBuyRatings int64 `json:"strong_buy_ratings" api:"required"`
 	// The count of strong sell analyst ratings
-	StrongSellRatings int64 `json:"strong_sell_ratings,required"`
+	StrongSellRatings int64 `json:"strong_sell_ratings" api:"required"`
 	// The trading symbol for the instrument
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// The total count of analyst ratings
-	TotalRatings int64 `json:"total_ratings,required"`
+	TotalRatings int64 `json:"total_ratings" api:"required"`
 	// The consensus analyst price target
-	ConsensusPriceTarget string `json:"consensus_price_target,nullable"`
+	ConsensusPriceTarget string `json:"consensus_price_target" api:"nullable"`
 	// The highest analyst price target
-	ConsensusPriceTargetHigh string `json:"consensus_price_target_high,nullable"`
+	ConsensusPriceTargetHigh string `json:"consensus_price_target_high" api:"nullable"`
 	// The lowest analyst price target
-	ConsensusPriceTargetLow string `json:"consensus_price_target_low,nullable"`
+	ConsensusPriceTargetLow string `json:"consensus_price_target_low" api:"nullable"`
 	// The consensus analyst rating
 	//
 	// Any of "STRONG_BUY", "BUY", "HOLD", "SELL", "STRONG_SELL".
-	ConsensusRating AnalystRating `json:"consensus_rating,nullable"`
+	ConsensusRating AnalystRating `json:"consensus_rating" api:"nullable"`
 	// The ISO country code of the instrument's issue
-	CountryOfIssue string `json:"country_of_issue,nullable"`
+	CountryOfIssue string `json:"country_of_issue" api:"nullable"`
 	// A detailed description of the instrument or company
-	Description string `json:"description,nullable"`
+	Description string `json:"description" api:"nullable"`
 	// The specific industry of the instrument's issuer
-	Industry string `json:"industry,nullable"`
+	Industry string `json:"industry" api:"nullable"`
 	// The date the instrument was first listed
-	ListDate time.Time `json:"list_date,nullable" format:"date"`
+	ListDate time.Time `json:"list_date" api:"nullable" format:"date"`
 	// The total market capitalization
-	MarketCap string `json:"market_cap,nullable"`
+	MarketCap string `json:"market_cap" api:"nullable"`
 	// The average trading volume over the past month
-	MonthAvgVolume string `json:"month_avg_volume,nullable"`
+	MonthAvgVolume string `json:"month_avg_volume" api:"nullable"`
 	// The full name of the instrument or its issuer
-	Name string `json:"name,nullable"`
+	Name string `json:"name" api:"nullable"`
 	// The percent change from previous close to current price
-	PercentChange string `json:"percent_change,nullable"`
+	PercentChange string `json:"percent_change" api:"nullable"`
 	// The previous day's closing price
-	PrevDayClose string `json:"prev_day_close,nullable"`
+	PrevDayClose string `json:"prev_day_close" api:"nullable"`
 	// The business sector of the instrument's issuer
-	Sector string `json:"sector,nullable"`
+	Sector string `json:"sector" api:"nullable"`
 	// The type of security
-	SecurityType string `json:"security_type,nullable"`
+	SecurityType string `json:"security_type" api:"nullable"`
 	// The TTM debt-to-equity ratio
-	TtmDebtToEquity string `json:"ttm_debt_to_equity,nullable"`
+	TtmDebtToEquity string `json:"ttm_debt_to_equity" api:"nullable"`
 	// The TTM dividend yield percent
-	TtmDividendYield string `json:"ttm_dividend_yield,nullable"`
+	TtmDividendYield string `json:"ttm_dividend_yield" api:"nullable"`
 	// The TTM earnings per share
-	TtmEarningsPerShare string `json:"ttm_earnings_per_share,nullable"`
+	TtmEarningsPerShare string `json:"ttm_earnings_per_share" api:"nullable"`
 	// The TTM price-to-earnings ratio
-	TtmPriceToEarnings string `json:"ttm_price_to_earnings,nullable"`
+	TtmPriceToEarnings string `json:"ttm_price_to_earnings" api:"nullable"`
 	// The MIC code of the primary listing venue
-	Venue string `json:"venue,nullable"`
+	Venue string `json:"venue" api:"nullable"`
 	// The latest trading volume for the instrument
-	Volume string `json:"volume,nullable"`
+	Volume string `json:"volume" api:"nullable"`
 	// The average trading volume over the past week
-	WeekAvgVolume string `json:"week_avg_volume,nullable"`
+	WeekAvgVolume string `json:"week_avg_volume" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		BuyRatings               respjson.Field
@@ -170,7 +170,7 @@ func (r *ScreenerItem) UnmarshalJSON(data []byte) error {
 type ScreenerItemList []ScreenerItem
 
 type ActiveV1ScreenerGetScreenerResponse struct {
-	Data ScreenerItemList `json:"data,required"`
+	Data ScreenerItemList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

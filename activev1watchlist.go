@@ -83,13 +83,13 @@ func (r *ActiveV1WatchlistService) GetWatchlists(ctx context.Context, opts ...op
 // Detailed watchlist with all items
 type WatchlistDetail struct {
 	// Watchlist ID
-	ID string `json:"id,required" format:"uuid"`
+	ID string `json:"id" api:"required" format:"uuid"`
 	// Creation timestamp
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Items in the watchlist
-	Items []WatchlistItemEntry `json:"items,required"`
+	Items []WatchlistItemEntry `json:"items" api:"required"`
 	// Watchlist name
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -110,11 +110,11 @@ func (r *WatchlistDetail) UnmarshalJSON(data []byte) error {
 // Represents a user watchlist.
 type WatchlistEntry struct {
 	// The unique identifier for the watchlist.
-	ID string `json:"id,required" format:"uuid"`
+	ID string `json:"id" api:"required" format:"uuid"`
 	// The timestamp when the watchlist was created.
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// The user-provided watchlist name.
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -136,13 +136,13 @@ type WatchlistEntryList []WatchlistEntry
 // A single item in a watchlist
 type WatchlistItemEntry struct {
 	// Item ID
-	ID string `json:"id,required" format:"uuid"`
+	ID string `json:"id" api:"required" format:"uuid"`
 	// When the item was added
-	AddedAt time.Time `json:"added_at,required" format:"date-time"`
+	AddedAt time.Time `json:"added_at" api:"required" format:"date-time"`
 	// Price when the item was added
-	AddedPrice string `json:"added_price,nullable"`
+	AddedPrice string `json:"added_price" api:"nullable"`
 	// Instrument details
-	Instrument Instrument `json:"instrument,nullable"`
+	Instrument Instrument `json:"instrument" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -162,7 +162,7 @@ func (r *WatchlistItemEntry) UnmarshalJSON(data []byte) error {
 
 type ActiveV1WatchlistNewWatchlistResponse struct {
 	// Represents a user watchlist.
-	Data WatchlistEntry `json:"data,required"`
+	Data WatchlistEntry `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -180,7 +180,7 @@ func (r *ActiveV1WatchlistNewWatchlistResponse) UnmarshalJSON(data []byte) error
 
 type ActiveV1WatchlistGetWatchlistByIDResponse struct {
 	// Detailed watchlist with all items
-	Data WatchlistDetail `json:"data,required"`
+	Data WatchlistDetail `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -197,7 +197,7 @@ func (r *ActiveV1WatchlistGetWatchlistByIDResponse) UnmarshalJSON(data []byte) e
 }
 
 type ActiveV1WatchlistGetWatchlistsResponse struct {
-	Data WatchlistEntryList `json:"data,required"`
+	Data WatchlistEntryList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -215,7 +215,7 @@ func (r *ActiveV1WatchlistGetWatchlistsResponse) UnmarshalJSON(data []byte) erro
 
 type ActiveV1WatchlistNewWatchlistParams struct {
 	// The desired watchlist name.
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	paramObj
 }
 

@@ -48,17 +48,17 @@ func (r *ActiveV1CalendarSummaryService) GetCalendarSummary(ctx context.Context,
 // Summary of events for a specific date
 type CalendarDateSummary struct {
 	// The date of the events
-	Date time.Time `json:"date,required" format:"date"`
+	Date time.Time `json:"date" api:"required" format:"date"`
 	// The number of dividend events on this date
-	DividendsCount int64 `json:"dividends_count,required"`
+	DividendsCount int64 `json:"dividends_count" api:"required"`
 	// The number of earnings announcements on this date
-	EarningsCount int64 `json:"earnings_count,required"`
+	EarningsCount int64 `json:"earnings_count" api:"required"`
 	// The number of economic events on this date
-	EconomicEventsCount int64 `json:"economic_events_count,required"`
+	EconomicEventsCount int64 `json:"economic_events_count" api:"required"`
 	// The number of mergers and acquisitions on this date
-	MergersAcquisitionsCount int64 `json:"mergers_acquisitions_count,required"`
+	MergersAcquisitionsCount int64 `json:"mergers_acquisitions_count" api:"required"`
 	// The number of stock split events on this date
-	StockSplitsCount int64 `json:"stock_splits_count,required"`
+	StockSplitsCount int64 `json:"stock_splits_count" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date                     respjson.Field
@@ -81,7 +81,7 @@ func (r *CalendarDateSummary) UnmarshalJSON(data []byte) error {
 type CalendarDateSummaryList []CalendarDateSummary
 
 type ActiveV1CalendarSummaryGetCalendarSummaryResponse struct {
-	Data CalendarDateSummaryList `json:"data,required"`
+	Data CalendarDateSummaryList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

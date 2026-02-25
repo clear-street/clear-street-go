@@ -48,25 +48,25 @@ func (r *ActiveV1CalendarEconomicService) GetEconomicCalendar(ctx context.Contex
 // Represents a single economic calendar event
 type EconomicCalendarEvent struct {
 	// The ISO 3166-1 alpha-2 country code
-	Country string `json:"country,required"`
+	Country string `json:"country" api:"required"`
 	// The ISO 4217 currency code
-	Currency string `json:"currency,required"`
+	Currency string `json:"currency" api:"required"`
 	// The name of the economic event
-	EventName string `json:"event_name,required"`
+	EventName string `json:"event_name" api:"required"`
 	// The date and time of the event in UTC
-	EventTimestamp time.Time `json:"event_timestamp,required" format:"date-time"`
+	EventTimestamp time.Time `json:"event_timestamp" api:"required" format:"date-time"`
 	// The expected market impact of the event
 	//
 	// Any of "LOW", "MEDIUM", "HIGH".
-	Impact EconomicCalendarEventImpact `json:"impact,required"`
+	Impact EconomicCalendarEventImpact `json:"impact" api:"required"`
 	// The actual value reported for the event
-	ActualValue string `json:"actual_value,nullable"`
+	ActualValue string `json:"actual_value" api:"nullable"`
 	// The percentage change between the actual and previous values
-	ChangePercent string `json:"change_percent,nullable"`
+	ChangePercent string `json:"change_percent" api:"nullable"`
 	// The market consensus estimate for the event's value
-	EstimatedValue string `json:"estimated_value,nullable"`
+	EstimatedValue string `json:"estimated_value" api:"nullable"`
 	// The previous value for this event
-	PreviousValue string `json:"previous_value,nullable"`
+	PreviousValue string `json:"previous_value" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Country        respjson.Field
@@ -101,7 +101,7 @@ const (
 type EconomicCalendarEventList []EconomicCalendarEvent
 
 type ActiveV1CalendarEconomicGetEconomicCalendarResponse struct {
-	Data EconomicCalendarEventList `json:"data,required"`
+	Data EconomicCalendarEventList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

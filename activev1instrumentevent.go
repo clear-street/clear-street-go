@@ -68,7 +68,7 @@ func (r *ActiveV1InstrumentEventService) GetInstrumentEvents(ctx context.Context
 // All-events payload grouped by date.
 type InstrumentAllEventsData struct {
 	// Events grouped by date in descending order.
-	EventDates []InstrumentEventsByDate `json:"event_dates,required"`
+	EventDates []InstrumentEventsByDate `json:"event_dates" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		EventDates  respjson.Field
@@ -86,24 +86,24 @@ func (r *InstrumentAllEventsData) UnmarshalJSON(data []byte) error {
 // Represents a dividend event for an instrument
 type InstrumentDividendEvent struct {
 	// The adjusted dividend amount accounting for any splits.
-	AdjustedDividendAmount string `json:"adjusted_dividend_amount,required"`
+	AdjustedDividendAmount string `json:"adjusted_dividend_amount" api:"required"`
 	// The day the stock starts trading without the right to receive that dividend.
-	ExDate time.Time `json:"ex_date,required" format:"date"`
+	ExDate time.Time `json:"ex_date" api:"required" format:"date"`
 	// The declaration date of the dividend
-	DeclarationDate time.Time `json:"declaration_date,nullable" format:"date"`
+	DeclarationDate time.Time `json:"declaration_date" api:"nullable" format:"date"`
 	// The dividend amount per share.
-	DividendAmount string `json:"dividend_amount,nullable"`
+	DividendAmount string `json:"dividend_amount" api:"nullable"`
 	// The dividend yield as a percentage of the stock price.
-	DividendYield string `json:"dividend_yield,nullable"`
+	DividendYield string `json:"dividend_yield" api:"nullable"`
 	// The frequency of the dividend payments (e.g., "Quarterly", "Annual").
-	Frequency string `json:"frequency,nullable"`
+	Frequency string `json:"frequency" api:"nullable"`
 	// The payment date is the date on which a declared stock dividend is scheduled to
 	// be paid.
-	PaymentDate time.Time `json:"payment_date,nullable" format:"date"`
+	PaymentDate time.Time `json:"payment_date" api:"nullable" format:"date"`
 	// The record date, set by a company's board of directors, is when a company
 	// compiles a list of shareholders of the stock for which it has declared a
 	// dividend.
-	RecordDate time.Time `json:"record_date,nullable" format:"date"`
+	RecordDate time.Time `json:"record_date" api:"nullable" format:"date"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AdjustedDividendAmount respjson.Field
@@ -128,9 +128,9 @@ func (r *InstrumentDividendEvent) UnmarshalJSON(data []byte) error {
 // Instrument events for a single date.
 type InstrumentEventsByDate struct {
 	// Event date.
-	Date time.Time `json:"date,required" format:"date"`
+	Date time.Time `json:"date" api:"required" format:"date"`
 	// Flat event envelopes for this date.
-	Events []InstrumentEventsByDateEvent `json:"events,required"`
+	Events []InstrumentEventsByDateEvent `json:"events" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date        respjson.Field
@@ -149,7 +149,7 @@ func (r *InstrumentEventsByDate) UnmarshalJSON(data []byte) error {
 // Unified envelope for the all-events response.
 type InstrumentEventsByDateEvent struct {
 	// Security identifier for the event.
-	SecurityID string `json:"security_id,required"`
+	SecurityID string `json:"security_id" api:"required"`
 	// Security identifier source for the event.
 	//
 	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
@@ -160,26 +160,26 @@ type InstrumentEventsByDateEvent struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
 	// Symbol associated with the event.
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// Event type discriminator.
 	//
 	// Any of "EARNINGS", "DIVIDEND", "STOCK_SPLIT", "IPO".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// Dividend payload when type is DIVIDEND.
-	DividendEventData InstrumentDividendEvent `json:"dividend_event_data,nullable"`
+	DividendEventData InstrumentDividendEvent `json:"dividend_event_data" api:"nullable"`
 	// Earnings payload when type is EARNINGS.
-	EarningsEventData InstrumentEarnings `json:"earnings_event_data,nullable"`
+	EarningsEventData InstrumentEarnings `json:"earnings_event_data" api:"nullable"`
 	// OEMS instrument identifier, when the instrument is found in the instrument
 	// cache.
-	InstrumentID string `json:"instrument_id,nullable" format:"uuid"`
+	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
 	// IPO payload when type is IPO.
-	IpoEventData InstrumentEventsByDateEventIpoEventData `json:"ipo_event_data,nullable"`
+	IpoEventData InstrumentEventsByDateEventIpoEventData `json:"ipo_event_data" api:"nullable"`
 	// Instrument name associated with the event, when available.
-	Name string `json:"name,nullable"`
+	Name string `json:"name" api:"nullable"`
 	// Stock split payload when type is STOCK_SPLIT.
-	StockSplitEventData InstrumentSplitEvent `json:"stock_split_event_data,nullable"`
+	StockSplitEventData InstrumentSplitEvent `json:"stock_split_event_data" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		SecurityID          respjson.Field
@@ -206,19 +206,19 @@ func (r *InstrumentEventsByDateEvent) UnmarshalJSON(data []byte) error {
 // IPO payload when type is IPO.
 type InstrumentEventsByDateEventIpoEventData struct {
 	// IPO action.
-	Actions string `json:"actions,nullable"`
+	Actions string `json:"actions" api:"nullable"`
 	// IPO announced timestamp.
-	AnnouncedAt time.Time `json:"announced_at,nullable" format:"date-time"`
+	AnnouncedAt time.Time `json:"announced_at" api:"nullable" format:"date-time"`
 	// IPO company name.
-	Company string `json:"company,nullable"`
+	Company string `json:"company" api:"nullable"`
 	// IPO exchange.
-	Exchange string `json:"exchange,nullable"`
+	Exchange string `json:"exchange" api:"nullable"`
 	// IPO market cap.
-	MarketCap string `json:"market_cap,nullable"`
+	MarketCap string `json:"market_cap" api:"nullable"`
 	// IPO price range.
-	PriceRange string `json:"price_range,nullable"`
+	PriceRange string `json:"price_range" api:"nullable"`
 	// IPO shares offered.
-	Shares string `json:"shares,nullable"`
+	Shares string `json:"shares" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Actions     respjson.Field
@@ -242,11 +242,11 @@ func (r *InstrumentEventsByDateEventIpoEventData) UnmarshalJSON(data []byte) err
 // Grouped instrument events by type
 type InstrumentEventsData struct {
 	// Dividend distribution events
-	Dividends []InstrumentDividendEvent `json:"dividends,required"`
+	Dividends []InstrumentDividendEvent `json:"dividends" api:"required"`
 	// Earnings announcement events
-	Earnings []InstrumentEarnings `json:"earnings,required"`
+	Earnings []InstrumentEarnings `json:"earnings" api:"required"`
 	// The security ID from the request
-	SecurityID string `json:"security_id,required"`
+	SecurityID string `json:"security_id" api:"required"`
 	// The security ID source from the request
 	//
 	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
@@ -257,9 +257,9 @@ type InstrumentEventsData struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
 	// Stock split events
-	Splits []InstrumentSplitEvent `json:"splits,required"`
+	Splits []InstrumentSplitEvent `json:"splits" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Dividends        respjson.Field
@@ -281,13 +281,13 @@ func (r *InstrumentEventsData) UnmarshalJSON(data []byte) error {
 // Represents a stock split event for an instrument
 type InstrumentSplitEvent struct {
 	// The date of the stock split
-	Date time.Time `json:"date,required" format:"date"`
+	Date time.Time `json:"date" api:"required" format:"date"`
 	// The denominator of the split ratio
-	Denominator string `json:"denominator,required"`
+	Denominator string `json:"denominator" api:"required"`
 	// The numerator of the split ratio
-	Numerator string `json:"numerator,required"`
+	Numerator string `json:"numerator" api:"required"`
 	// The type of stock split (e.g., "stock-split", "stock-dividend", "bonus-issue")
-	SplitType string `json:"split_type,required"`
+	SplitType string `json:"split_type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date        respjson.Field
@@ -307,7 +307,7 @@ func (r *InstrumentSplitEvent) UnmarshalJSON(data []byte) error {
 
 type ActiveV1InstrumentEventGetAllInstrumentEventsResponse struct {
 	// All-events payload grouped by date.
-	Data InstrumentAllEventsData `json:"data,required"`
+	Data InstrumentAllEventsData `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -325,7 +325,7 @@ func (r *ActiveV1InstrumentEventGetAllInstrumentEventsResponse) UnmarshalJSON(da
 
 type ActiveV1InstrumentEventGetInstrumentEventsResponse struct {
 	// Grouped instrument events by type
-	Data InstrumentEventsData `json:"data,required"`
+	Data InstrumentEventsData `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -392,7 +392,7 @@ type ActiveV1InstrumentEventGetInstrumentEventsParams struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero,required" json:"-"`
+	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero" api:"required" json:"-"`
 	// The start date for the query range, inclusive (YYYY-MM-DD).
 	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
 	// The end date for the query range, inclusive (YYYY-MM-DD).

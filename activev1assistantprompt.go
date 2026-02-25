@@ -60,11 +60,11 @@ func (r *ActiveV1AssistantPromptService) RunPrompt(ctx context.Context, body Act
 }
 
 type PromptResult struct {
-	PromptID string `json:"prompt_id,required"`
-	Response string `json:"response,required"`
+	PromptID string `json:"prompt_id" api:"required"`
+	Response string `json:"response" api:"required"`
 	// Any of "RUNNING", "SUCCESS", "FAILED", "UNSPECIFIED", "UNKNOWN".
-	Status  PromptStatus                  `json:"status,required"`
-	Error   string                        `json:"error,nullable"`
+	Status  PromptStatus                  `json:"status" api:"required"`
+	Error   string                        `json:"error" api:"nullable"`
 	Outputs map[string]PromptResultOutput `json:"outputs"`
 	Raw     any                           `json:"raw"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -87,10 +87,10 @@ func (r *PromptResult) UnmarshalJSON(data []byte) error {
 }
 
 type PromptResultOutput struct {
-	IsOutputNode    bool   `json:"is_output_node,required"`
-	Status          string `json:"status,required"`
+	IsOutputNode    bool   `json:"is_output_node" api:"required"`
+	Status          string `json:"status" api:"required"`
 	DisplayValue    any    `json:"display_value"`
-	ErrorMessage    string `json:"error_message,nullable"`
+	ErrorMessage    string `json:"error_message" api:"nullable"`
 	RawErrorMessage any    `json:"raw_error_message"`
 	Value           any    `json:"value"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -123,11 +123,11 @@ const (
 )
 
 type RunPromptResponse struct {
-	RequestID string `json:"request_id,required"`
-	Response  string `json:"response,required"`
+	RequestID string `json:"request_id" api:"required"`
+	Response  string `json:"response" api:"required"`
 	// Any of "RUNNING", "SUCCESS", "FAILED", "UNSPECIFIED", "UNKNOWN".
-	Status PromptStatus `json:"status,required"`
-	Error  string       `json:"error,nullable"`
+	Status PromptStatus `json:"status" api:"required"`
+	Error  string       `json:"error" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		RequestID   respjson.Field
@@ -146,7 +146,7 @@ func (r *RunPromptResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1AssistantPromptGetPromptResultResponse struct {
-	Data PromptResult `json:"data,required"`
+	Data PromptResult `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -163,7 +163,7 @@ func (r *ActiveV1AssistantPromptGetPromptResultResponse) UnmarshalJSON(data []by
 }
 
 type ActiveV1AssistantPromptRunPromptResponse struct {
-	Data RunPromptResponse `json:"data,required"`
+	Data RunPromptResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -196,9 +196,9 @@ func (r ActiveV1AssistantPromptGetPromptResultParams) URLQuery() (v url.Values, 
 
 type ActiveV1AssistantPromptRunPromptParams struct {
 	// JSON payload forwarded to the prompt workflow.
-	Body any `json:"body,omitzero,required"`
+	Body any `json:"body,omitzero" api:"required"`
 	// Unique slug identifying the prompt workflow to execute.
-	Slug     string            `json:"slug,required"`
+	Slug     string            `json:"slug" api:"required"`
 	Metadata map[string]string `json:"metadata,omitzero"`
 	paramObj
 }

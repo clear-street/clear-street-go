@@ -18,9 +18,9 @@ type paramObj = param.APIObject
 type APIError struct {
 	// The error code is used to identify the nature of the error. It corresponds to an
 	// HTTP status code.
-	Code int64 `json:"code,required"`
+	Code int64 `json:"code" api:"required"`
 	// A human-readable message providing more details about the error.
-	Message string `json:"message,required"`
+	Message string `json:"message" api:"required"`
 	// Additional error details, if any. This can include structured information such
 	// as field violations or error metadata.
 	Details []map[string]any `json:"details"`
@@ -42,9 +42,9 @@ func (r *APIError) UnmarshalJSON(data []byte) error {
 
 type BaseResponse struct {
 	// Response metadata, including the request ID and optional pagination info.
-	Metadata ResponseMetadata `json:"metadata,required"`
+	Metadata ResponseMetadata `json:"metadata" api:"required"`
 	// Structured error details when the request is unsuccessful.
-	Error APIError `json:"error,nullable"`
+	Error APIError `json:"error" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Metadata    respjson.Field
@@ -65,17 +65,17 @@ func (r *BaseResponse) UnmarshalJSON(data []byte) error {
 // include pagination data.
 type ResponseMetadata struct {
 	// A unique ID for this request, generated upon ingestion of the request.
-	RequestID string `json:"request_id,required"`
+	RequestID string `json:"request_id" api:"required"`
 	// Base64URL-encoded pagination token containing limit and offset
-	NextPageToken string `json:"next_page_token,nullable" format:"byte"`
+	NextPageToken string `json:"next_page_token" api:"nullable" format:"byte"`
 	// Pagination. Included if this was a GET (list) response
-	PageNumber int64 `json:"page_number,nullable"`
+	PageNumber int64 `json:"page_number" api:"nullable"`
 	// Base64URL-encoded pagination token containing limit and offset
-	PreviousPageToken string `json:"previous_page_token,nullable" format:"byte"`
+	PreviousPageToken string `json:"previous_page_token" api:"nullable" format:"byte"`
 	// Total number of items available (not just in this page).
-	TotalItems int64 `json:"total_items,nullable"`
+	TotalItems int64 `json:"total_items" api:"nullable"`
 	// Total number of pages available.
-	TotalPages int64 `json:"total_pages,nullable"`
+	TotalPages int64 `json:"total_pages" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		RequestID         respjson.Field

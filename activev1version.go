@@ -52,7 +52,7 @@ func (r *ActiveV1VersionService) UpdateVersion(ctx context.Context, opts ...opti
 // API version information
 type Version struct {
 	// API version string
-	Version string `json:"version,required"`
+	Version string `json:"version" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Version     respjson.Field
@@ -69,7 +69,7 @@ func (r *Version) UnmarshalJSON(data []byte) error {
 
 type ActiveV1VersionGetVersionResponse struct {
 	// API version information
-	Data Version `json:"data,required"`
+	Data Version `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -87,7 +87,7 @@ func (r *ActiveV1VersionGetVersionResponse) UnmarshalJSON(data []byte) error {
 
 type ActiveV1VersionUpdateVersionResponse struct {
 	// API version information
-	Data Version `json:"data,required"`
+	Data Version `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

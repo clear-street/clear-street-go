@@ -44,30 +44,30 @@ func (r *ActiveV1InstrumentVenueService) GetVenues(ctx context.Context, opts ...
 // A trading venue with its characteristics and capabilities
 type Venue struct {
 	// The ISO country code where the venue operates
-	Country string `json:"country,required"`
+	Country string `json:"country" api:"required"`
 	// The display characteristics of the venue
 	//
 	// Any of "LIT", "DARK", "PERIODIC_AUCTION", "RFQ".
-	DisplayType VenueDisplayType `json:"display_type,required"`
+	DisplayType VenueDisplayType `json:"display_type" api:"required"`
 	// Indicates whether GOOD_TILL_DATE orders accept date-only or timestamp
 	// specifications
-	GtdAccepts VenueGtdAccepts `json:"gtd_accepts,required"`
+	GtdAccepts VenueGtdAccepts `json:"gtd_accepts" api:"required"`
 	// The minimum quantity increment for orders at this venue
-	LotSize int64 `json:"lot_size,required"`
+	LotSize int64 `json:"lot_size" api:"required"`
 	// The Market Identifier Code (MIC) for the venue
-	Mic string `json:"mic,required"`
+	Mic string `json:"mic" api:"required"`
 	// The display name of the venue
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Trading sessions available at this venue
-	Sessions []VenueSession `json:"sessions,required"`
+	Sessions []VenueSession `json:"sessions" api:"required"`
 	// Order types supported by this venue
-	SupportedOrderTypes []string `json:"supported_order_types,required"`
+	SupportedOrderTypes []string `json:"supported_order_types" api:"required"`
 	// Time-in-force options supported by this venue
-	SupportedTifs []string `json:"supported_tifs,required"`
+	SupportedTifs []string `json:"supported_tifs" api:"required"`
 	// The minimum price increment for orders at this venue
-	TickSize string `json:"tick_size,required"`
+	TickSize string `json:"tick_size" api:"required"`
 	// IANA timezone identifier for the venue's local time
-	Timezone string `json:"timezone,required"`
+	Timezone string `json:"timezone" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Country             respjson.Field
@@ -106,9 +106,9 @@ const (
 // specifications
 type VenueGtdAccepts struct {
 	// Whether the venue accepts date-only expiration (YYYY-MM-DD)
-	Date bool `json:"date,required"`
+	Date bool `json:"date" api:"required"`
 	// Whether the venue accepts precise timestamp expiration
-	Timestamp bool `json:"timestamp,required"`
+	Timestamp bool `json:"timestamp" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date        respjson.Field
@@ -127,11 +127,11 @@ func (r *VenueGtdAccepts) UnmarshalJSON(data []byte) error {
 // A trading session within a venue's trading day
 type VenueSession struct {
 	// Session end time in venue's local timezone (HH:MM format, 24-hour)
-	EndLocal string `json:"end_local,required"`
+	EndLocal string `json:"end_local" api:"required"`
 	// The name of the trading session
-	Name string `json:"name,required"`
+	Name string `json:"name" api:"required"`
 	// Session start time in venue's local timezone (HH:MM format, 24-hour)
-	StartLocal string `json:"start_local,required"`
+	StartLocal string `json:"start_local" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		EndLocal    respjson.Field
@@ -151,7 +151,7 @@ func (r *VenueSession) UnmarshalJSON(data []byte) error {
 type VenueList []Venue
 
 type ActiveV1InstrumentVenueGetVenuesResponse struct {
-	Data VenueList `json:"data,required"`
+	Data VenueList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
