@@ -51,8 +51,8 @@ func (r *ActiveV1IrisThreadMessageService) ListMessages(ctx context.Context, thr
 }
 
 type ListMessagesResponse struct {
-	Messages      []Message `json:"messages,required"`
-	NextPageToken string    `json:"next_page_token,nullable" format:"uuid"`
+	Messages      []Message `json:"messages" api:"required"`
+	NextPageToken string    `json:"next_page_token" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Messages      respjson.Field
@@ -69,7 +69,7 @@ func (r *ListMessagesResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1IrisThreadMessageListMessagesResponse struct {
-	Data ListMessagesResponse `json:"data,required"`
+	Data ListMessagesResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -87,7 +87,7 @@ func (r *ActiveV1IrisThreadMessageListMessagesResponse) UnmarshalJSON(data []byt
 
 type ActiveV1IrisThreadMessageListMessagesParams struct {
 	// Account ID for the request
-	AccountID string `query:"account_id,required" json:"-"`
+	AccountID string `query:"account_id" api:"required" json:"-"`
 	// Return messages after this sequence number
 	AfterSeq param.Opt[int64] `query:"after_seq,omitzero" json:"-"`
 	// Maximum messages to return

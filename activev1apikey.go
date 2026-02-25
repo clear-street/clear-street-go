@@ -74,11 +74,11 @@ func (r *ActiveV1APIKeyService) RevokeAll(ctx context.Context, opts ...option.Re
 }
 
 type APIKey struct {
-	ID        string    `json:"id,required" format:"uuid"`
-	APIKey    string    `json:"api_key,required" format:"password"`
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
-	ExpiresAt time.Time `json:"expires_at,required" format:"date-time"`
-	Name      string    `json:"name,nullable"`
+	ID        string    `json:"id" api:"required" format:"uuid"`
+	APIKey    string    `json:"api_key" api:"required" format:"password"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	ExpiresAt time.Time `json:"expires_at" api:"required" format:"date-time"`
+	Name      string    `json:"name" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -98,11 +98,11 @@ func (r *APIKey) UnmarshalJSON(data []byte) error {
 }
 
 type APIKeyListEntry struct {
-	ID        string    `json:"id,required" format:"uuid"`
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
-	ExpiresAt time.Time `json:"expires_at,required" format:"date-time"`
-	Name      string    `json:"name,nullable"`
-	RevokedAt time.Time `json:"revoked_at,nullable" format:"date-time"`
+	ID        string    `json:"id" api:"required" format:"uuid"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	ExpiresAt time.Time `json:"expires_at" api:"required" format:"date-time"`
+	Name      string    `json:"name" api:"nullable"`
+	RevokedAt time.Time `json:"revoked_at" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -124,8 +124,8 @@ func (r *APIKeyListEntry) UnmarshalJSON(data []byte) error {
 type APIKeyListEntryList []APIKeyListEntry
 
 type Revocation struct {
-	ID        string    `json:"id,required" format:"uuid"`
-	RevokedAt time.Time `json:"revoked_at,required" format:"date-time"`
+	ID        string    `json:"id" api:"required" format:"uuid"`
+	RevokedAt time.Time `json:"revoked_at" api:"required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -144,7 +144,7 @@ func (r *Revocation) UnmarshalJSON(data []byte) error {
 type RevocationList []Revocation
 
 type ActiveV1APIKeyNewResponse struct {
-	Data APIKey `json:"data,required"`
+	Data APIKey `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -161,7 +161,7 @@ func (r *ActiveV1APIKeyNewResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1APIKeyListResponse struct {
-	Data APIKeyListEntryList `json:"data,required"`
+	Data APIKeyListEntryList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -178,7 +178,7 @@ func (r *ActiveV1APIKeyListResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1APIKeyRevokeResponse struct {
-	Data Revocation `json:"data,required"`
+	Data Revocation `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -195,7 +195,7 @@ func (r *ActiveV1APIKeyRevokeResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1APIKeyRevokeAllResponse struct {
-	Data RevocationList `json:"data,required"`
+	Data RevocationList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

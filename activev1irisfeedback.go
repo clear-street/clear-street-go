@@ -43,8 +43,8 @@ func (r *ActiveV1IrisFeedbackService) NewFeedback(ctx context.Context, body Acti
 }
 
 type CreateFeedbackResponse struct {
-	CreatedAt  string `json:"created_at,required"`
-	FeedbackID string `json:"feedback_id,nullable" format:"uuid"`
+	CreatedAt  string `json:"created_at" api:"required"`
+	FeedbackID string `json:"feedback_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		CreatedAt   respjson.Field
@@ -61,7 +61,7 @@ func (r *CreateFeedbackResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1IrisFeedbackNewFeedbackResponse struct {
-	Data CreateFeedbackResponse `json:"data,required"`
+	Data CreateFeedbackResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -79,13 +79,13 @@ func (r *ActiveV1IrisFeedbackNewFeedbackResponse) UnmarshalJSON(data []byte) err
 
 type ActiveV1IrisFeedbackNewFeedbackParams struct {
 	// Account ID for the request
-	AccountID string `json:"account_id,required"`
+	AccountID string `json:"account_id" api:"required"`
 	// Message to provide feedback on
-	MessageID string `json:"message_id,required" format:"uuid"`
+	MessageID string `json:"message_id" api:"required" format:"uuid"`
 	// Feedback score (-1, 0, +1 or 1-5)
-	Score int64 `json:"score,required"`
+	Score int64 `json:"score" api:"required"`
 	// Thread containing the message
-	ThreadID string `json:"thread_id,required" format:"uuid"`
+	ThreadID string `json:"thread_id" api:"required" format:"uuid"`
 	// Optional feedback comment
 	Comment param.Opt[string] `json:"comment,omitzero"`
 	// Optional metadata

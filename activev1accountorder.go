@@ -106,9 +106,9 @@ func (r *ActiveV1AccountOrderService) SubmitOrders(ctx context.Context, accountI
 // Arrival Price strategy
 type ApStrategy struct {
 	// Maximum percentage of market volume to participate in (0-100)
-	MaxPercent APIDecimal64 `json:"max_percent,nullable"`
+	MaxPercent APIDecimal64 `json:"max_percent" api:"nullable"`
 	// Minimum percentage of market volume to participate in (0-100)
-	MinPercent APIDecimal64 `json:"min_percent,nullable"`
+	MinPercent APIDecimal64 `json:"min_percent" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		MaxPercent  respjson.Field
@@ -156,9 +156,9 @@ type APIDecimal64 = string
 // Base parameters common to most algorithmic strategies
 type BaseStrategyParamsResp struct {
 	// UTC timestamp to end execution (defaults to market close)
-	EndAt time.Time `json:"end_at,nullable" format:"date-time"`
+	EndAt time.Time `json:"end_at" api:"nullable" format:"date-time"`
 	// UTC timestamp to start execution (defaults to order placement time)
-	StartAt time.Time `json:"start_at,nullable" format:"date-time"`
+	StartAt time.Time `json:"start_at" api:"nullable" format:"date-time"`
 	// Urgency level for execution aggressiveness
 	//
 	// Any of "SUPER_PASSIVE", "PASSIVE", "MODERATE", "AGGRESSIVE", "SUPER_AGGRESSIVE".
@@ -212,7 +212,7 @@ func (r *BaseStrategyParams) UnmarshalJSON(data []byte) error {
 // Dark Pool strategy
 type DarkStrategy struct {
 	// Maximum percentage of market volume to participate in (0-100)
-	MaxPercent APIDecimal64 `json:"max_percent,nullable"`
+	MaxPercent APIDecimal64 `json:"max_percent" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		MaxPercent  respjson.Field
@@ -255,7 +255,7 @@ func (r DarkStrategyParam) MarshalJSON() (data []byte, err error) {
 // Direct Market Access strategy
 type DmaStrategy struct {
 	// Destination exchange (MIC code)
-	Destination string `json:"destination,required"`
+	Destination string `json:"destination" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Destination respjson.Field
@@ -284,7 +284,7 @@ func (r DmaStrategy) ToParam() DmaStrategyParam {
 // The property Destination is required.
 type DmaStrategyParam struct {
 	// Destination exchange (MIC code)
-	Destination string `json:"destination,required"`
+	Destination string `json:"destination" api:"required"`
 	paramObj
 }
 
@@ -403,7 +403,7 @@ func (r OrderStrategyUnion) ToParam() OrderStrategyUnionParam {
 // Smart Order Router (default) - routes to best available venue
 type OrderStrategySor struct {
 	// Any of "SOR".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Type        respjson.Field
@@ -422,7 +422,7 @@ func (r *OrderStrategySor) UnmarshalJSON(data []byte) error {
 // Volume Weighted Average Price - matches VWAP over a period
 type OrderStrategyVwap struct {
 	// Any of "VWAP".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Type        respjson.Field
@@ -441,7 +441,7 @@ func (r *OrderStrategyVwap) UnmarshalJSON(data []byte) error {
 // Time Weighted Average Price - spreads execution evenly over time
 type OrderStrategyTwap struct {
 	// Any of "TWAP".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Type        respjson.Field
@@ -460,7 +460,7 @@ func (r *OrderStrategyTwap) UnmarshalJSON(data []byte) error {
 // Arrival Price - aims to match price at order placement time
 type OrderStrategyAp struct {
 	// Any of "AP".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Type        respjson.Field
@@ -479,7 +479,7 @@ func (r *OrderStrategyAp) UnmarshalJSON(data []byte) error {
 // Percentage of Volume - participates as a percentage of market volume
 type OrderStrategyPov struct {
 	// Any of "POV".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Type        respjson.Field
@@ -498,7 +498,7 @@ func (r *OrderStrategyPov) UnmarshalJSON(data []byte) error {
 // Dark Pool - routes to dark pool venues
 type OrderStrategyDark struct {
 	// Any of "DARK".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Type        respjson.Field
@@ -517,7 +517,7 @@ func (r *OrderStrategyDark) UnmarshalJSON(data []byte) error {
 // Direct Market Access - sends directly to a specified exchange
 type OrderStrategyDma struct {
 	// Any of "DMA".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Type        respjson.Field
@@ -606,7 +606,7 @@ func (u *OrderStrategyUnionParam) UnmarshalJSON(data []byte) error {
 
 // Smart Order Router (default) - routes to best available venue
 type OrderStrategySorParam struct {
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	SorStrategyParam
 }
 
@@ -620,7 +620,7 @@ func (r OrderStrategySorParam) MarshalJSON() (data []byte, err error) {
 
 // Volume Weighted Average Price - matches VWAP over a period
 type OrderStrategyVwapParam struct {
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	VwapStrategyParam
 }
 
@@ -634,7 +634,7 @@ func (r OrderStrategyVwapParam) MarshalJSON() (data []byte, err error) {
 
 // Time Weighted Average Price - spreads execution evenly over time
 type OrderStrategyTwapParam struct {
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	TwapStrategyParam
 }
 
@@ -648,7 +648,7 @@ func (r OrderStrategyTwapParam) MarshalJSON() (data []byte, err error) {
 
 // Arrival Price - aims to match price at order placement time
 type OrderStrategyApParam struct {
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	ApStrategyParam
 }
 
@@ -662,7 +662,7 @@ func (r OrderStrategyApParam) MarshalJSON() (data []byte, err error) {
 
 // Percentage of Volume - participates as a percentage of market volume
 type OrderStrategyPovParam struct {
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	PovStrategyParam
 }
 
@@ -676,7 +676,7 @@ func (r OrderStrategyPovParam) MarshalJSON() (data []byte, err error) {
 
 // Dark Pool - routes to dark pool venues
 type OrderStrategyDarkParam struct {
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	DarkStrategyParam
 }
 
@@ -690,7 +690,7 @@ func (r OrderStrategyDarkParam) MarshalJSON() (data []byte, err error) {
 
 // Direct Market Access - sends directly to a specified exchange
 type OrderStrategyDmaParam struct {
-	Type string `json:"type,omitzero,required"`
+	Type string `json:"type,omitzero" api:"required"`
 	DmaStrategyParam
 }
 
@@ -718,7 +718,7 @@ const (
 // Percentage of Volume strategy
 type PovStrategy struct {
 	// Target percentage of market volume to participate in (0-100)
-	TargetPercent APIDecimal64 `json:"target_percent,required"`
+	TargetPercent APIDecimal64 `json:"target_percent" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		TargetPercent respjson.Field
@@ -746,7 +746,7 @@ func (r PovStrategy) ToParam() PovStrategyParam {
 // Percentage of Volume strategy
 type PovStrategyParam struct {
 	// Target percentage of market volume to participate in (0-100)
-	TargetPercent APIDecimal64 `json:"target_percent,required"`
+	TargetPercent APIDecimal64 `json:"target_percent" api:"required"`
 	BaseStrategyParams
 }
 
@@ -771,9 +771,9 @@ const (
 // Base parameters common to most algorithmic strategies
 type SorStrategy struct {
 	// UTC timestamp to end execution (defaults to market close)
-	EndAt time.Time `json:"end_at,nullable" format:"date-time"`
+	EndAt time.Time `json:"end_at" api:"nullable" format:"date-time"`
 	// UTC timestamp to start execution (defaults to order placement time)
-	StartAt time.Time `json:"start_at,nullable" format:"date-time"`
+	StartAt time.Time `json:"start_at" api:"nullable" format:"date-time"`
 	// Urgency level for execution aggressiveness
 	//
 	// Any of "SUPER_PASSIVE", "PASSIVE", "MODERATE", "AGGRESSIVE", "SUPER_AGGRESSIVE".
@@ -852,9 +852,9 @@ const (
 // Time Weighted Average Price strategy
 type TwapStrategy struct {
 	// Maximum percentage of market volume to participate in (0-50)
-	MaxPercent APIDecimal64 `json:"max_percent,nullable"`
+	MaxPercent APIDecimal64 `json:"max_percent" api:"nullable"`
 	// Minimum percentage of market volume to participate in (0-100)
-	MinPercent APIDecimal64 `json:"min_percent,nullable"`
+	MinPercent APIDecimal64 `json:"min_percent" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		MaxPercent  respjson.Field
@@ -911,9 +911,9 @@ const (
 // Volume Weighted Average Price strategy
 type VwapStrategy struct {
 	// Maximum percentage of market volume to participate in (0-50)
-	MaxPercent APIDecimal64 `json:"max_percent,nullable"`
+	MaxPercent APIDecimal64 `json:"max_percent" api:"nullable"`
 	// Minimum percentage of market volume to participate in (0-100)
-	MinPercent APIDecimal64 `json:"min_percent,nullable"`
+	MinPercent APIDecimal64 `json:"min_percent" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		MaxPercent  respjson.Field
@@ -957,7 +957,7 @@ func (r VwapStrategyParam) MarshalJSON() (data []byte, err error) {
 }
 
 type ActiveV1AccountOrderCancelAllOrdersResponse struct {
-	Data OrderList `json:"data,required"`
+	Data OrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -979,7 +979,7 @@ type ActiveV1AccountOrderCancelOrderResponse struct {
 	// This is the unified API representation of an order across its lifecycle,
 	// combining data from execution reports, order status queries, and parent/child
 	// tracking.
-	Data Order `json:"data,required"`
+	Data Order `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -1001,7 +1001,7 @@ type ActiveV1AccountOrderGetOrderByIDResponse struct {
 	// This is the unified API representation of an order across its lifecycle,
 	// combining data from execution reports, order status queries, and parent/child
 	// tracking.
-	Data Order `json:"data,required"`
+	Data Order `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -1018,7 +1018,7 @@ func (r *ActiveV1AccountOrderGetOrderByIDResponse) UnmarshalJSON(data []byte) er
 }
 
 type ActiveV1AccountOrderGetOrdersResponse struct {
-	Data OrderList `json:"data,required"`
+	Data OrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -1040,7 +1040,7 @@ type ActiveV1AccountOrderReplaceOrderResponse struct {
 	// This is the unified API representation of an order across its lifecycle,
 	// combining data from execution reports, order status queries, and parent/child
 	// tracking.
-	Data Order `json:"data,required"`
+	Data Order `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -1057,7 +1057,7 @@ func (r *ActiveV1AccountOrderReplaceOrderResponse) UnmarshalJSON(data []byte) er
 }
 
 type ActiveV1AccountOrderSubmitOrdersResponse struct {
-	Data OrderList `json:"data,required"`
+	Data OrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -1153,12 +1153,12 @@ const (
 )
 
 type ActiveV1AccountOrderCancelOrderParams struct {
-	AccountID int64 `path:"account_id,required" json:"-"`
+	AccountID int64 `path:"account_id" api:"required" json:"-"`
 	paramObj
 }
 
 type ActiveV1AccountOrderGetOrderByIDParams struct {
-	AccountID int64 `path:"account_id,required" json:"-"`
+	AccountID int64 `path:"account_id" api:"required" json:"-"`
 	paramObj
 }
 
@@ -1249,7 +1249,7 @@ const (
 )
 
 type ActiveV1AccountOrderReplaceOrderParams struct {
-	AccountID int64 `path:"account_id,required" json:"-"`
+	AccountID int64 `path:"account_id" api:"required" json:"-"`
 	// New limit price for the order
 	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
 	// New quantity for the order
@@ -1294,25 +1294,25 @@ type ActiveV1AccountOrderSubmitOrdersParamsBody struct {
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
 	// "TRAILING_STOP_LIMIT", "OTHER".
-	OrderType OrderType `json:"order_type,omitzero,required"`
+	OrderType OrderType `json:"order_type,omitzero" api:"required"`
 	// Quantity to trade. For COMMON_STOCK: shares (may be fractional if supported).
 	// For OPTION (single-leg): contracts (must be an integer)
-	Quantity string `json:"quantity,required"`
+	Quantity string `json:"quantity" api:"required"`
 	// Type of security
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `json:"security_type,omitzero,required"`
+	SecurityType SecurityType `json:"security_type,omitzero" api:"required"`
 	// Side of the order
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side Side `json:"side,omitzero,required"`
+	Side Side `json:"side,omitzero" api:"required"`
 	// Time in force
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
 	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
 	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
-	TimeInForce TimeInForce `json:"time_in_force,omitzero,required"`
+	TimeInForce TimeInForce `json:"time_in_force,omitzero" api:"required"`
 	// Optional client-provided unique ID (idempotency). Required to be unique per
 	// account.
 	ID param.Opt[string] `json:"id,omitzero"`

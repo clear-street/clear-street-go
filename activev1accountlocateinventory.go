@@ -47,16 +47,16 @@ func (r *ActiveV1AccountLocateInventoryService) GetLocateInventory(ctx context.C
 // Represents the available locate inventory for a symbol
 type LocateInventoryItem struct {
 	// The account the locate inventory belongs to
-	AccountID int64 `json:"account_id,required"`
+	AccountID int64 `json:"account_id" api:"required"`
 	// The available quantity of shares that can be located to borrow
-	Available int64 `json:"available,required"`
+	Available int64 `json:"available" api:"required"`
 	// The quantity of shares reserved for locate orders that have been `OFFERED` but
 	// not yet `FILLED`
-	Reserved int64 `json:"reserved,required"`
+	Reserved int64 `json:"reserved" api:"required"`
 	// The symbol of the security
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// The quantity of shares that have been `FILLED` and are currently borrowed
-	Used int64 `json:"used,required"`
+	Used int64 `json:"used" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AccountID   respjson.Field
@@ -78,7 +78,7 @@ func (r *LocateInventoryItem) UnmarshalJSON(data []byte) error {
 type LocateInventoryItemList []LocateInventoryItem
 
 type ActiveV1AccountLocateInventoryGetLocateInventoryResponse struct {
-	Data LocateInventoryItemList `json:"data,required"`
+	Data LocateInventoryItemList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -96,7 +96,7 @@ func (r *ActiveV1AccountLocateInventoryGetLocateInventoryResponse) UnmarshalJSON
 
 type ActiveV1AccountLocateInventoryGetLocateInventoryParams struct {
 	// The instrument symbol
-	Symbol string `query:"symbol,required" json:"-"`
+	Symbol string `query:"symbol" api:"required" json:"-"`
 	paramObj
 }
 

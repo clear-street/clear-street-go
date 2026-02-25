@@ -61,7 +61,7 @@ func (r *ActiveV1IrisThreadService) ListThreads(ctx context.Context, query Activ
 }
 
 type GetThreadResponse struct {
-	Thread Thread `json:"thread,required"`
+	Thread Thread `json:"thread" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Thread      respjson.Field
@@ -77,8 +77,8 @@ func (r *GetThreadResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ListThreadsResponse struct {
-	Threads       []Thread `json:"threads,required"`
-	NextPageToken string   `json:"next_page_token,nullable" format:"uuid"`
+	Threads       []Thread `json:"threads" api:"required"`
+	NextPageToken string   `json:"next_page_token" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Threads       respjson.Field
@@ -95,7 +95,7 @@ func (r *ListThreadsResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1IrisThreadGetThreadResponse struct {
-	Data GetThreadResponse `json:"data,required"`
+	Data GetThreadResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -112,7 +112,7 @@ func (r *ActiveV1IrisThreadGetThreadResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1IrisThreadListThreadsResponse struct {
-	Data ListThreadsResponse `json:"data,required"`
+	Data ListThreadsResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -130,7 +130,7 @@ func (r *ActiveV1IrisThreadListThreadsResponse) UnmarshalJSON(data []byte) error
 
 type ActiveV1IrisThreadGetThreadParams struct {
 	// Account ID for the request
-	AccountID string `query:"account_id,required" json:"-"`
+	AccountID string `query:"account_id" api:"required" json:"-"`
 	paramObj
 }
 
@@ -145,7 +145,7 @@ func (r ActiveV1IrisThreadGetThreadParams) URLQuery() (v url.Values, err error) 
 
 type ActiveV1IrisThreadListThreadsParams struct {
 	// Account ID for the request
-	AccountID string `query:"account_id,required" json:"-"`
+	AccountID string `query:"account_id" api:"required" json:"-"`
 	// Maximum threads to return
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Page token for pagination

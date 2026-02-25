@@ -35,18 +35,18 @@ func NewActiveV1IrisService(opts ...option.RequestOption) (r ActiveV1IrisService
 
 type Message struct {
 	// Denormalized text content for search/display
-	ContentText string `json:"content_text,required"`
-	CreatedAt   string `json:"created_at,required"`
+	ContentText string `json:"content_text" api:"required"`
+	CreatedAt   string `json:"created_at" api:"required"`
 	// Any of "UNSPECIFIED", "SYSTEM", "USER", "ASSISTANT", "TOOL".
-	Role         MessageRole `json:"role,required"`
-	Seq          int64       `json:"seq,required"`
-	ID           string      `json:"id,nullable" format:"uuid"`
-	AuthorUserID string      `json:"author_user_id,nullable"`
+	Role         MessageRole `json:"role" api:"required"`
+	Seq          int64       `json:"seq" api:"required"`
+	ID           string      `json:"id" api:"nullable" format:"uuid"`
+	AuthorUserID string      `json:"author_user_id" api:"nullable"`
 	// Parsed content parts (text and structured actions)
-	Content  MessageContent `json:"content,nullable"`
-	Metadata any            `json:"metadata,nullable"`
-	RunID    string         `json:"run_id,nullable" format:"uuid"`
-	ThreadID string         `json:"thread_id,nullable" format:"uuid"`
+	Content  MessageContent `json:"content" api:"nullable"`
+	Metadata any            `json:"metadata" api:"nullable"`
+	RunID    string         `json:"run_id" api:"nullable" format:"uuid"`
+	ThreadID string         `json:"thread_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ContentText  respjson.Field
@@ -71,14 +71,14 @@ func (r *Message) UnmarshalJSON(data []byte) error {
 }
 
 type Thread struct {
-	AccountID   string `json:"account_id,required"`
-	CreatedAt   string `json:"created_at,required"`
-	Description string `json:"description,required"`
-	OwnerUserID string `json:"owner_user_id,required"`
-	Title       string `json:"title,required"`
-	UpdatedAt   string `json:"updated_at,required"`
-	ID          string `json:"id,nullable" format:"uuid"`
-	Metadata    any    `json:"metadata,nullable"`
+	AccountID   string `json:"account_id" api:"required"`
+	CreatedAt   string `json:"created_at" api:"required"`
+	Description string `json:"description" api:"required"`
+	OwnerUserID string `json:"owner_user_id" api:"required"`
+	Title       string `json:"title" api:"required"`
+	UpdatedAt   string `json:"updated_at" api:"required"`
+	ID          string `json:"id" api:"nullable" format:"uuid"`
+	Metadata    any    `json:"metadata" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AccountID   respjson.Field

@@ -69,39 +69,39 @@ func (r *ActiveV1AccountLocateService) UpdateLocateRequest(ctx context.Context, 
 // Represents a single locate order and its status
 type LocateOrder struct {
 	// The unique system-generated ID for the locate order
-	LocateOrderID string `json:"locate_order_id,required"`
+	LocateOrderID string `json:"locate_order_id" api:"required"`
 	// The quantity of shares that have been located
-	LocatedQuantity int64 `json:"located_quantity,required"`
+	LocatedQuantity int64 `json:"located_quantity" api:"required"`
 	// The client Market Participant Identifier, assigned by Clear Street
-	Mpid string `json:"mpid,required"`
+	Mpid string `json:"mpid" api:"required"`
 	// The timestamp when the locate order was received from the client in UTC
-	RequestedAt time.Time `json:"requested_at,required" format:"date-time"`
+	RequestedAt time.Time `json:"requested_at" api:"required" format:"date-time"`
 	// The quantity of shares requested by the client
-	RequestedQuantity int64 `json:"requested_quantity,required"`
+	RequestedQuantity int64 `json:"requested_quantity" api:"required"`
 	// The status of the locate order
 	//
 	// Any of "PENDING", "OFFERED", "FILLED", "REJECTED", "DECLINED", "EXPIRED",
 	// "CANCELED".
-	Status LocateOrderStatus `json:"status,required"`
+	Status LocateOrderStatus `json:"status" api:"required"`
 	// The symbol of the security to locate
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// The borrow rate for the security if held overnight, expressed as a decimal
-	BorrowRate string `json:"borrow_rate,nullable"`
+	BorrowRate string `json:"borrow_rate" api:"nullable"`
 	// Comments provided by the trading desk
-	DeskComment string `json:"desk_comment,nullable"`
+	DeskComment string `json:"desk_comment" api:"nullable"`
 	// The timestamp when the locate order will expire, set once the order has been
 	// processed, in UTC
-	ExpiresAt time.Time `json:"expires_at,nullable" format:"date-time"`
+	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
 	// A unique ID for the locate order, available after the order has been `OFFERED`
-	LocateID string `json:"locate_id,nullable"`
+	LocateID string `json:"locate_id" api:"nullable"`
 	// The timestamp when the security was located in UTC
-	LocatedAt time.Time `json:"located_at,nullable" format:"date-time"`
+	LocatedAt time.Time `json:"located_at" api:"nullable" format:"date-time"`
 	// The reference ID provided when submitting the locate order
-	ReferenceID string `json:"reference_id,nullable"`
+	ReferenceID string `json:"reference_id" api:"nullable"`
 	// The total cost of the locate
-	TotalCost string `json:"total_cost,nullable"`
+	TotalCost string `json:"total_cost" api:"nullable"`
 	// Comments provided by the trader when submitting the locate order
-	TraderComment string `json:"trader_comment,nullable"`
+	TraderComment string `json:"trader_comment" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		LocateOrderID     respjson.Field
@@ -146,7 +146,7 @@ const (
 )
 
 type ActiveV1AccountLocateNewLocateRequestResponse struct {
-	Data LocateOrderList `json:"data,required"`
+	Data LocateOrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -163,7 +163,7 @@ func (r *ActiveV1AccountLocateNewLocateRequestResponse) UnmarshalJSON(data []byt
 }
 
 type ActiveV1AccountLocateGetLocateRequestsResponse struct {
-	Data LocateOrderList `json:"data,required"`
+	Data LocateOrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -181,7 +181,7 @@ func (r *ActiveV1AccountLocateGetLocateRequestsResponse) UnmarshalJSON(data []by
 
 type ActiveV1AccountLocateUpdateLocateRequestResponse struct {
 	// Represents a single locate order and its status
-	Data LocateOrder `json:"data,required"`
+	Data LocateOrder `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -214,9 +214,9 @@ func (r *ActiveV1AccountLocateNewLocateRequestParams) UnmarshalJSON(data []byte)
 // The properties Quantity, Symbol are required.
 type ActiveV1AccountLocateNewLocateRequestParamsBody struct {
 	// The quantity of shares to locate
-	Quantity int64 `json:"quantity,required"`
+	Quantity int64 `json:"quantity" api:"required"`
 	// The symbol of the security to locate
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// Optional comments to associate with the locate request
 	Comments param.Opt[string] `json:"comments,omitzero"`
 	// A client-provided reference ID to identify the locate order
@@ -260,7 +260,7 @@ func (r ActiveV1AccountLocateGetLocateRequestsParams) URLQuery() (v url.Values, 
 
 type ActiveV1AccountLocateUpdateLocateRequestParams struct {
 	// Whether to accept (`true`) or decline (`false`) the locate offer
-	Accept bool `json:"accept,required"`
+	Accept bool `json:"accept" api:"required"`
 	paramObj
 }
 

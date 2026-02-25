@@ -76,21 +76,21 @@ func (r *ActiveV1AccountService) PatchAccountByID(ctx context.Context, accountID
 // Represents a trading account
 type Account struct {
 	// The unique identifier for the account
-	ID int64 `json:"id,required"`
+	ID int64 `json:"id" api:"required"`
 	// The full legal name of the account
-	FullName string `json:"full_name,required"`
+	FullName string `json:"full_name" api:"required"`
 	// The type of account
 	//
 	// Any of "HOUSE", "PAB", "CUSTOMER", "COUNTERPARTY", "OTHER".
-	Kind AccountKind `json:"kind,required"`
+	Kind AccountKind `json:"kind" api:"required"`
 	// The date the account was opened
-	OpenDate time.Time `json:"open_date,required" format:"date"`
+	OpenDate time.Time `json:"open_date" api:"required" format:"date"`
 	// The short name of the account
-	ShortName string `json:"short_name,required"`
+	ShortName string `json:"short_name" api:"required"`
 	// The current status of the account
 	//
 	// Any of "ACTIVE", "INACTIVE", "CLOSED".
-	Status AccountStatus `json:"status,required"`
+	Status AccountStatus `json:"status" api:"required"`
 	// The sub-type of account
 	//
 	// Any of "AFFILIATE", "ALLOCATION", "ARRANGING", "BANK", "BLOCK_TRADING",
@@ -99,9 +99,9 @@ type Account struct {
 	// "HEDGE", "MARGIN", "MUTUAL_FUND", "OPERATING", "OTHER", "RELATED_MASTER",
 	// "REPO", "SECURITIES_LENDING", "SHADOW_AWAY", "TRADING",
 	// "TRIPARTY_COLLATERAL_AWAY", "UNKNOWN".
-	Subkind AccountSubkind `json:"subkind,required"`
+	Subkind AccountSubkind `json:"subkind" api:"required"`
 	// The date the account was closed, if applicable
-	CloseDate time.Time `json:"close_date,nullable" format:"date"`
+	CloseDate time.Time `json:"close_date" api:"nullable" format:"date"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -138,7 +138,7 @@ type AccountList []Account
 
 type AccountSettings struct {
 	// Risk settings for the account
-	Risk RiskSettings `json:"risk,nullable"`
+	Risk RiskSettings `json:"risk" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Risk        respjson.Field
@@ -204,25 +204,25 @@ const (
 // tracking.
 type Order struct {
 	// Client-provided unique identifier for this order
-	ID string `json:"id,required"`
+	ID string `json:"id" api:"required"`
 	// Account placing the order
-	AccountID int64 `json:"account_id,required"`
+	AccountID int64 `json:"account_id" api:"required"`
 	// Timestamp when order was created (UTC)
-	CreatedAt time.Time `json:"created_at,required" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Cumulative filled quantity
-	FilledQuantity string `json:"filled_quantity,required"`
+	FilledQuantity string `json:"filled_quantity" api:"required"`
 	// Remaining unfilled quantity
-	LeavesQuantity string `json:"leaves_quantity,required"`
+	LeavesQuantity string `json:"leaves_quantity" api:"required"`
 	// Type of order (MARKET, LIMIT, etc.)
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
 	// "TRAILING_STOP_LIMIT", "OTHER".
-	OrderType OrderType `json:"order_type,required"`
+	OrderType OrderType `json:"order_type" api:"required"`
 	// Total order quantity
-	Quantity string `json:"quantity,required"`
+	Quantity string `json:"quantity" api:"required"`
 	// The identifier for the traded instrument (CMS/CUSIP/ISIN/FIGI for equities or
 	// option OPRA OSI)
-	SecurityID string `json:"security_id,required"`
+	SecurityID string `json:"security_id" api:"required"`
 	// The source of the security identifier
 	//
 	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
@@ -233,59 +233,59 @@ type Order struct {
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `json:"security_id_source,required"`
+	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
 	// Type of security
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `json:"security_type,required"`
+	SecurityType SecurityType `json:"security_type" api:"required"`
 	// Side of the order (BUY, SELL, SELL_SHORT)
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side Side `json:"side,required"`
+	Side Side `json:"side" api:"required"`
 	// Current status of the order
 	//
 	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
 	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
 	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
-	Status OrderStatus `json:"status,required"`
+	Status OrderStatus `json:"status" api:"required"`
 	// Trading symbol
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// Time in force instruction
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
 	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
 	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
-	TimeInForce TimeInForce `json:"time_in_force,required"`
+	TimeInForce TimeInForce `json:"time_in_force" api:"required"`
 	// Timestamp of the most recent update (UTC)
-	UpdatedAt time.Time `json:"updated_at,required" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// MIC code of the venue where the order is routed
-	Venue string `json:"venue,required"`
+	Venue string `json:"venue" api:"required"`
 	// Average fill price across all executions
-	AverageFillPrice string `json:"average_fill_price,nullable"`
+	AverageFillPrice string `json:"average_fill_price" api:"nullable"`
 	// Contains execution, rejection or cancellation details, if any
 	Details []string `json:"details"`
 	// Timestamp when the order will expire (UTC). Present when time_in_force is
 	// GOOD_TILL_DATE.
-	ExpiresAt time.Time `json:"expires_at,nullable" format:"date-time"`
+	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
 	// Limit offset for trailing stop-limit orders (signed)
-	LimitOffset string `json:"limit_offset,nullable"`
+	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// Limit price (for LIMIT and STOP_LIMIT orders)
-	LimitPrice string `json:"limit_price,nullable"`
+	LimitPrice string `json:"limit_price" api:"nullable"`
 	// Stop price (for STOP and STOP_LIMIT orders)
-	StopPrice string `json:"stop_price,nullable"`
+	StopPrice string `json:"stop_price" api:"nullable"`
 	// Execution strategy for this order
-	Strategy OrderStrategyUnion `json:"strategy,nullable"`
+	Strategy OrderStrategyUnion `json:"strategy" api:"nullable"`
 	// Trailing offset amount for trailing orders
-	TrailingOffsetAmt string `json:"trailing_offset_amt,nullable"`
+	TrailingOffsetAmt string `json:"trailing_offset_amt" api:"nullable"`
 	// Trailing offset type for trailing orders
 	//
 	// Any of "PRICE", "PERCENT_BPS".
-	TrailingOffsetAmtType TrailingOffsetType `json:"trailing_offset_amt_type,nullable"`
+	TrailingOffsetAmtType TrailingOffsetType `json:"trailing_offset_amt_type" api:"nullable"`
 	// Trailing watermark price for trailing orders
-	TrailingWatermarkPx string `json:"trailing_watermark_px,nullable"`
+	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
 	// Trailing watermark timestamp for trailing orders
-	TrailingWatermarkTs time.Time `json:"trailing_watermark_ts,nullable" format:"date-time"`
+	TrailingWatermarkTs time.Time `json:"trailing_watermark_ts" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                    respjson.Field
@@ -331,7 +331,7 @@ type OrderList []Order
 // Risk settings for an account
 type RiskSettings struct {
 	// The maximum notional value available to the account
-	MaxNotional string `json:"max_notional,nullable"`
+	MaxNotional string `json:"max_notional" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		MaxNotional respjson.Field
@@ -372,7 +372,7 @@ func (r *RiskSettingsParam) UnmarshalJSON(data []byte) error {
 
 type ActiveV1AccountGetAccountByIDResponse struct {
 	// Represents a trading account
-	Data Account `json:"data,required"`
+	Data Account `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -389,7 +389,7 @@ func (r *ActiveV1AccountGetAccountByIDResponse) UnmarshalJSON(data []byte) error
 }
 
 type ActiveV1AccountGetAccountsResponse struct {
-	Data AccountList `json:"data,required"`
+	Data AccountList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -406,7 +406,7 @@ func (r *ActiveV1AccountGetAccountsResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1AccountPatchAccountByIDResponse struct {
-	Data AccountSettings `json:"data,required"`
+	Data AccountSettings `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

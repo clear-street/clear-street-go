@@ -48,13 +48,13 @@ func (r *ActiveV1CalendarSplitService) GetSplitsCalendar(ctx context.Context, qu
 // Represents a stock split event
 type StockSplitEvent struct {
 	// The date the split will occur
-	Date time.Time `json:"date,required" format:"date"`
+	Date time.Time `json:"date" api:"required" format:"date"`
 	// The pre-split number of shares
-	Denominator int64 `json:"denominator,required"`
+	Denominator int64 `json:"denominator" api:"required"`
 	// The post-split number of shares for every 'denominator' pre-split shares
-	Numerator int64 `json:"numerator,required"`
+	Numerator int64 `json:"numerator" api:"required"`
 	// The symbol for the instrument
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date        respjson.Field
@@ -75,7 +75,7 @@ func (r *StockSplitEvent) UnmarshalJSON(data []byte) error {
 type StockSplitEventList []StockSplitEvent
 
 type ActiveV1CalendarSplitGetSplitsCalendarResponse struct {
-	Data StockSplitEventList `json:"data,required"`
+	Data StockSplitEventList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

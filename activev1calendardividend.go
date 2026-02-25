@@ -48,25 +48,25 @@ func (r *ActiveV1CalendarDividendService) GetDividendsCalendar(ctx context.Conte
 // Represents a single dividend event
 type DividendCalendarEvent struct {
 	// The dividend amount adjusted for any stock splits
-	AdjustedDividend string `json:"adjusted_dividend,required"`
+	AdjustedDividend string `json:"adjusted_dividend" api:"required"`
 	// The ex-dividend date
-	Date time.Time `json:"date,required" format:"date"`
+	Date time.Time `json:"date" api:"required" format:"date"`
 	// The dividend amount per share
-	Dividend string `json:"dividend,required"`
+	Dividend string `json:"dividend" api:"required"`
 	// The symbol for the instrument
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// The date the dividend was declared
-	DeclarationDate time.Time `json:"declaration_date,nullable" format:"date"`
+	DeclarationDate time.Time `json:"declaration_date" api:"nullable" format:"date"`
 	// The frequency of the dividend payment
 	//
 	// Any of "ANNUALLY", "SEMI_ANNUALLY", "QUARTERLY", "MONTHLY", "OTHER".
-	Frequency DividendCalendarEventFrequency `json:"frequency,nullable"`
+	Frequency DividendCalendarEventFrequency `json:"frequency" api:"nullable"`
 	// The payment date for the dividend
-	PaymentDate time.Time `json:"payment_date,nullable" format:"date"`
+	PaymentDate time.Time `json:"payment_date" api:"nullable" format:"date"`
 	// The record date for the dividend
-	RecordDate time.Time `json:"record_date,nullable" format:"date"`
+	RecordDate time.Time `json:"record_date" api:"nullable" format:"date"`
 	// The dividend yield as a percentage decimal
-	Yield string `json:"yield,nullable"`
+	Yield string `json:"yield" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AdjustedDividend respjson.Field
@@ -103,7 +103,7 @@ const (
 type DividendCalendarEventList []DividendCalendarEvent
 
 type ActiveV1CalendarDividendGetDividendsCalendarResponse struct {
-	Data DividendCalendarEventList `json:"data,required"`
+	Data DividendCalendarEventList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

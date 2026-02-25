@@ -55,15 +55,15 @@ func (r *ActiveV1InstrumentAnalystReportingService) GetInstrumentAnalystConsensu
 // Analyst recommendation distribution
 type AnalystDistribution struct {
 	// Number of buy recommendations
-	Buy int64 `json:"buy,required"`
+	Buy int64 `json:"buy" api:"required"`
 	// Number of hold recommendations
-	Hold int64 `json:"hold,required"`
+	Hold int64 `json:"hold" api:"required"`
 	// Number of sell recommendations
-	Sell int64 `json:"sell,required"`
+	Sell int64 `json:"sell" api:"required"`
 	// Number of strong buy recommendations
-	StrongBuy int64 `json:"strong_buy,required"`
+	StrongBuy int64 `json:"strong_buy" api:"required"`
 	// Number of strong sell recommendations
-	StrongSell int64 `json:"strong_sell,required"`
+	StrongSell int64 `json:"strong_sell" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Buy         respjson.Field
@@ -96,15 +96,15 @@ const (
 // Aggregated analyst consensus metrics
 type InstrumentAnalystConsensus struct {
 	// The date the consensus snapshot was generated
-	Date time.Time `json:"date,required" format:"date"`
+	Date time.Time `json:"date" api:"required" format:"date"`
 	// Count of individual analyst recommendations by category
-	Distribution AnalystDistribution `json:"distribution,nullable"`
+	Distribution AnalystDistribution `json:"distribution" api:"nullable"`
 	// Aggregated analyst price target statistics
-	PriceTarget PriceTarget `json:"price_target,nullable"`
+	PriceTarget PriceTarget `json:"price_target" api:"nullable"`
 	// Consensus analyst rating
 	//
 	// Any of "STRONG_BUY", "BUY", "HOLD", "SELL", "STRONG_SELL".
-	Rating AnalystRating `json:"rating,nullable"`
+	Rating AnalystRating `json:"rating" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date         respjson.Field
@@ -125,13 +125,13 @@ func (r *InstrumentAnalystConsensus) UnmarshalJSON(data []byte) error {
 // Analyst price target statistics
 type PriceTarget struct {
 	// Average analyst price target
-	Average string `json:"average,required"`
+	Average string `json:"average" api:"required"`
 	// ISO 4217 currency code of the price targets
-	Currency string `json:"currency,required"`
+	Currency string `json:"currency" api:"required"`
 	// Highest analyst price target
-	High string `json:"high,required"`
+	High string `json:"high" api:"required"`
 	// Lowest analyst price target
-	Low string `json:"low,required"`
+	Low string `json:"low" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Average     respjson.Field
@@ -151,7 +151,7 @@ func (r *PriceTarget) UnmarshalJSON(data []byte) error {
 
 type ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusResponse struct {
 	// Aggregated analyst consensus metrics
-	Data InstrumentAnalystConsensus `json:"data,required"`
+	Data InstrumentAnalystConsensus `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -180,7 +180,7 @@ type ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusParams struc
 	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero,required" json:"-"`
+	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero" api:"required" json:"-"`
 	// The start date for the query range, inclusive (YYYY-MM-DD)
 	From param.Opt[time.Time] `query:"from,omitzero" format:"date" json:"-"`
 	// The end date for the query range, inclusive (YYYY-MM-DD)

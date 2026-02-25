@@ -48,19 +48,19 @@ func (r *ActiveV1CalendarEarningService) GetEarningsCalendar(ctx context.Context
 // Represents a single earnings announcement event
 type EarningsCalendarEvent struct {
 	// The date of the earnings announcement
-	Date time.Time `json:"date,required" format:"date"`
+	Date time.Time `json:"date" api:"required" format:"date"`
 	// The date of the last update to this event
-	LastUpdated time.Time `json:"last_updated,required" format:"date"`
+	LastUpdated time.Time `json:"last_updated" api:"required" format:"date"`
 	// The symbol for the instrument
-	Symbol string `json:"symbol,required"`
+	Symbol string `json:"symbol" api:"required"`
 	// The actual reported earnings per share
-	EpsActual string `json:"eps_actual,nullable"`
+	EpsActual string `json:"eps_actual" api:"nullable"`
 	// The consensus estimated earnings per share
-	EpsEstimated string `json:"eps_estimated,nullable"`
+	EpsEstimated string `json:"eps_estimated" api:"nullable"`
 	// The actual reported revenue
-	RevenueActual string `json:"revenue_actual,nullable"`
+	RevenueActual string `json:"revenue_actual" api:"nullable"`
 	// The consensus estimated revenue
-	RevenueEstimated string `json:"revenue_estimated,nullable"`
+	RevenueEstimated string `json:"revenue_estimated" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date             respjson.Field
@@ -84,7 +84,7 @@ func (r *EarningsCalendarEvent) UnmarshalJSON(data []byte) error {
 type EarningsCalendarEventList []EarningsCalendarEvent
 
 type ActiveV1CalendarEarningGetEarningsCalendarResponse struct {
-	Data EarningsCalendarEventList `json:"data,required"`
+	Data EarningsCalendarEventList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field

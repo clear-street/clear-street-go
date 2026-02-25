@@ -73,7 +73,7 @@ func (r *ActiveV1IrisRunService) StartRun(ctx context.Context, body ActiveV1Iris
 }
 
 type CancelRunResponse struct {
-	Canceled bool `json:"canceled,required"`
+	Canceled bool `json:"canceled" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Canceled    respjson.Field
@@ -147,9 +147,9 @@ func (r *ContentPartUnion) UnmarshalJSON(data []byte) error {
 
 // Plain text content
 type ContentPartObject struct {
-	Text string `json:"text,required"`
+	Text string `json:"text" api:"required"`
 	// Any of "text".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Text        respjson.Field
@@ -168,7 +168,7 @@ func (r *ContentPartObject) UnmarshalJSON(data []byte) error {
 // Custom/extensible content
 type ContentPartType struct {
 	// Any of "custom".
-	Type string `json:"type,required"`
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Type        respjson.Field
@@ -184,9 +184,9 @@ func (r *ContentPartType) UnmarshalJSON(data []byte) error {
 }
 
 type GetRunResponse struct {
-	Events        []any  `json:"events,required"`
-	Run           Run    `json:"run,required"`
-	NextPageToken string `json:"next_page_token,nullable" format:"uuid"`
+	Events        []any  `json:"events" api:"required"`
+	Run           Run    `json:"run" api:"required"`
+	NextPageToken string `json:"next_page_token" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Events        respjson.Field
@@ -205,7 +205,7 @@ func (r *GetRunResponse) UnmarshalJSON(data []byte) error {
 
 // Message content containing text and structured action parts.
 type MessageContent struct {
-	Parts []ContentPartUnion `json:"parts,required"`
+	Parts []ContentPartUnion `json:"parts" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Parts       respjson.Field
@@ -231,20 +231,20 @@ const (
 )
 
 type Run struct {
-	CreatedAt string `json:"created_at,required"`
-	Model     string `json:"model,required"`
-	Provider  string `json:"provider,required"`
+	CreatedAt string `json:"created_at" api:"required"`
+	Model     string `json:"model" api:"required"`
+	Provider  string `json:"provider" api:"required"`
 	// Any of "UNSPECIFIED", "QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELED".
-	Status       RunStatus    `json:"status,required"`
-	ID           string       `json:"id,nullable" format:"uuid"`
+	Status       RunStatus    `json:"status" api:"required"`
+	ID           string       `json:"id" api:"nullable" format:"uuid"`
 	Capabilities []Capability `json:"capabilities"`
-	EndedAt      string       `json:"ended_at,nullable"`
-	Error        any          `json:"error,nullable"`
-	Metadata     any          `json:"metadata,nullable"`
-	Parameters   any          `json:"parameters,nullable"`
-	StartedAt    string       `json:"started_at,nullable"`
-	ThreadID     string       `json:"thread_id,nullable" format:"uuid"`
-	Usage        any          `json:"usage,nullable"`
+	EndedAt      string       `json:"ended_at" api:"nullable"`
+	Error        any          `json:"error" api:"nullable"`
+	Metadata     any          `json:"metadata" api:"nullable"`
+	Parameters   any          `json:"parameters" api:"nullable"`
+	StartedAt    string       `json:"started_at" api:"nullable"`
+	ThreadID     string       `json:"thread_id" api:"nullable" format:"uuid"`
+	Usage        any          `json:"usage" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		CreatedAt    respjson.Field
@@ -283,9 +283,9 @@ const (
 )
 
 type StartRunResponse struct {
-	Run         Run     `json:"run,required"`
-	Thread      Thread  `json:"thread,required"`
-	UserMessage Message `json:"user_message,required"`
+	Run         Run     `json:"run" api:"required"`
+	Thread      Thread  `json:"thread" api:"required"`
+	UserMessage Message `json:"user_message" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Run         respjson.Field
@@ -303,7 +303,7 @@ func (r *StartRunResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1IrisRunCancelRunResponse struct {
-	Data CancelRunResponse `json:"data,required"`
+	Data CancelRunResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -320,7 +320,7 @@ func (r *ActiveV1IrisRunCancelRunResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1IrisRunGetRunResponse struct {
-	Data GetRunResponse `json:"data,required"`
+	Data GetRunResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -337,7 +337,7 @@ func (r *ActiveV1IrisRunGetRunResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1IrisRunStartRunResponse struct {
-	Data StartRunResponse `json:"data,required"`
+	Data StartRunResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -355,7 +355,7 @@ func (r *ActiveV1IrisRunStartRunResponse) UnmarshalJSON(data []byte) error {
 
 type ActiveV1IrisRunCancelRunParams struct {
 	// Account ID for the request
-	AccountID string `json:"account_id,required"`
+	AccountID string `json:"account_id" api:"required"`
 	// Reason for cancellation
 	Reason param.Opt[string] `json:"reason,omitzero"`
 	paramObj
@@ -371,7 +371,7 @@ func (r *ActiveV1IrisRunCancelRunParams) UnmarshalJSON(data []byte) error {
 
 type ActiveV1IrisRunGetRunParams struct {
 	// Account ID for the request
-	AccountID string `query:"account_id,required" json:"-"`
+	AccountID string `query:"account_id" api:"required" json:"-"`
 	// Maximum events to return
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Page token for incremental polling
@@ -390,9 +390,9 @@ func (r ActiveV1IrisRunGetRunParams) URLQuery() (v url.Values, err error) {
 
 type ActiveV1IrisRunStartRunParams struct {
 	// Account ID for the request
-	AccountID string `json:"account_id,required"`
+	AccountID string `json:"account_id" api:"required"`
 	// The user's natural language command
-	CommandText string `json:"command_text,required"`
+	CommandText string `json:"command_text" api:"required"`
 	// Optional model override
 	Model param.Opt[string] `json:"model,omitzero"`
 	// Optional LLM provider override
