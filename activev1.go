@@ -13,19 +13,27 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1Service] method instead.
 type ActiveV1Service struct {
-	Options     []option.RequestOption
-	Accounts    ActiveV1AccountService
-	APIKeys     ActiveV1APIKeyService
-	Assistant   ActiveV1AssistantService
-	Calendars   ActiveV1CalendarService
+	Options []option.RequestOption
+	// Manage trading accounts and view balances.
+	Accounts ActiveV1AccountService
+	// Manage API keys for authentication.
+	APIKeys   ActiveV1APIKeyService
+	Assistant ActiveV1AssistantService
+	Calendars ActiveV1CalendarService
+	// Retrieve details and lists of tradable instruments.
 	Instruments ActiveV1InstrumentService
 	Iris        ActiveV1IrisService
 	MarketData  ActiveV1MarketDataService
-	News        ActiveV1NewsService
-	Screener    ActiveV1ScreenerService
-	Version     ActiveV1VersionService
-	Watchlists  ActiveV1WatchlistService
-	Ws          ActiveV1WService
+	// Retrieve details and lists of tradable instruments.
+	News ActiveV1NewsService
+	// Retrieve details and lists of tradable instruments.
+	Screener ActiveV1ScreenerService
+	// Endpoints for API service metadata.
+	Version ActiveV1VersionService
+	// Retrieve details and lists of tradable instruments.
+	Watchlists ActiveV1WatchlistService
+	// Active Websocket.
+	Ws ActiveV1WService
 }
 
 // NewActiveV1Service generates a new service that applies the given options to

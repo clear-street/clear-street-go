@@ -13,14 +13,21 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1CalendarService] method instead.
 type ActiveV1CalendarService struct {
-	Options             []option.RequestOption
-	Dividends           ActiveV1CalendarDividendService
-	Earnings            ActiveV1CalendarEarningService
-	Economic            ActiveV1CalendarEconomicService
-	MarketHours         ActiveV1CalendarMarketHourService
+	Options []option.RequestOption
+	// Access financial calendars for events like earnings, dividends, and splits.
+	Dividends ActiveV1CalendarDividendService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	Earnings ActiveV1CalendarEarningService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	Economic ActiveV1CalendarEconomicService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	MarketHours ActiveV1CalendarMarketHourService
+	// Access financial calendars for events like earnings, dividends, and splits.
 	MergersAcquisitions ActiveV1CalendarMergersAcquisitionService
-	Splits              ActiveV1CalendarSplitService
-	Summary             ActiveV1CalendarSummaryService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	Splits ActiveV1CalendarSplitService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	Summary ActiveV1CalendarSummaryService
 }
 
 // NewActiveV1CalendarService generates a new service that applies the given

@@ -19,6 +19,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// AI assistant for conversational trading interactions.
+//
 // ActiveV1IrisThreadMessageService contains methods and other services that help
 // with interacting with the clear-street API.
 //

@@ -18,6 +18,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Manage trading accounts and view balances.
+//
 // ActiveV1AccountPortfolioHistoryService contains methods and other services that
 // help with interacting with the clear-street API.
 //

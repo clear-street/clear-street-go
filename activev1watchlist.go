@@ -18,6 +18,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Retrieve details and lists of tradable instruments.
+//
 // ActiveV1WatchlistService contains methods and other services that help with
 // interacting with the clear-street API.
 //
@@ -26,7 +28,8 @@ import (
 // the [NewActiveV1WatchlistService] method instead.
 type ActiveV1WatchlistService struct {
 	Options []option.RequestOption
-	Items   ActiveV1WatchlistItemService
+	// Retrieve details and lists of tradable instruments.
+	Items ActiveV1WatchlistItemService
 }
 
 // NewActiveV1WatchlistService generates a new service that applies the given

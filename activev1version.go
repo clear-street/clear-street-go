@@ -14,6 +14,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Endpoints for API service metadata.
+//
 // ActiveV1VersionService contains methods and other services that help with
 // interacting with the clear-street API.
 //
