@@ -20,6 +20,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Manage trading accounts and view balances.
+//
 // ActiveV1AccountService contains methods and other services that help with
 // interacting with the clear-street API.
 //
@@ -27,12 +29,17 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1AccountService] method instead.
 type ActiveV1AccountService struct {
-	Options          []option.RequestOption
-	Balances         ActiveV1AccountBalanceService
-	Locates          ActiveV1AccountLocateService
-	Orders           ActiveV1AccountOrderService
+	Options []option.RequestOption
+	// Manage trading accounts and view balances.
+	Balances ActiveV1AccountBalanceService
+	// Manage locate requests for short selling.
+	Locates ActiveV1AccountLocateService
+	// Place, monitor, and manage trading orders.
+	Orders ActiveV1AccountOrderService
+	// Manage trading accounts and view balances.
 	PortfolioHistory ActiveV1AccountPortfolioHistoryService
-	Positions        ActiveV1AccountPositionService
+	// View account positions.
+	Positions ActiveV1AccountPositionService
 }
 
 // NewActiveV1AccountService generates a new service that applies the given options

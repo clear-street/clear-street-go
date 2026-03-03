@@ -17,6 +17,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Real-time market data snapshots.
+//
 // ActiveV1MarketDataSnapshotService contains methods and other services that help
 // with interacting with the clear-street API.
 //

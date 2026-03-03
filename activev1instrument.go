@@ -20,6 +20,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Retrieve details and lists of tradable instruments.
+//
 // ActiveV1InstrumentService contains methods and other services that help with
 // interacting with the clear-street API.
 //
@@ -27,11 +29,15 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1InstrumentService] method instead.
 type ActiveV1InstrumentService struct {
-	Options          []option.RequestOption
+	Options []option.RequestOption
+	// Retrieve details and lists of tradable instruments.
 	AnalystReporting ActiveV1InstrumentAnalystReportingService
-	Events           ActiveV1InstrumentEventService
-	Reporting        ActiveV1InstrumentReportingService
-	Venues           ActiveV1InstrumentVenueService
+	// Retrieve details and lists of tradable instruments.
+	Events ActiveV1InstrumentEventService
+	// Retrieve details and lists of tradable instruments.
+	Reporting ActiveV1InstrumentReportingService
+	// Retrieve details and lists of tradable instruments.
+	Venues ActiveV1InstrumentVenueService
 }
 
 // NewActiveV1InstrumentService generates a new service that applies the given

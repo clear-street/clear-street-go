@@ -17,6 +17,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Manage locate requests for short selling.
+//
 // ActiveV1AccountLocateInventoryService contains methods and other services that
 // help with interacting with the clear-street API.
 //

@@ -22,6 +22,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Place, monitor, and manage trading orders.
+//
 // ActiveV1AccountOrderService contains methods and other services that help with
 // interacting with the clear-street API.
 //

@@ -15,10 +15,13 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1IrisService] method instead.
 type ActiveV1IrisService struct {
-	Options  []option.RequestOption
+	Options []option.RequestOption
+	// AI assistant for conversational trading interactions.
 	Feedback ActiveV1IrisFeedbackService
-	Runs     ActiveV1IrisRunService
-	Threads  ActiveV1IrisThreadService
+	// AI assistant for conversational trading interactions.
+	Runs ActiveV1IrisRunService
+	// AI assistant for conversational trading interactions.
+	Threads ActiveV1IrisThreadService
 }
 
 // NewActiveV1IrisService generates a new service that applies the given options to

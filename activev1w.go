@@ -11,6 +11,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/option"
 )
 
+// Active Websocket.
+//
 // ActiveV1WService contains methods and other services that help with interacting
 // with the clear-street API.
 //

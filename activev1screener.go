@@ -18,6 +18,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Retrieve details and lists of tradable instruments.
+//
 // ActiveV1ScreenerService contains methods and other services that help with
 // interacting with the clear-street API.
 //

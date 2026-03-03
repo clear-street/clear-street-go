@@ -13,7 +13,8 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1MarketDataService] method instead.
 type ActiveV1MarketDataService struct {
-	Options  []option.RequestOption
+	Options []option.RequestOption
+	// Real-time market data snapshots.
 	Snapshot ActiveV1MarketDataSnapshotService
 }
 

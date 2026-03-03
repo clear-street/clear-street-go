@@ -19,6 +19,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// AI assistant for conversational trading interactions.
+//
 // ActiveV1IrisThreadService contains methods and other services that help with
 // interacting with the clear-street API.
 //
@@ -26,7 +28,8 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1IrisThreadService] method instead.
 type ActiveV1IrisThreadService struct {
-	Options  []option.RequestOption
+	Options []option.RequestOption
+	// AI assistant for conversational trading interactions.
 	Messages ActiveV1IrisThreadMessageService
 }
 

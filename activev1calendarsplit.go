@@ -18,6 +18,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Access financial calendars for events like earnings, dividends, and splits.
+//
 // ActiveV1CalendarSplitService contains methods and other services that help with
 // interacting with the clear-street API.
 //

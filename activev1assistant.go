@@ -14,6 +14,7 @@ import (
 // the [NewActiveV1AssistantService] method instead.
 type ActiveV1AssistantService struct {
 	Options []option.RequestOption
+	// Run and monitor Iris prompt workflows.
 	Prompts ActiveV1AssistantPromptService
 }
 

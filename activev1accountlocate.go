@@ -21,6 +21,8 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
+// Manage locate requests for short selling.
+//
 // ActiveV1AccountLocateService contains methods and other services that help with
 // interacting with the clear-street API.
 //
@@ -28,7 +30,8 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1AccountLocateService] method instead.
 type ActiveV1AccountLocateService struct {
-	Options   []option.RequestOption
+	Options []option.RequestOption
+	// Manage locate requests for short selling.
 	Inventory ActiveV1AccountLocateInventoryService
 }
 
