@@ -44,7 +44,7 @@ func (r *ActiveV1ScreenerService) GetScreener(ctx context.Context, query ActiveV
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/screener"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // An instrument returned by the screener

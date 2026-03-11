@@ -44,7 +44,7 @@ func (r *ActiveV1AccountPortfolioHistoryService) GetPortfolioHistory(ctx context
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/portfolio-history", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 type PortfolioHistoryResponse struct {

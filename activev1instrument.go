@@ -58,11 +58,11 @@ func (r *ActiveV1InstrumentService) GetInstrumentByID(ctx context.Context, secur
 	opts = slices.Concat(r.Options, opts)
 	if securityID == "" {
 		err = errors.New("missing required security_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/instruments/%v/%s", query.SecurityIDSource, url.PathEscape(securityID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Retrieves a list of tradeable instruments.
@@ -70,7 +70,7 @@ func (r *ActiveV1InstrumentService) GetInstruments(ctx context.Context, query Ac
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/instruments"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents a tradable financial instrument, including supplemental information

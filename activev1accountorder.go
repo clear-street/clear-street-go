@@ -50,7 +50,7 @@ func (r *ActiveV1AccountOrderService) CancelAllOrders(ctx context.Context, accou
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/orders", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Cancel a specific order
@@ -58,11 +58,11 @@ func (r *ActiveV1AccountOrderService) CancelOrder(ctx context.Context, orderID s
 	opts = slices.Concat(r.Options, opts)
 	if orderID == "" {
 		err = errors.New("missing required order_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/accounts/%v/orders/%s", body.AccountID, url.PathEscape(orderID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Get order by ID
@@ -70,11 +70,11 @@ func (r *ActiveV1AccountOrderService) GetOrderByID(ctx context.Context, orderID 
 	opts = slices.Concat(r.Options, opts)
 	if orderID == "" {
 		err = errors.New("missing required order_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/accounts/%v/orders/%s", query.AccountID, url.PathEscape(orderID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // List orders for an account with optional filtering
@@ -82,7 +82,7 @@ func (r *ActiveV1AccountOrderService) GetOrders(ctx context.Context, accountID i
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/orders", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Replace an order with new parameters
@@ -90,11 +90,11 @@ func (r *ActiveV1AccountOrderService) ReplaceOrder(ctx context.Context, orderID 
 	opts = slices.Concat(r.Options, opts)
 	if orderID == "" {
 		err = errors.New("missing required order_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/accounts/%v/orders/%s", params.AccountID, url.PathEscape(orderID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Submit new orders
@@ -102,7 +102,7 @@ func (r *ActiveV1AccountOrderService) SubmitOrders(ctx context.Context, accountI
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/orders", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Arrival Price strategy

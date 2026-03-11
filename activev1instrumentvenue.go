@@ -40,7 +40,7 @@ func (r *ActiveV1InstrumentVenueService) GetVenues(ctx context.Context, opts ...
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/instruments/venues"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // A trading venue with its characteristics and capabilities

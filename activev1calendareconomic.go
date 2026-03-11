@@ -44,7 +44,7 @@ func (r *ActiveV1CalendarEconomicService) GetEconomicCalendar(ctx context.Contex
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/calendars/economic"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents a single economic calendar event

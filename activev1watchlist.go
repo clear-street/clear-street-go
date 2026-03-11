@@ -47,7 +47,7 @@ func (r *ActiveV1WatchlistService) NewWatchlist(ctx context.Context, body Active
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/watchlists"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Delete a watchlist and all its items
@@ -56,11 +56,11 @@ func (r *ActiveV1WatchlistService) DeleteWatchlist(ctx context.Context, watchlis
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if watchlistID == "" {
 		err = errors.New("missing required watchlist_id parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("active/v1/watchlists/%s", watchlistID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 // Get a watchlist by ID with all its items
@@ -68,11 +68,11 @@ func (r *ActiveV1WatchlistService) GetWatchlistByID(ctx context.Context, watchli
 	opts = slices.Concat(r.Options, opts)
 	if watchlistID == "" {
 		err = errors.New("missing required watchlist_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/watchlists/%s", watchlistID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // List watchlists for the authenticated user
@@ -80,7 +80,7 @@ func (r *ActiveV1WatchlistService) GetWatchlists(ctx context.Context, opts ...op
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/watchlists"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Detailed watchlist with all items

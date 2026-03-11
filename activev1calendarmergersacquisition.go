@@ -45,7 +45,7 @@ func (r *ActiveV1CalendarMergersAcquisitionService) GetMergersAndAcquisitionsCal
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/calendars/mergers-acquisitions"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents a merger or acquisition event

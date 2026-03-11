@@ -44,7 +44,7 @@ func (r *ActiveV1CalendarEarningService) GetEarningsCalendar(ctx context.Context
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/calendars/earnings"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents a single earnings announcement event

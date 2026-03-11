@@ -45,11 +45,11 @@ func (r *ActiveV1AccountPositionService) ClosePosition(ctx context.Context, secu
 	opts = slices.Concat(r.Options, opts)
 	if securityID == "" {
 		err = errors.New("missing required security_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/accounts/%v/positions/%v/%s", params.AccountID, params.SecurityIDSource, url.PathEscape(securityID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // Closes all positions for the specified trading account.
@@ -57,7 +57,7 @@ func (r *ActiveV1AccountPositionService) ClosePositions(ctx context.Context, acc
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/positions", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Retrieves all positions for the specified trading account.
@@ -65,7 +65,7 @@ func (r *ActiveV1AccountPositionService) GetPositions(ctx context.Context, accou
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/positions", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents a holding of a particular instrument in an account

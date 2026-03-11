@@ -44,7 +44,7 @@ func (r *ActiveV1CalendarDividendService) GetDividendsCalendar(ctx context.Conte
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/calendars/dividends"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents a single dividend event

@@ -46,7 +46,7 @@ func (r *ActiveV1InstrumentEventService) GetAllInstrumentEvents(ctx context.Cont
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/instruments/events"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Retrieves corporate events (dividends, splits, etc.) for an instrument, grouped
@@ -60,11 +60,11 @@ func (r *ActiveV1InstrumentEventService) GetInstrumentEvents(ctx context.Context
 	opts = slices.Concat(r.Options, opts)
 	if securityID == "" {
 		err = errors.New("missing required security_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/instruments/%v/%s/events", params.SecurityIDSource, url.PathEscape(securityID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 // All-events payload grouped by date.

@@ -45,7 +45,7 @@ func (r *ActiveV1NewsService) GetNews(ctx context.Context, query ActiveV1NewsGet
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/news"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // A single news item and its associated instruments.

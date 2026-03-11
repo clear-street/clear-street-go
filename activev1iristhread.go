@@ -48,11 +48,11 @@ func (r *ActiveV1IrisThreadService) GetThread(ctx context.Context, threadID stri
 	opts = slices.Concat(r.Options, opts)
 	if threadID == "" {
 		err = errors.New("missing required thread_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/iris/threads/%s", threadID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Retrieves threads for the authenticated user.
@@ -60,7 +60,7 @@ func (r *ActiveV1IrisThreadService) ListThreads(ctx context.Context, query Activ
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/iris/threads"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 type GetThreadResponse struct {

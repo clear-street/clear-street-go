@@ -45,11 +45,11 @@ func (r *ActiveV1IrisThreadMessageService) ListMessages(ctx context.Context, thr
 	opts = slices.Concat(r.Options, opts)
 	if threadID == "" {
 		err = errors.New("missing required thread_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/iris/threads/%s/messages", threadID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 type ListMessagesResponse struct {

@@ -45,11 +45,11 @@ func (r *ActiveV1AssistantPromptService) GetPromptResult(ctx context.Context, id
 	opts = slices.Concat(r.Options, opts)
 	if id == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/assistant/prompts/%s", url.PathEscape(id))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Forwards an arbitrary JSON payload to an Iris prompt identified by `slug` and
@@ -58,7 +58,7 @@ func (r *ActiveV1AssistantPromptService) RunPrompt(ctx context.Context, body Act
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/assistant/prompts"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 type PromptResult struct {

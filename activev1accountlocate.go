@@ -50,7 +50,7 @@ func (r *ActiveV1AccountLocateService) NewLocateRequest(ctx context.Context, acc
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/locates", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Retrieves all locate requests for the specified account.
@@ -58,7 +58,7 @@ func (r *ActiveV1AccountLocateService) GetLocateRequests(ctx context.Context, ac
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/locates", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Modifies an existing locate request.
@@ -66,7 +66,7 @@ func (r *ActiveV1AccountLocateService) UpdateLocateRequest(ctx context.Context, 
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/locates", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents a single locate order and its status

@@ -43,7 +43,7 @@ func (r *ActiveV1AccountLocateInventoryService) GetLocateInventory(ctx context.C
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/locates/inventory", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents the available locate inventory for a symbol
