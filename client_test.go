@@ -38,7 +38,7 @@ func TestUserAgentHeader(t *testing.T) {
 			},
 		}),
 	)
-	client.Active.V1.Accounts.GetAccounts(context.Background(), clearstreet.ActiveV1AccountGetAccountsParams{})
+	_, _ = client.Active.V1.Accounts.GetAccounts(context.Background(), clearstreet.ActiveV1AccountGetAccountsParams{})
 	if userAgent != fmt.Sprintf("ClearStreet/Go %s", internal.PackageVersion) {
 		t.Errorf("Expected User-Agent to be correct, but got: %#v", userAgent)
 	}
