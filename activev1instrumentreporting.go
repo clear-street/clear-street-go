@@ -46,11 +46,11 @@ func (r *ActiveV1InstrumentReportingService) GetInstrumentReporting(ctx context.
 	opts = slices.Concat(r.Options, opts)
 	if securityID == "" {
 		err = errors.New("missing required security_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/instruments/%v/%s/reporting", params.SecurityIDSource, url.PathEscape(securityID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
-	return
+	return res, err
 }
 
 type ActiveV1InstrumentReportingGetInstrumentReportingResponse struct {

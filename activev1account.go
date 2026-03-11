@@ -61,7 +61,7 @@ func (r *ActiveV1AccountService) GetAccountByID(ctx context.Context, accountID i
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // List accounts the authenticated user has permission to access
@@ -69,7 +69,7 @@ func (r *ActiveV1AccountService) GetAccounts(ctx context.Context, query ActiveV1
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/accounts"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Update account risk settings
@@ -77,7 +77,7 @@ func (r *ActiveV1AccountService) PatchAccountByID(ctx context.Context, accountID
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents a trading account

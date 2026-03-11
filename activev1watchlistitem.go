@@ -43,11 +43,11 @@ func (r *ActiveV1WatchlistItemService) AddWatchlistItem(ctx context.Context, wat
 	opts = slices.Concat(r.Options, opts)
 	if watchlistID == "" {
 		err = errors.New("missing required watchlist_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/watchlists/%s/items", watchlistID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Delete an instrument from a watchlist
@@ -56,15 +56,15 @@ func (r *ActiveV1WatchlistItemService) DeleteWatchlistItem(ctx context.Context, 
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.WatchlistID == "" {
 		err = errors.New("missing required watchlist_id parameter")
-		return
+		return err
 	}
 	if itemID == "" {
 		err = errors.New("missing required item_id parameter")
-		return
+		return err
 	}
 	path := fmt.Sprintf("active/v1/watchlists/%s/items/%s", body.WatchlistID, itemID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return
+	return err
 }
 
 // Response data for adding a watchlist item

@@ -44,7 +44,7 @@ func (r *ActiveV1APIKeyService) New(ctx context.Context, body ActiveV1APIKeyNewP
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/api_keys"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // List API keys for the authenticated user
@@ -52,7 +52,7 @@ func (r *ActiveV1APIKeyService) List(ctx context.Context, opts ...option.Request
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/api_keys"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Revoke a specific API key
@@ -60,11 +60,11 @@ func (r *ActiveV1APIKeyService) Revoke(ctx context.Context, id string, opts ...o
 	opts = slices.Concat(r.Options, opts)
 	if id == "" {
 		err = errors.New("missing required id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/api_keys/%s", id)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Revoke all API keys for the authenticated user
@@ -72,7 +72,7 @@ func (r *ActiveV1APIKeyService) RevokeAll(ctx context.Context, opts ...option.Re
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/api_keys"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 type APIKey struct {

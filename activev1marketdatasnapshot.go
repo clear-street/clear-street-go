@@ -43,7 +43,7 @@ func (r *ActiveV1MarketDataSnapshotService) GetSnapshots(ctx context.Context, qu
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/market-data/snapshot"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Market data snapshot for a single security.

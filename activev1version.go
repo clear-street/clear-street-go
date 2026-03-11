@@ -40,7 +40,7 @@ func (r *ActiveV1VersionService) GetVersion(ctx context.Context, opts ...option.
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/version"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Allows clients to set their preferred API version.
@@ -48,7 +48,7 @@ func (r *ActiveV1VersionService) UpdateVersion(ctx context.Context, opts ...opti
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/version"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // API version information

@@ -44,7 +44,7 @@ func (r *ActiveV1CalendarSummaryService) GetCalendarSummary(ctx context.Context,
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/calendars/summary"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Summary of events for a specific date

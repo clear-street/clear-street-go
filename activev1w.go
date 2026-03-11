@@ -38,5 +38,5 @@ func (r *ActiveV1WService) WebsocketHandler(ctx context.Context, opts ...option.
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	path := "active/v1/ws"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, nil, opts...)
-	return
+	return err
 }

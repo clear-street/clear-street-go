@@ -41,7 +41,7 @@ func (r *ActiveV1IrisFeedbackService) NewFeedback(ctx context.Context, body Acti
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/iris/feedback"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 type CreateFeedbackResponse struct {

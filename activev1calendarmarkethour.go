@@ -45,7 +45,7 @@ func (r *ActiveV1CalendarMarketHourService) GetMarketHoursCalendar(ctx context.C
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/calendars/market-hours"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Comprehensive market hours information for a specific market and date

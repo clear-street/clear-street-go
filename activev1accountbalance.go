@@ -41,7 +41,7 @@ func (r *ActiveV1AccountBalanceService) GetAccountBalances(ctx context.Context, 
 	opts = slices.Concat(r.Options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/balances", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
-	return
+	return res, err
 }
 
 // Represents the balance details for a trading account

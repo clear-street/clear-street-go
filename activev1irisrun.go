@@ -46,11 +46,11 @@ func (r *ActiveV1IrisRunService) CancelRun(ctx context.Context, runID string, bo
 	opts = slices.Concat(r.Options, opts)
 	if runID == "" {
 		err = errors.New("missing required run_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/iris/runs/%s", runID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 // Poll for the current status of a run and any new events since the last poll.
@@ -58,11 +58,11 @@ func (r *ActiveV1IrisRunService) GetRun(ctx context.Context, runID string, query
 	opts = slices.Concat(r.Options, opts)
 	if runID == "" {
 		err = errors.New("missing required run_id parameter")
-		return
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/iris/runs/%s", runID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return
+	return res, err
 }
 
 // Begins an agentic conversation run. If thread_id is provided, continues an
@@ -71,7 +71,7 @@ func (r *ActiveV1IrisRunService) StartRun(ctx context.Context, body ActiveV1Iris
 	opts = slices.Concat(r.Options, opts)
 	path := "active/v1/iris/runs"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
-	return
+	return res, err
 }
 
 type CancelRunResponse struct {
