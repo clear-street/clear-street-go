@@ -28,7 +28,7 @@ func TestActiveV1CalendarMarketHourGetMarketHoursCalendarWithOptionalParams(t *t
 	)
 	_, err := client.Active.V1.Calendars.MarketHours.GetMarketHoursCalendar(context.TODO(), clearstreet.ActiveV1CalendarMarketHourGetMarketHoursCalendarParams{
 		Date:   "date",
-		Market: clearstreet.ActiveV1CalendarMarketHourGetMarketHoursCalendarParamsMarketUsEquities,
+		Market: clearstreet.MarketTypeUsEquities,
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

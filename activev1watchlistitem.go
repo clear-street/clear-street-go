@@ -26,7 +26,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1WatchlistItemService] method instead.
 type ActiveV1WatchlistItemService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1WatchlistItemService generates a new service that applies the given
@@ -34,13 +34,13 @@ type ActiveV1WatchlistItemService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1WatchlistItemService(opts ...option.RequestOption) (r ActiveV1WatchlistItemService) {
 	r = ActiveV1WatchlistItemService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Add an instrument to a watchlist
 func (r *ActiveV1WatchlistItemService) AddWatchlistItem(ctx context.Context, watchlistID string, body ActiveV1WatchlistItemAddWatchlistItemParams, opts ...option.RequestOption) (res *ActiveV1WatchlistItemAddWatchlistItemResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	if watchlistID == "" {
 		err = errors.New("missing required watchlist_id parameter")
 		return nil, err
@@ -52,7 +52,7 @@ func (r *ActiveV1WatchlistItemService) AddWatchlistItem(ctx context.Context, wat
 
 // Delete an instrument from a watchlist
 func (r *ActiveV1WatchlistItemService) DeleteWatchlistItem(ctx context.Context, itemID string, body ActiveV1WatchlistItemDeleteWatchlistItemParams, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.WatchlistID == "" {
 		err = errors.New("missing required watchlist_id parameter")

@@ -30,7 +30,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1AccountLocateService] method instead.
 type ActiveV1AccountLocateService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 	// Manage locate requests for short selling.
 	Inventory ActiveV1AccountLocateInventoryService
 }
@@ -40,14 +40,14 @@ type ActiveV1AccountLocateService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1AccountLocateService(opts ...option.RequestOption) (r ActiveV1AccountLocateService) {
 	r = ActiveV1AccountLocateService{}
-	r.Options = opts
+	r.options = opts
 	r.Inventory = NewActiveV1AccountLocateInventoryService(opts...)
 	return
 }
 
 // Submits a new short stock locate request.
 func (r *ActiveV1AccountLocateService) NewLocateRequest(ctx context.Context, accountID int64, body ActiveV1AccountLocateNewLocateRequestParams, opts ...option.RequestOption) (res *ActiveV1AccountLocateNewLocateRequestResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/locates", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
@@ -55,7 +55,7 @@ func (r *ActiveV1AccountLocateService) NewLocateRequest(ctx context.Context, acc
 
 // Retrieves all locate requests for the specified account.
 func (r *ActiveV1AccountLocateService) GetLocateRequests(ctx context.Context, accountID int64, query ActiveV1AccountLocateGetLocateRequestsParams, opts ...option.RequestOption) (res *ActiveV1AccountLocateGetLocateRequestsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/locates", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -63,7 +63,7 @@ func (r *ActiveV1AccountLocateService) GetLocateRequests(ctx context.Context, ac
 
 // Modifies an existing locate request.
 func (r *ActiveV1AccountLocateService) UpdateLocateRequest(ctx context.Context, accountID int64, body ActiveV1AccountLocateUpdateLocateRequestParams, opts ...option.RequestOption) (res *ActiveV1AccountLocateUpdateLocateRequestResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/locates", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return res, err
@@ -236,8 +236,6 @@ func (r *ActiveV1AccountLocateNewLocateRequestParamsBody) UnmarshalJSON(data []b
 }
 
 type ActiveV1AccountLocateGetLocateRequestsParams struct {
-	// The number of items to return per page (only used when page_token is not
-	// provided)
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next page of results. Contains encoded pagination state
 	// (limit + offset). When provided, page_size is ignored.
@@ -256,7 +254,7 @@ type ActiveV1AccountLocateGetLocateRequestsParams struct {
 // parameters as `url.Values`.
 func (r ActiveV1AccountLocateGetLocateRequestsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

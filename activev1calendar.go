@@ -13,7 +13,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1CalendarService] method instead.
 type ActiveV1CalendarService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 	// Access financial calendars for events like earnings, dividends, and splits.
 	Dividends ActiveV1CalendarDividendService
 	// Access financial calendars for events like earnings, dividends, and splits.
@@ -35,7 +35,7 @@ type ActiveV1CalendarService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1CalendarService(opts ...option.RequestOption) (r ActiveV1CalendarService) {
 	r = ActiveV1CalendarService{}
-	r.Options = opts
+	r.options = opts
 	r.Dividends = NewActiveV1CalendarDividendService(opts...)
 	r.Earnings = NewActiveV1CalendarEarningService(opts...)
 	r.Economic = NewActiveV1CalendarEconomicService(opts...)

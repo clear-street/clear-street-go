@@ -15,38 +15,36 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
-// Deprecated /iris/_ routes. Use /omni-ai/_ instead.
+// AI assistant for conversational trading interactions.
 //
-// ActiveV1IrisFeedbackService contains methods and other services that help with
+// ActiveV1OmniAIFeedbackService contains methods and other services that help with
 // interacting with the clear-street API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
-// the [NewActiveV1IrisFeedbackService] method instead.
-type ActiveV1IrisFeedbackService struct {
+// the [NewActiveV1OmniAIFeedbackService] method instead.
+type ActiveV1OmniAIFeedbackService struct {
 	options []option.RequestOption
 }
 
-// NewActiveV1IrisFeedbackService generates a new service that applies the given
+// NewActiveV1OmniAIFeedbackService generates a new service that applies the given
 // options to each request. These options are applied after the parent client's
 // options (if there is one), and before any request-specific options.
-func NewActiveV1IrisFeedbackService(opts ...option.RequestOption) (r ActiveV1IrisFeedbackService) {
-	r = ActiveV1IrisFeedbackService{}
+func NewActiveV1OmniAIFeedbackService(opts ...option.RequestOption) (r ActiveV1OmniAIFeedbackService) {
+	r = ActiveV1OmniAIFeedbackService{}
 	r.options = opts
 	return
 }
 
-// **Deprecated**: Use `POST /omni-ai/feedback` instead.
-//
-// Deprecated: deprecated
-func (r *ActiveV1IrisFeedbackService) NewFeedbackDeprecated(ctx context.Context, body ActiveV1IrisFeedbackNewFeedbackDeprecatedParams, opts ...option.RequestOption) (res *ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse, err error) {
+// Submit user feedback (thumbs up/down, rating, comment) for an assistant message.
+func (r *ActiveV1OmniAIFeedbackService) NewFeedback(ctx context.Context, body ActiveV1OmniAIFeedbackNewFeedbackParams, opts ...option.RequestOption) (res *ActiveV1OmniAIFeedbackNewFeedbackResponse, err error) {
 	opts = slices.Concat(r.options, opts)
-	path := "active/v1/iris/feedback"
+	path := "active/v1/omni-ai/feedback"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
 }
 
-type ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse struct {
+type ActiveV1OmniAIFeedbackNewFeedbackResponse struct {
 	Data CreateFeedbackResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -58,12 +56,12 @@ type ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse) RawJSON() string { return r.JSON.raw }
-func (r *ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse) UnmarshalJSON(data []byte) error {
+func (r ActiveV1OmniAIFeedbackNewFeedbackResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1OmniAIFeedbackNewFeedbackResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1IrisFeedbackNewFeedbackDeprecatedParams struct {
+type ActiveV1OmniAIFeedbackNewFeedbackParams struct {
 	// Account ID for the request
 	AccountID string `json:"account_id" api:"required"`
 	// Message to provide feedback on
@@ -79,10 +77,10 @@ type ActiveV1IrisFeedbackNewFeedbackDeprecatedParams struct {
 	paramObj
 }
 
-func (r ActiveV1IrisFeedbackNewFeedbackDeprecatedParams) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1IrisFeedbackNewFeedbackDeprecatedParams
+func (r ActiveV1OmniAIFeedbackNewFeedbackParams) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1OmniAIFeedbackNewFeedbackParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ActiveV1IrisFeedbackNewFeedbackDeprecatedParams) UnmarshalJSON(data []byte) error {
+func (r *ActiveV1OmniAIFeedbackNewFeedbackParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }

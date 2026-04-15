@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1CalendarSummaryService] method instead.
 type ActiveV1CalendarSummaryService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1CalendarSummaryService generates a new service that applies the given
@@ -35,13 +35,13 @@ type ActiveV1CalendarSummaryService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1CalendarSummaryService(opts ...option.RequestOption) (r ActiveV1CalendarSummaryService) {
 	r = ActiveV1CalendarSummaryService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves a consolidated view of all calendar events.
 func (r *ActiveV1CalendarSummaryService) GetCalendarSummary(ctx context.Context, query ActiveV1CalendarSummaryGetCalendarSummaryParams, opts ...option.RequestOption) (res *ActiveV1CalendarSummaryGetCalendarSummaryResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/calendars/summary"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -111,7 +111,7 @@ type ActiveV1CalendarSummaryGetCalendarSummaryParams struct {
 // parameters as `url.Values`.
 func (r ActiveV1CalendarSummaryGetCalendarSummaryParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

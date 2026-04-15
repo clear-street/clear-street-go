@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1WatchlistService] method instead.
 type ActiveV1WatchlistService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 	// Retrieve details and lists of tradable instruments.
 	Items ActiveV1WatchlistItemService
 }
@@ -37,14 +37,14 @@ type ActiveV1WatchlistService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1WatchlistService(opts ...option.RequestOption) (r ActiveV1WatchlistService) {
 	r = ActiveV1WatchlistService{}
-	r.Options = opts
+	r.options = opts
 	r.Items = NewActiveV1WatchlistItemService(opts...)
 	return
 }
 
 // Create a new watchlist
 func (r *ActiveV1WatchlistService) NewWatchlist(ctx context.Context, body ActiveV1WatchlistNewWatchlistParams, opts ...option.RequestOption) (res *ActiveV1WatchlistNewWatchlistResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/watchlists"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
@@ -52,7 +52,7 @@ func (r *ActiveV1WatchlistService) NewWatchlist(ctx context.Context, body Active
 
 // Delete a watchlist and all its items
 func (r *ActiveV1WatchlistService) DeleteWatchlist(ctx context.Context, watchlistID string, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if watchlistID == "" {
 		err = errors.New("missing required watchlist_id parameter")
@@ -65,7 +65,7 @@ func (r *ActiveV1WatchlistService) DeleteWatchlist(ctx context.Context, watchlis
 
 // Get a watchlist by ID with all its items
 func (r *ActiveV1WatchlistService) GetWatchlistByID(ctx context.Context, watchlistID string, opts ...option.RequestOption) (res *ActiveV1WatchlistGetWatchlistByIDResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	if watchlistID == "" {
 		err = errors.New("missing required watchlist_id parameter")
 		return nil, err
@@ -77,7 +77,7 @@ func (r *ActiveV1WatchlistService) GetWatchlistByID(ctx context.Context, watchli
 
 // List watchlists for the authenticated user
 func (r *ActiveV1WatchlistService) GetWatchlists(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1WatchlistGetWatchlistsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/watchlists"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return res, err

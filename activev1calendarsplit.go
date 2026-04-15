@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1CalendarSplitService] method instead.
 type ActiveV1CalendarSplitService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1CalendarSplitService generates a new service that applies the given
@@ -35,13 +35,13 @@ type ActiveV1CalendarSplitService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1CalendarSplitService(opts ...option.RequestOption) (r ActiveV1CalendarSplitService) {
 	r = ActiveV1CalendarSplitService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves upcoming stock splits.
 func (r *ActiveV1CalendarSplitService) GetSplitsCalendar(ctx context.Context, query ActiveV1CalendarSplitGetSplitsCalendarParams, opts ...option.RequestOption) (res *ActiveV1CalendarSplitGetSplitsCalendarResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/calendars/splits"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -105,7 +105,7 @@ type ActiveV1CalendarSplitGetSplitsCalendarParams struct {
 // parameters as `url.Values`.
 func (r ActiveV1CalendarSplitGetSplitsCalendarParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

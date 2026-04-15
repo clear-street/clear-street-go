@@ -27,7 +27,7 @@ func TestActiveV1InstrumentEventGetAllInstrumentEventsWithOptionalParams(t *test
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Active.V1.Instruments.Events.GetAllInstrumentEvents(context.TODO(), clearstreet.ActiveV1InstrumentEventGetAllInstrumentEventsParams{
-		EventTypes:       []string{"EARNINGS"},
+		EventTypes:       []clearstreet.AllEventsEventType{clearstreet.AllEventsEventTypeEarnings},
 		FromDate:         clearstreet.String("from_date"),
 		InstrumentIDs:    []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 		SecurityID:       []string{"string"},

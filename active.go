@@ -13,7 +13,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveService] method instead.
 type ActiveService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 	V1      ActiveV1Service
 }
 
@@ -22,7 +22,7 @@ type ActiveService struct {
 // is one), and before any request-specific options.
 func NewActiveService(opts ...option.RequestOption) (r ActiveService) {
 	r = ActiveService{}
-	r.Options = opts
+	r.options = opts
 	r.V1 = NewActiveV1Service(opts...)
 	return
 }

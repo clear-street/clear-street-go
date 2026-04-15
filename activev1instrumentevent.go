@@ -29,7 +29,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1InstrumentEventService] method instead.
 type ActiveV1InstrumentEventService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1InstrumentEventService generates a new service that applies the given
@@ -37,13 +37,13 @@ type ActiveV1InstrumentEventService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1InstrumentEventService(opts ...option.RequestOption) (r ActiveV1InstrumentEventService) {
 	r = ActiveV1InstrumentEventService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves all instrument events grouped by date.
 func (r *ActiveV1InstrumentEventService) GetAllInstrumentEvents(ctx context.Context, query ActiveV1InstrumentEventGetAllInstrumentEventsParams, opts ...option.RequestOption) (res *ActiveV1InstrumentEventGetAllInstrumentEventsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/instruments/events"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -57,7 +57,7 @@ func (r *ActiveV1InstrumentEventService) GetAllInstrumentEvents(ctx context.Cont
 // - `from_date`: today - 365 days
 // - `to_date`: today + 60 days
 func (r *ActiveV1InstrumentEventService) GetInstrumentEvents(ctx context.Context, securityID string, params ActiveV1InstrumentEventGetInstrumentEventsParams, opts ...option.RequestOption) (res *ActiveV1InstrumentEventGetInstrumentEventsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	if securityID == "" {
 		err = errors.New("missing required security_id parameter")
 		return nil, err
@@ -66,6 +66,16 @@ func (r *ActiveV1InstrumentEventService) GetInstrumentEvents(ctx context.Context
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return res, err
 }
+
+// Event types supported by the all-events endpoint.
+type AllEventsEventType string
+
+const (
+	AllEventsEventTypeEarnings   AllEventsEventType = "EARNINGS"
+	AllEventsEventTypeDividend   AllEventsEventType = "DIVIDEND"
+	AllEventsEventTypeStockSplit AllEventsEventType = "STOCK_SPLIT"
+	AllEventsEventTypeIpo        AllEventsEventType = "IPO"
+)
 
 // All-events payload grouped by date.
 type InstrumentAllEventsData struct {
@@ -127,29 +137,8 @@ func (r *InstrumentDividendEvent) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Instrument events for a single date.
-type InstrumentEventsByDate struct {
-	// Event date.
-	Date time.Time `json:"date" api:"required" format:"date"`
-	// Flat event envelopes for this date.
-	Events []InstrumentEventsByDateEvent `json:"events" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Date        respjson.Field
-		Events      respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r InstrumentEventsByDate) RawJSON() string { return r.JSON.raw }
-func (r *InstrumentEventsByDate) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 // Unified envelope for the all-events response.
-type InstrumentEventsByDateEvent struct {
+type InstrumentEventEnvelope struct {
 	// Security identifier for the event.
 	SecurityID string `json:"security_id" api:"required"`
 	// Security identifier source for the event.
@@ -168,7 +157,7 @@ type InstrumentEventsByDateEvent struct {
 	// Event type discriminator.
 	//
 	// Any of "EARNINGS", "DIVIDEND", "STOCK_SPLIT", "IPO".
-	Type string `json:"type" api:"required"`
+	Type AllEventsEventType `json:"type" api:"required"`
 	// Dividend payload when type is DIVIDEND.
 	DividendEventData InstrumentDividendEvent `json:"dividend_event_data" api:"nullable"`
 	// Earnings payload when type is EARNINGS.
@@ -177,7 +166,7 @@ type InstrumentEventsByDateEvent struct {
 	// cache.
 	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
 	// IPO payload when type is IPO.
-	IpoEventData InstrumentEventsByDateEventIpoEventData `json:"ipo_event_data" api:"nullable"`
+	IpoEventData InstrumentEventIpoItem `json:"ipo_event_data" api:"nullable"`
 	// Instrument name associated with the event, when available.
 	Name string `json:"name" api:"nullable"`
 	// Stock split payload when type is STOCK_SPLIT.
@@ -200,13 +189,13 @@ type InstrumentEventsByDateEvent struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r InstrumentEventsByDateEvent) RawJSON() string { return r.JSON.raw }
-func (r *InstrumentEventsByDateEvent) UnmarshalJSON(data []byte) error {
+func (r InstrumentEventEnvelope) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentEventEnvelope) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// IPO payload when type is IPO.
-type InstrumentEventsByDateEventIpoEventData struct {
+// IPO event in the all-events date grouping response.
+type InstrumentEventIpoItem struct {
 	// IPO action.
 	Actions string `json:"actions" api:"nullable"`
 	// IPO announced timestamp.
@@ -236,8 +225,29 @@ type InstrumentEventsByDateEventIpoEventData struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r InstrumentEventsByDateEventIpoEventData) RawJSON() string { return r.JSON.raw }
-func (r *InstrumentEventsByDateEventIpoEventData) UnmarshalJSON(data []byte) error {
+func (r InstrumentEventIpoItem) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentEventIpoItem) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Instrument events for a single date.
+type InstrumentEventsByDate struct {
+	// Event date.
+	Date time.Time `json:"date" api:"required" format:"date"`
+	// Flat event envelopes for this date.
+	Events []InstrumentEventEnvelope `json:"events" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Date        respjson.Field
+		Events      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r InstrumentEventsByDate) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentEventsByDate) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -350,9 +360,7 @@ type ActiveV1InstrumentEventGetAllInstrumentEventsParams struct {
 	ToDate param.Opt[string] `query:"to_date,omitzero" json:"-"`
 	// Filter by event type(s). Comma-delimited list. Example:
 	// `event_types=EARNINGS,IPO`.
-	//
-	// Any of "EARNINGS", "DIVIDEND", "STOCK_SPLIT", "IPO".
-	EventTypes []string `query:"event_types,omitzero" json:"-"`
+	EventTypes []AllEventsEventType `query:"event_types,omitzero" json:"-"`
 	// Filter by OEMS instrument ID(s). Comma-delimited list of UUIDs. Example:
 	// `instrument_ids=550e8400-e29b-41d4-a716-446655440000`.
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
@@ -378,7 +386,7 @@ type ActiveV1InstrumentEventGetAllInstrumentEventsParams struct {
 // query parameters as `url.Values`.
 func (r ActiveV1InstrumentEventGetAllInstrumentEventsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -406,7 +414,7 @@ type ActiveV1InstrumentEventGetInstrumentEventsParams struct {
 // parameters as `url.Values`.
 func (r ActiveV1InstrumentEventGetInstrumentEventsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

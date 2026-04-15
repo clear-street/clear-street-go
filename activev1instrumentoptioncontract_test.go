@@ -7,13 +7,14 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stainless-sdks/clear-street-go"
 	"github.com/stainless-sdks/clear-street-go/internal/testutil"
 	"github.com/stainless-sdks/clear-street-go/option"
 )
 
-func TestActiveV1IrisThreadMessageListMessagesDeprecatedWithOptionalParams(t *testing.T) {
+func TestActiveV1InstrumentOptionContractGetOptionContractsWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,16 +27,16 @@ func TestActiveV1IrisThreadMessageListMessagesDeprecatedWithOptionalParams(t *te
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Iris.Threads.Messages.ListMessagesDeprecated(
-		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.ActiveV1IrisThreadMessageListMessagesDeprecatedParams{
-			AccountID: "account_id",
-			AfterSeq:  clearstreet.Int(0),
-			PageSize:  clearstreet.Int(0),
-			PageToken: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		},
-	)
+	_, err := client.Active.V1.Instruments.Options.Contracts.GetOptionContracts(context.TODO(), clearstreet.ActiveV1InstrumentOptionContractGetOptionContractsParams{
+		ContractType:              clearstreet.ContractTypeCall,
+		Expiry:                    clearstreet.Time(time.Now()),
+		PageSize:                  clearstreet.Int(1),
+		PageToken:                 clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+		Underlier:                 clearstreet.String("underlier"),
+		UnderlierInstrumentID:     clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		UnderlierSecurityID:       clearstreet.String("underlier_security_id"),
+		UnderlierSecurityIDSource: clearstreet.SecurityIDSourceCms,
+	})
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {

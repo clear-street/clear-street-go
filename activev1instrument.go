@@ -29,11 +29,12 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1InstrumentService] method instead.
 type ActiveV1InstrumentService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 	// Retrieve details and lists of tradable instruments.
 	AnalystReporting ActiveV1InstrumentAnalystReportingService
 	// Retrieve details and lists of tradable instruments.
-	Events ActiveV1InstrumentEventService
+	Events  ActiveV1InstrumentEventService
+	Options ActiveV1InstrumentOptionService
 	// Retrieve details and lists of tradable instruments.
 	Reporting ActiveV1InstrumentReportingService
 	// Retrieve details and lists of tradable instruments.
@@ -45,33 +46,61 @@ type ActiveV1InstrumentService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1InstrumentService(opts ...option.RequestOption) (r ActiveV1InstrumentService) {
 	r = ActiveV1InstrumentService{}
-	r.Options = opts
+	r.options = opts
 	r.AnalystReporting = NewActiveV1InstrumentAnalystReportingService(opts...)
 	r.Events = NewActiveV1InstrumentEventService(opts...)
+	r.Options = NewActiveV1InstrumentOptionService(opts...)
 	r.Reporting = NewActiveV1InstrumentReportingService(opts...)
 	r.Venues = NewActiveV1InstrumentVenueService(opts...)
 	return
 }
 
 // Retrieves detailed information for a specific instrument.
-func (r *ActiveV1InstrumentService) GetInstrumentByID(ctx context.Context, securityID string, query ActiveV1InstrumentGetInstrumentByIDParams, opts ...option.RequestOption) (res *ActiveV1InstrumentGetInstrumentByIDResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+func (r *ActiveV1InstrumentService) GetInstrumentByID(ctx context.Context, securityID string, params ActiveV1InstrumentGetInstrumentByIDParams, opts ...option.RequestOption) (res *ActiveV1InstrumentGetInstrumentByIDResponse, err error) {
+	opts = slices.Concat(r.options, opts)
 	if securityID == "" {
 		err = errors.New("missing required security_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("active/v1/instruments/%v/%s", query.SecurityIDSource, url.PathEscape(securityID))
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
+	path := fmt.Sprintf("active/v1/instruments/%v/%s", params.SecurityIDSource, url.PathEscape(securityID))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, params, &res, opts...)
 	return res, err
 }
 
 // Retrieves a list of tradeable instruments.
 func (r *ActiveV1InstrumentService) GetInstruments(ctx context.Context, query ActiveV1InstrumentGetInstrumentsParams, opts ...option.RequestOption) (res *ActiveV1InstrumentGetInstrumentsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/instruments"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
+
+// Analyst rating category
+type AnalystRating string
+
+const (
+	AnalystRatingStrongBuy  AnalystRating = "STRONG_BUY"
+	AnalystRatingBuy        AnalystRating = "BUY"
+	AnalystRatingHold       AnalystRating = "HOLD"
+	AnalystRatingSell       AnalystRating = "SELL"
+	AnalystRatingStrongSell AnalystRating = "STRONG_SELL"
+)
+
+// The type of options contract
+type ContractType string
+
+const (
+	ContractTypeCall ContractType = "CALL"
+	ContractTypePut  ContractType = "PUT"
+)
+
+// The exercise style of an options contract
+type ExerciseStyle string
+
+const (
+	ExerciseStyleAmerican ExerciseStyle = "AMERICAN"
+	ExerciseStyleEuropean ExerciseStyle = "EUROPEAN"
+)
 
 // Represents a tradable financial instrument, including supplemental information
 type Instrument struct {
@@ -105,6 +134,9 @@ type Instrument struct {
 	LongConcentrationLimit string `json:"long_concentration_limit" api:"nullable"`
 	// The total market capitalization
 	MarketCap string `json:"market_cap" api:"nullable"`
+	// Available options expiration dates for this instrument. Present only when
+	// `include_options_expiry_dates=true` in the request.
+	OptionsExpiryDates []time.Time `json:"options_expiry_dates" api:"nullable" format:"date"`
 	// The closing price from the previous trading day
 	PreviousClose string `json:"previous_close" api:"nullable"`
 	// The price-to-earnings (P/E) ratio for the trailing twelve months (TTM)
@@ -132,6 +164,7 @@ type Instrument struct {
 		LogoURL                 respjson.Field
 		LongConcentrationLimit  respjson.Field
 		MarketCap               respjson.Field
+		OptionsExpiryDates      respjson.Field
 		PreviousClose           respjson.Field
 		PriceToEarnings         respjson.Field
 		Quote                   respjson.Field
@@ -340,6 +373,86 @@ func (r *InstrumentSecurityID) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// The listing type of an options contract
+type ListingType string
+
+const (
+	ListingTypeStandard ListingType = "STANDARD"
+	ListingTypeFlex     ListingType = "FLEX"
+	ListingTypeOtc      ListingType = "OTC"
+)
+
+// An options contract with options-specific metadata
+type OptionsContract struct {
+	// OEMS instrument identifier
+	ID string `json:"id" api:"required" format:"uuid"`
+	// Whether this is a CALL or PUT
+	//
+	// Any of "CALL", "PUT".
+	ContractType ContractType `json:"contract_type" api:"required"`
+	// ISO currency code
+	Currency string `json:"currency" api:"required"`
+	// MIC code of the primary listing venue
+	Exchange string `json:"exchange" api:"required"`
+	// Exercise style
+	//
+	// Any of "AMERICAN", "EUROPEAN".
+	ExerciseStyle ExerciseStyle `json:"exercise_style" api:"required"`
+	// Expiration date
+	Expiry time.Time `json:"expiry" api:"required" format:"date"`
+	// Whether the contract is liquidation-only
+	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
+	// Whether the contract is marginable
+	IsMarginable bool `json:"is_marginable" api:"required"`
+	// Whether the contract is restricted from trading
+	IsRestricted bool `json:"is_restricted" api:"required"`
+	// Listing type
+	//
+	// Any of "STANDARD", "FLEX", "OTC".
+	ListingType ListingType `json:"listing_type" api:"required"`
+	// Contract multiplier (100 for standard options)
+	Multiplier string `json:"multiplier" api:"required"`
+	// All known security identifiers for this contract
+	SecurityIDs []InstrumentSecurityID `json:"security_ids" api:"required"`
+	// Strike price
+	StrikePrice string `json:"strike_price" api:"required"`
+	// OSI symbol (e.g. "AAPL 251219C00150000")
+	Symbol string `json:"symbol" api:"required"`
+	// Open interest (number of outstanding contracts), if available
+	OpenInterest int64 `json:"open_interest" api:"nullable"`
+	// OEMS instrument ID of the underlying instrument, if resolvable
+	UnderlierInstrumentID string `json:"underlier_instrument_id" api:"nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID                    respjson.Field
+		ContractType          respjson.Field
+		Currency              respjson.Field
+		Exchange              respjson.Field
+		ExerciseStyle         respjson.Field
+		Expiry                respjson.Field
+		IsLiquidationOnly     respjson.Field
+		IsMarginable          respjson.Field
+		IsRestricted          respjson.Field
+		ListingType           respjson.Field
+		Multiplier            respjson.Field
+		SecurityIDs           respjson.Field
+		StrikePrice           respjson.Field
+		Symbol                respjson.Field
+		OpenInterest          respjson.Field
+		UnderlierInstrumentID respjson.Field
+		ExtraFields           map[string]respjson.Field
+		raw                   string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OptionsContract) RawJSON() string { return r.JSON.raw }
+func (r *OptionsContract) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type OptionsContractList []OptionsContract
+
 type ActiveV1InstrumentGetInstrumentByIDResponse struct {
 	// Represents a tradable financial instrument, including supplemental information
 	Data Instrument `json:"data" api:"required"`
@@ -387,13 +500,26 @@ type ActiveV1InstrumentGetInstrumentByIDParams struct {
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
 	SecurityIDSource SecurityIDSource `path:"security_id_source,omitzero" api:"required" json:"-"`
+	// When true, include unique options expiry dates for this instrument
+	IncludeOptionsExpiryDates param.Opt[bool] `query:"include_options_expiry_dates,omitzero" json:"-"`
 	paramObj
+}
+
+// URLQuery serializes [ActiveV1InstrumentGetInstrumentByIDParams]'s query
+// parameters as `url.Values`.
+func (r ActiveV1InstrumentGetInstrumentByIDParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
 }
 
 type ActiveV1InstrumentGetInstrumentsParams struct {
 	// Filter by easy to borrow status
 	EasyToBorrow param.Opt[bool] `query:"easy_to_borrow,omitzero" json:"-"`
-	// Filter IDs to those containing this substring. For options, this is required.
+	// Filter IDs to those containing this substring. For options, and when
+	// security_type is omitted and no security_id/security_id_source filters are
+	// provided, this is required.
 	IDFilter param.Opt[string] `query:"id_filter,omitzero" json:"-"`
 	// Filter by liquidation only status
 	IsLiquidationOnly param.Opt[bool] `query:"is_liquidation_only,omitzero" json:"-"`
@@ -404,10 +530,8 @@ type ActiveV1InstrumentGetInstrumentsParams struct {
 	// Filter by short prohibited status
 	IsShortProhibited param.Opt[bool] `query:"is_short_prohibited,omitzero" json:"-"`
 	// Filter by threshold security status
-	IsThresholdSecurity param.Opt[bool] `query:"is_threshold_security,omitzero" json:"-"`
-	// The number of items to return per page (only used when page_token is not
-	// provided)
-	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	IsThresholdSecurity param.Opt[bool]  `query:"is_threshold_security,omitzero" json:"-"`
+	PageSize            param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next page of results. Contains encoded pagination state
 	// (limit + offset). When provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
@@ -426,7 +550,7 @@ type ActiveV1InstrumentGetInstrumentsParams struct {
 	// - Single: `security_id_source=CUSIP`
 	// - Multiple: `security_id_source[0]=CUSIP&security_id_source[1]=FIGI`
 	SecurityIDSource []string `query:"security_id_source,omitzero" json:"-"`
-	// Filter by security type, required and defaults to COMMON_STOCK
+	// Filter by security type. If omitted, returns all types.
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
@@ -438,12 +562,12 @@ type ActiveV1InstrumentGetInstrumentsParams struct {
 // as `url.Values`.
 func (r ActiveV1InstrumentGetInstrumentsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Filter by security type, required and defaults to COMMON_STOCK
+// Filter by security type. If omitted, returns all types.
 type ActiveV1InstrumentGetInstrumentsParamsSecurityType string
 
 const (

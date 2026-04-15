@@ -19,66 +19,61 @@ import (
 	"github.com/stainless-sdks/clear-street-go/shared"
 )
 
-// Deprecated /iris/_ routes. Use /omni-ai/_ instead.
+// AI assistant for conversational trading interactions.
 //
-// ActiveV1IrisRunService contains methods and other services that help with
+// ActiveV1OmniAIRunService contains methods and other services that help with
 // interacting with the clear-street API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
-// the [NewActiveV1IrisRunService] method instead.
-type ActiveV1IrisRunService struct {
+// the [NewActiveV1OmniAIRunService] method instead.
+type ActiveV1OmniAIRunService struct {
 	options []option.RequestOption
 }
 
-// NewActiveV1IrisRunService generates a new service that applies the given options
-// to each request. These options are applied after the parent client's options (if
-// there is one), and before any request-specific options.
-func NewActiveV1IrisRunService(opts ...option.RequestOption) (r ActiveV1IrisRunService) {
-	r = ActiveV1IrisRunService{}
+// NewActiveV1OmniAIRunService generates a new service that applies the given
+// options to each request. These options are applied after the parent client's
+// options (if there is one), and before any request-specific options.
+func NewActiveV1OmniAIRunService(opts ...option.RequestOption) (r ActiveV1OmniAIRunService) {
+	r = ActiveV1OmniAIRunService{}
 	r.options = opts
 	return
 }
 
-// **Deprecated**: Use `DELETE /omni-ai/runs/{run_id}` instead.
-//
-// Deprecated: deprecated
-func (r *ActiveV1IrisRunService) CancelRunDeprecated(ctx context.Context, runID string, body ActiveV1IrisRunCancelRunDeprecatedParams, opts ...option.RequestOption) (res *ActiveV1IrisRunCancelRunDeprecatedResponse, err error) {
+// Cancel a running assistant run.
+func (r *ActiveV1OmniAIRunService) CancelRun(ctx context.Context, runID string, body ActiveV1OmniAIRunCancelRunParams, opts ...option.RequestOption) (res *ActiveV1OmniAIRunCancelRunResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if runID == "" {
 		err = errors.New("missing required run_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("active/v1/iris/runs/%s", runID)
+	path := fmt.Sprintf("active/v1/omni-ai/runs/%s", runID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
 	return res, err
 }
 
-// **Deprecated**: Use `GET /omni-ai/runs/{run_id}` instead.
-//
-// Deprecated: deprecated
-func (r *ActiveV1IrisRunService) GetRunDeprecated(ctx context.Context, runID string, query ActiveV1IrisRunGetRunDeprecatedParams, opts ...option.RequestOption) (res *ActiveV1IrisRunGetRunDeprecatedResponse, err error) {
+// Poll for the current status of a run and any new events since the last poll.
+func (r *ActiveV1OmniAIRunService) GetRun(ctx context.Context, runID string, query ActiveV1OmniAIRunGetRunParams, opts ...option.RequestOption) (res *ActiveV1OmniAIRunGetRunResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if runID == "" {
 		err = errors.New("missing required run_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("active/v1/iris/runs/%s", runID)
+	path := fmt.Sprintf("active/v1/omni-ai/runs/%s", runID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
 
-// **Deprecated**: Use `POST /omni-ai/runs` instead.
-//
-// Deprecated: deprecated
-func (r *ActiveV1IrisRunService) StartRunDeprecated(ctx context.Context, body ActiveV1IrisRunStartRunDeprecatedParams, opts ...option.RequestOption) (res *ActiveV1IrisRunStartRunDeprecatedResponse, err error) {
+// Begins an agentic conversation run. If thread_id is provided, continues an
+// existing conversation; otherwise creates a new thread.
+func (r *ActiveV1OmniAIRunService) StartRun(ctx context.Context, body ActiveV1OmniAIRunStartRunParams, opts ...option.RequestOption) (res *ActiveV1OmniAIRunStartRunResponse, err error) {
 	opts = slices.Concat(r.options, opts)
-	path := "active/v1/iris/runs"
+	path := "active/v1/omni-ai/runs"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
 }
 
-type ActiveV1IrisRunCancelRunDeprecatedResponse struct {
+type ActiveV1OmniAIRunCancelRunResponse struct {
 	Data CancelRunResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -90,12 +85,12 @@ type ActiveV1IrisRunCancelRunDeprecatedResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ActiveV1IrisRunCancelRunDeprecatedResponse) RawJSON() string { return r.JSON.raw }
-func (r *ActiveV1IrisRunCancelRunDeprecatedResponse) UnmarshalJSON(data []byte) error {
+func (r ActiveV1OmniAIRunCancelRunResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1OmniAIRunCancelRunResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1IrisRunGetRunDeprecatedResponse struct {
+type ActiveV1OmniAIRunGetRunResponse struct {
 	Data GetRunResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -107,12 +102,12 @@ type ActiveV1IrisRunGetRunDeprecatedResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ActiveV1IrisRunGetRunDeprecatedResponse) RawJSON() string { return r.JSON.raw }
-func (r *ActiveV1IrisRunGetRunDeprecatedResponse) UnmarshalJSON(data []byte) error {
+func (r ActiveV1OmniAIRunGetRunResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1OmniAIRunGetRunResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1IrisRunStartRunDeprecatedResponse struct {
+type ActiveV1OmniAIRunStartRunResponse struct {
 	Data StartRunResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -124,12 +119,12 @@ type ActiveV1IrisRunStartRunDeprecatedResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ActiveV1IrisRunStartRunDeprecatedResponse) RawJSON() string { return r.JSON.raw }
-func (r *ActiveV1IrisRunStartRunDeprecatedResponse) UnmarshalJSON(data []byte) error {
+func (r ActiveV1OmniAIRunStartRunResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1OmniAIRunStartRunResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1IrisRunCancelRunDeprecatedParams struct {
+type ActiveV1OmniAIRunCancelRunParams struct {
 	// Account ID for the request
 	AccountID string `json:"account_id" api:"required"`
 	// Reason for cancellation
@@ -137,15 +132,15 @@ type ActiveV1IrisRunCancelRunDeprecatedParams struct {
 	paramObj
 }
 
-func (r ActiveV1IrisRunCancelRunDeprecatedParams) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1IrisRunCancelRunDeprecatedParams
+func (r ActiveV1OmniAIRunCancelRunParams) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1OmniAIRunCancelRunParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ActiveV1IrisRunCancelRunDeprecatedParams) UnmarshalJSON(data []byte) error {
+func (r *ActiveV1OmniAIRunCancelRunParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1IrisRunGetRunDeprecatedParams struct {
+type ActiveV1OmniAIRunGetRunParams struct {
 	// Account ID for the request
 	AccountID string `query:"account_id" api:"required" json:"-"`
 	// Maximum events to return
@@ -155,16 +150,16 @@ type ActiveV1IrisRunGetRunDeprecatedParams struct {
 	paramObj
 }
 
-// URLQuery serializes [ActiveV1IrisRunGetRunDeprecatedParams]'s query parameters
-// as `url.Values`.
-func (r ActiveV1IrisRunGetRunDeprecatedParams) URLQuery() (v url.Values, err error) {
+// URLQuery serializes [ActiveV1OmniAIRunGetRunParams]'s query parameters as
+// `url.Values`.
+func (r ActiveV1OmniAIRunGetRunParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-type ActiveV1IrisRunStartRunDeprecatedParams struct {
+type ActiveV1OmniAIRunStartRunParams struct {
 	// Account ID for the request
 	AccountID string `json:"account_id" api:"required"`
 	// The user's natural language command
@@ -178,10 +173,10 @@ type ActiveV1IrisRunStartRunDeprecatedParams struct {
 	paramObj
 }
 
-func (r ActiveV1IrisRunStartRunDeprecatedParams) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1IrisRunStartRunDeprecatedParams
+func (r ActiveV1OmniAIRunStartRunParams) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1OmniAIRunStartRunParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ActiveV1IrisRunStartRunDeprecatedParams) UnmarshalJSON(data []byte) error {
+func (r *ActiveV1OmniAIRunStartRunParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }

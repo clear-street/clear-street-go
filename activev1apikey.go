@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1APIKeyService] method instead.
 type ActiveV1APIKeyService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1APIKeyService generates a new service that applies the given options
@@ -35,13 +35,13 @@ type ActiveV1APIKeyService struct {
 // there is one), and before any request-specific options.
 func NewActiveV1APIKeyService(opts ...option.RequestOption) (r ActiveV1APIKeyService) {
 	r = ActiveV1APIKeyService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Create a new API key
 func (r *ActiveV1APIKeyService) New(ctx context.Context, body ActiveV1APIKeyNewParams, opts ...option.RequestOption) (res *ActiveV1APIKeyNewResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/api_keys"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
@@ -49,7 +49,7 @@ func (r *ActiveV1APIKeyService) New(ctx context.Context, body ActiveV1APIKeyNewP
 
 // List API keys for the authenticated user
 func (r *ActiveV1APIKeyService) List(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1APIKeyListResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/api_keys"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return res, err
@@ -57,7 +57,7 @@ func (r *ActiveV1APIKeyService) List(ctx context.Context, opts ...option.Request
 
 // Revoke a specific API key
 func (r *ActiveV1APIKeyService) Revoke(ctx context.Context, id string, opts ...option.RequestOption) (res *ActiveV1APIKeyRevokeResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	if id == "" {
 		err = errors.New("missing required id parameter")
 		return nil, err
@@ -69,7 +69,7 @@ func (r *ActiveV1APIKeyService) Revoke(ctx context.Context, id string, opts ...o
 
 // Revoke all API keys for the authenticated user
 func (r *ActiveV1APIKeyService) RevokeAll(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1APIKeyRevokeAllResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/api_keys"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
 	return res, err

@@ -13,7 +13,7 @@ import (
 	"github.com/stainless-sdks/clear-street-go/option"
 )
 
-func TestActiveV1IrisThreadGetThread(t *testing.T) {
+func TestActiveV1IrisThreadGetThreadDeprecated(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,10 +26,10 @@ func TestActiveV1IrisThreadGetThread(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Iris.Threads.GetThread(
+	_, err := client.Active.V1.Iris.Threads.GetThreadDeprecated(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.ActiveV1IrisThreadGetThreadParams{
+		clearstreet.ActiveV1IrisThreadGetThreadDeprecatedParams{
 			AccountID: "account_id",
 		},
 	)
@@ -42,7 +42,7 @@ func TestActiveV1IrisThreadGetThread(t *testing.T) {
 	}
 }
 
-func TestActiveV1IrisThreadListThreadsWithOptionalParams(t *testing.T) {
+func TestActiveV1IrisThreadListThreadsDeprecatedWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -55,7 +55,7 @@ func TestActiveV1IrisThreadListThreadsWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Iris.Threads.ListThreads(context.TODO(), clearstreet.ActiveV1IrisThreadListThreadsParams{
+	_, err := client.Active.V1.Iris.Threads.ListThreadsDeprecated(context.TODO(), clearstreet.ActiveV1IrisThreadListThreadsDeprecatedParams{
 		AccountID: "account_id",
 		PageSize:  clearstreet.Int(0),
 		PageToken: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),

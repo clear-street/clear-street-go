@@ -29,7 +29,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1InstrumentAnalystReportingService] method instead.
 type ActiveV1InstrumentAnalystReportingService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1InstrumentAnalystReportingService generates a new service that
@@ -38,13 +38,13 @@ type ActiveV1InstrumentAnalystReportingService struct {
 // options.
 func NewActiveV1InstrumentAnalystReportingService(opts ...option.RequestOption) (r ActiveV1InstrumentAnalystReportingService) {
 	r = ActiveV1InstrumentAnalystReportingService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves analyst ratings and price targets for an instrument.
 func (r *ActiveV1InstrumentAnalystReportingService) GetInstrumentAnalystConsensus(ctx context.Context, securityID string, params ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusParams, opts ...option.RequestOption) (res *ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	if securityID == "" {
 		err = errors.New("missing required security_id parameter")
 		return nil, err
@@ -83,17 +83,6 @@ func (r AnalystDistribution) RawJSON() string { return r.JSON.raw }
 func (r *AnalystDistribution) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Analyst rating category
-type AnalystRating string
-
-const (
-	AnalystRatingStrongBuy  AnalystRating = "STRONG_BUY"
-	AnalystRatingBuy        AnalystRating = "BUY"
-	AnalystRatingHold       AnalystRating = "HOLD"
-	AnalystRatingSell       AnalystRating = "SELL"
-	AnalystRatingStrongSell AnalystRating = "STRONG_SELL"
-)
 
 // Aggregated analyst consensus metrics
 type InstrumentAnalystConsensus struct {
@@ -195,7 +184,7 @@ type ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusParams struc
 // parameters as `url.Values`.
 func (r ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
