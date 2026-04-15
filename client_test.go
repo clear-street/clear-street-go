@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stainless-sdks/clear-street-go"
-	"github.com/stainless-sdks/clear-street-go/internal"
-	"github.com/stainless-sdks/clear-street-go/option"
+	"github.com/clear-street/clear-street-go"
+	"github.com/clear-street/clear-street-go/internal"
+	"github.com/clear-street/clear-street-go/option"
 )
 
 type closureTransport struct {

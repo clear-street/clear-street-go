@@ -3,8 +3,8 @@ package respjson_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stainless-sdks/clear-street-go/internal/apijson"
-	rj "github.com/stainless-sdks/clear-street-go/packages/respjson"
+	"github.com/clear-street/clear-street-go/internal/apijson"
+	rj "github.com/clear-street/clear-street-go/packages/respjson"
 	"reflect"
 	"testing"
 )

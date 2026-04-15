@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stainless-sdks/clear-street-go/packages/param"
+	"github.com/clear-street/clear-street-go/packages/param"
 )
 
 var encoders sync.Map // map[reflect.Type]encoderFunc

@@ -1,4 +1,4 @@
-module github.com/stainless-sdks/clear-street-go
+module github.com/clear-street/clear-street-go
 
 go 1.22
 
