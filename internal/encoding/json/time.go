@@ -2,7 +2,7 @@
 package json
 
 import (
-	"github.com/stainless-sdks/clear-street-go/internal/encoding/json/shims"
+	"github.com/clear-street/clear-street-go/internal/encoding/json/shims"
 	"reflect"
 	"time"
 )

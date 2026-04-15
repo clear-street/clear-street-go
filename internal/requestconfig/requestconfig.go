@@ -18,10 +18,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/stainless-sdks/clear-street-go/internal"
-	"github.com/stainless-sdks/clear-street-go/internal/apierror"
-	"github.com/stainless-sdks/clear-street-go/internal/apiform"
-	"github.com/stainless-sdks/clear-street-go/internal/apiquery"
+	"github.com/clear-street/clear-street-go/internal"
+	"github.com/clear-street/clear-street-go/internal/apierror"
+	"github.com/clear-street/clear-street-go/internal/apiform"
+	"github.com/clear-street/clear-street-go/internal/apiquery"
 )
 
 func getDefaultHeaders() map[string]string {

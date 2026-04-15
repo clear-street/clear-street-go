@@ -2,7 +2,7 @@ package param
 
 import (
 	"encoding/json"
-	"github.com/stainless-sdks/clear-street-go/internal/encoding/json/sentinel"
+	"github.com/clear-street/clear-street-go/internal/encoding/json/sentinel"
 	"reflect"
 )
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stainless-sdks/clear-street-go/packages/param"
+	"github.com/clear-street/clear-street-go/packages/param"
 )
 
 type Struct struct {
