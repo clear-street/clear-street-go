@@ -20,7 +20,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1WService] method instead.
 type ActiveV1WService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1WService generates a new service that applies the given options to
@@ -28,13 +28,13 @@ type ActiveV1WService struct {
 // there is one), and before any request-specific options.
 func NewActiveV1WService(opts ...option.RequestOption) (r ActiveV1WService) {
 	r = ActiveV1WService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Upgrade the HTTP connection to a WebSocket and echo incoming messages.
 func (r *ActiveV1WService) WebsocketHandler(ctx context.Context, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	path := "active/v1/ws"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, nil, opts...)

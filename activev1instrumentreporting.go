@@ -29,7 +29,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1InstrumentReportingService] method instead.
 type ActiveV1InstrumentReportingService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1InstrumentReportingService generates a new service that applies the
@@ -37,13 +37,13 @@ type ActiveV1InstrumentReportingService struct {
 // client's options (if there is one), and before any request-specific options.
 func NewActiveV1InstrumentReportingService(opts ...option.RequestOption) (r ActiveV1InstrumentReportingService) {
 	r = ActiveV1InstrumentReportingService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves fundamental and financial reporting data for an instrument.
 func (r *ActiveV1InstrumentReportingService) GetInstrumentReporting(ctx context.Context, securityID string, params ActiveV1InstrumentReportingGetInstrumentReportingParams, opts ...option.RequestOption) (res *ActiveV1InstrumentReportingGetInstrumentReportingResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	if securityID == "" {
 		err = errors.New("missing required security_id parameter")
 		return nil, err
@@ -96,7 +96,7 @@ type ActiveV1InstrumentReportingGetInstrumentReportingParams struct {
 // query parameters as `url.Values`.
 func (r ActiveV1InstrumentReportingGetInstrumentReportingParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

@@ -13,19 +13,23 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1Service] method instead.
 type ActiveV1Service struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 	// Manage trading accounts and view balances.
 	Accounts ActiveV1AccountService
 	// Manage API keys for authentication.
 	APIKeys   ActiveV1APIKeyService
-	Assistant ActiveV1AssistantService
 	Calendars ActiveV1CalendarService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	Clock ActiveV1ClockService
 	// Retrieve details and lists of tradable instruments.
 	Instruments ActiveV1InstrumentService
 	Iris        ActiveV1IrisService
 	MarketData  ActiveV1MarketDataService
 	// Retrieve details and lists of tradable instruments.
-	News ActiveV1NewsService
+	News   ActiveV1NewsService
+	OmniAI ActiveV1OmniAIService
+	// Retrieve details and lists of tradable instruments.
+	SavedScreeners ActiveV1SavedScreenerService
 	// Retrieve details and lists of tradable instruments.
 	Screener ActiveV1ScreenerService
 	// Endpoints for API service metadata.
@@ -41,21 +45,25 @@ type ActiveV1Service struct {
 // there is one), and before any request-specific options.
 func NewActiveV1Service(opts ...option.RequestOption) (r ActiveV1Service) {
 	r = ActiveV1Service{}
-	r.Options = opts
+	r.options = opts
 	r.Accounts = NewActiveV1AccountService(opts...)
 	r.APIKeys = NewActiveV1APIKeyService(opts...)
-	r.Assistant = NewActiveV1AssistantService(opts...)
 	r.Calendars = NewActiveV1CalendarService(opts...)
+	r.Clock = NewActiveV1ClockService(opts...)
 	r.Instruments = NewActiveV1InstrumentService(opts...)
 	r.Iris = NewActiveV1IrisService(opts...)
 	r.MarketData = NewActiveV1MarketDataService(opts...)
 	r.News = NewActiveV1NewsService(opts...)
+	r.OmniAI = NewActiveV1OmniAIService(opts...)
+	r.SavedScreeners = NewActiveV1SavedScreenerService(opts...)
 	r.Screener = NewActiveV1ScreenerService(opts...)
 	r.Version = NewActiveV1VersionService(opts...)
 	r.Watchlists = NewActiveV1WatchlistService(opts...)
 	r.Ws = NewActiveV1WService(opts...)
 	return
 }
+
+type APIDecimal64 = string
 
 // Security identifier source
 type SecurityIDSource string

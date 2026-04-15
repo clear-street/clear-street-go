@@ -13,7 +13,7 @@ import (
 	"github.com/stainless-sdks/clear-street-go/option"
 )
 
-func TestActiveV1IrisFeedbackNewFeedbackWithOptionalParams(t *testing.T) {
+func TestActiveV1IrisFeedbackNewFeedbackDeprecatedWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,7 +26,7 @@ func TestActiveV1IrisFeedbackNewFeedbackWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Iris.Feedback.NewFeedback(context.TODO(), clearstreet.ActiveV1IrisFeedbackNewFeedbackParams{
+	_, err := client.Active.V1.Iris.Feedback.NewFeedbackDeprecated(context.TODO(), clearstreet.ActiveV1IrisFeedbackNewFeedbackDeprecatedParams{
 		AccountID: "account_id",
 		MessageID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		Score:     0,

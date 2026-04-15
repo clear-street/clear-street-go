@@ -29,7 +29,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1AccountService] method instead.
 type ActiveV1AccountService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 	// Manage trading accounts and view balances.
 	Balances ActiveV1AccountBalanceService
 	// Manage locate requests for short selling.
@@ -47,7 +47,7 @@ type ActiveV1AccountService struct {
 // there is one), and before any request-specific options.
 func NewActiveV1AccountService(opts ...option.RequestOption) (r ActiveV1AccountService) {
 	r = ActiveV1AccountService{}
-	r.Options = opts
+	r.options = opts
 	r.Balances = NewActiveV1AccountBalanceService(opts...)
 	r.Locates = NewActiveV1AccountLocateService(opts...)
 	r.Orders = NewActiveV1AccountOrderService(opts...)
@@ -58,7 +58,7 @@ func NewActiveV1AccountService(opts ...option.RequestOption) (r ActiveV1AccountS
 
 // Fetch account details by ID
 func (r *ActiveV1AccountService) GetAccountByID(ctx context.Context, accountID int64, opts ...option.RequestOption) (res *ActiveV1AccountGetAccountByIDResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return res, err
@@ -66,7 +66,7 @@ func (r *ActiveV1AccountService) GetAccountByID(ctx context.Context, accountID i
 
 // List accounts the authenticated user has permission to access
 func (r *ActiveV1AccountService) GetAccounts(ctx context.Context, query ActiveV1AccountGetAccountsParams, opts ...option.RequestOption) (res *ActiveV1AccountGetAccountsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/accounts"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -74,7 +74,7 @@ func (r *ActiveV1AccountService) GetAccounts(ctx context.Context, query ActiveV1
 
 // Update account risk settings
 func (r *ActiveV1AccountService) PatchAccountByID(ctx context.Context, accountID int64, body ActiveV1AccountPatchAccountByIDParams, opts ...option.RequestOption) (res *ActiveV1AccountPatchAccountByIDResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
 	return res, err
@@ -84,6 +84,8 @@ func (r *ActiveV1AccountService) PatchAccountByID(ctx context.Context, accountID
 type Account struct {
 	// The unique identifier for the account
 	ID int64 `json:"id" api:"required"`
+	// The account holder entity identifier
+	AccountHolderEntityID int64 `json:"account_holder_entity_id" api:"required"`
 	// The full legal name of the account
 	FullName string `json:"full_name" api:"required"`
 	// The type of account
@@ -111,16 +113,17 @@ type Account struct {
 	CloseDate time.Time `json:"close_date" api:"nullable" format:"date"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          respjson.Field
-		FullName    respjson.Field
-		Kind        respjson.Field
-		OpenDate    respjson.Field
-		ShortName   respjson.Field
-		Status      respjson.Field
-		Subkind     respjson.Field
-		CloseDate   respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		ID                    respjson.Field
+		AccountHolderEntityID respjson.Field
+		FullName              respjson.Field
+		Kind                  respjson.Field
+		OpenDate              respjson.Field
+		ShortName             respjson.Field
+		Status                respjson.Field
+		Subkind               respjson.Field
+		CloseDate             respjson.Field
+		ExtraFields           map[string]respjson.Field
+		raw                   string
 	} `json:"-"`
 }
 
@@ -203,137 +206,6 @@ const (
 	AccountSubkindTripartyCollateralAway AccountSubkind = "TRIPARTY_COLLATERAL_AWAY"
 	AccountSubkindUnknown                AccountSubkind = "UNKNOWN"
 )
-
-// A trading order with its current state and execution details.
-//
-// This is the unified API representation of an order across its lifecycle,
-// combining data from execution reports, order status queries, and parent/child
-// tracking.
-type Order struct {
-	// Client-provided unique identifier for this order
-	ID string `json:"id" api:"required"`
-	// Account placing the order
-	AccountID int64 `json:"account_id" api:"required"`
-	// Timestamp when order was created (UTC)
-	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
-	// Cumulative filled quantity
-	FilledQuantity string `json:"filled_quantity" api:"required"`
-	// Remaining unfilled quantity
-	LeavesQuantity string `json:"leaves_quantity" api:"required"`
-	// Type of order (MARKET, LIMIT, etc.)
-	//
-	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
-	// "TRAILING_STOP_LIMIT", "OTHER".
-	OrderType OrderType `json:"order_type" api:"required"`
-	// Total order quantity
-	Quantity string `json:"quantity" api:"required"`
-	// The identifier for the traded instrument (CMS/CUSIP/ISIN/FIGI for equities or
-	// option OPRA OSI)
-	SecurityID string `json:"security_id" api:"required"`
-	// The source of the security identifier
-	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
-	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
-	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
-	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
-	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
-	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
-	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
-	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `json:"security_type" api:"required"`
-	// Side of the order (BUY, SELL, SELL_SHORT)
-	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side Side `json:"side" api:"required"`
-	// Current status of the order
-	//
-	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
-	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
-	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
-	Status OrderStatus `json:"status" api:"required"`
-	// Trading symbol
-	Symbol string `json:"symbol" api:"required"`
-	// Time in force instruction
-	//
-	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
-	TimeInForce TimeInForce `json:"time_in_force" api:"required"`
-	// Timestamp of the most recent update (UTC)
-	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
-	// MIC code of the venue where the order is routed
-	Venue string `json:"venue" api:"required"`
-	// Average fill price across all executions
-	AverageFillPrice string `json:"average_fill_price" api:"nullable"`
-	// Contains execution, rejection or cancellation details, if any
-	Details []string `json:"details"`
-	// Timestamp when the order will expire (UTC). Present when time_in_force is
-	// GOOD_TILL_DATE.
-	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
-	// Limit offset for trailing stop-limit orders (signed)
-	LimitOffset string `json:"limit_offset" api:"nullable"`
-	// Limit price (for LIMIT and STOP_LIMIT orders)
-	LimitPrice string `json:"limit_price" api:"nullable"`
-	// Stop price (for STOP and STOP_LIMIT orders)
-	StopPrice string `json:"stop_price" api:"nullable"`
-	// Execution strategy for this order
-	Strategy OrderStrategyUnion `json:"strategy" api:"nullable"`
-	// Trailing offset amount for trailing orders
-	TrailingOffsetAmt string `json:"trailing_offset_amt" api:"nullable"`
-	// Trailing offset type for trailing orders
-	//
-	// Any of "PRICE", "PERCENT_BPS".
-	TrailingOffsetAmtType TrailingOffsetType `json:"trailing_offset_amt_type" api:"nullable"`
-	// Trailing watermark price for trailing orders
-	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
-	// Trailing watermark timestamp for trailing orders
-	TrailingWatermarkTs time.Time `json:"trailing_watermark_ts" api:"nullable" format:"date-time"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ID                    respjson.Field
-		AccountID             respjson.Field
-		CreatedAt             respjson.Field
-		FilledQuantity        respjson.Field
-		LeavesQuantity        respjson.Field
-		OrderType             respjson.Field
-		Quantity              respjson.Field
-		SecurityID            respjson.Field
-		SecurityIDSource      respjson.Field
-		SecurityType          respjson.Field
-		Side                  respjson.Field
-		Status                respjson.Field
-		Symbol                respjson.Field
-		TimeInForce           respjson.Field
-		UpdatedAt             respjson.Field
-		Venue                 respjson.Field
-		AverageFillPrice      respjson.Field
-		Details               respjson.Field
-		ExpiresAt             respjson.Field
-		LimitOffset           respjson.Field
-		LimitPrice            respjson.Field
-		StopPrice             respjson.Field
-		Strategy              respjson.Field
-		TrailingOffsetAmt     respjson.Field
-		TrailingOffsetAmtType respjson.Field
-		TrailingWatermarkPx   respjson.Field
-		TrailingWatermarkTs   respjson.Field
-		ExtraFields           map[string]respjson.Field
-		raw                   string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r Order) RawJSON() string { return r.JSON.raw }
-func (r *Order) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type OrderList []Order
 
 // Risk settings for an account
 type RiskSettings struct {
@@ -430,8 +302,6 @@ func (r *ActiveV1AccountPatchAccountByIDResponse) UnmarshalJSON(data []byte) err
 }
 
 type ActiveV1AccountGetAccountsParams struct {
-	// The number of items to return per page (only used when page_token is not
-	// provided)
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next page of results. Contains encoded pagination state
 	// (limit + offset). When provided, page_size is ignored.
@@ -443,7 +313,7 @@ type ActiveV1AccountGetAccountsParams struct {
 // `url.Values`.
 func (r ActiveV1AccountGetAccountsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

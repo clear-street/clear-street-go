@@ -23,7 +23,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1InstrumentVenueService] method instead.
 type ActiveV1InstrumentVenueService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1InstrumentVenueService generates a new service that applies the given
@@ -31,16 +31,47 @@ type ActiveV1InstrumentVenueService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1InstrumentVenueService(opts ...option.RequestOption) (r ActiveV1InstrumentVenueService) {
 	r = ActiveV1InstrumentVenueService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves a list of available trading venues and exchanges.
 func (r *ActiveV1InstrumentVenueService) GetVenues(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1InstrumentVenueGetVenuesResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/instruments/venues"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return res, err
+}
+
+// Display characteristics of a venue
+type DisplayType string
+
+const (
+	DisplayTypeLit             DisplayType = "LIT"
+	DisplayTypeDark            DisplayType = "DARK"
+	DisplayTypePeriodicAuction DisplayType = "PERIODIC_AUCTION"
+	DisplayTypeRfq             DisplayType = "RFQ"
+)
+
+// Good-till-date order acceptance capabilities
+type GtdAccepts struct {
+	// Whether the venue accepts date-only expiration (YYYY-MM-DD)
+	Date bool `json:"date" api:"required"`
+	// Whether the venue accepts precise timestamp expiration
+	Timestamp bool `json:"timestamp" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Date        respjson.Field
+		Timestamp   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r GtdAccepts) RawJSON() string { return r.JSON.raw }
+func (r *GtdAccepts) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // A trading venue with its characteristics and capabilities
@@ -50,10 +81,10 @@ type Venue struct {
 	// The display characteristics of the venue
 	//
 	// Any of "LIT", "DARK", "PERIODIC_AUCTION", "RFQ".
-	DisplayType VenueDisplayType `json:"display_type" api:"required"`
+	DisplayType DisplayType `json:"display_type" api:"required"`
 	// Indicates whether GOOD_TILL_DATE orders accept date-only or timestamp
 	// specifications
-	GtdAccepts VenueGtdAccepts `json:"gtd_accepts" api:"required"`
+	GtdAccepts GtdAccepts `json:"gtd_accepts" api:"required"`
 	// The minimum quantity increment for orders at this venue
 	LotSize int64 `json:"lot_size" api:"required"`
 	// The Market Identifier Code (MIC) for the venue
@@ -94,37 +125,7 @@ func (r *Venue) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// The display characteristics of the venue
-type VenueDisplayType string
-
-const (
-	VenueDisplayTypeLit             VenueDisplayType = "LIT"
-	VenueDisplayTypeDark            VenueDisplayType = "DARK"
-	VenueDisplayTypePeriodicAuction VenueDisplayType = "PERIODIC_AUCTION"
-	VenueDisplayTypeRfq             VenueDisplayType = "RFQ"
-)
-
-// Indicates whether GOOD_TILL_DATE orders accept date-only or timestamp
-// specifications
-type VenueGtdAccepts struct {
-	// Whether the venue accepts date-only expiration (YYYY-MM-DD)
-	Date bool `json:"date" api:"required"`
-	// Whether the venue accepts precise timestamp expiration
-	Timestamp bool `json:"timestamp" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Date        respjson.Field
-		Timestamp   respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r VenueGtdAccepts) RawJSON() string { return r.JSON.raw }
-func (r *VenueGtdAccepts) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
+type VenueList []Venue
 
 // A trading session within a venue's trading day
 type VenueSession struct {
@@ -149,8 +150,6 @@ func (r VenueSession) RawJSON() string { return r.JSON.raw }
 func (r *VenueSession) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-type VenueList []Venue
 
 type ActiveV1InstrumentVenueGetVenuesResponse struct {
 	Data VenueList `json:"data" api:"required"`

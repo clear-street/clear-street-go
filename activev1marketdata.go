@@ -13,7 +13,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1MarketDataService] method instead.
 type ActiveV1MarketDataService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 	// Real-time market data snapshots.
 	Snapshot ActiveV1MarketDataSnapshotService
 }
@@ -23,7 +23,7 @@ type ActiveV1MarketDataService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1MarketDataService(opts ...option.RequestOption) (r ActiveV1MarketDataService) {
 	r = ActiveV1MarketDataService{}
-	r.Options = opts
+	r.options = opts
 	r.Snapshot = NewActiveV1MarketDataSnapshotService(opts...)
 	return
 }

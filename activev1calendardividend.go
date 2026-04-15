@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1CalendarDividendService] method instead.
 type ActiveV1CalendarDividendService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1CalendarDividendService generates a new service that applies the
@@ -35,13 +35,13 @@ type ActiveV1CalendarDividendService struct {
 // client's options (if there is one), and before any request-specific options.
 func NewActiveV1CalendarDividendService(opts ...option.RequestOption) (r ActiveV1CalendarDividendService) {
 	r = ActiveV1CalendarDividendService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves upcoming dividend payments.
 func (r *ActiveV1CalendarDividendService) GetDividendsCalendar(ctx context.Context, query ActiveV1CalendarDividendGetDividendsCalendarParams, opts ...option.RequestOption) (res *ActiveV1CalendarDividendGetDividendsCalendarResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/calendars/dividends"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -62,7 +62,7 @@ type DividendCalendarEvent struct {
 	// The frequency of the dividend payment
 	//
 	// Any of "ANNUALLY", "SEMI_ANNUALLY", "QUARTERLY", "MONTHLY", "OTHER".
-	Frequency DividendCalendarEventFrequency `json:"frequency" api:"nullable"`
+	Frequency DividendFrequency `json:"frequency" api:"nullable"`
 	// The payment date for the dividend
 	PaymentDate time.Time `json:"payment_date" api:"nullable" format:"date"`
 	// The record date for the dividend
@@ -91,18 +91,18 @@ func (r *DividendCalendarEvent) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// The frequency of the dividend payment
-type DividendCalendarEventFrequency string
+type DividendCalendarEventList []DividendCalendarEvent
+
+// Dividend payment frequency
+type DividendFrequency string
 
 const (
-	DividendCalendarEventFrequencyAnnually     DividendCalendarEventFrequency = "ANNUALLY"
-	DividendCalendarEventFrequencySemiAnnually DividendCalendarEventFrequency = "SEMI_ANNUALLY"
-	DividendCalendarEventFrequencyQuarterly    DividendCalendarEventFrequency = "QUARTERLY"
-	DividendCalendarEventFrequencyMonthly      DividendCalendarEventFrequency = "MONTHLY"
-	DividendCalendarEventFrequencyOther        DividendCalendarEventFrequency = "OTHER"
+	DividendFrequencyAnnually     DividendFrequency = "ANNUALLY"
+	DividendFrequencySemiAnnually DividendFrequency = "SEMI_ANNUALLY"
+	DividendFrequencyQuarterly    DividendFrequency = "QUARTERLY"
+	DividendFrequencyMonthly      DividendFrequency = "MONTHLY"
+	DividendFrequencyOther        DividendFrequency = "OTHER"
 )
-
-type DividendCalendarEventList []DividendCalendarEvent
 
 type ActiveV1CalendarDividendGetDividendsCalendarResponse struct {
 	Data DividendCalendarEventList `json:"data" api:"required"`
@@ -133,7 +133,7 @@ type ActiveV1CalendarDividendGetDividendsCalendarParams struct {
 // parameters as `url.Values`.
 func (r ActiveV1CalendarDividendGetDividendsCalendarParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

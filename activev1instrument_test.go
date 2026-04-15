@@ -13,7 +13,7 @@ import (
 	"github.com/stainless-sdks/clear-street-go/option"
 )
 
-func TestActiveV1InstrumentGetInstrumentByID(t *testing.T) {
+func TestActiveV1InstrumentGetInstrumentByIDWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -30,7 +30,8 @@ func TestActiveV1InstrumentGetInstrumentByID(t *testing.T) {
 		context.TODO(),
 		"security_id",
 		clearstreet.ActiveV1InstrumentGetInstrumentByIDParams{
-			SecurityIDSource: clearstreet.SecurityIDSourceCms,
+			SecurityIDSource:          clearstreet.SecurityIDSourceCms,
+			IncludeOptionsExpiryDates: clearstreet.Bool(true),
 		},
 	)
 	if err != nil {

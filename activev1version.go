@@ -23,7 +23,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1VersionService] method instead.
 type ActiveV1VersionService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1VersionService generates a new service that applies the given options
@@ -31,13 +31,13 @@ type ActiveV1VersionService struct {
 // there is one), and before any request-specific options.
 func NewActiveV1VersionService(opts ...option.RequestOption) (r ActiveV1VersionService) {
 	r = ActiveV1VersionService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Returns the current version string for this API endpoint.
 func (r *ActiveV1VersionService) GetVersion(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1VersionGetVersionResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/version"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return res, err
@@ -45,7 +45,7 @@ func (r *ActiveV1VersionService) GetVersion(ctx context.Context, opts ...option.
 
 // Allows clients to set their preferred API version.
 func (r *ActiveV1VersionService) UpdateVersion(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1VersionUpdateVersionResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/version"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, nil, &res, opts...)
 	return res, err

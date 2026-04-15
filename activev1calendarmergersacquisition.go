@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1CalendarMergersAcquisitionService] method instead.
 type ActiveV1CalendarMergersAcquisitionService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1CalendarMergersAcquisitionService generates a new service that
@@ -36,13 +36,13 @@ type ActiveV1CalendarMergersAcquisitionService struct {
 // options.
 func NewActiveV1CalendarMergersAcquisitionService(opts ...option.RequestOption) (r ActiveV1CalendarMergersAcquisitionService) {
 	r = ActiveV1CalendarMergersAcquisitionService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves upcoming M&A events.
 func (r *ActiveV1CalendarMergersAcquisitionService) GetMergersAndAcquisitionsCalendar(ctx context.Context, query ActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendarParams, opts ...option.RequestOption) (res *ActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendarResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/calendars/mergers-acquisitions"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -121,7 +121,7 @@ type ActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendarParams s
 // query parameters as `url.Values`.
 func (r ActiveV1CalendarMergersAcquisitionGetMergersAndAcquisitionsCalendarParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/stainless-sdks/clear-street-go/option"
 )
 
-func TestActiveV1IrisThreadMessageListMessagesDeprecatedWithOptionalParams(t *testing.T) {
+func TestActiveV1OmniAIFeedbackNewFeedbackWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,16 +26,14 @@ func TestActiveV1IrisThreadMessageListMessagesDeprecatedWithOptionalParams(t *te
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Iris.Threads.Messages.ListMessagesDeprecated(
-		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.ActiveV1IrisThreadMessageListMessagesDeprecatedParams{
-			AccountID: "account_id",
-			AfterSeq:  clearstreet.Int(0),
-			PageSize:  clearstreet.Int(0),
-			PageToken: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-		},
-	)
+	_, err := client.Active.V1.OmniAI.Feedback.NewFeedback(context.TODO(), clearstreet.ActiveV1OmniAIFeedbackNewFeedbackParams{
+		AccountID: "account_id",
+		MessageID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		Score:     0,
+		ThreadID:  "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		Comment:   clearstreet.String("comment"),
+		Metadata:  map[string]any{},
+	})
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {

@@ -28,7 +28,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1AccountPositionService] method instead.
 type ActiveV1AccountPositionService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1AccountPositionService generates a new service that applies the given
@@ -36,13 +36,13 @@ type ActiveV1AccountPositionService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1AccountPositionService(opts ...option.RequestOption) (r ActiveV1AccountPositionService) {
 	r = ActiveV1AccountPositionService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves all positions for the specified trading account.
 func (r *ActiveV1AccountPositionService) ClosePosition(ctx context.Context, securityID string, params ActiveV1AccountPositionClosePositionParams, opts ...option.RequestOption) (res *ActiveV1AccountPositionClosePositionResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	if securityID == "" {
 		err = errors.New("missing required security_id parameter")
 		return nil, err
@@ -54,7 +54,7 @@ func (r *ActiveV1AccountPositionService) ClosePosition(ctx context.Context, secu
 
 // Closes all positions for the specified trading account.
 func (r *ActiveV1AccountPositionService) ClosePositions(ctx context.Context, accountID int64, body ActiveV1AccountPositionClosePositionsParams, opts ...option.RequestOption) (res *ActiveV1AccountPositionClosePositionsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/positions", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
 	return res, err
@@ -62,7 +62,7 @@ func (r *ActiveV1AccountPositionService) ClosePositions(ctx context.Context, acc
 
 // Retrieves all positions for the specified trading account.
 func (r *ActiveV1AccountPositionService) GetPositions(ctx context.Context, accountID int64, query ActiveV1AccountPositionGetPositionsParams, opts ...option.RequestOption) (res *ActiveV1AccountPositionGetPositionsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/positions", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -84,7 +84,7 @@ type Position struct {
 	// The type of position
 	//
 	// Any of "LONG", "SHORT", "LONG_CALL", "SHORT_CALL", "LONG_PUT", "SHORT_PUT".
-	PositionType PositionPositionType `json:"position_type" api:"required"`
+	PositionType PositionType `json:"position_type" api:"required"`
 	// The number of shares or contracts. Can be positive (long) or negative (short)
 	Quantity string `json:"quantity" api:"required"`
 	// An identifier for the instrument which, when paired with `security_id_source`,
@@ -111,30 +111,38 @@ type Position struct {
 	CostBasis string `json:"cost_basis" api:"nullable"`
 	// The unrealized profit or loss for this position relative to the previous close
 	DailyUnrealizedPnl string `json:"daily_unrealized_pnl" api:"nullable"`
+	// The unrealized profit/loss for the position for the current day, expressed as a
+	// percentage of the baseline value (range: 0-100).
+	DailyUnrealizedPnlPct string `json:"daily_unrealized_pnl_pct" api:"nullable"`
 	// The current market price of the instrument
 	MarketPrice string `json:"market_price" api:"nullable"`
 	// The total unrealized profit or loss for this position based on current market
 	// value
 	UnrealizedPnl string `json:"unrealized_pnl" api:"nullable"`
+	// The unrealized profit/loss for the position, expressed as a percentage of the
+	// position's cost basis (range: 0-100).
+	UnrealizedPnlPct string `json:"unrealized_pnl_pct" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AccountID          respjson.Field
-		AvailableQuantity  respjson.Field
-		InstrumentType     respjson.Field
-		MarketValue        respjson.Field
-		PositionType       respjson.Field
-		Quantity           respjson.Field
-		SecurityID         respjson.Field
-		SecurityIDSource   respjson.Field
-		Symbol             respjson.Field
-		AvgPrice           respjson.Field
-		ClosingPrice       respjson.Field
-		CostBasis          respjson.Field
-		DailyUnrealizedPnl respjson.Field
-		MarketPrice        respjson.Field
-		UnrealizedPnl      respjson.Field
-		ExtraFields        map[string]respjson.Field
-		raw                string
+		AccountID             respjson.Field
+		AvailableQuantity     respjson.Field
+		InstrumentType        respjson.Field
+		MarketValue           respjson.Field
+		PositionType          respjson.Field
+		Quantity              respjson.Field
+		SecurityID            respjson.Field
+		SecurityIDSource      respjson.Field
+		Symbol                respjson.Field
+		AvgPrice              respjson.Field
+		ClosingPrice          respjson.Field
+		CostBasis             respjson.Field
+		DailyUnrealizedPnl    respjson.Field
+		DailyUnrealizedPnlPct respjson.Field
+		MarketPrice           respjson.Field
+		UnrealizedPnl         respjson.Field
+		UnrealizedPnlPct      respjson.Field
+		ExtraFields           map[string]respjson.Field
+		raw                   string
 	} `json:"-"`
 }
 
@@ -144,19 +152,19 @@ func (r *Position) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// The type of position
-type PositionPositionType string
+type PositionList []Position
+
+// Position type classification
+type PositionType string
 
 const (
-	PositionPositionTypeLong      PositionPositionType = "LONG"
-	PositionPositionTypeShort     PositionPositionType = "SHORT"
-	PositionPositionTypeLongCall  PositionPositionType = "LONG_CALL"
-	PositionPositionTypeShortCall PositionPositionType = "SHORT_CALL"
-	PositionPositionTypeLongPut   PositionPositionType = "LONG_PUT"
-	PositionPositionTypeShortPut  PositionPositionType = "SHORT_PUT"
+	PositionTypeLong      PositionType = "LONG"
+	PositionTypeShort     PositionType = "SHORT"
+	PositionTypeLongCall  PositionType = "LONG_CALL"
+	PositionTypeShortCall PositionType = "SHORT_CALL"
+	PositionTypeLongPut   PositionType = "LONG_PUT"
+	PositionTypeShortPut  PositionType = "SHORT_PUT"
 )
-
-type PositionList []Position
 
 type ActiveV1AccountPositionClosePositionResponse struct {
 	Data OrderList `json:"data" api:"required"`
@@ -248,8 +256,6 @@ func (r *ActiveV1AccountPositionClosePositionsParams) UnmarshalJSON(data []byte)
 }
 
 type ActiveV1AccountPositionGetPositionsParams struct {
-	// The number of items to return per page (only used when page_token is not
-	// provided)
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next page of results. Contains encoded pagination state
 	// (limit + offset). When provided, page_size is ignored.
@@ -285,7 +291,7 @@ type ActiveV1AccountPositionGetPositionsParams struct {
 // parameters as `url.Values`.
 func (r ActiveV1AccountPositionGetPositionsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

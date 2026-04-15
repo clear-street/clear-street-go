@@ -128,7 +128,7 @@ func TestActiveV1AccountOrderGetOrdersWithOptionalParams(t *testing.T) {
 			SecurityID:       []string{"string"},
 			SecurityIDSource: []string{"string"},
 			SecurityType:     clearstreet.ActiveV1AccountOrderGetOrdersParamsSecurityTypeCommonStock,
-			Status:           clearstreet.ActiveV1AccountOrderGetOrdersParamsStatusPendingNew,
+			Status:           []string{"PENDING_NEW"},
 			Symbol:           clearstreet.String("symbol"),
 			To:               clearstreet.Time(time.Now()),
 		},
@@ -192,34 +192,42 @@ func TestActiveV1AccountOrderSubmitOrders(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.ActiveV1AccountOrderSubmitOrdersParams{
-			Body: []clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBody{{
-				OrderType:        clearstreet.OrderTypeLimit,
-				Quantity:         "25",
-				SecurityType:     clearstreet.SecurityTypeCommonStock,
-				Side:             clearstreet.SideBuy,
-				TimeInForce:      clearstreet.TimeInForceDay,
-				ID:               clearstreet.String("my-ref-id-20251001-002"),
-				ExpireAt:         clearstreet.Time(time.Now()),
-				ExtendedHours:    clearstreet.Bool(true),
-				LimitOffset:      clearstreet.String("0.10"),
-				LimitPrice:       clearstreet.String("140.50"),
-				PositionEffect:   "OPEN",
-				SecurityID:       clearstreet.String("AAPL"),
-				SecurityIDSource: clearstreet.SecurityIDSourceCms,
-				StopPrice:        clearstreet.String("135.00"),
-				Strategy: clearstreet.OrderStrategyUnionParam{
-					OfSor: &clearstreet.OrderStrategySorParam{
-						SorStrategyParam: clearstreet.SorStrategyParam{
-							EndAt:   clearstreet.Time(time.Now()),
-							StartAt: clearstreet.Time(time.Now()),
-							Urgency: clearstreet.UrgencySuperPassive,
+			Body: []clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyUnion{{
+				OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequest: &clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest{
+					Legs: []clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg{{
+						Ratio: "ratio",
+						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion{
+							OfString: clearstreet.String("0193bb84-447a-706f-996f-097254663f02"),
 						},
-						Type: "SOR",
-					},
+						SecurityType:   clearstreet.SecurityTypeOption,
+						Side:           clearstreet.SideBuy,
+						ID:             clearstreet.String("1"),
+						PositionEffect: "OPEN",
+					}, {
+						Ratio: "ratio",
+						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion{
+							OfString: clearstreet.String("0193bb84-4db4-78ec-b4fd-cba8be61cf8a"),
+						},
+						SecurityType:   clearstreet.SecurityTypeOption,
+						Side:           clearstreet.SideSell,
+						ID:             clearstreet.String("2"),
+						PositionEffect: "OPEN",
+					}, {
+						Ratio: "ratio",
+						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion{
+							OfString: clearstreet.String("0193bb84-5264-7f20-8fd3-35df82cd6ef0"),
+						},
+						SecurityType:   clearstreet.SecurityTypeOption,
+						Side:           clearstreet.SideBuy,
+						ID:             clearstreet.String("3"),
+						PositionEffect: "OPEN",
+					}},
+					OrderType:   clearstreet.OrderTypeLimit,
+					TimeInForce: clearstreet.TimeInForceDay,
+					ID:          clearstreet.String("my-mleg-ref-20251001-001"),
+					LimitPrice:  clearstreet.String("0.50"),
+					Quantity:    clearstreet.String("1"),
 				},
-				Symbol:                clearstreet.String("AAPL"),
-				TrailingOffsetAmt:     clearstreet.String("1.25"),
-				TrailingOffsetAmtType: clearstreet.TrailingOffsetTypePrice,
 			}},
 		},
 	)

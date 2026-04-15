@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1AccountPortfolioHistoryService] method instead.
 type ActiveV1AccountPortfolioHistoryService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1AccountPortfolioHistoryService generates a new service that applies
@@ -35,13 +35,13 @@ type ActiveV1AccountPortfolioHistoryService struct {
 // client's options (if there is one), and before any request-specific options.
 func NewActiveV1AccountPortfolioHistoryService(opts ...option.RequestOption) (r ActiveV1AccountPortfolioHistoryService) {
 	r = ActiveV1AccountPortfolioHistoryService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves daily portfolio history for the specified account.
 func (r *ActiveV1AccountPortfolioHistoryService) GetPortfolioHistory(ctx context.Context, accountID int64, query ActiveV1AccountPortfolioHistoryGetPortfolioHistoryParams, opts ...option.RequestOption) (res *ActiveV1AccountPortfolioHistoryGetPortfolioHistoryResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/portfolio-history", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -143,7 +143,7 @@ type ActiveV1AccountPortfolioHistoryGetPortfolioHistoryParams struct {
 // query parameters as `url.Values`.
 func (r ActiveV1AccountPortfolioHistoryGetPortfolioHistoryParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

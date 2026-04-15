@@ -26,7 +26,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1MarketDataSnapshotService] method instead.
 type ActiveV1MarketDataSnapshotService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1MarketDataSnapshotService generates a new service that applies the
@@ -34,13 +34,13 @@ type ActiveV1MarketDataSnapshotService struct {
 // client's options (if there is one), and before any request-specific options.
 func NewActiveV1MarketDataSnapshotService(opts ...option.RequestOption) (r ActiveV1MarketDataSnapshotService) {
 	r = ActiveV1MarketDataSnapshotService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Get market data snapshots for one or more securities.
 func (r *ActiveV1MarketDataSnapshotService) GetSnapshots(ctx context.Context, query ActiveV1MarketDataSnapshotGetSnapshotsParams, opts ...option.RequestOption) (res *ActiveV1MarketDataSnapshotGetSnapshotsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/market-data/snapshot"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -53,13 +53,13 @@ type MarketDataSnapshot struct {
 	// Display symbol for the security.
 	Symbol string `json:"symbol" api:"required"`
 	// Most recent quote if available.
-	LastQuote MarketDataSnapshotLastQuote `json:"last_quote" api:"nullable"`
+	LastQuote SnapshotQuote `json:"last_quote" api:"nullable"`
 	// Most recent last-sale trade if available.
-	LastTrade MarketDataSnapshotLastTrade `json:"last_trade" api:"nullable"`
+	LastTrade SnapshotLastTrade `json:"last_trade" api:"nullable"`
 	// Security name if available.
 	Name string `json:"name" api:"nullable"`
 	// Session metrics computed from previous close and last trade, if available.
-	Session MarketDataSnapshotSession `json:"session" api:"nullable"`
+	Session SnapshotSession `json:"session" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		InstrumentID respjson.Field
@@ -79,8 +79,28 @@ func (r *MarketDataSnapshot) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Most recent quote if available.
-type MarketDataSnapshotLastQuote struct {
+type MarketDataSnapshotList []MarketDataSnapshot
+
+// Last-trade fields for a market data snapshot.
+type SnapshotLastTrade struct {
+	// Most recent last-sale eligible trade price.
+	Price string `json:"price" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Price       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SnapshotLastTrade) RawJSON() string { return r.JSON.raw }
+func (r *SnapshotLastTrade) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// L1 quote fields for a market data snapshot.
+type SnapshotQuote struct {
 	// Current best ask.
 	Ask string `json:"ask" api:"required"`
 	// Current best bid.
@@ -104,31 +124,13 @@ type MarketDataSnapshotLastQuote struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r MarketDataSnapshotLastQuote) RawJSON() string { return r.JSON.raw }
-func (r *MarketDataSnapshotLastQuote) UnmarshalJSON(data []byte) error {
+func (r SnapshotQuote) RawJSON() string { return r.JSON.raw }
+func (r *SnapshotQuote) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Most recent last-sale trade if available.
-type MarketDataSnapshotLastTrade struct {
-	// Most recent last-sale eligible trade price.
-	Price string `json:"price" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Price       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r MarketDataSnapshotLastTrade) RawJSON() string { return r.JSON.raw }
-func (r *MarketDataSnapshotLastTrade) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Session metrics computed from previous close and last trade, if available.
-type MarketDataSnapshotSession struct {
+// Session-level pricing metrics for a market data snapshot.
+type SnapshotSession struct {
 	// Absolute change from previous close to last trade.
 	Change string `json:"change" api:"required"`
 	// Percent change from previous close to last trade.
@@ -146,12 +148,10 @@ type MarketDataSnapshotSession struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r MarketDataSnapshotSession) RawJSON() string { return r.JSON.raw }
-func (r *MarketDataSnapshotSession) UnmarshalJSON(data []byte) error {
+func (r SnapshotSession) RawJSON() string { return r.JSON.raw }
+func (r *SnapshotSession) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-type MarketDataSnapshotList []MarketDataSnapshot
 
 type ActiveV1MarketDataSnapshotGetSnapshotsResponse struct {
 	Data MarketDataSnapshotList `json:"data" api:"required"`
@@ -195,7 +195,7 @@ type ActiveV1MarketDataSnapshotGetSnapshotsParams struct {
 // parameters as `url.Values`.
 func (r ActiveV1MarketDataSnapshotGetSnapshotsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

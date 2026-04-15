@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1ScreenerService] method instead.
 type ActiveV1ScreenerService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1ScreenerService generates a new service that applies the given
@@ -35,16 +35,40 @@ type ActiveV1ScreenerService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1ScreenerService(opts ...option.RequestOption) (r ActiveV1ScreenerService) {
 	r = ActiveV1ScreenerService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Searches for instruments matching specified criteria.
 func (r *ActiveV1ScreenerService) GetScreener(ctx context.Context, query ActiveV1ScreenerGetScreenerParams, opts ...option.RequestOption) (res *ActiveV1ScreenerGetScreenerResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/screener"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
+}
+
+// A single filter criterion for the screener.
+type ScreenerFilter struct {
+	// Field to filter on (e.g., "market_cap", "sector", "price")
+	Field string `json:"field" api:"required"`
+	// Comparison operator (e.g., "eq", "gte", "lte", "in")
+	Operator string `json:"operator" api:"required"`
+	// Filter value
+	Value any `json:"value" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Field       respjson.Field
+		Operator    respjson.Field
+		Value       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ScreenerFilter) RawJSON() string { return r.JSON.raw }
+func (r *ScreenerFilter) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // An instrument returned by the screener
@@ -92,6 +116,14 @@ type ScreenerItem struct {
 	CountryOfIssue string `json:"country_of_issue" api:"nullable"`
 	// A detailed description of the instrument or company
 	Description string `json:"description" api:"nullable"`
+	// The highest price over the last 52 weeks
+	FiftyTwoWeekHigh string `json:"fifty_two_week_high" api:"nullable"`
+	// The lowest price over the last 52 weeks
+	FiftyTwoWeekLow string `json:"fifty_two_week_low" api:"nullable"`
+	// Percent gap from 52-week high to previous day close (negative = below high)
+	GapFrom52wHighPct string `json:"gap_from_52w_high_pct" api:"nullable"`
+	// Percent gap from 52-week low to previous day close (positive = above low)
+	GapFrom52wLowPct string `json:"gap_from_52w_low_pct" api:"nullable"`
 	// The specific industry of the instrument's issuer
 	Industry string `json:"industry" api:"nullable"`
 	// The date the instrument was first listed
@@ -102,6 +134,24 @@ type ScreenerItem struct {
 	MonthAvgVolume string `json:"month_avg_volume" api:"nullable"`
 	// The full name of the instrument or its issuer
 	Name string `json:"name" api:"nullable"`
+	// The closing price approximately one month ago
+	OneMonthAgoClose string `json:"one_month_ago_close" api:"nullable"`
+	// The opening price approximately one month ago
+	OneMonthAgoOpen string `json:"one_month_ago_open" api:"nullable"`
+	// Percent change from one month ago close to previous day close
+	OneMonthChangePct string `json:"one_month_change_pct" api:"nullable"`
+	// The closing price approximately one week ago
+	OneWeekAgoClose string `json:"one_week_ago_close" api:"nullable"`
+	// The opening price approximately one week ago
+	OneWeekAgoOpen string `json:"one_week_ago_open" api:"nullable"`
+	// Percent change from one week ago close to previous day close
+	OneWeekChangePct string `json:"one_week_change_pct" api:"nullable"`
+	// The closing price approximately one year ago
+	OneYearAgoClose string `json:"one_year_ago_close" api:"nullable"`
+	// The opening price approximately one year ago
+	OneYearAgoOpen string `json:"one_year_ago_open" api:"nullable"`
+	// Percent change from one year ago close to previous day close
+	OneYearChangePct string `json:"one_year_change_pct" api:"nullable"`
 	// The percent change from previous close to current price
 	PercentChange string `json:"percent_change" api:"nullable"`
 	// The previous day's closing price
@@ -110,6 +160,18 @@ type ScreenerItem struct {
 	Sector string `json:"sector" api:"nullable"`
 	// The type of security
 	SecurityType string `json:"security_type" api:"nullable"`
+	// Percent change from six months ago close to previous day close
+	SixMonthChangePct string `json:"six_month_change_pct" api:"nullable"`
+	// The closing price approximately six months ago
+	SixMonthsAgoClose string `json:"six_months_ago_close" api:"nullable"`
+	// The opening price approximately six months ago
+	SixMonthsAgoOpen string `json:"six_months_ago_open" api:"nullable"`
+	// Percent change from three months ago close to previous day close
+	ThreeMonthChangePct string `json:"three_month_change_pct" api:"nullable"`
+	// The closing price approximately three months ago
+	ThreeMonthsAgoClose string `json:"three_months_ago_close" api:"nullable"`
+	// The opening price approximately three months ago
+	ThreeMonthsAgoOpen string `json:"three_months_ago_open" api:"nullable"`
 	// The TTM debt-to-equity ratio
 	TtmDebtToEquity string `json:"ttm_debt_to_equity" api:"nullable"`
 	// The TTM dividend yield percent
@@ -124,6 +186,10 @@ type ScreenerItem struct {
 	Volume string `json:"volume" api:"nullable"`
 	// The average trading volume over the past week
 	WeekAvgVolume string `json:"week_avg_volume" api:"nullable"`
+	// The opening price on the first trading day of the current year
+	YearToDateOpen string `json:"year_to_date_open" api:"nullable"`
+	// Percent change from year-to-date open to previous day close
+	YtdChangePct string `json:"ytd_change_pct" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		BuyRatings               respjson.Field
@@ -142,15 +208,34 @@ type ScreenerItem struct {
 		ConsensusRating          respjson.Field
 		CountryOfIssue           respjson.Field
 		Description              respjson.Field
+		FiftyTwoWeekHigh         respjson.Field
+		FiftyTwoWeekLow          respjson.Field
+		GapFrom52wHighPct        respjson.Field
+		GapFrom52wLowPct         respjson.Field
 		Industry                 respjson.Field
 		ListDate                 respjson.Field
 		MarketCap                respjson.Field
 		MonthAvgVolume           respjson.Field
 		Name                     respjson.Field
+		OneMonthAgoClose         respjson.Field
+		OneMonthAgoOpen          respjson.Field
+		OneMonthChangePct        respjson.Field
+		OneWeekAgoClose          respjson.Field
+		OneWeekAgoOpen           respjson.Field
+		OneWeekChangePct         respjson.Field
+		OneYearAgoClose          respjson.Field
+		OneYearAgoOpen           respjson.Field
+		OneYearChangePct         respjson.Field
 		PercentChange            respjson.Field
 		PrevDayClose             respjson.Field
 		Sector                   respjson.Field
 		SecurityType             respjson.Field
+		SixMonthChangePct        respjson.Field
+		SixMonthsAgoClose        respjson.Field
+		SixMonthsAgoOpen         respjson.Field
+		ThreeMonthChangePct      respjson.Field
+		ThreeMonthsAgoClose      respjson.Field
+		ThreeMonthsAgoOpen       respjson.Field
 		TtmDebtToEquity          respjson.Field
 		TtmDividendYield         respjson.Field
 		TtmEarningsPerShare      respjson.Field
@@ -158,6 +243,8 @@ type ScreenerItem struct {
 		Venue                    respjson.Field
 		Volume                   respjson.Field
 		WeekAvgVolume            respjson.Field
+		YearToDateOpen           respjson.Field
+		YtdChangePct             respjson.Field
 		ExtraFields              map[string]respjson.Field
 		raw                      string
 	} `json:"-"`
@@ -212,7 +299,7 @@ type ActiveV1ScreenerGetScreenerParams struct {
 // `url.Values`.
 func (r ActiveV1ScreenerGetScreenerParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

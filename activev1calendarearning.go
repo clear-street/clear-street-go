@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1CalendarEarningService] method instead.
 type ActiveV1CalendarEarningService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1CalendarEarningService generates a new service that applies the given
@@ -35,13 +35,13 @@ type ActiveV1CalendarEarningService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1CalendarEarningService(opts ...option.RequestOption) (r ActiveV1CalendarEarningService) {
 	r = ActiveV1CalendarEarningService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves upcoming earnings announcements.
 func (r *ActiveV1CalendarEarningService) GetEarningsCalendar(ctx context.Context, query ActiveV1CalendarEarningGetEarningsCalendarParams, opts ...option.RequestOption) (res *ActiveV1CalendarEarningGetEarningsCalendarResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/calendars/earnings"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -114,7 +114,7 @@ type ActiveV1CalendarEarningGetEarningsCalendarParams struct {
 // parameters as `url.Values`.
 func (r ActiveV1CalendarEarningGetEarningsCalendarParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

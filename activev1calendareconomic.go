@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1CalendarEconomicService] method instead.
 type ActiveV1CalendarEconomicService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1CalendarEconomicService generates a new service that applies the
@@ -35,13 +35,13 @@ type ActiveV1CalendarEconomicService struct {
 // client's options (if there is one), and before any request-specific options.
 func NewActiveV1CalendarEconomicService(opts ...option.RequestOption) (r ActiveV1CalendarEconomicService) {
 	r = ActiveV1CalendarEconomicService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves upcoming economic events and indicators.
 func (r *ActiveV1CalendarEconomicService) GetEconomicCalendar(ctx context.Context, query ActiveV1CalendarEconomicGetEconomicCalendarParams, opts ...option.RequestOption) (res *ActiveV1CalendarEconomicGetEconomicCalendarResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/calendars/economic"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -60,7 +60,7 @@ type EconomicCalendarEvent struct {
 	// The expected market impact of the event
 	//
 	// Any of "LOW", "MEDIUM", "HIGH".
-	Impact EconomicCalendarEventImpact `json:"impact" api:"required"`
+	Impact EconomicEventImpact `json:"impact" api:"required"`
 	// The actual value reported for the event
 	ActualValue string `json:"actual_value" api:"nullable"`
 	// The percentage change between the actual and previous values
@@ -91,16 +91,16 @@ func (r *EconomicCalendarEvent) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// The expected market impact of the event
-type EconomicCalendarEventImpact string
+type EconomicCalendarEventList []EconomicCalendarEvent
+
+// Economic event impact level
+type EconomicEventImpact string
 
 const (
-	EconomicCalendarEventImpactLow    EconomicCalendarEventImpact = "LOW"
-	EconomicCalendarEventImpactMedium EconomicCalendarEventImpact = "MEDIUM"
-	EconomicCalendarEventImpactHigh   EconomicCalendarEventImpact = "HIGH"
+	EconomicEventImpactLow    EconomicEventImpact = "LOW"
+	EconomicEventImpactMedium EconomicEventImpact = "MEDIUM"
+	EconomicEventImpactHigh   EconomicEventImpact = "HIGH"
 )
-
-type EconomicCalendarEventList []EconomicCalendarEvent
 
 type ActiveV1CalendarEconomicGetEconomicCalendarResponse struct {
 	Data EconomicCalendarEventList `json:"data" api:"required"`
@@ -131,7 +131,7 @@ type ActiveV1CalendarEconomicGetEconomicCalendarParams struct {
 // parameters as `url.Values`.
 func (r ActiveV1CalendarEconomicGetEconomicCalendarParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

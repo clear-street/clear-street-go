@@ -26,7 +26,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1AccountLocateInventoryService] method instead.
 type ActiveV1AccountLocateInventoryService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1AccountLocateInventoryService generates a new service that applies
@@ -34,13 +34,13 @@ type ActiveV1AccountLocateInventoryService struct {
 // client's options (if there is one), and before any request-specific options.
 func NewActiveV1AccountLocateInventoryService(opts ...option.RequestOption) (r ActiveV1AccountLocateInventoryService) {
 	r = ActiveV1AccountLocateInventoryService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves available inventory for short stock locates.
 func (r *ActiveV1AccountLocateInventoryService) GetLocateInventory(ctx context.Context, accountID int64, query ActiveV1AccountLocateInventoryGetLocateInventoryParams, opts ...option.RequestOption) (res *ActiveV1AccountLocateInventoryGetLocateInventoryResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/locates/inventory", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -106,7 +106,7 @@ type ActiveV1AccountLocateInventoryGetLocateInventoryParams struct {
 // query parameters as `url.Values`.
 func (r ActiveV1AccountLocateInventoryGetLocateInventoryParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

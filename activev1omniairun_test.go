@@ -13,7 +13,7 @@ import (
 	"github.com/stainless-sdks/clear-street-go/option"
 )
 
-func TestActiveV1IrisRunCancelRunDeprecatedWithOptionalParams(t *testing.T) {
+func TestActiveV1OmniAIRunCancelRunWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,10 +26,10 @@ func TestActiveV1IrisRunCancelRunDeprecatedWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Iris.Runs.CancelRunDeprecated(
+	_, err := client.Active.V1.OmniAI.Runs.CancelRun(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.ActiveV1IrisRunCancelRunDeprecatedParams{
+		clearstreet.ActiveV1OmniAIRunCancelRunParams{
 			AccountID: "account_id",
 			Reason:    clearstreet.String("reason"),
 		},
@@ -43,7 +43,7 @@ func TestActiveV1IrisRunCancelRunDeprecatedWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestActiveV1IrisRunGetRunDeprecatedWithOptionalParams(t *testing.T) {
+func TestActiveV1OmniAIRunGetRunWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -56,10 +56,10 @@ func TestActiveV1IrisRunGetRunDeprecatedWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Iris.Runs.GetRunDeprecated(
+	_, err := client.Active.V1.OmniAI.Runs.GetRun(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.ActiveV1IrisRunGetRunDeprecatedParams{
+		clearstreet.ActiveV1OmniAIRunGetRunParams{
 			AccountID: "account_id",
 			PageSize:  clearstreet.Int(0),
 			PageToken: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
@@ -74,7 +74,7 @@ func TestActiveV1IrisRunGetRunDeprecatedWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestActiveV1IrisRunStartRunDeprecatedWithOptionalParams(t *testing.T) {
+func TestActiveV1OmniAIRunStartRunWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -87,7 +87,7 @@ func TestActiveV1IrisRunStartRunDeprecatedWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Iris.Runs.StartRunDeprecated(context.TODO(), clearstreet.ActiveV1IrisRunStartRunDeprecatedParams{
+	_, err := client.Active.V1.OmniAI.Runs.StartRun(context.TODO(), clearstreet.ActiveV1OmniAIRunStartRunParams{
 		AccountID:    "account_id",
 		CommandText:  "command_text",
 		Capabilities: []clearstreet.Capability{clearstreet.CapabilityNavigate},

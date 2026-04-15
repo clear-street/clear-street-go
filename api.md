@@ -10,11 +10,13 @@
 
 Params Types:
 
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#APIDecimal64">APIDecimal64</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SecurityIDSource">SecurityIDSource</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SecurityType">SecurityType</a>
 
 Response Types:
 
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#APIDecimal64">APIDecimal64</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SecurityIDSource">SecurityIDSource</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SecurityType">SecurityType</a>
 
@@ -32,8 +34,6 @@ Response Types:
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#AccountSettings">AccountSettings</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#AccountStatus">AccountStatus</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#AccountSubkind">AccountSubkind</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Order">Order</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OrderList">OrderList</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#RiskSettings">RiskSettings</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountGetAccountByIDResponse">ActiveV1AccountGetAccountByIDResponse</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountGetAccountsResponse">ActiveV1AccountGetAccountsResponse</a>
@@ -50,14 +50,16 @@ Methods:
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#AccountBalances">AccountBalances</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#APITimestamp">APITimestamp</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#AccountBalancesSod">AccountBalancesSod</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarginDetails">MarginDetails</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarginDetailsUsage">MarginDetailsUsage</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarginTopContributor">MarginTopContributor</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarginType">MarginType</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#RegTBalance">RegTBalance</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountBalanceGetAccountBalancesResponse">ActiveV1AccountBalanceGetAccountBalancesResponse</a>
 
 Methods:
 
-- <code title="get /active/v1/accounts/{account_id}/balances">client.Active.V1.Accounts.Balances.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountBalanceService.GetAccountBalances">GetAccountBalances</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountBalanceGetAccountBalancesResponse">ActiveV1AccountBalanceGetAccountBalancesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/accounts/{account_id}/balances">client.Active.V1.Accounts.Balances.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountBalanceService.GetAccountBalances">GetAccountBalances</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountBalanceGetAccountBalancesParams">ActiveV1AccountBalanceGetAccountBalancesParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountBalanceGetAccountBalancesResponse">ActiveV1AccountBalanceGetAccountBalancesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 #### Locates
 
@@ -97,7 +99,6 @@ Methods:
 Params Types:
 
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ApStrategyParam">ApStrategyParam</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#APIDecimal64">APIDecimal64</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#BaseStrategyParams">BaseStrategyParams</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#DarkStrategyParam">DarkStrategyParam</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#DmaStrategyParam">DmaStrategyParam</a>
@@ -115,10 +116,11 @@ Params Types:
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ApStrategy">ApStrategy</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#APIDecimal64">APIDecimal64</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#BaseStrategyParamsResp">BaseStrategyParamsResp</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#DarkStrategy">DarkStrategy</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#DmaStrategy">DmaStrategy</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Order">Order</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OrderList">OrderList</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OrderStatus">OrderStatus</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OrderStrategyUnion">OrderStrategyUnion</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OrderType">OrderType</a>
@@ -164,6 +166,7 @@ Response Types:
 
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Position">Position</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#PositionList">PositionList</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#PositionType">PositionType</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountPositionClosePositionResponse">ActiveV1AccountPositionClosePositionResponse</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountPositionClosePositionsResponse">ActiveV1AccountPositionClosePositionsResponse</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AccountPositionGetPositionsResponse">ActiveV1AccountPositionGetPositionsResponse</a>
@@ -195,23 +198,6 @@ Methods:
 - <code title="delete /active/v1/api_keys/{id}">client.Active.V1.APIKeys.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1APIKeyService.Revoke">Revoke</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, id <a href="https://pkg.go.dev/builtin#string">string</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1APIKeyRevokeResponse">ActiveV1APIKeyRevokeResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="delete /active/v1/api_keys">client.Active.V1.APIKeys.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1APIKeyService.RevokeAll">RevokeAll</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1APIKeyRevokeAllResponse">ActiveV1APIKeyRevokeAllResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
-### Assistant
-
-#### Prompts
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#PromptResult">PromptResult</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#PromptStatus">PromptStatus</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#RunPromptResponse">RunPromptResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AssistantPromptGetPromptResultResponse">ActiveV1AssistantPromptGetPromptResultResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AssistantPromptRunPromptResponse">ActiveV1AssistantPromptRunPromptResponse</a>
-
-Methods:
-
-- <code title="get /active/v1/assistant/prompts/{id}">client.Active.V1.Assistant.Prompts.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AssistantPromptService.GetPromptResult">GetPromptResult</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, id <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AssistantPromptGetPromptResultParams">ActiveV1AssistantPromptGetPromptResultParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AssistantPromptGetPromptResultResponse">ActiveV1AssistantPromptGetPromptResultResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="post /active/v1/assistant/prompts">client.Active.V1.Assistant.Prompts.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AssistantPromptService.RunPrompt">RunPrompt</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AssistantPromptRunPromptParams">ActiveV1AssistantPromptRunPromptParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1AssistantPromptRunPromptResponse">ActiveV1AssistantPromptRunPromptResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
 ### Calendars
 
 #### Dividends
@@ -220,6 +206,7 @@ Response Types:
 
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#DividendCalendarEvent">DividendCalendarEvent</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#DividendCalendarEventList">DividendCalendarEventList</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#DividendFrequency">DividendFrequency</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1CalendarDividendGetDividendsCalendarResponse">ActiveV1CalendarDividendGetDividendsCalendarResponse</a>
 
 Methods:
@@ -244,6 +231,7 @@ Response Types:
 
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#EconomicCalendarEvent">EconomicCalendarEvent</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#EconomicCalendarEventList">EconomicCalendarEventList</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#EconomicEventImpact">EconomicEventImpact</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1CalendarEconomicGetEconomicCalendarResponse">ActiveV1CalendarEconomicGetEconomicCalendarResponse</a>
 
 Methods:
@@ -252,10 +240,20 @@ Methods:
 
 #### MarketHours
 
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarketType">MarketType</a>
+
 Response Types:
 
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#DayType">DayType</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarketHoursDetail">MarketHoursDetail</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarketHoursDetailList">MarketHoursDetailList</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarketSessionType">MarketSessionType</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarketStatus">MarketStatus</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarketType">MarketType</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SessionSchedule">SessionSchedule</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#TradingSessions">TradingSessions</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1CalendarMarketHourGetMarketHoursCalendarResponse">ActiveV1CalendarMarketHourGetMarketHoursCalendarResponse</a>
 
 Methods:
@@ -298,22 +296,43 @@ Methods:
 
 - <code title="get /active/v1/calendars/summary">client.Active.V1.Calendars.Summary.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1CalendarSummaryService.GetCalendarSummary">GetCalendarSummary</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1CalendarSummaryGetCalendarSummaryParams">ActiveV1CalendarSummaryGetCalendarSummaryParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1CalendarSummaryGetCalendarSummaryResponse">ActiveV1CalendarSummaryGetCalendarSummaryResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
-### Instruments
+### Clock
 
 Response Types:
 
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ClockDetail">ClockDetail</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1ClockGetClockResponse">ActiveV1ClockGetClockResponse</a>
+
+Methods:
+
+- <code title="get /active/v1/clock">client.Active.V1.Clock.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1ClockService.GetClock">GetClock</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1ClockGetClockResponse">ActiveV1ClockGetClockResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+### Instruments
+
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ContractType">ContractType</a>
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#AnalystRating">AnalystRating</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ContractType">ContractType</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ExerciseStyle">ExerciseStyle</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Instrument">Instrument</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentCore">InstrumentCore</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentCoreList">InstrumentCoreList</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentEarnings">InstrumentEarnings</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentQuote">InstrumentQuote</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentSecurityID">InstrumentSecurityID</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ListingType">ListingType</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OptionsContract">OptionsContract</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OptionsContractList">OptionsContractList</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentGetInstrumentByIDResponse">ActiveV1InstrumentGetInstrumentByIDResponse</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentGetInstrumentsResponse">ActiveV1InstrumentGetInstrumentsResponse</a>
 
 Methods:
 
-- <code title="get /active/v1/instruments/{security_id_source}/{security_id}">client.Active.V1.Instruments.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentService.GetInstrumentByID">GetInstrumentByID</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, securityID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentGetInstrumentByIDParams">ActiveV1InstrumentGetInstrumentByIDParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentGetInstrumentByIDResponse">ActiveV1InstrumentGetInstrumentByIDResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/instruments/{security_id_source}/{security_id}">client.Active.V1.Instruments.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentService.GetInstrumentByID">GetInstrumentByID</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, securityID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentGetInstrumentByIDParams">ActiveV1InstrumentGetInstrumentByIDParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentGetInstrumentByIDResponse">ActiveV1InstrumentGetInstrumentByIDResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /active/v1/instruments">client.Active.V1.Instruments.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentService.GetInstruments">GetInstruments</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentGetInstrumentsParams">ActiveV1InstrumentGetInstrumentsParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentGetInstrumentsResponse">ActiveV1InstrumentGetInstrumentsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 #### AnalystReporting
@@ -321,7 +340,6 @@ Methods:
 Response Types:
 
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#AnalystDistribution">AnalystDistribution</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#AnalystRating">AnalystRating</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentAnalystConsensus">InstrumentAnalystConsensus</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#PriceTarget">PriceTarget</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusResponse">ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusResponse</a>
@@ -332,10 +350,17 @@ Methods:
 
 #### Events
 
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#AllEventsEventType">AllEventsEventType</a>
+
 Response Types:
 
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#AllEventsEventType">AllEventsEventType</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentAllEventsData">InstrumentAllEventsData</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentDividendEvent">InstrumentDividendEvent</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentEventEnvelope">InstrumentEventEnvelope</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentEventIpoItem">InstrumentEventIpoItem</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentEventsByDate">InstrumentEventsByDate</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentEventsData">InstrumentEventsData</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#InstrumentSplitEvent">InstrumentSplitEvent</a>
@@ -346,6 +371,18 @@ Methods:
 
 - <code title="get /active/v1/instruments/events">client.Active.V1.Instruments.Events.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentEventService.GetAllInstrumentEvents">GetAllInstrumentEvents</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentEventGetAllInstrumentEventsParams">ActiveV1InstrumentEventGetAllInstrumentEventsParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentEventGetAllInstrumentEventsResponse">ActiveV1InstrumentEventGetAllInstrumentEventsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /active/v1/instruments/{security_id_source}/{security_id}/events">client.Active.V1.Instruments.Events.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentEventService.GetInstrumentEvents">GetInstrumentEvents</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, securityID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentEventGetInstrumentEventsParams">ActiveV1InstrumentEventGetInstrumentEventsParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentEventGetInstrumentEventsResponse">ActiveV1InstrumentEventGetInstrumentEventsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+#### Options
+
+##### Contracts
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentOptionContractGetOptionContractsResponse">ActiveV1InstrumentOptionContractGetOptionContractsResponse</a>
+
+Methods:
+
+- <code title="get /active/v1/instruments/options/contracts">client.Active.V1.Instruments.Options.Contracts.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentOptionContractService.GetOptionContracts">GetOptionContracts</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentOptionContractGetOptionContractsParams">ActiveV1InstrumentOptionContractGetOptionContractsParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentOptionContractGetOptionContractsResponse">ActiveV1InstrumentOptionContractGetOptionContractsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 #### Reporting
 
@@ -361,8 +398,11 @@ Methods:
 
 Response Types:
 
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#DisplayType">DisplayType</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#GtdAccepts">GtdAccepts</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Venue">Venue</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#VenueList">VenueList</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#VenueSession">VenueSession</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1InstrumentVenueGetVenuesResponse">ActiveV1InstrumentVenueGetVenuesResponse</a>
 
 Methods:
@@ -371,73 +411,51 @@ Methods:
 
 ### Iris
 
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Message">Message</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Thread">Thread</a>
-
 #### Feedback
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#CreateFeedbackResponse">CreateFeedbackResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisFeedbackNewFeedbackResponse">ActiveV1IrisFeedbackNewFeedbackResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse">ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse</a>
 
 Methods:
 
-- <code title="post /active/v1/iris/feedback">client.Active.V1.Iris.Feedback.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisFeedbackService.NewFeedback">NewFeedback</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisFeedbackNewFeedbackParams">ActiveV1IrisFeedbackNewFeedbackParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisFeedbackNewFeedbackResponse">ActiveV1IrisFeedbackNewFeedbackResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="post /active/v1/iris/feedback">client.Active.V1.Iris.Feedback.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisFeedbackService.NewFeedbackDeprecated">NewFeedbackDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisFeedbackNewFeedbackDeprecatedParams">ActiveV1IrisFeedbackNewFeedbackDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse">ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 #### Runs
 
-Params Types:
-
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Capability">Capability</a>
-
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#CancelRunResponse">CancelRunResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Capability">Capability</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ContentPartUnion">ContentPartUnion</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#GetRunResponse">GetRunResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MessageContent">MessageContent</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MessageRole">MessageRole</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Run">Run</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#RunStatus">RunStatus</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#StartRunResponse">StartRunResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunCancelRunResponse">ActiveV1IrisRunCancelRunResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunGetRunResponse">ActiveV1IrisRunGetRunResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunStartRunResponse">ActiveV1IrisRunStartRunResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunCancelRunDeprecatedResponse">ActiveV1IrisRunCancelRunDeprecatedResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunGetRunDeprecatedResponse">ActiveV1IrisRunGetRunDeprecatedResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunStartRunDeprecatedResponse">ActiveV1IrisRunStartRunDeprecatedResponse</a>
 
 Methods:
 
-- <code title="delete /active/v1/iris/runs/{run_id}">client.Active.V1.Iris.Runs.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunService.CancelRun">CancelRun</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, runID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunCancelRunParams">ActiveV1IrisRunCancelRunParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunCancelRunResponse">ActiveV1IrisRunCancelRunResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="get /active/v1/iris/runs/{run_id}">client.Active.V1.Iris.Runs.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunService.GetRun">GetRun</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, runID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunGetRunParams">ActiveV1IrisRunGetRunParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunGetRunResponse">ActiveV1IrisRunGetRunResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="post /active/v1/iris/runs">client.Active.V1.Iris.Runs.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunService.StartRun">StartRun</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunStartRunParams">ActiveV1IrisRunStartRunParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunStartRunResponse">ActiveV1IrisRunStartRunResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="delete /active/v1/iris/runs/{run_id}">client.Active.V1.Iris.Runs.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunService.CancelRunDeprecated">CancelRunDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, runID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunCancelRunDeprecatedParams">ActiveV1IrisRunCancelRunDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunCancelRunDeprecatedResponse">ActiveV1IrisRunCancelRunDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/iris/runs/{run_id}">client.Active.V1.Iris.Runs.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunService.GetRunDeprecated">GetRunDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, runID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunGetRunDeprecatedParams">ActiveV1IrisRunGetRunDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunGetRunDeprecatedResponse">ActiveV1IrisRunGetRunDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="post /active/v1/iris/runs">client.Active.V1.Iris.Runs.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunService.StartRunDeprecated">StartRunDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunStartRunDeprecatedParams">ActiveV1IrisRunStartRunDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisRunStartRunDeprecatedResponse">ActiveV1IrisRunStartRunDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 #### Threads
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#GetThreadResponse">GetThreadResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ListThreadsResponse">ListThreadsResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadGetThreadResponse">ActiveV1IrisThreadGetThreadResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadListThreadsResponse">ActiveV1IrisThreadListThreadsResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadGetThreadDeprecatedResponse">ActiveV1IrisThreadGetThreadDeprecatedResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadListThreadsDeprecatedResponse">ActiveV1IrisThreadListThreadsDeprecatedResponse</a>
 
 Methods:
 
-- <code title="get /active/v1/iris/threads/{thread_id}">client.Active.V1.Iris.Threads.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadService.GetThread">GetThread</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadGetThreadParams">ActiveV1IrisThreadGetThreadParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadGetThreadResponse">ActiveV1IrisThreadGetThreadResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="get /active/v1/iris/threads">client.Active.V1.Iris.Threads.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadService.ListThreads">ListThreads</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadListThreadsParams">ActiveV1IrisThreadListThreadsParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadListThreadsResponse">ActiveV1IrisThreadListThreadsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/iris/threads/{thread_id}">client.Active.V1.Iris.Threads.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadService.GetThreadDeprecated">GetThreadDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadGetThreadDeprecatedParams">ActiveV1IrisThreadGetThreadDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadGetThreadDeprecatedResponse">ActiveV1IrisThreadGetThreadDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/iris/threads">client.Active.V1.Iris.Threads.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadService.ListThreadsDeprecated">ListThreadsDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadListThreadsDeprecatedParams">ActiveV1IrisThreadListThreadsDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadListThreadsDeprecatedResponse">ActiveV1IrisThreadListThreadsDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ##### Messages
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ListMessagesResponse">ListMessagesResponse</a>
-- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadMessageListMessagesResponse">ActiveV1IrisThreadMessageListMessagesResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadMessageListMessagesDeprecatedResponse">ActiveV1IrisThreadMessageListMessagesDeprecatedResponse</a>
 
 Methods:
 
-- <code title="get /active/v1/iris/threads/{thread_id}/messages">client.Active.V1.Iris.Threads.Messages.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadMessageService.ListMessages">ListMessages</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadMessageListMessagesParams">ActiveV1IrisThreadMessageListMessagesParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadMessageListMessagesResponse">ActiveV1IrisThreadMessageListMessagesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/iris/threads/{thread_id}/messages">client.Active.V1.Iris.Threads.Messages.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadMessageService.ListMessagesDeprecated">ListMessagesDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadMessageListMessagesDeprecatedParams">ActiveV1IrisThreadMessageListMessagesDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1IrisThreadMessageListMessagesDeprecatedResponse">ActiveV1IrisThreadMessageListMessagesDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ### MarketData
 
@@ -447,6 +465,9 @@ Response Types:
 
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarketDataSnapshot">MarketDataSnapshot</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MarketDataSnapshotList">MarketDataSnapshotList</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SnapshotLastTrade">SnapshotLastTrade</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SnapshotQuote">SnapshotQuote</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SnapshotSession">SnapshotSession</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1MarketDataSnapshotGetSnapshotsResponse">ActiveV1MarketDataSnapshotGetSnapshotsResponse</a>
 
 Methods:
@@ -457,18 +478,135 @@ Methods:
 
 Response Types:
 
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#NewsInstrument">NewsInstrument</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#NewsItem">NewsItem</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#NewsItemList">NewsItemList</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#NewsType">NewsType</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1NewsGetNewsResponse">ActiveV1NewsGetNewsResponse</a>
 
 Methods:
 
 - <code title="get /active/v1/news">client.Active.V1.News.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1NewsService.GetNews">GetNews</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1NewsGetNewsParams">ActiveV1NewsGetNewsParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1NewsGetNewsResponse">ActiveV1NewsGetNewsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
+### OmniAI
+
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Capability">Capability</a>
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActionButton">ActionButton</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ButtonActionUnion">ButtonActionUnion</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#CancelRunResponse">CancelRunResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Capability">Capability</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ChartKindUnion">ChartKindUnion</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ChartPoint">ChartPoint</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ChartSeries">ChartSeries</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ContentPartUnion">ContentPartUnion</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ContentPartChart">ContentPartChart</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ContentPartSuggestedActions">ContentPartSuggestedActions</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ContentPartText">ContentPartText</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ContentPartThinking">ContentPartThinking</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#CreateFeedbackResponse">CreateFeedbackResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#DataChart">DataChart</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#GetRunResponse">GetRunResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#GetThreadResponse">GetThreadResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ListMessagesResponse">ListMessagesResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ListThreadsResponse">ListThreadsResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Message">Message</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MessageContent">MessageContent</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#MessageRole">MessageRole</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#NavigateAction">NavigateAction</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OpenChartAction">OpenChartAction</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OpenChatWindowAction">OpenChatWindowAction</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OpenScreenerAction">OpenScreenerAction</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OrderPayload">OrderPayload</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#OrderStrategyType">OrderStrategyType</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#PrefillOrderAction">PrefillOrderAction</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#PromptButtonAction">PromptButtonAction</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Run">Run</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#RunStatus">RunStatus</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#StartRunResponse">StartRunResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#StructuredActionButtonAction">StructuredActionButtonAction</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SymbolChart">SymbolChart</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#Thread">Thread</a>
+
+#### Feedback
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIFeedbackNewFeedbackResponse">ActiveV1OmniAIFeedbackNewFeedbackResponse</a>
+
+Methods:
+
+- <code title="post /active/v1/omni-ai/feedback">client.Active.V1.OmniAI.Feedback.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIFeedbackService.NewFeedback">NewFeedback</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIFeedbackNewFeedbackParams">ActiveV1OmniAIFeedbackNewFeedbackParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIFeedbackNewFeedbackResponse">ActiveV1OmniAIFeedbackNewFeedbackResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+#### Runs
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunCancelRunResponse">ActiveV1OmniAIRunCancelRunResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunGetRunResponse">ActiveV1OmniAIRunGetRunResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunStartRunResponse">ActiveV1OmniAIRunStartRunResponse</a>
+
+Methods:
+
+- <code title="delete /active/v1/omni-ai/runs/{run_id}">client.Active.V1.OmniAI.Runs.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunService.CancelRun">CancelRun</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, runID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunCancelRunParams">ActiveV1OmniAIRunCancelRunParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunCancelRunResponse">ActiveV1OmniAIRunCancelRunResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/omni-ai/runs/{run_id}">client.Active.V1.OmniAI.Runs.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunService.GetRun">GetRun</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, runID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunGetRunParams">ActiveV1OmniAIRunGetRunParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunGetRunResponse">ActiveV1OmniAIRunGetRunResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="post /active/v1/omni-ai/runs">client.Active.V1.OmniAI.Runs.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunService.StartRun">StartRun</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunStartRunParams">ActiveV1OmniAIRunStartRunParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIRunStartRunResponse">ActiveV1OmniAIRunStartRunResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+#### Threads
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadGetThreadResponse">ActiveV1OmniAIThreadGetThreadResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadListThreadsResponse">ActiveV1OmniAIThreadListThreadsResponse</a>
+
+Methods:
+
+- <code title="get /active/v1/omni-ai/threads/{thread_id}">client.Active.V1.OmniAI.Threads.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadService.GetThread">GetThread</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadGetThreadParams">ActiveV1OmniAIThreadGetThreadParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadGetThreadResponse">ActiveV1OmniAIThreadGetThreadResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/omni-ai/threads">client.Active.V1.OmniAI.Threads.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadService.ListThreads">ListThreads</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadListThreadsParams">ActiveV1OmniAIThreadListThreadsParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadListThreadsResponse">ActiveV1OmniAIThreadListThreadsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+##### Messages
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadMessageListMessagesResponse">ActiveV1OmniAIThreadMessageListMessagesResponse</a>
+
+Methods:
+
+- <code title="get /active/v1/omni-ai/threads/{thread_id}/messages">client.Active.V1.OmniAI.Threads.Messages.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadMessageService.ListMessages">ListMessages</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadMessageListMessagesParams">ActiveV1OmniAIThreadMessageListMessagesParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1OmniAIThreadMessageListMessagesResponse">ActiveV1OmniAIThreadMessageListMessagesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+### SavedScreeners
+
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SavedScreenerFilterParam">SavedScreenerFilterParam</a>
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#SavedScreenerFilter">SavedScreenerFilter</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ScreenerEntry">ScreenerEntry</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ScreenerEntryList">ScreenerEntryList</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerNewScreenerResponse">ActiveV1SavedScreenerNewScreenerResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerGetScreenerByIDResponse">ActiveV1SavedScreenerGetScreenerByIDResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerListScreenersResponse">ActiveV1SavedScreenerListScreenersResponse</a>
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerUpdateScreenerResponse">ActiveV1SavedScreenerUpdateScreenerResponse</a>
+
+Methods:
+
+- <code title="post /active/v1/saved-screeners">client.Active.V1.SavedScreeners.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerService.NewScreener">NewScreener</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerNewScreenerParams">ActiveV1SavedScreenerNewScreenerParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerNewScreenerResponse">ActiveV1SavedScreenerNewScreenerResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="delete /active/v1/saved-screeners/{screener_id}">client.Active.V1.SavedScreeners.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerService.DeleteScreener">DeleteScreener</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, screenerID <a href="https://pkg.go.dev/builtin#string">string</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
+- <code title="get /active/v1/saved-screeners/{screener_id}">client.Active.V1.SavedScreeners.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerService.GetScreenerByID">GetScreenerByID</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, screenerID <a href="https://pkg.go.dev/builtin#string">string</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerGetScreenerByIDResponse">ActiveV1SavedScreenerGetScreenerByIDResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/saved-screeners">client.Active.V1.SavedScreeners.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerService.ListScreeners">ListScreeners</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerListScreenersResponse">ActiveV1SavedScreenerListScreenersResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="put /active/v1/saved-screeners/{screener_id}">client.Active.V1.SavedScreeners.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerService.UpdateScreener">UpdateScreener</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, screenerID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerUpdateScreenerParams">ActiveV1SavedScreenerUpdateScreenerParams</a>) (\*<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1SavedScreenerUpdateScreenerResponse">ActiveV1SavedScreenerUpdateScreenerResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
 ### Screener
 
 Response Types:
 
+- <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ScreenerFilter">ScreenerFilter</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ScreenerItem">ScreenerItem</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ScreenerItemList">ScreenerItemList</a>
 - <a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/stainless-sdks/clear-street-go#ActiveV1ScreenerGetScreenerResponse">ActiveV1ScreenerGetScreenerResponse</a>

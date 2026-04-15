@@ -27,7 +27,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1NewsService] method instead.
 type ActiveV1NewsService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1NewsService generates a new service that applies the given options to
@@ -35,27 +35,66 @@ type ActiveV1NewsService struct {
 // there is one), and before any request-specific options.
 func NewActiveV1NewsService(opts ...option.RequestOption) (r ActiveV1NewsService) {
 	r = ActiveV1NewsService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
 // Retrieves news items with optional filtering by security IDs, time range,
 // publisher, type, and text query.
 func (r *ActiveV1NewsService) GetNews(ctx context.Context, query ActiveV1NewsGetNewsParams, opts ...option.RequestOption) (res *ActiveV1NewsGetNewsResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := "active/v1/news"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
 
+// Instrument associated with a news item.
+type NewsInstrument struct {
+	// Security identifier value.
+	SecurityID string `json:"security_id" api:"required"`
+	// Security identifier source.
+	//
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
+	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
+	// OEMS instrument UUID, if available from instrument cache enrichment.
+	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
+	// Instrument name/description, if available from instrument cache enrichment.
+	Name string `json:"name" api:"nullable"`
+	// Trading symbol, if available from instrument cache enrichment.
+	Symbol string `json:"symbol" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		SecurityID       respjson.Field
+		SecurityIDSource respjson.Field
+		InstrumentID     respjson.Field
+		Name             respjson.Field
+		Symbol           respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r NewsInstrument) RawJSON() string { return r.JSON.raw }
+func (r *NewsInstrument) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // A single news item and its associated instruments.
 type NewsItem struct {
 	// Instruments associated with this news item.
-	Instruments []NewsItemInstrument `json:"instruments" api:"required"`
+	Instruments []NewsInstrument `json:"instruments" api:"required"`
 	// Classification of the item.
 	//
 	// Any of "NEWS", "PRESS_RELEASE".
-	NewsType NewsItemNewsType `json:"news_type" api:"required"`
+	NewsType NewsType `json:"news_type" api:"required"`
 	// The published date/time of the article in UTC.
 	PublishedAt time.Time `json:"published_at" api:"required" format:"date-time"`
 	// The publisher or newswire source.
@@ -92,54 +131,15 @@ func (r *NewsItem) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Instrument associated with a news item.
-type NewsItemInstrument struct {
-	// Security identifier value.
-	SecurityID string `json:"security_id" api:"required"`
-	// Security identifier source.
-	//
-	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
-	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
-	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
-	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
-	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
-	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
-	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
-	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
-	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
-	// OEMS instrument UUID, if available from instrument cache enrichment.
-	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
-	// Instrument name/description, if available from instrument cache enrichment.
-	Name string `json:"name" api:"nullable"`
-	// Trading symbol, if available from instrument cache enrichment.
-	Symbol string `json:"symbol" api:"nullable"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		SecurityID       respjson.Field
-		SecurityIDSource respjson.Field
-		InstrumentID     respjson.Field
-		Name             respjson.Field
-		Symbol           respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
-	} `json:"-"`
-}
+type NewsItemList []NewsItem
 
-// Returns the unmodified JSON received from the API
-func (r NewsItemInstrument) RawJSON() string { return r.JSON.raw }
-func (r *NewsItemInstrument) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Classification of the item.
-type NewsItemNewsType string
+// News item classification.
+type NewsType string
 
 const (
-	NewsItemNewsTypeNews         NewsItemNewsType = "NEWS"
-	NewsItemNewsTypePressRelease NewsItemNewsType = "PRESS_RELEASE"
+	NewsTypeNews         NewsType = "NEWS"
+	NewsTypePressRelease NewsType = "PRESS_RELEASE"
 )
-
-type NewsItemList []NewsItem
 
 type ActiveV1NewsGetNewsResponse struct {
 	Data NewsItemList `json:"data" api:"required"`
@@ -167,9 +167,7 @@ type ActiveV1NewsGetNewsParams struct {
 	// Comma-separated list of publishers to include (mutually exclusive with
 	// exclude_publishers).
 	IncludePublishers param.Opt[string] `query:"include_publishers,omitzero" json:"-"`
-	// The number of items to return per page (only used when page_token is not
-	// provided)
-	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	PageSize          param.Opt[int64]  `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next page of results. Contains encoded pagination state
 	// (limit + offset). When provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
@@ -205,7 +203,7 @@ type ActiveV1NewsGetNewsParams struct {
 // `url.Values`.
 func (r ActiveV1NewsGetNewsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

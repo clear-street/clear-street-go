@@ -31,7 +31,7 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewActiveV1AccountOrderService] method instead.
 type ActiveV1AccountOrderService struct {
-	Options []option.RequestOption
+	options []option.RequestOption
 }
 
 // NewActiveV1AccountOrderService generates a new service that applies the given
@@ -39,7 +39,7 @@ type ActiveV1AccountOrderService struct {
 // options (if there is one), and before any request-specific options.
 func NewActiveV1AccountOrderService(opts ...option.RequestOption) (r ActiveV1AccountOrderService) {
 	r = ActiveV1AccountOrderService{}
-	r.Options = opts
+	r.options = opts
 	return
 }
 
@@ -47,7 +47,7 @@ func NewActiveV1AccountOrderService(opts ...option.RequestOption) (r ActiveV1Acc
 // is that `security_id` and `security_id_source` must be provided together if
 // either is specified.
 func (r *ActiveV1AccountOrderService) CancelAllOrders(ctx context.Context, accountID int64, body ActiveV1AccountOrderCancelAllOrdersParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderCancelAllOrdersResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/orders", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
 	return res, err
@@ -55,7 +55,7 @@ func (r *ActiveV1AccountOrderService) CancelAllOrders(ctx context.Context, accou
 
 // Cancel a specific order
 func (r *ActiveV1AccountOrderService) CancelOrder(ctx context.Context, orderID string, body ActiveV1AccountOrderCancelOrderParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderCancelOrderResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	if orderID == "" {
 		err = errors.New("missing required order_id parameter")
 		return nil, err
@@ -67,7 +67,7 @@ func (r *ActiveV1AccountOrderService) CancelOrder(ctx context.Context, orderID s
 
 // Get order by ID
 func (r *ActiveV1AccountOrderService) GetOrderByID(ctx context.Context, orderID string, query ActiveV1AccountOrderGetOrderByIDParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderGetOrderByIDResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	if orderID == "" {
 		err = errors.New("missing required order_id parameter")
 		return nil, err
@@ -79,7 +79,7 @@ func (r *ActiveV1AccountOrderService) GetOrderByID(ctx context.Context, orderID 
 
 // List orders for an account with optional filtering
 func (r *ActiveV1AccountOrderService) GetOrders(ctx context.Context, accountID int64, query ActiveV1AccountOrderGetOrdersParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderGetOrdersResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/orders", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
@@ -87,7 +87,7 @@ func (r *ActiveV1AccountOrderService) GetOrders(ctx context.Context, accountID i
 
 // Replace an order with new parameters
 func (r *ActiveV1AccountOrderService) ReplaceOrder(ctx context.Context, orderID string, params ActiveV1AccountOrderReplaceOrderParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderReplaceOrderResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	if orderID == "" {
 		err = errors.New("missing required order_id parameter")
 		return nil, err
@@ -99,7 +99,7 @@ func (r *ActiveV1AccountOrderService) ReplaceOrder(ctx context.Context, orderID 
 
 // Submit new orders
 func (r *ActiveV1AccountOrderService) SubmitOrders(ctx context.Context, accountID int64, body ActiveV1AccountOrderSubmitOrdersParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderSubmitOrdersResponse, err error) {
-	opts = slices.Concat(r.Options, opts)
+	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/orders", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
@@ -152,8 +152,6 @@ func (r ApStrategyParam) MarshalJSON() (data []byte, err error) {
 	}
 	return param.MarshalObject(r, shadow{&r, false})
 }
-
-type APIDecimal64 = string
 
 // Base parameters common to most algorithmic strategies
 type BaseStrategyParamsResp struct {
@@ -297,6 +295,137 @@ func (r DmaStrategyParam) MarshalJSON() (data []byte, err error) {
 func (r *DmaStrategyParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// A trading order with its current state and execution details.
+//
+// This is the unified API representation of an order across its lifecycle,
+// combining data from execution reports, order status queries, and parent/child
+// tracking.
+type Order struct {
+	// Client-provided unique identifier for this order
+	ID string `json:"id" api:"required"`
+	// Account placing the order
+	AccountID int64 `json:"account_id" api:"required"`
+	// Timestamp when order was created (UTC)
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	// Cumulative filled quantity
+	FilledQuantity string `json:"filled_quantity" api:"required"`
+	// Remaining unfilled quantity
+	LeavesQuantity string `json:"leaves_quantity" api:"required"`
+	// Type of order (MARKET, LIMIT, etc.)
+	//
+	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
+	// "TRAILING_STOP_LIMIT", "OTHER".
+	OrderType OrderType `json:"order_type" api:"required"`
+	// Total order quantity
+	Quantity string `json:"quantity" api:"required"`
+	// The identifier for the traded instrument (CMS/CUSIP/ISIN/FIGI for equities or
+	// option OPRA OSI)
+	SecurityID string `json:"security_id" api:"required"`
+	// The source of the security identifier
+	//
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
+	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
+	// Type of security
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
+	// "WARRANT", "CASH", "OTHER".
+	SecurityType SecurityType `json:"security_type" api:"required"`
+	// Side of the order (BUY, SELL, SELL_SHORT)
+	//
+	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	Side Side `json:"side" api:"required"`
+	// Current status of the order
+	//
+	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
+	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
+	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
+	Status OrderStatus `json:"status" api:"required"`
+	// Trading symbol
+	Symbol string `json:"symbol" api:"required"`
+	// Time in force instruction
+	//
+	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
+	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
+	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
+	TimeInForce TimeInForce `json:"time_in_force" api:"required"`
+	// Timestamp of the most recent update (UTC)
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
+	// MIC code of the venue where the order is routed
+	Venue string `json:"venue" api:"required"`
+	// Average fill price across all executions
+	AverageFillPrice string `json:"average_fill_price" api:"nullable"`
+	// Contains execution, rejection or cancellation details, if any
+	Details []string `json:"details"`
+	// Timestamp when the order will expire (UTC). Present when time_in_force is
+	// GOOD_TILL_DATE.
+	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
+	// Limit offset for trailing stop-limit orders (signed)
+	LimitOffset string `json:"limit_offset" api:"nullable"`
+	// Limit price (for LIMIT and STOP_LIMIT orders)
+	LimitPrice string `json:"limit_price" api:"nullable"`
+	// Stop price (for STOP and STOP_LIMIT orders)
+	StopPrice string `json:"stop_price" api:"nullable"`
+	// Execution strategy for this order
+	Strategy OrderStrategyUnion `json:"strategy" api:"nullable"`
+	// Trailing offset amount for trailing orders
+	TrailingOffsetAmt string `json:"trailing_offset_amt" api:"nullable"`
+	// Trailing offset type for trailing orders
+	//
+	// Any of "PRICE", "PERCENT_BPS".
+	TrailingOffsetAmtType TrailingOffsetType `json:"trailing_offset_amt_type" api:"nullable"`
+	// Trailing watermark price for trailing orders
+	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
+	// Trailing watermark timestamp for trailing orders
+	TrailingWatermarkTs time.Time `json:"trailing_watermark_ts" api:"nullable" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID                    respjson.Field
+		AccountID             respjson.Field
+		CreatedAt             respjson.Field
+		FilledQuantity        respjson.Field
+		LeavesQuantity        respjson.Field
+		OrderType             respjson.Field
+		Quantity              respjson.Field
+		SecurityID            respjson.Field
+		SecurityIDSource      respjson.Field
+		SecurityType          respjson.Field
+		Side                  respjson.Field
+		Status                respjson.Field
+		Symbol                respjson.Field
+		TimeInForce           respjson.Field
+		UpdatedAt             respjson.Field
+		Venue                 respjson.Field
+		AverageFillPrice      respjson.Field
+		Details               respjson.Field
+		ExpiresAt             respjson.Field
+		LimitOffset           respjson.Field
+		LimitPrice            respjson.Field
+		StopPrice             respjson.Field
+		Strategy              respjson.Field
+		TrailingOffsetAmt     respjson.Field
+		TrailingOffsetAmtType respjson.Field
+		TrailingWatermarkPx   respjson.Field
+		TrailingWatermarkTs   respjson.Field
+		ExtraFields           map[string]respjson.Field
+		raw                   string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Order) RawJSON() string { return r.JSON.raw }
+func (r *Order) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type OrderList []Order
 
 // Order status
 type OrderStatus string
@@ -1112,7 +1241,7 @@ type ActiveV1AccountOrderCancelAllOrdersParams struct {
 // parameters as `url.Values`.
 func (r ActiveV1AccountOrderCancelAllOrdersParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -1166,10 +1295,8 @@ type ActiveV1AccountOrderGetOrderByIDParams struct {
 
 type ActiveV1AccountOrderGetOrdersParams struct {
 	// The start date and time for the query range, inclusive (ISO 8601 format)
-	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
-	// The number of items to return per page (only used when page_token is not
-	// provided)
-	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	From     param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
+	PageSize param.Opt[int64]     `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next page of results. Contains encoded pagination state
 	// (limit + offset). When provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
@@ -1197,12 +1324,12 @@ type ActiveV1AccountOrderGetOrdersParams struct {
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
 	SecurityType ActiveV1AccountOrderGetOrdersParamsSecurityType `query:"security_type,omitzero" json:"-"`
-	// Filter by order status
+	// Comma-separated order statuses to filter by
 	//
 	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
 	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
 	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
-	Status ActiveV1AccountOrderGetOrdersParamsStatus `query:"status,omitzero" json:"-"`
+	Status []string `query:"status,omitzero" json:"-"`
 	paramObj
 }
 
@@ -1210,7 +1337,7 @@ type ActiveV1AccountOrderGetOrdersParams struct {
 // `url.Values`.
 func (r ActiveV1AccountOrderGetOrdersParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -1227,27 +1354,6 @@ const (
 	ActiveV1AccountOrderGetOrdersParamsSecurityTypeWarrant        ActiveV1AccountOrderGetOrdersParamsSecurityType = "WARRANT"
 	ActiveV1AccountOrderGetOrdersParamsSecurityTypeCash           ActiveV1AccountOrderGetOrdersParamsSecurityType = "CASH"
 	ActiveV1AccountOrderGetOrdersParamsSecurityTypeOther          ActiveV1AccountOrderGetOrdersParamsSecurityType = "OTHER"
-)
-
-// Filter by order status
-type ActiveV1AccountOrderGetOrdersParamsStatus string
-
-const (
-	ActiveV1AccountOrderGetOrdersParamsStatusPendingNew      ActiveV1AccountOrderGetOrdersParamsStatus = "PENDING_NEW"
-	ActiveV1AccountOrderGetOrdersParamsStatusNew             ActiveV1AccountOrderGetOrdersParamsStatus = "NEW"
-	ActiveV1AccountOrderGetOrdersParamsStatusPartiallyFilled ActiveV1AccountOrderGetOrdersParamsStatus = "PARTIALLY_FILLED"
-	ActiveV1AccountOrderGetOrdersParamsStatusFilled          ActiveV1AccountOrderGetOrdersParamsStatus = "FILLED"
-	ActiveV1AccountOrderGetOrdersParamsStatusCanceled        ActiveV1AccountOrderGetOrdersParamsStatus = "CANCELED"
-	ActiveV1AccountOrderGetOrdersParamsStatusRejected        ActiveV1AccountOrderGetOrdersParamsStatus = "REJECTED"
-	ActiveV1AccountOrderGetOrdersParamsStatusExpired         ActiveV1AccountOrderGetOrdersParamsStatus = "EXPIRED"
-	ActiveV1AccountOrderGetOrdersParamsStatusPendingCancel   ActiveV1AccountOrderGetOrdersParamsStatus = "PENDING_CANCEL"
-	ActiveV1AccountOrderGetOrdersParamsStatusPendingReplace  ActiveV1AccountOrderGetOrdersParamsStatus = "PENDING_REPLACE"
-	ActiveV1AccountOrderGetOrdersParamsStatusReplaced        ActiveV1AccountOrderGetOrdersParamsStatus = "REPLACED"
-	ActiveV1AccountOrderGetOrdersParamsStatusDoneForDay      ActiveV1AccountOrderGetOrdersParamsStatus = "DONE_FOR_DAY"
-	ActiveV1AccountOrderGetOrdersParamsStatusStopped         ActiveV1AccountOrderGetOrdersParamsStatus = "STOPPED"
-	ActiveV1AccountOrderGetOrdersParamsStatusSuspended       ActiveV1AccountOrderGetOrdersParamsStatus = "SUSPENDED"
-	ActiveV1AccountOrderGetOrdersParamsStatusCalculated      ActiveV1AccountOrderGetOrdersParamsStatus = "CALCULATED"
-	ActiveV1AccountOrderGetOrdersParamsStatusOther           ActiveV1AccountOrderGetOrdersParamsStatus = "OTHER"
 )
 
 type ActiveV1AccountOrderReplaceOrderParams struct {
@@ -1276,7 +1382,7 @@ func (r *ActiveV1AccountOrderReplaceOrderParams) UnmarshalJSON(data []byte) erro
 }
 
 type ActiveV1AccountOrderSubmitOrdersParams struct {
-	Body []ActiveV1AccountOrderSubmitOrdersParamsBody
+	Body []ActiveV1AccountOrderSubmitOrdersParamsBodyUnion
 	paramObj
 }
 
@@ -1287,11 +1393,143 @@ func (r *ActiveV1AccountOrderSubmitOrdersParams) UnmarshalJSON(data []byte) erro
 	return json.Unmarshal(data, &r.Body)
 }
 
-// Request to submit a new order (PlaceOrderRequest from spec)
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ActiveV1AccountOrderSubmitOrdersParamsBodyUnion struct {
+	OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequest *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest `json:",omitzero,inline"`
+	OfActiveV1AccountOrderSubmitOrderssBodyNewOrderRequest         *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest         `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ActiveV1AccountOrderSubmitOrdersParamsBodyUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequest, u.OfActiveV1AccountOrderSubmitOrderssBodyNewOrderRequest)
+}
+func (u *ActiveV1AccountOrderSubmitOrdersParamsBodyUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+// Multileg strategy order request
+//
+// The properties Legs, OrderType, TimeInForce are required.
+type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest struct {
+	// Legs that compose the strategy.
+	Legs []ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg `json:"legs,omitzero" api:"required"`
+	// Type of order (currently MARKET or LIMIT for multileg strategy submission)
+	//
+	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
+	// "TRAILING_STOP_LIMIT", "OTHER".
+	OrderType OrderType `json:"order_type,omitzero" api:"required"`
+	// Time in force
+	//
+	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
+	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
+	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
+	TimeInForce TimeInForce `json:"time_in_force,omitzero" api:"required"`
+	// Optional client-provided unique ID (idempotency). Required to be unique per
+	// account.
+	ID param.Opt[string] `json:"id,omitzero"`
+	// Strategy price, required for LIMIT orders.
+	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
+	// Optional strategy-level quantity. Multiplies leg quantities. Defaults to 1.
+	Quantity param.Opt[string] `json:"quantity,omitzero"`
+	paramObj
+}
+
+func (r ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A single leg in a multileg strategy request.
+//
+// The properties Ratio, Security, SecurityType, Side are required.
+type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg struct {
+	// Ratio for the leg.
+	Ratio string `json:"ratio" api:"required"`
+	// Security identifier for the leg.
+	Security ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion `json:"security,omitzero" api:"required"`
+	// Security type for the leg.
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
+	// "WARRANT", "CASH", "OTHER".
+	SecurityType SecurityType `json:"security_type,omitzero" api:"required"`
+	// Leg side.
+	//
+	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	Side Side `json:"side,omitzero" api:"required"`
+	// Optional leg reference identifier.
+	ID param.Opt[string] `json:"id,omitzero"`
+	// Optional leg position effect.
+	//
+	// Any of "OPEN", "CLOSE".
+	PositionEffect string `json:"position_effect,omitzero"`
+	paramObj
+}
+
+func (r ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg](
+		"position_effect", "OPEN", "CLOSE",
+	)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion struct {
+	OfString                                                                                param.Opt[string]                                                                           `json:",omitzero,inline"`
+	OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequestLegSecuritySecurityIDPair *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecuritySecurityIDPair `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfString, u.OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequestLegSecuritySecurityIDPair)
+}
+func (u *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+// The properties ID, Source are required.
+type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecuritySecurityIDPair struct {
+	ID string `json:"id" api:"required"`
+	// Security identifier source
+	//
+	// Any of "CMS", "CLST", "OPRA", "FIGI", "CUSIP", "CURRENCY", "FMP", "OEMS",
+	// "SEDOL", "QUIK", "ISIN", "RIC", "COUNTRY", "EXCHANGE", "CTA", "BLOOMBERG",
+	// "WERTPAPIER", "DUTCH", "VALOREN", "SICOVAM", "BELGIAN", "COMMON",
+	// "CLEARING_HOUSE", "ISDA_FPML_SPECIFICATION", "ISDA_FPML_URL",
+	// "LETTER_OF_CREDIT", "MARKETPLACE_ASSIGNED_IDENTIFIER", "MARKIT_RED_ENTITY_CLIP",
+	// "MARKIT_RED_PAIR_CLIP", "CFTC", "ISDA_COMMODITY_REFERENCE_PRICE",
+	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
+	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
+	Source SecurityIDSource `json:"source,omitzero" api:"required"`
+	paramObj
+}
+
+func (r ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecuritySecurityIDPair) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecuritySecurityIDPair
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecuritySecurityIDPair) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Single-leg order request
 //
 // The properties OrderType, Quantity, SecurityType, Side, TimeInForce are
 // required.
-type ActiveV1AccountOrderSubmitOrdersParamsBody struct {
+type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest struct {
 	// Type of order
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
@@ -1365,16 +1603,16 @@ type ActiveV1AccountOrderSubmitOrdersParamsBody struct {
 	paramObj
 }
 
-func (r ActiveV1AccountOrderSubmitOrdersParamsBody) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1AccountOrderSubmitOrdersParamsBody
+func (r ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ActiveV1AccountOrderSubmitOrdersParamsBody) UnmarshalJSON(data []byte) error {
+func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 func init() {
-	apijson.RegisterFieldValidator[ActiveV1AccountOrderSubmitOrdersParamsBody](
+	apijson.RegisterFieldValidator[ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest](
 		"position_effect", "OPEN", "CLOSE",
 	)
 }
