@@ -454,9 +454,14 @@ const (
 //
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type OrderStrategyUnion struct {
-	EndAt   time.Time `json:"end_at"`
+	// This field is from variant [OrderStrategySor], [OrderStrategyVwap],
+	// [OrderStrategyTwap], [OrderStrategyAp], [OrderStrategyPov], [OrderStrategyDark].
+	EndAt time.Time `json:"end_at"`
+	// This field is from variant [OrderStrategySor], [OrderStrategyVwap],
+	// [OrderStrategyTwap], [OrderStrategyAp], [OrderStrategyPov], [OrderStrategyDark].
 	StartAt time.Time `json:"start_at"`
-	// This field is from variant [OrderStrategySor].
+	// This field is from variant [OrderStrategySor], [OrderStrategyVwap],
+	// [OrderStrategyTwap], [OrderStrategyAp], [OrderStrategyPov], [OrderStrategyDark].
 	Urgency Urgency `json:"urgency"`
 	Type    string  `json:"type"`
 	// This field is from variant [OrderStrategyVwap].
@@ -541,7 +546,7 @@ type OrderStrategySor struct {
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
-	SorStrategy
+	BaseStrategyParamsResp
 }
 
 // Returns the unmodified JSON received from the API
@@ -738,7 +743,7 @@ func (u *OrderStrategyUnionParam) UnmarshalJSON(data []byte) error {
 // Smart Order Router (default) - routes to best available venue
 type OrderStrategySorParam struct {
 	Type string `json:"type,omitzero" api:"required"`
-	SorStrategyParam
+	BaseStrategyParams
 }
 
 func (r OrderStrategySorParam) MarshalJSON() (data []byte, err error) {
@@ -898,62 +903,6 @@ const (
 	SideSellShort Side = "SELL_SHORT"
 	SideOther     Side = "OTHER"
 )
-
-// Base parameters common to most algorithmic strategies
-type SorStrategy struct {
-	// UTC timestamp to end execution (defaults to market close)
-	EndAt time.Time `json:"end_at" api:"nullable" format:"date-time"`
-	// UTC timestamp to start execution (defaults to order placement time)
-	StartAt time.Time `json:"start_at" api:"nullable" format:"date-time"`
-	// Urgency level for execution aggressiveness
-	//
-	// Any of "SUPER_PASSIVE", "PASSIVE", "MODERATE", "AGGRESSIVE", "SUPER_AGGRESSIVE".
-	Urgency Urgency `json:"urgency"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		EndAt       respjson.Field
-		StartAt     respjson.Field
-		Urgency     respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SorStrategy) RawJSON() string { return r.JSON.raw }
-func (r *SorStrategy) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// ToParam converts this SorStrategy to a SorStrategyParam.
-//
-// Warning: the fields of the param type will not be present. ToParam should only
-// be used at the last possible moment before sending a request. Test for this with
-// SorStrategyParam.Overrides()
-func (r SorStrategy) ToParam() SorStrategyParam {
-	return param.Override[SorStrategyParam](json.RawMessage(r.RawJSON()))
-}
-
-// Base parameters common to most algorithmic strategies
-type SorStrategyParam struct {
-	// UTC timestamp to end execution (defaults to market close)
-	EndAt param.Opt[time.Time] `json:"end_at,omitzero" format:"date-time"`
-	// UTC timestamp to start execution (defaults to order placement time)
-	StartAt param.Opt[time.Time] `json:"start_at,omitzero" format:"date-time"`
-	// Urgency level for execution aggressiveness
-	//
-	// Any of "SUPER_PASSIVE", "PASSIVE", "MODERATE", "AGGRESSIVE", "SUPER_AGGRESSIVE".
-	Urgency Urgency `json:"urgency,omitzero"`
-	paramObj
-}
-
-func (r SorStrategyParam) MarshalJSON() (data []byte, err error) {
-	type shadow SorStrategyParam
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *SorStrategyParam) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
 
 // Time in force
 type TimeInForce string
@@ -1390,7 +1339,7 @@ func (r ActiveV1AccountOrderSubmitOrdersParams) MarshalJSON() (data []byte, err 
 	return shimjson.Marshal(r.Body)
 }
 func (r *ActiveV1AccountOrderSubmitOrdersParams) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &r.Body)
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Only one field can be non-zero.
