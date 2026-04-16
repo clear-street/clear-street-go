@@ -4,6 +4,7 @@ package clearstreet
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/url"
 	"slices"
@@ -47,6 +48,183 @@ func (r *ActiveV1ScreenerService) GetScreener(ctx context.Context, query ActiveV
 	return res, err
 }
 
+// Returns a columnar response where each row is an array of column objects. Each
+// column contains a human-readable name, a field reference, an optional type hint
+// (e.g. `CURR_USD`, `PERCENT`), and the value.
+//
+// Use `field_filter` to select which columns appear in each row. When omitted, the
+// default field set is returned.
+func (r *ActiveV1ScreenerService) SearchScreener(ctx context.Context, body ActiveV1ScreenerSearchScreenerParams, opts ...option.RequestOption) (res *ActiveV1ScreenerSearchScreenerResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "active/v1/screener"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	return res, err
+}
+
+// Historical lookback window for price/change fields.
+type FieldLookback string
+
+const (
+	FieldLookbackOneWeek     FieldLookback = "ONE_WEEK"
+	FieldLookbackOneMonth    FieldLookback = "ONE_MONTH"
+	FieldLookbackThreeMonths FieldLookback = "THREE_MONTHS"
+	FieldLookbackSixMonths   FieldLookback = "SIX_MONTHS"
+	FieldLookbackYtd         FieldLookback = "YTD"
+	FieldLookbackOneYear     FieldLookback = "ONE_YEAR"
+)
+
+// Reporting period for financial data fields.
+type FieldPeriod string
+
+const (
+	FieldPeriodQuarter FieldPeriod = "QUARTER"
+	FieldPeriodTtm     FieldPeriod = "TTM"
+)
+
+// A reference to a screener field.
+type FieldRef struct {
+	// The field name.
+	Name string `json:"name" api:"required"`
+	// Optional historical lookback window.
+	//
+	// Any of "ONE_WEEK", "ONE_MONTH", "THREE_MONTHS", "SIX_MONTHS", "YTD", "ONE_YEAR".
+	Lookback FieldLookback `json:"lookback" api:"nullable"`
+	// Optional reporting period (e.g. quarter or TTM).
+	//
+	// Any of "QUARTER", "TTM".
+	Period FieldPeriod `json:"period" api:"nullable"`
+	// The data type of the field value. Present only in responses.
+	//
+	// Any of "DECIMAL", "INTEGER", "STRING", "ANALYST_RATING", "DATE".
+	ValueType FieldType `json:"value_type" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Lookback    respjson.Field
+		Period      respjson.Field
+		ValueType   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r FieldRef) RawJSON() string { return r.JSON.raw }
+func (r *FieldRef) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this FieldRef to a FieldRefParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// FieldRefParam.Overrides()
+func (r FieldRef) ToParam() FieldRefParam {
+	return param.Override[FieldRefParam](json.RawMessage(r.RawJSON()))
+}
+
+// A reference to a screener field.
+//
+// The property Name is required.
+type FieldRefParam struct {
+	// The field name.
+	Name string `json:"name" api:"required"`
+	// Optional historical lookback window.
+	//
+	// Any of "ONE_WEEK", "ONE_MONTH", "THREE_MONTHS", "SIX_MONTHS", "YTD", "ONE_YEAR".
+	Lookback FieldLookback `json:"lookback,omitzero"`
+	// Optional reporting period (e.g. quarter or TTM).
+	//
+	// Any of "QUARTER", "TTM".
+	Period FieldPeriod `json:"period,omitzero"`
+	// The data type of the field value. Present only in responses.
+	//
+	// Any of "DECIMAL", "INTEGER", "STRING", "ANALYST_RATING", "DATE".
+	ValueType FieldType `json:"value_type,omitzero"`
+	paramObj
+}
+
+func (r FieldRefParam) MarshalJSON() (data []byte, err error) {
+	type shadow FieldRefParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FieldRefParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The data type of a screener field value.
+type FieldType string
+
+const (
+	FieldTypeDecimal       FieldType = "DECIMAL"
+	FieldTypeInteger       FieldType = "INTEGER"
+	FieldTypeString        FieldType = "STRING"
+	FieldTypeAnalystRating FieldType = "ANALYST_RATING"
+	FieldTypeDate          FieldType = "DATE"
+)
+
+// A single column in the screener search response.
+type ScreenerColumn struct {
+	// Field reference (same shape as filter/sort field references)
+	Field FieldRef `json:"field" api:"required"`
+	// Human-readable display name for this field
+	Name  string                   `json:"name" api:"required"`
+	Value ScreenerColumnValueUnion `json:"value" api:"required"`
+	// Value format hint: "CURR_USD", "PERCENT", etc. Omitted when not applicable.
+	Type string `json:"type" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Field       respjson.Field
+		Name        respjson.Field
+		Value       respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ScreenerColumn) RawJSON() string { return r.JSON.raw }
+func (r *ScreenerColumn) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ScreenerColumnValueUnion contains all possible properties and values from
+// [float64], [string].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfFloat OfString]
+type ScreenerColumnValueUnion struct {
+	// This field will be present if the value is a [float64] instead of an object.
+	OfFloat float64 `json:",inline"`
+	// This field will be present if the value is a [string] instead of an object.
+	OfString string `json:",inline"`
+	JSON     struct {
+		OfFloat  respjson.Field
+		OfString respjson.Field
+		raw      string
+	} `json:"-"`
+}
+
+func (u ScreenerColumnValueUnion) AsFloat() (v float64) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ScreenerColumnValueUnion) AsString() (v string) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u ScreenerColumnValueUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *ScreenerColumnValueUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // A single filter criterion for the screener.
 type ScreenerFilter struct {
 	// Field to filter on (e.g., "market_cap", "sector", "price")
@@ -73,10 +251,6 @@ func (r *ScreenerFilter) UnmarshalJSON(data []byte) error {
 
 // An instrument returned by the screener
 type ScreenerItem struct {
-	// The count of buy analyst ratings
-	BuyRatings int64 `json:"buy_ratings" api:"required"`
-	// The count of hold analyst ratings
-	HoldRatings int64 `json:"hold_ratings" api:"required"`
 	// The latest price for the instrument
 	Price string `json:"price" api:"required"`
 	// The identifier for the instrument
@@ -92,30 +266,28 @@ type ScreenerItem struct {
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
 	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
-	// The count of sell analyst ratings
-	SellRatings int64 `json:"sell_ratings" api:"required"`
-	// The count of strong buy analyst ratings
-	StrongBuyRatings int64 `json:"strong_buy_ratings" api:"required"`
-	// The count of strong sell analyst ratings
-	StrongSellRatings int64 `json:"strong_sell_ratings" api:"required"`
 	// The trading symbol for the instrument
 	Symbol string `json:"symbol" api:"required"`
 	// The total count of analyst ratings
 	TotalRatings int64 `json:"total_ratings" api:"required"`
 	// The consensus analyst price target
 	ConsensusPriceTarget string `json:"consensus_price_target" api:"nullable"`
-	// The highest analyst price target
-	ConsensusPriceTargetHigh string `json:"consensus_price_target_high" api:"nullable"`
-	// The lowest analyst price target
-	ConsensusPriceTargetLow string `json:"consensus_price_target_low" api:"nullable"`
 	// The consensus analyst rating
 	//
 	// Any of "STRONG_BUY", "BUY", "HOLD", "SELL", "STRONG_SELL".
 	ConsensusRating AnalystRating `json:"consensus_rating" api:"nullable"`
 	// The ISO country code of the instrument's issue
 	CountryOfIssue string `json:"country_of_issue" api:"nullable"`
+	// The TTM debt-to-equity ratio
+	DebtToEquityTtm string `json:"debt_to_equity_ttm" api:"nullable"`
 	// A detailed description of the instrument or company
 	Description string `json:"description" api:"nullable"`
+	// The TTM dividend yield percent
+	DividendYieldTtm string `json:"dividend_yield_ttm" api:"nullable"`
+	// The TTM earnings per share
+	EarningsPerShareTtm string `json:"earnings_per_share_ttm" api:"nullable"`
+	// The MIC code of the primary listing exchange
+	Exchange string `json:"exchange" api:"nullable"`
 	// The highest price over the last 52 weeks
 	FiftyTwoWeekHigh string `json:"fifty_two_week_high" api:"nullable"`
 	// The lowest price over the last 52 weeks
@@ -156,6 +328,8 @@ type ScreenerItem struct {
 	PercentChange string `json:"percent_change" api:"nullable"`
 	// The previous day's closing price
 	PrevDayClose string `json:"prev_day_close" api:"nullable"`
+	// The TTM price-to-earnings ratio
+	PriceToEarningsTtm string `json:"price_to_earnings_ttm" api:"nullable"`
 	// The business sector of the instrument's issuer
 	Sector string `json:"sector" api:"nullable"`
 	// The type of security
@@ -172,16 +346,6 @@ type ScreenerItem struct {
 	ThreeMonthsAgoClose string `json:"three_months_ago_close" api:"nullable"`
 	// The opening price approximately three months ago
 	ThreeMonthsAgoOpen string `json:"three_months_ago_open" api:"nullable"`
-	// The TTM debt-to-equity ratio
-	TtmDebtToEquity string `json:"ttm_debt_to_equity" api:"nullable"`
-	// The TTM dividend yield percent
-	TtmDividendYield string `json:"ttm_dividend_yield" api:"nullable"`
-	// The TTM earnings per share
-	TtmEarningsPerShare string `json:"ttm_earnings_per_share" api:"nullable"`
-	// The TTM price-to-earnings ratio
-	TtmPriceToEarnings string `json:"ttm_price_to_earnings" api:"nullable"`
-	// The MIC code of the primary listing venue
-	Venue string `json:"venue" api:"nullable"`
 	// The latest trading volume for the instrument
 	Volume string `json:"volume" api:"nullable"`
 	// The average trading volume over the past week
@@ -192,61 +356,54 @@ type ScreenerItem struct {
 	YtdChangePct string `json:"ytd_change_pct" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		BuyRatings               respjson.Field
-		HoldRatings              respjson.Field
-		Price                    respjson.Field
-		SecurityID               respjson.Field
-		SecurityIDSource         respjson.Field
-		SellRatings              respjson.Field
-		StrongBuyRatings         respjson.Field
-		StrongSellRatings        respjson.Field
-		Symbol                   respjson.Field
-		TotalRatings             respjson.Field
-		ConsensusPriceTarget     respjson.Field
-		ConsensusPriceTargetHigh respjson.Field
-		ConsensusPriceTargetLow  respjson.Field
-		ConsensusRating          respjson.Field
-		CountryOfIssue           respjson.Field
-		Description              respjson.Field
-		FiftyTwoWeekHigh         respjson.Field
-		FiftyTwoWeekLow          respjson.Field
-		GapFrom52wHighPct        respjson.Field
-		GapFrom52wLowPct         respjson.Field
-		Industry                 respjson.Field
-		ListDate                 respjson.Field
-		MarketCap                respjson.Field
-		MonthAvgVolume           respjson.Field
-		Name                     respjson.Field
-		OneMonthAgoClose         respjson.Field
-		OneMonthAgoOpen          respjson.Field
-		OneMonthChangePct        respjson.Field
-		OneWeekAgoClose          respjson.Field
-		OneWeekAgoOpen           respjson.Field
-		OneWeekChangePct         respjson.Field
-		OneYearAgoClose          respjson.Field
-		OneYearAgoOpen           respjson.Field
-		OneYearChangePct         respjson.Field
-		PercentChange            respjson.Field
-		PrevDayClose             respjson.Field
-		Sector                   respjson.Field
-		SecurityType             respjson.Field
-		SixMonthChangePct        respjson.Field
-		SixMonthsAgoClose        respjson.Field
-		SixMonthsAgoOpen         respjson.Field
-		ThreeMonthChangePct      respjson.Field
-		ThreeMonthsAgoClose      respjson.Field
-		ThreeMonthsAgoOpen       respjson.Field
-		TtmDebtToEquity          respjson.Field
-		TtmDividendYield         respjson.Field
-		TtmEarningsPerShare      respjson.Field
-		TtmPriceToEarnings       respjson.Field
-		Venue                    respjson.Field
-		Volume                   respjson.Field
-		WeekAvgVolume            respjson.Field
-		YearToDateOpen           respjson.Field
-		YtdChangePct             respjson.Field
-		ExtraFields              map[string]respjson.Field
-		raw                      string
+		Price                respjson.Field
+		SecurityID           respjson.Field
+		SecurityIDSource     respjson.Field
+		Symbol               respjson.Field
+		TotalRatings         respjson.Field
+		ConsensusPriceTarget respjson.Field
+		ConsensusRating      respjson.Field
+		CountryOfIssue       respjson.Field
+		DebtToEquityTtm      respjson.Field
+		Description          respjson.Field
+		DividendYieldTtm     respjson.Field
+		EarningsPerShareTtm  respjson.Field
+		Exchange             respjson.Field
+		FiftyTwoWeekHigh     respjson.Field
+		FiftyTwoWeekLow      respjson.Field
+		GapFrom52wHighPct    respjson.Field
+		GapFrom52wLowPct     respjson.Field
+		Industry             respjson.Field
+		ListDate             respjson.Field
+		MarketCap            respjson.Field
+		MonthAvgVolume       respjson.Field
+		Name                 respjson.Field
+		OneMonthAgoClose     respjson.Field
+		OneMonthAgoOpen      respjson.Field
+		OneMonthChangePct    respjson.Field
+		OneWeekAgoClose      respjson.Field
+		OneWeekAgoOpen       respjson.Field
+		OneWeekChangePct     respjson.Field
+		OneYearAgoClose      respjson.Field
+		OneYearAgoOpen       respjson.Field
+		OneYearChangePct     respjson.Field
+		PercentChange        respjson.Field
+		PrevDayClose         respjson.Field
+		PriceToEarningsTtm   respjson.Field
+		Sector               respjson.Field
+		SecurityType         respjson.Field
+		SixMonthChangePct    respjson.Field
+		SixMonthsAgoClose    respjson.Field
+		SixMonthsAgoOpen     respjson.Field
+		ThreeMonthChangePct  respjson.Field
+		ThreeMonthsAgoClose  respjson.Field
+		ThreeMonthsAgoOpen   respjson.Field
+		Volume               respjson.Field
+		WeekAvgVolume        respjson.Field
+		YearToDateOpen       respjson.Field
+		YtdChangePct         respjson.Field
+		ExtraFields          map[string]respjson.Field
+		raw                  string
 	} `json:"-"`
 }
 
@@ -257,6 +414,10 @@ func (r *ScreenerItem) UnmarshalJSON(data []byte) error {
 }
 
 type ScreenerItemList []ScreenerItem
+
+type ScreenerRow []ScreenerColumn
+
+type ScreenerRowList []ScreenerRow
 
 type ActiveV1ScreenerGetScreenerResponse struct {
 	Data ScreenerItemList `json:"data" api:"required"`
@@ -272,6 +433,23 @@ type ActiveV1ScreenerGetScreenerResponse struct {
 // Returns the unmodified JSON received from the API
 func (r ActiveV1ScreenerGetScreenerResponse) RawJSON() string { return r.JSON.raw }
 func (r *ActiveV1ScreenerGetScreenerResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ActiveV1ScreenerSearchScreenerResponse struct {
+	Data ScreenerRowList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r ActiveV1ScreenerSearchScreenerResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1ScreenerSearchScreenerResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -310,3 +488,222 @@ const (
 	ActiveV1ScreenerGetScreenerParamsSortDirectionAsc  ActiveV1ScreenerGetScreenerParamsSortDirection = "ASC"
 	ActiveV1ScreenerGetScreenerParamsSortDirectionDesc ActiveV1ScreenerGetScreenerParamsSortDirection = "DESC"
 )
+
+type ActiveV1ScreenerSearchScreenerParams struct {
+	// Maximum number of results per page.
+	PageSize param.Opt[int64] `json:"page_size,omitzero"`
+	// Opaque token for cursor-based pagination.
+	PageToken param.Opt[string] `json:"page_token,omitzero"`
+	// Whether string sorts should be case-sensitive (default: false).
+	SortCaseSensitive param.Opt[bool] `json:"sort_case_sensitive,omitzero"`
+	// Subset of fields to include in the response.
+	FieldFilter []FieldRefParam `json:"field_filter,omitzero"`
+	// Filter conditions to apply.
+	Filters []ActiveV1ScreenerSearchScreenerParamsFilter `json:"filters,omitzero"`
+	// Multi-field sort specifications. When present, takes precedence over
+	// sort_by/sort_direction.
+	Sorts []ActiveV1ScreenerSearchScreenerParamsSort `json:"sorts,omitzero"`
+	// Field to sort results by.
+	SortBy FieldRefParam `json:"sort_by,omitzero"`
+	// Sort direction (defaults to DESC).
+	//
+	// Any of "ASC", "DESC".
+	SortDirection ActiveV1ScreenerSearchScreenerParamsSortDirection `json:"sort_direction,omitzero"`
+	paramObj
+}
+
+func (r ActiveV1ScreenerSearchScreenerParams) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1ScreenerSearchScreenerParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1ScreenerSearchScreenerParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A single filter condition.
+//
+// The properties Left, Op, Right are required.
+type ActiveV1ScreenerSearchScreenerParamsFilter struct {
+	// The field to filter on.
+	Left FieldRefParam `json:"left,omitzero" api:"required"`
+	// The operator and optional arguments.
+	Op ActiveV1ScreenerSearchScreenerParamsFilterOp `json:"op,omitzero" api:"required"`
+	// The value(s) to compare against.
+	Right []ActiveV1ScreenerSearchScreenerParamsFilterRight `json:"right,omitzero" api:"required"`
+	paramObj
+}
+
+func (r ActiveV1ScreenerSearchScreenerParamsFilter) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1ScreenerSearchScreenerParamsFilter
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1ScreenerSearchScreenerParamsFilter) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The operator and optional arguments.
+//
+// The property Name is required.
+type ActiveV1ScreenerSearchScreenerParamsFilterOp struct {
+	// The operator to apply.
+	//
+	// Any of "LT", "LTE", "GT", "GTE", "EQ", "BETWEEN", "NOT_BETWEEN", "ONE_OF",
+	// "REGEX", "BEGINS_WITH", "ENDS_WITH", "CONTAINS", "IS_NULL", "IS_NOT_NULL".
+	Name string `json:"name,omitzero" api:"required"`
+	// Optional arguments that modify operator behavior.
+	//
+	// Any of "LEFT_INCLUSIVE", "RIGHT_INCLUSIVE", "LEFT_EXCLUSIVE", "RIGHT_EXCLUSIVE",
+	// "CASE_INSENSITIVE".
+	Args []string `json:"args,omitzero"`
+	paramObj
+}
+
+func (r ActiveV1ScreenerSearchScreenerParamsFilterOp) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1ScreenerSearchScreenerParamsFilterOp
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1ScreenerSearchScreenerParamsFilterOp) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[ActiveV1ScreenerSearchScreenerParamsFilterOp](
+		"name", "LT", "LTE", "GT", "GTE", "EQ", "BETWEEN", "NOT_BETWEEN", "ONE_OF", "REGEX", "BEGINS_WITH", "ENDS_WITH", "CONTAINS", "IS_NULL", "IS_NOT_NULL",
+	)
+}
+
+// A filter value: either a literal or a variable reference.
+type ActiveV1ScreenerSearchScreenerParamsFilterRight struct {
+	Value ActiveV1ScreenerSearchScreenerParamsFilterRightValueUnion `json:"value,omitzero"`
+	// A variable reference.
+	Variable ActiveV1ScreenerSearchScreenerParamsFilterRightVariable `json:"variable,omitzero"`
+	paramObj
+}
+
+func (r ActiveV1ScreenerSearchScreenerParamsFilterRight) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1ScreenerSearchScreenerParamsFilterRight
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1ScreenerSearchScreenerParamsFilterRight) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ActiveV1ScreenerSearchScreenerParamsFilterRightValueUnion struct {
+	OfFloat  param.Opt[float64] `json:",omitzero,inline"`
+	OfString param.Opt[string]  `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ActiveV1ScreenerSearchScreenerParamsFilterRightValueUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfFloat, u.OfString)
+}
+func (u *ActiveV1ScreenerSearchScreenerParamsFilterRightValueUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+// A variable reference.
+//
+// The property Name is required.
+type ActiveV1ScreenerSearchScreenerParamsFilterRightVariable struct {
+	// The variable name.
+	Name string `json:"name" api:"required"`
+	// Optional arithmetic modifier.
+	Modifier ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier `json:"modifier,omitzero"`
+	// Optional historical lookback window.
+	//
+	// Any of "ONE_WEEK", "ONE_MONTH", "THREE_MONTHS", "SIX_MONTHS", "YTD", "ONE_YEAR".
+	Lookback FieldLookback `json:"lookback,omitzero"`
+	// Optional reporting period.
+	//
+	// Any of "QUARTER", "TTM".
+	Period FieldPeriod `json:"period,omitzero"`
+	paramObj
+}
+
+func (r ActiveV1ScreenerSearchScreenerParamsFilterRightVariable) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1ScreenerSearchScreenerParamsFilterRightVariable
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1ScreenerSearchScreenerParamsFilterRightVariable) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Optional arithmetic modifier.
+//
+// The properties Args, Name are required.
+type ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier struct {
+	Args []ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifierArgUnion `json:"args,omitzero" api:"required"`
+	// The modifier operation.
+	//
+	// Any of "ADD", "SUB".
+	Name string `json:"name,omitzero" api:"required"`
+	paramObj
+}
+
+func (r ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier](
+		"name", "ADD", "SUB",
+	)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifierArgUnion struct {
+	OfFloat  param.Opt[float64] `json:",omitzero,inline"`
+	OfString param.Opt[string]  `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifierArgUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfFloat, u.OfString)
+}
+func (u *ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifierArgUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+// Sort direction (defaults to DESC).
+type ActiveV1ScreenerSearchScreenerParamsSortDirection string
+
+const (
+	ActiveV1ScreenerSearchScreenerParamsSortDirectionAsc  ActiveV1ScreenerSearchScreenerParamsSortDirection = "ASC"
+	ActiveV1ScreenerSearchScreenerParamsSortDirectionDesc ActiveV1ScreenerSearchScreenerParamsSortDirection = "DESC"
+)
+
+// A sort specification pairing a field with a direction.
+//
+// The property Field is required.
+type ActiveV1ScreenerSearchScreenerParamsSort struct {
+	// The field to sort by.
+	Field FieldRefParam `json:"field,omitzero" api:"required"`
+	// Sort direction (defaults to DESC).
+	//
+	// Any of "ASC", "DESC".
+	Direction string `json:"direction,omitzero"`
+	paramObj
+}
+
+func (r ActiveV1ScreenerSearchScreenerParamsSort) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1ScreenerSearchScreenerParamsSort
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1ScreenerSearchScreenerParamsSort) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[ActiveV1ScreenerSearchScreenerParamsSort](
+		"direction", "ASC", "DESC",
+	)
+}
