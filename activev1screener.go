@@ -276,10 +276,9 @@ func (r *ActiveV1ScreenerGetScreenerResponse) UnmarshalJSON(data []byte) error {
 }
 
 type ActiveV1ScreenerGetScreenerParams struct {
-	// Number of items to return per page (default: 100, max: 10000)
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination
-	// state.
+	// Token for retrieving the next page of results. Contains encoded pagination state
+	// (limit + offset). When provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Field to sort by
 	SortBy param.Opt[string] `query:"sort_by,omitzero" json:"-"`
