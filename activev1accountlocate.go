@@ -4,7 +4,6 @@ package clearstreet
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -209,7 +208,7 @@ func (r ActiveV1AccountLocateNewLocateRequestParams) MarshalJSON() (data []byte,
 	return shimjson.Marshal(r.Body)
 }
 func (r *ActiveV1AccountLocateNewLocateRequestParams) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &r.Body)
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Request to create a new locate order
