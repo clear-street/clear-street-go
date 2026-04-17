@@ -18,17 +18,11 @@ import (
 // the [NewActiveV1OmniAIService] method instead.
 type ActiveV1OmniAIService struct {
 	options []option.RequestOption
-	// Thread-centric AI assistant for conversational trading. Create threads to start
-	// conversations, poll response objects for in-progress output, and read finalized
-	// messages from thread history. Every endpoint requires an explicit account_id.
-	Messages ActiveV1OmniAIMessageService
-	// Thread-centric AI assistant for conversational trading. Create threads to start
-	// conversations, poll response objects for in-progress output, and read finalized
-	// messages from thread history. Every endpoint requires an explicit account_id.
-	Responses ActiveV1OmniAIResponseService
-	// Thread-centric AI assistant for conversational trading. Create threads to start
-	// conversations, poll response objects for in-progress output, and read finalized
-	// messages from thread history. Every endpoint requires an explicit account_id.
+	// AI assistant for conversational trading interactions.
+	Feedback ActiveV1OmniAIFeedbackService
+	// AI assistant for conversational trading interactions.
+	Runs ActiveV1OmniAIRunService
+	// AI assistant for conversational trading interactions.
 	Threads ActiveV1OmniAIThreadService
 }
 
@@ -38,13 +32,107 @@ type ActiveV1OmniAIService struct {
 func NewActiveV1OmniAIService(opts ...option.RequestOption) (r ActiveV1OmniAIService) {
 	r = ActiveV1OmniAIService{}
 	r.options = opts
-	r.Messages = NewActiveV1OmniAIMessageService(opts...)
-	r.Responses = NewActiveV1OmniAIResponseService(opts...)
+	r.Feedback = NewActiveV1OmniAIFeedbackService(opts...)
+	r.Runs = NewActiveV1OmniAIRunService(opts...)
 	r.Threads = NewActiveV1OmniAIThreadService(opts...)
 	return
 }
 
-type CancelResponsePayload struct {
+type ActionButton struct {
+	ButtonID string `json:"button_id" api:"required"`
+	Label    string `json:"label" api:"required"`
+	// Send a follow-up prompt as the next user message
+	Action ButtonActionUnion `json:"action" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ButtonID    respjson.Field
+		Label       respjson.Field
+		Action      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ActionButton) RawJSON() string { return r.JSON.raw }
+func (r *ActionButton) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ButtonActionUnion contains all possible properties and values from
+// [ButtonActionPrompt], [ButtonActionStructuredAction].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type ButtonActionUnion struct {
+	// This field is from variant [ButtonActionPrompt].
+	Prompt     string `json:"prompt"`
+	ActionType string `json:"action_type"`
+	// This field is from variant [ButtonActionStructuredAction].
+	ActionID string `json:"action_id"`
+	JSON     struct {
+		Prompt     respjson.Field
+		ActionType respjson.Field
+		ActionID   respjson.Field
+		raw        string
+	} `json:"-"`
+}
+
+func (u ButtonActionUnion) AsPrompt() (v ButtonActionPrompt) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ButtonActionUnion) AsStructuredAction() (v ButtonActionStructuredAction) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u ButtonActionUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *ButtonActionUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Send a follow-up prompt as the next user message
+type ButtonActionPrompt struct {
+	// Any of "prompt".
+	ActionType string `json:"action_type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionType  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	PromptButtonAction
+}
+
+// Returns the unmodified JSON received from the API
+func (r ButtonActionPrompt) RawJSON() string { return r.JSON.raw }
+func (r *ButtonActionPrompt) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Trigger a structured action already present in the same message
+type ButtonActionStructuredAction struct {
+	// Any of "structured_action".
+	ActionType string `json:"action_type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionType  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	StructuredActionButtonAction
+}
+
+// Returns the unmodified JSON received from the API
+func (r ButtonActionStructuredAction) RawJSON() string { return r.JSON.raw }
+func (r *ButtonActionStructuredAction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type CancelRunResponse struct {
 	Canceled bool `json:"canceled" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -55,116 +143,536 @@ type CancelResponsePayload struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r CancelResponsePayload) RawJSON() string { return r.JSON.raw }
-func (r *CancelResponsePayload) UnmarshalJSON(data []byte) error {
+func (r CancelRunResponse) RawJSON() string { return r.JSON.raw }
+func (r *CancelRunResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Chart payload content part.
-type ContentPartChartPayload struct {
-	Payload any `json:"payload" api:"required"`
+// Capability allowlist for structured actions.
+//
+// Clients declare which capabilities they support when starting a run. Omni AI
+// will only emit structured actions that match the declared capabilities.
+type Capability string
+
+const (
+	CapabilityNavigate       Capability = "NAVIGATE"
+	CapabilityOpenChatWindow Capability = "OPEN_CHAT_WINDOW"
+	CapabilityPrefillOrder   Capability = "PREFILL_ORDER"
+	CapabilityOpenChart      Capability = "OPEN_CHART"
+	CapabilityOpenScreener   Capability = "OPEN_SCREENER"
+)
+
+// ChartKindUnion contains all possible properties and values from
+// [ChartKindSymbolChart], [ChartKindDataChart].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type ChartKindUnion struct {
+	// This field is from variant [ChartKindSymbolChart].
+	Symbol string `json:"symbol"`
+	// This field is from variant [ChartKindSymbolChart].
+	Timeframe string `json:"timeframe"`
+	ChartType string `json:"chart_type"`
+	// This field is from variant [ChartKindDataChart].
+	Series []ChartSeries `json:"series"`
+	JSON   struct {
+		Symbol    respjson.Field
+		Timeframe respjson.Field
+		ChartType respjson.Field
+		Series    respjson.Field
+		raw       string
+	} `json:"-"`
+}
+
+func (u ChartKindUnion) AsSymbolChart() (v ChartKindSymbolChart) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ChartKindUnion) AsDataChart() (v ChartKindDataChart) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u ChartKindUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *ChartKindUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Chart for a specific ticker symbol
+type ChartKindSymbolChart struct {
+	// Any of "symbol_chart".
+	ChartType string `json:"chart_type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Payload     respjson.Field
+		ChartType   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	SymbolChart
+}
+
+// Returns the unmodified JSON received from the API
+func (r ChartKindSymbolChart) RawJSON() string { return r.JSON.raw }
+func (r *ChartKindSymbolChart) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Chart built from explicit data series
+type ChartKindDataChart struct {
+	// Any of "data_chart".
+	ChartType string `json:"chart_type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ChartType   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	DataChart
+}
+
+// Returns the unmodified JSON received from the API
+func (r ChartKindDataChart) RawJSON() string { return r.JSON.raw }
+func (r *ChartKindDataChart) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ChartPoint struct {
+	X string  `json:"x" api:"required"`
+	Y float64 `json:"y" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		X           respjson.Field
+		Y           respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
 
 // Returns the unmodified JSON received from the API
-func (r ContentPartChartPayload) RawJSON() string { return r.JSON.raw }
-func (r *ContentPartChartPayload) UnmarshalJSON(data []byte) error {
+func (r ChartPoint) RawJSON() string { return r.JSON.raw }
+func (r *ChartPoint) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Escape-hatch custom payload content part.
-type ContentPartCustomPayload struct {
-	Payload any `json:"payload" api:"required"`
+type ChartSeries struct {
+	Name   string       `json:"name" api:"required"`
+	Points []ChartPoint `json:"points" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Payload     respjson.Field
+		Name        respjson.Field
+		Points      respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
 
 // Returns the unmodified JSON received from the API
-func (r ContentPartCustomPayload) RawJSON() string { return r.JSON.raw }
-func (r *ContentPartCustomPayload) UnmarshalJSON(data []byte) error {
+func (r ChartSeries) RawJSON() string { return r.JSON.raw }
+func (r *ChartSeries) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Structured action content part.
-type ContentPartStructuredActionPayload struct {
-	// Structured actions that Omni AI can return to clients.
-	//
-	// These actions provide machine-readable instructions for the client to execute,
-	// such as prefilling an order ticket, opening a chart, or navigating to a route.
-	Action   StructuredActionUnion `json:"action" api:"required"`
-	ActionID string                `json:"action_id" api:"required" format:"uuid"`
+// ContentPartUnion contains all possible properties and values from
+// [ContentPartText], [ContentPartStructuredActionUnion], [ContentPartThinking],
+// [ContentPartChart], [ContentPartSuggestedActions], [ContentPartType].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type ContentPartUnion struct {
+	// This field is from variant [ContentPartText].
+	Text string `json:"text"`
+	Type string `json:"type"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	Orders []OrderPayload `json:"orders"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	AccountID  int64  `json:"account_id"`
+	ActionType string `json:"action_type"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	Symbol string `json:"symbol"`
+	Extras any    `json:"extras"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	Timeframe string `json:"timeframe"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	Filters []ScreenerFilter `json:"filters"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	FieldFilter []string `json:"field_filter"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	PageSize int64 `json:"page_size"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	SortBy string `json:"sort_by"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	SortDirection string `json:"sort_direction"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	ThreadID string `json:"thread_id"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	Title string `json:"title"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	Route string `json:"route"`
+	// This field is from variant [ContentPartStructuredActionUnion].
+	Params any `json:"params"`
+	// This field is from variant [ContentPartThinking].
+	Thoughts []string `json:"thoughts"`
+	// This field is from variant [ContentPartChart].
+	ChartID       string         `json:"chart_id"`
+	ActionButtons []ActionButton `json:"action_buttons"`
+	// This field is from variant [ContentPartChart].
+	ChartKind ChartKindUnion `json:"chart_kind"`
+	JSON      struct {
+		Text          respjson.Field
+		Type          respjson.Field
+		Orders        respjson.Field
+		AccountID     respjson.Field
+		ActionType    respjson.Field
+		Symbol        respjson.Field
+		Extras        respjson.Field
+		Timeframe     respjson.Field
+		Filters       respjson.Field
+		FieldFilter   respjson.Field
+		PageSize      respjson.Field
+		SortBy        respjson.Field
+		SortDirection respjson.Field
+		ThreadID      respjson.Field
+		Title         respjson.Field
+		Route         respjson.Field
+		Params        respjson.Field
+		Thoughts      respjson.Field
+		ChartID       respjson.Field
+		ActionButtons respjson.Field
+		ChartKind     respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+func (u ContentPartUnion) AsText() (v ContentPartText) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ContentPartUnion) AsStructuredAction() (v ContentPartStructuredActionUnion) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ContentPartUnion) AsThinking() (v ContentPartThinking) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ContentPartUnion) AsChart() (v ContentPartChart) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ContentPartUnion) AsSuggestedActions() (v ContentPartSuggestedActions) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ContentPartUnion) AsContentPartType() (v ContentPartType) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u ContentPartUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *ContentPartUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Plain text content
+type ContentPartText struct {
+	// Any of "text".
+	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Action      respjson.Field
-		ActionID    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	ContentPartText
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContentPartText) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartText) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ContentPartStructuredActionUnion contains all possible properties and values
+// from [ContentPartStructuredActionPrefillOrder],
+// [ContentPartStructuredActionOpenChart],
+// [ContentPartStructuredActionOpenScreener],
+// [ContentPartStructuredActionOpenChatWindow],
+// [ContentPartStructuredActionNavigate].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type ContentPartStructuredActionUnion struct {
+	// This field is from variant [ContentPartStructuredActionPrefillOrder].
+	Orders []OrderPayload `json:"orders"`
+	// This field is from variant [ContentPartStructuredActionPrefillOrder].
+	AccountID  int64  `json:"account_id"`
+	ActionType string `json:"action_type"`
+	Type       string `json:"type"`
+	// This field is from variant [ContentPartStructuredActionOpenChart].
+	Symbol string `json:"symbol"`
+	Extras any    `json:"extras"`
+	// This field is from variant [ContentPartStructuredActionOpenChart].
+	Timeframe string `json:"timeframe"`
+	// This field is from variant [ContentPartStructuredActionOpenScreener].
+	Filters []ScreenerFilter `json:"filters"`
+	// This field is from variant [ContentPartStructuredActionOpenScreener].
+	FieldFilter []string `json:"field_filter"`
+	// This field is from variant [ContentPartStructuredActionOpenScreener].
+	PageSize int64 `json:"page_size"`
+	// This field is from variant [ContentPartStructuredActionOpenScreener].
+	SortBy string `json:"sort_by"`
+	// This field is from variant [ContentPartStructuredActionOpenScreener].
+	SortDirection string `json:"sort_direction"`
+	// This field is from variant [ContentPartStructuredActionOpenChatWindow].
+	ThreadID string `json:"thread_id"`
+	// This field is from variant [ContentPartStructuredActionOpenChatWindow].
+	Title string `json:"title"`
+	// This field is from variant [ContentPartStructuredActionNavigate].
+	Route string `json:"route"`
+	// This field is from variant [ContentPartStructuredActionNavigate].
+	Params any `json:"params"`
+	JSON   struct {
+		Orders        respjson.Field
+		AccountID     respjson.Field
+		ActionType    respjson.Field
+		Type          respjson.Field
+		Symbol        respjson.Field
+		Extras        respjson.Field
+		Timeframe     respjson.Field
+		Filters       respjson.Field
+		FieldFilter   respjson.Field
+		PageSize      respjson.Field
+		SortBy        respjson.Field
+		SortDirection respjson.Field
+		ThreadID      respjson.Field
+		Title         respjson.Field
+		Route         respjson.Field
+		Params        respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+func (u ContentPartStructuredActionUnion) AsPrefillOrder() (v ContentPartStructuredActionPrefillOrder) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ContentPartStructuredActionUnion) AsOpenChart() (v ContentPartStructuredActionOpenChart) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ContentPartStructuredActionUnion) AsOpenScreener() (v ContentPartStructuredActionOpenScreener) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ContentPartStructuredActionUnion) AsOpenChatWindow() (v ContentPartStructuredActionOpenChatWindow) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ContentPartStructuredActionUnion) AsNavigate() (v ContentPartStructuredActionNavigate) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u ContentPartStructuredActionUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *ContentPartStructuredActionUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Prefill an order ticket for user confirmation
+type ContentPartStructuredActionPrefillOrder struct {
+	// Any of "prefill_order".
+	ActionType string `json:"action_type" api:"required"`
+	// Any of "structured_action".
+	Type string `json:"type"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionType  respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	PrefillOrderAction
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContentPartStructuredActionPrefillOrder) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartStructuredActionPrefillOrder) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Open a chart for a symbol
+type ContentPartStructuredActionOpenChart struct {
+	// Any of "open_chart".
+	ActionType string `json:"action_type" api:"required"`
+	// Any of "structured_action".
+	Type string `json:"type"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionType  respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	OpenChartAction
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContentPartStructuredActionOpenChart) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartStructuredActionOpenChart) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Open a stock screener with filters
+type ContentPartStructuredActionOpenScreener struct {
+	// Any of "open_screener".
+	ActionType string `json:"action_type" api:"required"`
+	// Any of "structured_action".
+	Type string `json:"type"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionType  respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	OpenScreenerAction
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContentPartStructuredActionOpenScreener) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartStructuredActionOpenScreener) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Open a chat window
+type ContentPartStructuredActionOpenChatWindow struct {
+	// Any of "open_chat_window".
+	ActionType string `json:"action_type" api:"required"`
+	// Any of "structured_action".
+	Type string `json:"type"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionType  respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	OpenChatWindowAction
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContentPartStructuredActionOpenChatWindow) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartStructuredActionOpenChatWindow) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Navigate to a client route
+type ContentPartStructuredActionNavigate struct {
+	// Any of "navigate".
+	ActionType string `json:"action_type" api:"required"`
+	// Any of "structured_action".
+	Type string `json:"type"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionType  respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	NavigateAction
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContentPartStructuredActionNavigate) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartStructuredActionNavigate) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Model reasoning/thinking content and tool call status indicators
+type ContentPartThinking struct {
+	// Any of "thinking".
+	Type string `json:"type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	ContentPartThinking
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContentPartThinking) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartThinking) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Typed inline chart (symbol or data-driven)
+type ContentPartChart struct {
+	// Any of "chart".
+	Type string `json:"type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	ContentPartChart
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContentPartChart) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartChart) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Message-level follow-up action buttons
+type ContentPartSuggestedActions struct {
+	// Any of "suggested_actions".
+	Type string `json:"type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	ContentPartSuggestedActions
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContentPartSuggestedActions) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartSuggestedActions) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Custom/extensible content
+type ContentPartType struct {
+	// Any of "custom".
+	Type string `json:"type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
 
 // Returns the unmodified JSON received from the API
-func (r ContentPartStructuredActionPayload) RawJSON() string { return r.JSON.raw }
-func (r *ContentPartStructuredActionPayload) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Suggested actions payload content part.
-type ContentPartSuggestedActionsPayload struct {
-	Payload any `json:"payload" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Payload     respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r ContentPartSuggestedActionsPayload) RawJSON() string { return r.JSON.raw }
-func (r *ContentPartSuggestedActionsPayload) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Text content part.
-type ContentPartTextPayload struct {
-	Text string `json:"text" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Text        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r ContentPartTextPayload) RawJSON() string { return r.JSON.raw }
-func (r *ContentPartTextPayload) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Thinking content part shown on dynamic response polling.
-type ContentPartThinkingPayload struct {
-	Thoughts []string `json:"thoughts" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Thoughts    respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r ContentPartThinkingPayload) RawJSON() string { return r.JSON.raw }
-func (r *ContentPartThinkingPayload) UnmarshalJSON(data []byte) error {
+func (r ContentPartType) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartType) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -186,99 +694,122 @@ func (r *CreateFeedbackResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Response payload for continuing a thread with a new message.
-type CreateMessageResponse struct {
-	ResponseID    string `json:"response_id" api:"required" format:"uuid"`
-	ThreadID      string `json:"thread_id" api:"required" format:"uuid"`
-	UserMessageID string `json:"user_message_id" api:"required" format:"uuid"`
+type DataChart struct {
+	Series []ChartSeries `json:"series" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ResponseID    respjson.Field
-		ThreadID      respjson.Field
-		UserMessageID respjson.Field
-		ExtraFields   map[string]respjson.Field
-		raw           string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r CreateMessageResponse) RawJSON() string { return r.JSON.raw }
-func (r *CreateMessageResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Response payload for thread creation.
-type CreateThreadResponse struct {
-	ResponseID    string `json:"response_id" api:"required" format:"uuid"`
-	ThreadID      string `json:"thread_id" api:"required" format:"uuid"`
-	UserMessageID string `json:"user_message_id" api:"required" format:"uuid"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		ResponseID    respjson.Field
-		ThreadID      respjson.Field
-		UserMessageID respjson.Field
-		ExtraFields   map[string]respjson.Field
-		raw           string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r CreateThreadResponse) RawJSON() string { return r.JSON.raw }
-func (r *CreateThreadResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Shared sanitized error payload.
-type ErrorStatus struct {
-	Code    string `json:"code" api:"required"`
-	Message string `json:"message" api:"required"`
-	Details any    `json:"details" api:"nullable"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Code        respjson.Field
-		Message     respjson.Field
-		Details     respjson.Field
+		Series      respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
 
 // Returns the unmodified JSON received from the API
-func (r ErrorStatus) RawJSON() string { return r.JSON.raw }
-func (r *ErrorStatus) UnmarshalJSON(data []byte) error {
+func (r DataChart) RawJSON() string { return r.JSON.raw }
+func (r *DataChart) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Final immutable message.
+type GetRunResponse struct {
+	Events        []any  `json:"events" api:"required"`
+	Run           Run    `json:"run" api:"required"`
+	NextPageToken string `json:"next_page_token" api:"nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Events        respjson.Field
+		Run           respjson.Field
+		NextPageToken respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r GetRunResponse) RawJSON() string { return r.JSON.raw }
+func (r *GetRunResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type GetThreadResponse struct {
+	Thread Thread `json:"thread" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Thread      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r GetThreadResponse) RawJSON() string { return r.JSON.raw }
+func (r *GetThreadResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ListMessagesResponse struct {
+	Messages      []Message `json:"messages" api:"required"`
+	NextPageToken string    `json:"next_page_token" api:"nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Messages      respjson.Field
+		NextPageToken respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ListMessagesResponse) RawJSON() string { return r.JSON.raw }
+func (r *ListMessagesResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ListThreadsResponse struct {
+	Threads       []Thread `json:"threads" api:"required"`
+	NextPageToken string   `json:"next_page_token" api:"nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Threads       respjson.Field
+		NextPageToken respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ListThreadsResponse) RawJSON() string { return r.JSON.raw }
+func (r *ListThreadsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type Message struct {
-	ID string `json:"id" api:"required" format:"uuid"`
-	// Finalized immutable message content container. Never includes thinking parts.
-	Content   MessageContent `json:"content" api:"required"`
-	CreatedAt string         `json:"created_at" api:"required"`
-	// Immutable terminal outcome for a finalized assistant message.
-	//
-	// Any of "completed", "errored", "canceled".
-	Outcome MessageOutcome `json:"outcome" api:"required"`
-	// Finalized message role in the public contract.
-	//
-	// Any of "USER", "ASSISTANT".
-	Role     MessageRole `json:"role" api:"required"`
-	Seq      int64       `json:"seq" api:"required"`
-	ThreadID string      `json:"thread_id" api:"required" format:"uuid"`
-	// Shared sanitized error payload.
-	Error ErrorStatus `json:"error" api:"nullable"`
+	// Denormalized text content for search/display
+	ContentText string `json:"content_text" api:"required"`
+	CreatedAt   string `json:"created_at" api:"required"`
+	// Any of "UNSPECIFIED", "SYSTEM", "USER", "ASSISTANT", "TOOL".
+	Role         MessageRole `json:"role" api:"required"`
+	Seq          int64       `json:"seq" api:"required"`
+	ID           string      `json:"id" api:"nullable" format:"uuid"`
+	AuthorUserID string      `json:"author_user_id" api:"nullable"`
+	// Parsed content parts (text, thinking, and structured actions)
+	Content  MessageContent `json:"content" api:"nullable"`
+	Metadata any            `json:"metadata" api:"nullable"`
+	RunID    string         `json:"run_id" api:"nullable" format:"uuid"`
+	ThreadID string         `json:"thread_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          respjson.Field
-		Content     respjson.Field
-		CreatedAt   respjson.Field
-		Outcome     respjson.Field
-		Role        respjson.Field
-		Seq         respjson.Field
-		ThreadID    respjson.Field
-		Error       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		ContentText  respjson.Field
+		CreatedAt    respjson.Field
+		Role         respjson.Field
+		Seq          respjson.Field
+		ID           respjson.Field
+		AuthorUserID respjson.Field
+		Content      respjson.Field
+		Metadata     respjson.Field
+		RunID        respjson.Field
+		ThreadID     respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
 	} `json:"-"`
 }
 
@@ -288,9 +819,9 @@ func (r *Message) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Finalized immutable message content container. Never includes thinking parts.
+// Message content containing text and structured action parts.
 type MessageContent struct {
-	Parts []MessageContentPartUnion `json:"parts" api:"required"`
+	Parts []ContentPartUnion `json:"parts" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Parts       respjson.Field
@@ -305,176 +836,36 @@ func (r *MessageContent) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// MessageContentPartUnion contains all possible properties and values from
-// [MessageContentPartObject], [MessageContentPartObject2],
-// [MessageContentPartObject3], [MessageContentPartObject4],
-// [MessageContentPartObject5].
-//
-// Use the methods beginning with 'As' to cast the union to one of its variants.
-type MessageContentPartUnion struct {
-	// This field is from variant [MessageContentPartObject].
-	Text string `json:"text"`
-	Type string `json:"type"`
-	// This field is from variant [MessageContentPartObject2].
-	Action StructuredActionUnion `json:"action"`
-	// This field is from variant [MessageContentPartObject2].
-	ActionID string `json:"action_id"`
-	Payload  any    `json:"payload"`
-	JSON     struct {
-		Text     respjson.Field
-		Type     respjson.Field
-		Action   respjson.Field
-		ActionID respjson.Field
-		Payload  respjson.Field
-		raw      string
-	} `json:"-"`
-}
-
-func (u MessageContentPartUnion) AsMessageContentPartObject() (v MessageContentPartObject) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u MessageContentPartUnion) AsMessageContentPartObject2() (v MessageContentPartObject2) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u MessageContentPartUnion) AsMessageContentPartObject3() (v MessageContentPartObject3) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u MessageContentPartUnion) AsMessageContentPartObject4() (v MessageContentPartObject4) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u MessageContentPartUnion) AsMessageContentPartObject5() (v MessageContentPartObject5) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-// Returns the unmodified JSON received from the API
-func (u MessageContentPartUnion) RawJSON() string { return u.JSON.raw }
-
-func (r *MessageContentPartUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Text content part.
-type MessageContentPartObject struct {
-	// Any of "text".
-	Type string `json:"type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	ContentPartTextPayload
-}
-
-// Returns the unmodified JSON received from the API
-func (r MessageContentPartObject) RawJSON() string { return r.JSON.raw }
-func (r *MessageContentPartObject) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Structured action content part.
-type MessageContentPartObject2 struct {
-	// Any of "structured_action".
-	Type string `json:"type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	ContentPartStructuredActionPayload
-}
-
-// Returns the unmodified JSON received from the API
-func (r MessageContentPartObject2) RawJSON() string { return r.JSON.raw }
-func (r *MessageContentPartObject2) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Chart payload content part.
-type MessageContentPartObject3 struct {
-	// Any of "chart".
-	Type string `json:"type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	ContentPartChartPayload
-}
-
-// Returns the unmodified JSON received from the API
-func (r MessageContentPartObject3) RawJSON() string { return r.JSON.raw }
-func (r *MessageContentPartObject3) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Suggested actions payload content part.
-type MessageContentPartObject4 struct {
-	// Any of "suggested_actions".
-	Type string `json:"type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	ContentPartSuggestedActionsPayload
-}
-
-// Returns the unmodified JSON received from the API
-func (r MessageContentPartObject4) RawJSON() string { return r.JSON.raw }
-func (r *MessageContentPartObject4) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Escape-hatch custom payload content part.
-type MessageContentPartObject5 struct {
-	// Any of "custom".
-	Type string `json:"type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	ContentPartCustomPayload
-}
-
-// Returns the unmodified JSON received from the API
-func (r MessageContentPartObject5) RawJSON() string { return r.JSON.raw }
-func (r *MessageContentPartObject5) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type MessageList []Message
-
-// Immutable terminal outcome for a finalized assistant message.
-type MessageOutcome string
-
-const (
-	MessageOutcomeCompleted MessageOutcome = "completed"
-	MessageOutcomeErrored   MessageOutcome = "errored"
-	MessageOutcomeCanceled  MessageOutcome = "canceled"
-)
-
-// Finalized message role in the public contract.
 type MessageRole string
 
 const (
-	MessageRoleUser      MessageRole = "USER"
-	MessageRoleAssistant MessageRole = "ASSISTANT"
+	MessageRoleUnspecified MessageRole = "UNSPECIFIED"
+	MessageRoleSystem      MessageRole = "SYSTEM"
+	MessageRoleUser        MessageRole = "USER"
+	MessageRoleAssistant   MessageRole = "ASSISTANT"
+	MessageRoleTool        MessageRole = "TOOL"
 )
+
+// Action to navigate to a client route.
+type NavigateAction struct {
+	// Route path or key
+	Route string `json:"route" api:"required"`
+	// Route parameters
+	Params any `json:"params"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Route       respjson.Field
+		Params      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r NavigateAction) RawJSON() string { return r.JSON.raw }
+func (r *NavigateAction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Action to open a chart for a symbol.
 type OpenChartAction struct {
@@ -497,6 +888,30 @@ type OpenChartAction struct {
 // Returns the unmodified JSON received from the API
 func (r OpenChartAction) RawJSON() string { return r.JSON.raw }
 func (r *OpenChartAction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Action to open a chat window.
+type OpenChatWindowAction struct {
+	// Additional configuration
+	Extras any `json:"extras"`
+	// Thread ID to open (None to open a new chat window)
+	ThreadID string `json:"thread_id" api:"nullable"`
+	// Window title
+	Title string `json:"title" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Extras      respjson.Field
+		ThreadID    respjson.Field
+		Title       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OpenChatWindowAction) RawJSON() string { return r.JSON.raw }
+func (r *OpenChatWindowAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -630,383 +1045,137 @@ func (r *PrefillOrderAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Dynamic pollable response.
-type Response struct {
-	ID string `json:"id" api:"required" format:"uuid"`
-	// Dynamic lifecycle status for a pollable response.
-	//
-	// Any of "queued", "running", "succeeded", "failed", "canceled".
-	Status        ResponseStatus `json:"status" api:"required"`
-	ThreadID      string         `json:"thread_id" api:"required" format:"uuid"`
-	UserMessageID string         `json:"user_message_id" api:"required" format:"uuid"`
-	// Dynamic response content container. May include thinking parts.
-	Content ResponseContent `json:"content" api:"nullable"`
-	// Shared sanitized error payload.
-	Error           ErrorStatus `json:"error" api:"nullable"`
-	OutputMessageID string      `json:"output_message_id" api:"nullable" format:"uuid"`
+type PromptButtonAction struct {
+	Prompt string `json:"prompt" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID              respjson.Field
-		Status          respjson.Field
-		ThreadID        respjson.Field
-		UserMessageID   respjson.Field
-		Content         respjson.Field
-		Error           respjson.Field
-		OutputMessageID respjson.Field
-		ExtraFields     map[string]respjson.Field
-		raw             string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r Response) RawJSON() string { return r.JSON.raw }
-func (r *Response) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Dynamic response content container. May include thinking parts.
-type ResponseContent struct {
-	Parts []ResponseContentPartUnion `json:"parts" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Parts       respjson.Field
+		Prompt      respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
 }
 
 // Returns the unmodified JSON received from the API
-func (r ResponseContent) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContent) UnmarshalJSON(data []byte) error {
+func (r PromptButtonAction) RawJSON() string { return r.JSON.raw }
+func (r *PromptButtonAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// ResponseContentPartUnion contains all possible properties and values from
-// [ResponseContentPartObject], [ResponseContentPartObject2],
-// [ResponseContentPartObject3], [ResponseContentPartObject4],
-// [ResponseContentPartObject5], [ResponseContentPartObject6].
-//
-// Use the methods beginning with 'As' to cast the union to one of its variants.
-type ResponseContentPartUnion struct {
-	// This field is from variant [ResponseContentPartObject].
-	Text string `json:"text"`
-	Type string `json:"type"`
-	// This field is from variant [ResponseContentPartObject2].
-	Thoughts []string `json:"thoughts"`
-	// This field is from variant [ResponseContentPartObject3].
-	Action StructuredActionUnion `json:"action"`
-	// This field is from variant [ResponseContentPartObject3].
-	ActionID string `json:"action_id"`
-	Payload  any    `json:"payload"`
-	JSON     struct {
-		Text     respjson.Field
-		Type     respjson.Field
-		Thoughts respjson.Field
-		Action   respjson.Field
-		ActionID respjson.Field
-		Payload  respjson.Field
-		raw      string
-	} `json:"-"`
-}
-
-func (u ResponseContentPartUnion) AsResponseContentPartObject() (v ResponseContentPartObject) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u ResponseContentPartUnion) AsResponseContentPartObject2() (v ResponseContentPartObject2) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u ResponseContentPartUnion) AsResponseContentPartObject3() (v ResponseContentPartObject3) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u ResponseContentPartUnion) AsResponseContentPartObject4() (v ResponseContentPartObject4) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u ResponseContentPartUnion) AsResponseContentPartObject5() (v ResponseContentPartObject5) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u ResponseContentPartUnion) AsResponseContentPartObject6() (v ResponseContentPartObject6) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-// Returns the unmodified JSON received from the API
-func (u ResponseContentPartUnion) RawJSON() string { return u.JSON.raw }
-
-func (r *ResponseContentPartUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Text content part.
-type ResponseContentPartObject struct {
-	// Any of "text".
-	Type string `json:"type" api:"required"`
+type Run struct {
+	CreatedAt string `json:"created_at" api:"required"`
+	// Any of "UNSPECIFIED", "QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "CANCELED".
+	Status       RunStatus    `json:"status" api:"required"`
+	ID           string       `json:"id" api:"nullable" format:"uuid"`
+	Capabilities []Capability `json:"capabilities"`
+	EndedAt      string       `json:"ended_at" api:"nullable"`
+	Error        any          `json:"error" api:"nullable"`
+	StartedAt    string       `json:"started_at" api:"nullable"`
+	ThreadID     string       `json:"thread_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		CreatedAt    respjson.Field
+		Status       respjson.Field
+		ID           respjson.Field
+		Capabilities respjson.Field
+		EndedAt      respjson.Field
+		Error        respjson.Field
+		StartedAt    respjson.Field
+		ThreadID     respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
 	} `json:"-"`
-	ContentPartTextPayload
 }
 
 // Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject) UnmarshalJSON(data []byte) error {
+func (r Run) RawJSON() string { return r.JSON.raw }
+func (r *Run) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Thinking content part shown on dynamic response polling.
-type ResponseContentPartObject2 struct {
-	// Any of "thinking".
-	Type string `json:"type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	ContentPartThinkingPayload
-}
-
-// Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject2) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject2) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Structured action content part.
-type ResponseContentPartObject3 struct {
-	// Any of "structured_action".
-	Type string `json:"type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	ContentPartStructuredActionPayload
-}
-
-// Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject3) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject3) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Chart payload content part.
-type ResponseContentPartObject4 struct {
-	// Any of "chart".
-	Type string `json:"type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	ContentPartChartPayload
-}
-
-// Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject4) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject4) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Suggested actions payload content part.
-type ResponseContentPartObject5 struct {
-	// Any of "suggested_actions".
-	Type string `json:"type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	ContentPartSuggestedActionsPayload
-}
-
-// Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject5) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject5) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Escape-hatch custom payload content part.
-type ResponseContentPartObject6 struct {
-	// Any of "custom".
-	Type string `json:"type" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Type        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	ContentPartCustomPayload
-}
-
-// Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject6) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject6) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Dynamic lifecycle status for a pollable response.
-type ResponseStatus string
+type RunStatus string
 
 const (
-	ResponseStatusQueued    ResponseStatus = "queued"
-	ResponseStatusRunning   ResponseStatus = "running"
-	ResponseStatusSucceeded ResponseStatus = "succeeded"
-	ResponseStatusFailed    ResponseStatus = "failed"
-	ResponseStatusCanceled  ResponseStatus = "canceled"
+	RunStatusUnspecified RunStatus = "UNSPECIFIED"
+	RunStatusQueued      RunStatus = "QUEUED"
+	RunStatusRunning     RunStatus = "RUNNING"
+	RunStatusSucceeded   RunStatus = "SUCCEEDED"
+	RunStatusFailed      RunStatus = "FAILED"
+	RunStatusCanceled    RunStatus = "CANCELED"
 )
 
-// StructuredActionUnion contains all possible properties and values from
-// [StructuredActionPrefillOrder], [StructuredActionOpenChart],
-// [StructuredActionOpenScreener].
-//
-// Use the methods beginning with 'As' to cast the union to one of its variants.
-type StructuredActionUnion struct {
-	// This field is from variant [StructuredActionPrefillOrder].
-	Orders []OrderPayload `json:"orders"`
-	// This field is from variant [StructuredActionPrefillOrder].
-	AccountID  int64  `json:"account_id"`
-	ActionType string `json:"action_type"`
-	// This field is from variant [StructuredActionOpenChart].
-	Symbol string `json:"symbol"`
-	// This field is from variant [StructuredActionOpenChart].
-	Extras any `json:"extras"`
-	// This field is from variant [StructuredActionOpenChart].
-	Timeframe string `json:"timeframe"`
-	// This field is from variant [StructuredActionOpenScreener].
-	Filters []ScreenerFilter `json:"filters"`
-	// This field is from variant [StructuredActionOpenScreener].
-	FieldFilter []string `json:"field_filter"`
-	// This field is from variant [StructuredActionOpenScreener].
-	PageSize int64 `json:"page_size"`
-	// This field is from variant [StructuredActionOpenScreener].
-	SortBy string `json:"sort_by"`
-	// This field is from variant [StructuredActionOpenScreener].
-	SortDirection string `json:"sort_direction"`
-	JSON          struct {
-		Orders        respjson.Field
-		AccountID     respjson.Field
-		ActionType    respjson.Field
-		Symbol        respjson.Field
-		Extras        respjson.Field
-		Timeframe     respjson.Field
-		Filters       respjson.Field
-		FieldFilter   respjson.Field
-		PageSize      respjson.Field
-		SortBy        respjson.Field
-		SortDirection respjson.Field
-		raw           string
-	} `json:"-"`
-}
-
-func (u StructuredActionUnion) AsPrefillOrder() (v StructuredActionPrefillOrder) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u StructuredActionUnion) AsOpenChart() (v StructuredActionOpenChart) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-func (u StructuredActionUnion) AsOpenScreener() (v StructuredActionOpenScreener) {
-	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
-	return
-}
-
-// Returns the unmodified JSON received from the API
-func (u StructuredActionUnion) RawJSON() string { return u.JSON.raw }
-
-func (r *StructuredActionUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Prefill an order ticket for user confirmation
-type StructuredActionPrefillOrder struct {
-	// Any of "prefill_order".
-	ActionType string `json:"action_type" api:"required"`
+type StartRunResponse struct {
+	Run         Run     `json:"run" api:"required"`
+	Thread      Thread  `json:"thread" api:"required"`
+	UserMessage Message `json:"user_message" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ActionType  respjson.Field
+		Run         respjson.Field
+		Thread      respjson.Field
+		UserMessage respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
-	PrefillOrderAction
 }
 
 // Returns the unmodified JSON received from the API
-func (r StructuredActionPrefillOrder) RawJSON() string { return r.JSON.raw }
-func (r *StructuredActionPrefillOrder) UnmarshalJSON(data []byte) error {
+func (r StartRunResponse) RawJSON() string { return r.JSON.raw }
+func (r *StartRunResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Open a chart for a symbol
-type StructuredActionOpenChart struct {
-	// Any of "open_chart".
-	ActionType string `json:"action_type" api:"required"`
+type StructuredActionButtonAction struct {
+	ActionID string `json:"action_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ActionType  respjson.Field
+		ActionID    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
-	OpenChartAction
 }
 
 // Returns the unmodified JSON received from the API
-func (r StructuredActionOpenChart) RawJSON() string { return r.JSON.raw }
-func (r *StructuredActionOpenChart) UnmarshalJSON(data []byte) error {
+func (r StructuredActionButtonAction) RawJSON() string { return r.JSON.raw }
+func (r *StructuredActionButtonAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Open a stock screener with filters
-type StructuredActionOpenScreener struct {
-	// Any of "open_screener".
-	ActionType string `json:"action_type" api:"required"`
+type SymbolChart struct {
+	Symbol    string `json:"symbol" api:"required"`
+	Timeframe string `json:"timeframe" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ActionType  respjson.Field
+		Symbol      respjson.Field
+		Timeframe   respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
-	OpenScreenerAction
 }
 
 // Returns the unmodified JSON received from the API
-func (r StructuredActionOpenScreener) RawJSON() string { return r.JSON.raw }
-func (r *StructuredActionOpenScreener) UnmarshalJSON(data []byte) error {
+func (r SymbolChart) RawJSON() string { return r.JSON.raw }
+func (r *SymbolChart) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Thread metadata returned by list/get thread endpoints.
 type Thread struct {
-	ID          string `json:"id" api:"required" format:"uuid"`
+	AccountID   string `json:"account_id" api:"required"`
 	CreatedAt   string `json:"created_at" api:"required"`
 	Description string `json:"description" api:"required"`
+	OwnerUserID string `json:"owner_user_id" api:"required"`
 	Title       string `json:"title" api:"required"`
 	UpdatedAt   string `json:"updated_at" api:"required"`
+	ID          string `json:"id" api:"nullable" format:"uuid"`
+	Metadata    any    `json:"metadata" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID          respjson.Field
+		AccountID   respjson.Field
 		CreatedAt   respjson.Field
 		Description respjson.Field
+		OwnerUserID respjson.Field
 		Title       respjson.Field
 		UpdatedAt   respjson.Field
+		ID          respjson.Field
+		Metadata    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -1017,5 +1186,3 @@ func (r Thread) RawJSON() string { return r.JSON.raw }
 func (r *Thread) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-type ThreadList []Thread

@@ -13,7 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestActiveV1OmniAIMessageGetMessage(t *testing.T) {
+func TestActiveV1IrisThreadMessageListMessagesDeprecatedWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,11 +26,14 @@ func TestActiveV1OmniAIMessageGetMessage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.OmniAI.Messages.GetMessage(
+	_, err := client.Active.V1.Iris.Threads.Messages.ListMessagesDeprecated(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.ActiveV1OmniAIMessageGetMessageParams{
-			AccountID: 0,
+		clearstreet.ActiveV1IrisThreadMessageListMessagesDeprecatedParams{
+			AccountID: "account_id",
+			AfterSeq:  clearstreet.Int(0),
+			PageSize:  clearstreet.Int(0),
+			PageToken: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
 	if err != nil {

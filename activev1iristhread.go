@@ -19,51 +19,55 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// AI assistant for conversational trading interactions.
+// Deprecated /iris/_ routes. Use /omni-ai/_ instead.
 //
-// ActiveV1OmniAIThreadService contains methods and other services that help with
+// ActiveV1IrisThreadService contains methods and other services that help with
 // interacting with the clear-street API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
-// the [NewActiveV1OmniAIThreadService] method instead.
-type ActiveV1OmniAIThreadService struct {
+// the [NewActiveV1IrisThreadService] method instead.
+type ActiveV1IrisThreadService struct {
 	options []option.RequestOption
-	// AI assistant for conversational trading interactions.
-	Messages ActiveV1OmniAIThreadMessageService
+	// Deprecated /iris/_ routes. Use /omni-ai/_ instead.
+	Messages ActiveV1IrisThreadMessageService
 }
 
-// NewActiveV1OmniAIThreadService generates a new service that applies the given
+// NewActiveV1IrisThreadService generates a new service that applies the given
 // options to each request. These options are applied after the parent client's
 // options (if there is one), and before any request-specific options.
-func NewActiveV1OmniAIThreadService(opts ...option.RequestOption) (r ActiveV1OmniAIThreadService) {
-	r = ActiveV1OmniAIThreadService{}
+func NewActiveV1IrisThreadService(opts ...option.RequestOption) (r ActiveV1IrisThreadService) {
+	r = ActiveV1IrisThreadService{}
 	r.options = opts
-	r.Messages = NewActiveV1OmniAIThreadMessageService(opts...)
+	r.Messages = NewActiveV1IrisThreadMessageService(opts...)
 	return
 }
 
-// Get a specific thread.
-func (r *ActiveV1OmniAIThreadService) GetThread(ctx context.Context, threadID string, query ActiveV1OmniAIThreadGetThreadParams, opts ...option.RequestOption) (res *ActiveV1OmniAIThreadGetThreadResponse, err error) {
+// **Deprecated**: Use `GET /omni-ai/threads/{thread_id}` instead.
+//
+// Deprecated: deprecated
+func (r *ActiveV1IrisThreadService) GetThreadDeprecated(ctx context.Context, threadID string, query ActiveV1IrisThreadGetThreadDeprecatedParams, opts ...option.RequestOption) (res *ActiveV1IrisThreadGetThreadDeprecatedResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
 		err = errors.New("missing required thread_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("active/v1/omni-ai/threads/%s", threadID)
+	path := fmt.Sprintf("active/v1/iris/threads/%s", threadID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
 
-// Retrieves threads for the authenticated user.
-func (r *ActiveV1OmniAIThreadService) ListThreads(ctx context.Context, query ActiveV1OmniAIThreadListThreadsParams, opts ...option.RequestOption) (res *ActiveV1OmniAIThreadListThreadsResponse, err error) {
+// **Deprecated**: Use `GET /omni-ai/threads` instead.
+//
+// Deprecated: deprecated
+func (r *ActiveV1IrisThreadService) ListThreadsDeprecated(ctx context.Context, query ActiveV1IrisThreadListThreadsDeprecatedParams, opts ...option.RequestOption) (res *ActiveV1IrisThreadListThreadsDeprecatedResponse, err error) {
 	opts = slices.Concat(r.options, opts)
-	path := "active/v1/omni-ai/threads"
+	path := "active/v1/iris/threads"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
 
-type ActiveV1OmniAIThreadGetThreadResponse struct {
+type ActiveV1IrisThreadGetThreadDeprecatedResponse struct {
 	Data GetThreadResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -75,12 +79,12 @@ type ActiveV1OmniAIThreadGetThreadResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ActiveV1OmniAIThreadGetThreadResponse) RawJSON() string { return r.JSON.raw }
-func (r *ActiveV1OmniAIThreadGetThreadResponse) UnmarshalJSON(data []byte) error {
+func (r ActiveV1IrisThreadGetThreadDeprecatedResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1IrisThreadGetThreadDeprecatedResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1OmniAIThreadListThreadsResponse struct {
+type ActiveV1IrisThreadListThreadsDeprecatedResponse struct {
 	Data ListThreadsResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -92,27 +96,27 @@ type ActiveV1OmniAIThreadListThreadsResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ActiveV1OmniAIThreadListThreadsResponse) RawJSON() string { return r.JSON.raw }
-func (r *ActiveV1OmniAIThreadListThreadsResponse) UnmarshalJSON(data []byte) error {
+func (r ActiveV1IrisThreadListThreadsDeprecatedResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1IrisThreadListThreadsDeprecatedResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1OmniAIThreadGetThreadParams struct {
+type ActiveV1IrisThreadGetThreadDeprecatedParams struct {
 	// Account ID for the request
 	AccountID string `query:"account_id" api:"required" json:"-"`
 	paramObj
 }
 
-// URLQuery serializes [ActiveV1OmniAIThreadGetThreadParams]'s query parameters as
-// `url.Values`.
-func (r ActiveV1OmniAIThreadGetThreadParams) URLQuery() (v url.Values, err error) {
+// URLQuery serializes [ActiveV1IrisThreadGetThreadDeprecatedParams]'s query
+// parameters as `url.Values`.
+func (r ActiveV1IrisThreadGetThreadDeprecatedParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-type ActiveV1OmniAIThreadListThreadsParams struct {
+type ActiveV1IrisThreadListThreadsDeprecatedParams struct {
 	// Account ID for the request
 	AccountID string `query:"account_id" api:"required" json:"-"`
 	// Maximum threads to return
@@ -122,9 +126,9 @@ type ActiveV1OmniAIThreadListThreadsParams struct {
 	paramObj
 }
 
-// URLQuery serializes [ActiveV1OmniAIThreadListThreadsParams]'s query parameters
-// as `url.Values`.
-func (r ActiveV1OmniAIThreadListThreadsParams) URLQuery() (v url.Values, err error) {
+// URLQuery serializes [ActiveV1IrisThreadListThreadsDeprecatedParams]'s query
+// parameters as `url.Values`.
+func (r ActiveV1IrisThreadListThreadsDeprecatedParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
