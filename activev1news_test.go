@@ -35,6 +35,7 @@ func TestActiveV1NewsGetNewsWithOptionalParams(t *testing.T) {
 		PageSize:          clearstreet.Int(1),
 		PageToken:         clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 		SearchQuery:       clearstreet.String("search_query"),
+		Sectors:           []string{"BASIC_MATERIALS"},
 		SecurityID:        []string{"string"},
 		SecurityIDSource:  []string{"string"},
 		To:                clearstreet.String("to"),
