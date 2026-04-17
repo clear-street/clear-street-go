@@ -23,7 +23,6 @@ type ActiveV1Service struct {
 	Clock ActiveV1ClockService
 	// Retrieve details and lists of tradable instruments.
 	Instruments ActiveV1InstrumentService
-	Iris        ActiveV1IrisService
 	MarketData  ActiveV1MarketDataService
 	// Retrieve details and lists of tradable instruments.
 	News   ActiveV1NewsService
@@ -51,7 +50,6 @@ func NewActiveV1Service(opts ...option.RequestOption) (r ActiveV1Service) {
 	r.Calendars = NewActiveV1CalendarService(opts...)
 	r.Clock = NewActiveV1ClockService(opts...)
 	r.Instruments = NewActiveV1InstrumentService(opts...)
-	r.Iris = NewActiveV1IrisService(opts...)
 	r.MarketData = NewActiveV1MarketDataService(opts...)
 	r.News = NewActiveV1NewsService(opts...)
 	r.OmniAI = NewActiveV1OmniAIService(opts...)

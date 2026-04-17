@@ -19,7 +19,9 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// AI assistant for conversational trading interactions.
+// Thread-centric AI assistant for conversational trading. Create threads to start
+// conversations, poll response objects for in-progress output, and read finalized
+// messages from thread history. Every endpoint requires an explicit account_id.
 //
 // ActiveV1OmniAIThreadService contains methods and other services that help with
 // interacting with the clear-street API.
@@ -29,8 +31,14 @@ import (
 // the [NewActiveV1OmniAIThreadService] method instead.
 type ActiveV1OmniAIThreadService struct {
 	options []option.RequestOption
-	// AI assistant for conversational trading interactions.
+	// Thread-centric AI assistant for conversational trading. Create threads to start
+	// conversations, poll response objects for in-progress output, and read finalized
+	// messages from thread history. Every endpoint requires an explicit account_id.
 	Messages ActiveV1OmniAIThreadMessageService
+	// Thread-centric AI assistant for conversational trading. Create threads to start
+	// conversations, poll response objects for in-progress output, and read finalized
+	// messages from thread history. Every endpoint requires an explicit account_id.
+	Response ActiveV1OmniAIThreadResponseService
 }
 
 // NewActiveV1OmniAIThreadService generates a new service that applies the given
@@ -40,10 +48,29 @@ func NewActiveV1OmniAIThreadService(opts ...option.RequestOption) (r ActiveV1Omn
 	r = ActiveV1OmniAIThreadService{}
 	r.options = opts
 	r.Messages = NewActiveV1OmniAIThreadMessageService(opts...)
+	r.Response = NewActiveV1OmniAIThreadResponseService(opts...)
 	return
 }
 
-// Get a specific thread.
+// Atomically creates a new thread and submits the first user turn. The response
+// contains a `response_id` that should be polled via
+// `GET /omni-ai/responses/{response_id}` for assistant output.
+//
+// Two creation modes are supported:
+//
+//   - **instant** — provide `text` with a natural-language prompt.
+//   - **deep_insights** — provide a `target` ticker and optional `thesis` for
+//     long-form research.
+func (r *ActiveV1OmniAIThreadService) NewThread(ctx context.Context, body ActiveV1OmniAIThreadNewThreadParams, opts ...option.RequestOption) (res *ActiveV1OmniAIThreadNewThreadResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "active/v1/omni-ai/threads"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	return res, err
+}
+
+// Returns metadata (title, timestamps) for a single thread. Does not include
+// messages — use `GET /omni-ai/threads/{thread_id}/messages` for conversation
+// history.
 func (r *ActiveV1OmniAIThreadService) GetThread(ctx context.Context, threadID string, query ActiveV1OmniAIThreadGetThreadParams, opts ...option.RequestOption) (res *ActiveV1OmniAIThreadGetThreadResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
@@ -55,7 +82,9 @@ func (r *ActiveV1OmniAIThreadService) GetThread(ctx context.Context, threadID st
 	return res, err
 }
 
-// Retrieves threads for the authenticated user.
+// Returns thread metadata ordered by most recently created first. Use `page_size`
+// and `page_token` for pagination. Thread objects contain only metadata (title,
+// timestamps) — use the messages endpoint for conversation history.
 func (r *ActiveV1OmniAIThreadService) ListThreads(ctx context.Context, query ActiveV1OmniAIThreadListThreadsParams, opts ...option.RequestOption) (res *ActiveV1OmniAIThreadListThreadsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "active/v1/omni-ai/threads"
@@ -63,8 +92,27 @@ func (r *ActiveV1OmniAIThreadService) ListThreads(ctx context.Context, query Act
 	return res, err
 }
 
+type ActiveV1OmniAIThreadNewThreadResponse struct {
+	// Response payload for thread creation.
+	Data CreateThreadResponse `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r ActiveV1OmniAIThreadNewThreadResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1OmniAIThreadNewThreadResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ActiveV1OmniAIThreadGetThreadResponse struct {
-	Data GetThreadResponse `json:"data" api:"required"`
+	// Thread metadata returned by list/get thread endpoints.
+	Data Thread `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -81,7 +129,7 @@ func (r *ActiveV1OmniAIThreadGetThreadResponse) UnmarshalJSON(data []byte) error
 }
 
 type ActiveV1OmniAIThreadListThreadsResponse struct {
-	Data ListThreadsResponse `json:"data" api:"required"`
+	Data ThreadList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
@@ -97,9 +145,66 @@ func (r *ActiveV1OmniAIThreadListThreadsResponse) UnmarshalJSON(data []byte) err
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type ActiveV1OmniAIThreadNewThreadParams struct {
+	AccountID int64 `json:"account_id" api:"required"`
+	// Thread creation mode.
+	//
+	// Any of "instant", "deep_insights".
+	Type   ActiveV1OmniAIThreadNewThreadParamsType `json:"type,omitzero" api:"required"`
+	Text   param.Opt[string]                       `json:"text,omitzero"`
+	Thesis param.Opt[string]                       `json:"thesis,omitzero"`
+	// Deep-insights target payload.
+	Target ActiveV1OmniAIThreadNewThreadParamsTarget `json:"target,omitzero"`
+	// Any of "PREFILL_ORDER", "OPEN_CHART", "OPEN_SCREENER".
+	Capabilities []string `json:"capabilities,omitzero"`
+	paramObj
+}
+
+func (r ActiveV1OmniAIThreadNewThreadParams) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1OmniAIThreadNewThreadParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1OmniAIThreadNewThreadParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Thread creation mode.
+type ActiveV1OmniAIThreadNewThreadParamsType string
+
+const (
+	ActiveV1OmniAIThreadNewThreadParamsTypeInstant      ActiveV1OmniAIThreadNewThreadParamsType = "instant"
+	ActiveV1OmniAIThreadNewThreadParamsTypeDeepInsights ActiveV1OmniAIThreadNewThreadParamsType = "deep_insights"
+)
+
+// Deep-insights target payload.
+//
+// The properties Ticker, Type are required.
+type ActiveV1OmniAIThreadNewThreadParamsTarget struct {
+	Ticker string `json:"ticker" api:"required"`
+	// Deep-insights target type. Launch supports ticker-only.
+	//
+	// Any of "ticker".
+	Type string `json:"type,omitzero" api:"required"`
+	paramObj
+}
+
+func (r ActiveV1OmniAIThreadNewThreadParamsTarget) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1OmniAIThreadNewThreadParamsTarget
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ActiveV1OmniAIThreadNewThreadParamsTarget) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[ActiveV1OmniAIThreadNewThreadParamsTarget](
+		"type", "ticker",
+	)
+}
+
 type ActiveV1OmniAIThreadGetThreadParams struct {
 	// Account ID for the request
-	AccountID string `query:"account_id" api:"required" json:"-"`
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
 	paramObj
 }
 
@@ -114,11 +219,11 @@ func (r ActiveV1OmniAIThreadGetThreadParams) URLQuery() (v url.Values, err error
 
 type ActiveV1OmniAIThreadListThreadsParams struct {
 	// Account ID for the request
-	AccountID string `query:"account_id" api:"required" json:"-"`
-	// Maximum threads to return
-	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Page token for pagination
-	PageToken param.Opt[string] `query:"page_token,omitzero" format:"uuid" json:"-"`
+	AccountID int64            `query:"account_id" api:"required" json:"-"`
+	PageSize  param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next page of results. Contains encoded pagination state
+	// (limit + offset). When provided, page_size is ignored.
+	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	paramObj
 }
 
