@@ -76,8 +76,6 @@ type PortfolioHistorySegment struct {
 	UnrealizedPnl string `json:"unrealized_pnl" api:"required"`
 	// Amount bought MTM
 	BoughtNotional string `json:"bought_notional" api:"nullable"`
-	// Quantity bought MTM
-	BoughtQuantity string `json:"bought_quantity" api:"nullable"`
 	// Sum of the profit and loss from intraday trading activities for the trading day.
 	DayPnl string `json:"day_pnl" api:"nullable"`
 	// P&L after netting all realized and unrealized P&L, adjustments, dividends,
@@ -87,8 +85,6 @@ type PortfolioHistorySegment struct {
 	PositionPnl string `json:"position_pnl" api:"nullable"`
 	// Amount sold MTM
 	SoldNotional string `json:"sold_notional" api:"nullable"`
-	// Quantity sold MTM
-	SoldQuantity string `json:"sold_quantity" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date           respjson.Field
@@ -97,12 +93,10 @@ type PortfolioHistorySegment struct {
 		StartingEquity respjson.Field
 		UnrealizedPnl  respjson.Field
 		BoughtNotional respjson.Field
-		BoughtQuantity respjson.Field
 		DayPnl         respjson.Field
 		NetPnl         respjson.Field
 		PositionPnl    respjson.Field
 		SoldNotional   respjson.Field
-		SoldQuantity   respjson.Field
 		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
