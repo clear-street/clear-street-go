@@ -42,7 +42,7 @@ func NewActiveV1AccountPositionService(opts ...option.RequestOption) (r ActiveV1
 
 // Delete a position within an account for an instrument.
 //
-// Retrieves all positions for the specified trading account.
+// Retrieves orders generated to close the position.
 func (r *ActiveV1AccountPositionService) ClosePosition(ctx context.Context, securityID string, params ActiveV1AccountPositionClosePositionParams, opts ...option.RequestOption) (res *ActiveV1AccountPositionClosePositionResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if securityID == "" {

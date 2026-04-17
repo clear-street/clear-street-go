@@ -82,7 +82,7 @@ func (r *ActiveV1SavedScreenerService) GetScreenerByID(ctx context.Context, scre
 // List saved screener configurations.
 //
 // Returns all screener configurations for the authenticated user.
-func (r *ActiveV1SavedScreenerService) ListScreeners(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1SavedScreenerListScreenersResponse, err error) {
+func (r *ActiveV1SavedScreenerService) GetScreeners(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1SavedScreenerGetScreenersResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "active/v1/saved-screeners"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
@@ -93,7 +93,7 @@ func (r *ActiveV1SavedScreenerService) ListScreeners(ctx context.Context, opts .
 //
 // Replaces the screener configuration for the authenticated user. If `name` is
 // null, the existing name is preserved.
-func (r *ActiveV1SavedScreenerService) UpdateScreener(ctx context.Context, screenerID string, body ActiveV1SavedScreenerUpdateScreenerParams, opts ...option.RequestOption) (res *ActiveV1SavedScreenerUpdateScreenerResponse, err error) {
+func (r *ActiveV1SavedScreenerService) ReplaceScreener(ctx context.Context, screenerID string, body ActiveV1SavedScreenerReplaceScreenerParams, opts ...option.RequestOption) (res *ActiveV1SavedScreenerReplaceScreenerResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if screenerID == "" {
 		err = errors.New("missing required screener_id parameter")
@@ -235,7 +235,7 @@ func (r *ActiveV1SavedScreenerGetScreenerByIDResponse) UnmarshalJSON(data []byte
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1SavedScreenerListScreenersResponse struct {
+type ActiveV1SavedScreenerGetScreenersResponse struct {
 	Data ScreenerEntryList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -247,12 +247,12 @@ type ActiveV1SavedScreenerListScreenersResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ActiveV1SavedScreenerListScreenersResponse) RawJSON() string { return r.JSON.raw }
-func (r *ActiveV1SavedScreenerListScreenersResponse) UnmarshalJSON(data []byte) error {
+func (r ActiveV1SavedScreenerGetScreenersResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1SavedScreenerGetScreenersResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1SavedScreenerUpdateScreenerResponse struct {
+type ActiveV1SavedScreenerReplaceScreenerResponse struct {
 	// A saved screener configuration entry
 	Data ScreenerEntry `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -265,8 +265,8 @@ type ActiveV1SavedScreenerUpdateScreenerResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ActiveV1SavedScreenerUpdateScreenerResponse) RawJSON() string { return r.JSON.raw }
-func (r *ActiveV1SavedScreenerUpdateScreenerResponse) UnmarshalJSON(data []byte) error {
+func (r ActiveV1SavedScreenerReplaceScreenerResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1SavedScreenerReplaceScreenerResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -302,7 +302,7 @@ const (
 	ActiveV1SavedScreenerNewScreenerParamsSortDirectionDesc ActiveV1SavedScreenerNewScreenerParamsSortDirection = "DESC"
 )
 
-type ActiveV1SavedScreenerUpdateScreenerParams struct {
+type ActiveV1SavedScreenerReplaceScreenerParams struct {
 	// The name for this screener configuration
 	Name param.Opt[string] `json:"name,omitzero"`
 	// Field name to sort results by
@@ -314,22 +314,22 @@ type ActiveV1SavedScreenerUpdateScreenerParams struct {
 	// Sort direction for results
 	//
 	// Any of "ASC", "DESC".
-	SortDirection ActiveV1SavedScreenerUpdateScreenerParamsSortDirection `json:"sort_direction,omitzero"`
+	SortDirection ActiveV1SavedScreenerReplaceScreenerParamsSortDirection `json:"sort_direction,omitzero"`
 	paramObj
 }
 
-func (r ActiveV1SavedScreenerUpdateScreenerParams) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1SavedScreenerUpdateScreenerParams
+func (r ActiveV1SavedScreenerReplaceScreenerParams) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1SavedScreenerReplaceScreenerParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ActiveV1SavedScreenerUpdateScreenerParams) UnmarshalJSON(data []byte) error {
+func (r *ActiveV1SavedScreenerReplaceScreenerParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Sort direction for results
-type ActiveV1SavedScreenerUpdateScreenerParamsSortDirection string
+type ActiveV1SavedScreenerReplaceScreenerParamsSortDirection string
 
 const (
-	ActiveV1SavedScreenerUpdateScreenerParamsSortDirectionAsc  ActiveV1SavedScreenerUpdateScreenerParamsSortDirection = "ASC"
-	ActiveV1SavedScreenerUpdateScreenerParamsSortDirectionDesc ActiveV1SavedScreenerUpdateScreenerParamsSortDirection = "DESC"
+	ActiveV1SavedScreenerReplaceScreenerParamsSortDirectionAsc  ActiveV1SavedScreenerReplaceScreenerParamsSortDirection = "ASC"
+	ActiveV1SavedScreenerReplaceScreenerParamsSortDirectionDesc ActiveV1SavedScreenerReplaceScreenerParamsSortDirection = "DESC"
 )

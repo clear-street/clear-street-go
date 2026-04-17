@@ -92,7 +92,7 @@ func TestActiveV1SavedScreenerGetScreenerByID(t *testing.T) {
 	}
 }
 
-func TestActiveV1SavedScreenerListScreeners(t *testing.T) {
+func TestActiveV1SavedScreenerGetScreeners(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -105,7 +105,7 @@ func TestActiveV1SavedScreenerListScreeners(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.SavedScreeners.ListScreeners(context.TODO())
+	_, err := client.Active.V1.SavedScreeners.GetScreeners(context.TODO())
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {
@@ -115,7 +115,7 @@ func TestActiveV1SavedScreenerListScreeners(t *testing.T) {
 	}
 }
 
-func TestActiveV1SavedScreenerUpdateScreenerWithOptionalParams(t *testing.T) {
+func TestActiveV1SavedScreenerReplaceScreenerWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -128,10 +128,10 @@ func TestActiveV1SavedScreenerUpdateScreenerWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.SavedScreeners.UpdateScreener(
+	_, err := client.Active.V1.SavedScreeners.ReplaceScreener(
 		context.TODO(),
 		"550e8400-e29b-41d4-a716-446655440000",
-		clearstreet.ActiveV1SavedScreenerUpdateScreenerParams{
+		clearstreet.ActiveV1SavedScreenerReplaceScreenerParams{
 			FieldFilter: []string{"string"},
 			Filters: []clearstreet.SavedScreenerFilterParam{{
 				FieldName: "field_name",
@@ -140,7 +140,7 @@ func TestActiveV1SavedScreenerUpdateScreenerWithOptionalParams(t *testing.T) {
 			}},
 			Name:          clearstreet.String("name"),
 			SortBy:        clearstreet.String("sort_by"),
-			SortDirection: clearstreet.ActiveV1SavedScreenerUpdateScreenerParamsSortDirectionAsc,
+			SortDirection: clearstreet.ActiveV1SavedScreenerReplaceScreenerParamsSortDirectionAsc,
 		},
 	)
 	if err != nil {
