@@ -41,6 +41,8 @@ func NewActiveV1InstrumentEventService(opts ...option.RequestOption) (r ActiveV1
 	return
 }
 
+// List instrument events across all securities.
+//
 // Retrieves all instrument events grouped by date.
 func (r *ActiveV1InstrumentEventService) GetAllInstrumentEvents(ctx context.Context, query ActiveV1InstrumentEventGetAllInstrumentEventsParams, opts ...option.RequestOption) (res *ActiveV1InstrumentEventGetAllInstrumentEventsResponse, err error) {
 	opts = slices.Concat(r.options, opts)

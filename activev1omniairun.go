@@ -52,6 +52,8 @@ func (r *ActiveV1OmniAIRunService) CancelRun(ctx context.Context, runID string, 
 	return res, err
 }
 
+// Get run status and events.
+//
 // Poll for the current status of a run and any new events since the last poll.
 func (r *ActiveV1OmniAIRunService) GetRun(ctx context.Context, runID string, query ActiveV1OmniAIRunGetRunParams, opts ...option.RequestOption) (res *ActiveV1OmniAIRunGetRunResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -64,6 +66,8 @@ func (r *ActiveV1OmniAIRunService) GetRun(ctx context.Context, runID string, que
 	return res, err
 }
 
+// Start a new assistant run.
+//
 // Begins an agentic conversation run. If thread_id is provided, continues an
 // existing conversation; otherwise creates a new thread.
 func (r *ActiveV1OmniAIRunService) StartRun(ctx context.Context, body ActiveV1OmniAIRunStartRunParams, opts ...option.RequestOption) (res *ActiveV1OmniAIRunStartRunResponse, err error) {

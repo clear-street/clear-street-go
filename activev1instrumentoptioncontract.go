@@ -39,6 +39,8 @@ func NewActiveV1InstrumentOptionContractService(opts ...option.RequestOption) (r
 	return
 }
 
+// List options contracts.
+//
 // Returns options contracts for a given underlier with options-specific metadata.
 // Exactly one underlier identifier must be provided.
 func (r *ActiveV1InstrumentOptionContractService) GetOptionContracts(ctx context.Context, query ActiveV1InstrumentOptionContractGetOptionContractsParams, opts ...option.RequestOption) (res *ActiveV1InstrumentOptionContractGetOptionContractsResponse, err error) {

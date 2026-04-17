@@ -42,7 +42,7 @@ func NewActiveV1WatchlistService(opts ...option.RequestOption) (r ActiveV1Watchl
 	return
 }
 
-// Create a new watchlist
+// Create Watchlist
 func (r *ActiveV1WatchlistService) NewWatchlist(ctx context.Context, body ActiveV1WatchlistNewWatchlistParams, opts ...option.RequestOption) (res *ActiveV1WatchlistNewWatchlistResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "active/v1/watchlists"

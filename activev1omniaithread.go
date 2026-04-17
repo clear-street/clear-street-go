@@ -55,6 +55,8 @@ func (r *ActiveV1OmniAIThreadService) GetThread(ctx context.Context, threadID st
 	return res, err
 }
 
+// List conversation threads.
+//
 // Retrieves threads for the authenticated user.
 func (r *ActiveV1OmniAIThreadService) ListThreads(ctx context.Context, query ActiveV1OmniAIThreadListThreadsParams, opts ...option.RequestOption) (res *ActiveV1OmniAIThreadListThreadsResponse, err error) {
 	opts = slices.Concat(r.options, opts)

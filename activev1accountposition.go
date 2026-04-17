@@ -40,6 +40,8 @@ func NewActiveV1AccountPositionService(opts ...option.RequestOption) (r ActiveV1
 	return
 }
 
+// Delete a position within an account for an instrument.
+//
 // Retrieves all positions for the specified trading account.
 func (r *ActiveV1AccountPositionService) ClosePosition(ctx context.Context, securityID string, params ActiveV1AccountPositionClosePositionParams, opts ...option.RequestOption) (res *ActiveV1AccountPositionClosePositionResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -52,6 +54,8 @@ func (r *ActiveV1AccountPositionService) ClosePosition(ctx context.Context, secu
 	return res, err
 }
 
+// Delete all positions within an account.
+//
 // Closes all positions for the specified trading account.
 func (r *ActiveV1AccountPositionService) ClosePositions(ctx context.Context, accountID int64, body ActiveV1AccountPositionClosePositionsParams, opts ...option.RequestOption) (res *ActiveV1AccountPositionClosePositionsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
