@@ -14,7 +14,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestActiveV1AccountOrderCancelAllOrdersWithOptionalParams(t *testing.T) {
+func TestActiveV1AccountOrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -27,15 +27,15 @@ func TestActiveV1AccountOrderCancelAllOrdersWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Accounts.Orders.CancelAllOrders(
+	_, err := client.Active.V1.Accounts.Orders.CancelAllOpenOrders(
 		context.TODO(),
 		0,
-		clearstreet.ActiveV1AccountOrderCancelAllOrdersParams{
+		clearstreet.ActiveV1AccountOrderCancelAllOpenOrdersParams{
 			SecurityID:       []string{"string"},
 			SecurityIDSource: []string{"string"},
-			SecurityType:     clearstreet.ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeCommonStock,
-			Side:             clearstreet.ActiveV1AccountOrderCancelAllOrdersParamsSideBuy,
-			Type:             clearstreet.ActiveV1AccountOrderCancelAllOrdersParamsTypeMarket,
+			SecurityType:     clearstreet.ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeCommonStock,
+			Side:             clearstreet.ActiveV1AccountOrderCancelAllOpenOrdersParamsSideBuy,
+			Type:             clearstreet.ActiveV1AccountOrderCancelAllOpenOrdersParamsTypeMarket,
 		},
 	)
 	if err != nil {
@@ -47,7 +47,7 @@ func TestActiveV1AccountOrderCancelAllOrdersWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestActiveV1AccountOrderCancelOrder(t *testing.T) {
+func TestActiveV1AccountOrderCancelOpenOrder(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -60,10 +60,10 @@ func TestActiveV1AccountOrderCancelOrder(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Accounts.Orders.CancelOrder(
+	_, err := client.Active.V1.Accounts.Orders.CancelOpenOrder(
 		context.TODO(),
 		"order_id",
-		clearstreet.ActiveV1AccountOrderCancelOrderParams{
+		clearstreet.ActiveV1AccountOrderCancelOpenOrderParams{
 			AccountID: 0,
 		},
 	)
