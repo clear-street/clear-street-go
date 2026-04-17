@@ -36,6 +36,8 @@ func NewActiveV1OmniAIFeedbackService(opts ...option.RequestOption) (r ActiveV1O
 	return
 }
 
+// Create feedback on a message.
+//
 // Submit user feedback (thumbs up/down, rating, comment) for an assistant message.
 func (r *ActiveV1OmniAIFeedbackService) NewFeedback(ctx context.Context, body ActiveV1OmniAIFeedbackNewFeedbackParams, opts ...option.RequestOption) (res *ActiveV1OmniAIFeedbackNewFeedbackResponse, err error) {
 	opts = slices.Concat(r.options, opts)

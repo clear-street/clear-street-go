@@ -40,6 +40,8 @@ func NewActiveV1SavedScreenerService(opts ...option.RequestOption) (r ActiveV1Sa
 	return
 }
 
+// Create a saved screener configuration.
+//
 // Persists a screener configuration for the authenticated user.
 func (r *ActiveV1SavedScreenerService) NewScreener(ctx context.Context, body ActiveV1SavedScreenerNewScreenerParams, opts ...option.RequestOption) (res *ActiveV1SavedScreenerNewScreenerResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -48,6 +50,8 @@ func (r *ActiveV1SavedScreenerService) NewScreener(ctx context.Context, body Act
 	return res, err
 }
 
+// Delete a saved screener configuration.
+//
 // Deletes the screener configuration for the authenticated user.
 func (r *ActiveV1SavedScreenerService) DeleteScreener(ctx context.Context, screenerID string, opts ...option.RequestOption) (err error) {
 	opts = slices.Concat(r.options, opts)
@@ -61,6 +65,8 @@ func (r *ActiveV1SavedScreenerService) DeleteScreener(ctx context.Context, scree
 	return err
 }
 
+// Get a saved screener configuration by ID.
+//
 // Returns a single screener configuration for the authenticated user.
 func (r *ActiveV1SavedScreenerService) GetScreenerByID(ctx context.Context, screenerID string, opts ...option.RequestOption) (res *ActiveV1SavedScreenerGetScreenerByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -73,6 +79,8 @@ func (r *ActiveV1SavedScreenerService) GetScreenerByID(ctx context.Context, scre
 	return res, err
 }
 
+// List saved screener configurations.
+//
 // Returns all screener configurations for the authenticated user.
 func (r *ActiveV1SavedScreenerService) ListScreeners(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1SavedScreenerListScreenersResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -81,6 +89,8 @@ func (r *ActiveV1SavedScreenerService) ListScreeners(ctx context.Context, opts .
 	return res, err
 }
 
+// Update a saved screener configuration.
+//
 // Replaces the screener configuration for the authenticated user. If `name` is
 // null, the existing name is preserved.
 func (r *ActiveV1SavedScreenerService) UpdateScreener(ctx context.Context, screenerID string, body ActiveV1SavedScreenerUpdateScreenerParams, opts ...option.RequestOption) (res *ActiveV1SavedScreenerUpdateScreenerResponse, err error) {

@@ -43,6 +43,8 @@ func NewActiveV1AccountOrderService(opts ...option.RequestOption) (r ActiveV1Acc
 	return
 }
 
+// Cancel all orders for an account
+//
 // All filter parameters can be used independently or combined. The only constraint
 // is that `security_id` and `security_id_source` must be provided together if
 // either is specified.
@@ -65,7 +67,7 @@ func (r *ActiveV1AccountOrderService) CancelOrder(ctx context.Context, orderID s
 	return res, err
 }
 
-// Get order by ID
+// Get Order By ID
 func (r *ActiveV1AccountOrderService) GetOrderByID(ctx context.Context, orderID string, query ActiveV1AccountOrderGetOrderByIDParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderGetOrderByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if orderID == "" {
