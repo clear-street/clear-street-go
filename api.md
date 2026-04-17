@@ -407,54 +407,6 @@ Methods:
 
 - <code title="get /active/v1/instruments/venues">client.Active.V1.Instruments.Venues.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentVenueService.GetVenues">GetVenues</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentVenueGetVenuesResponse">ActiveV1InstrumentVenueGetVenuesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
-### Iris
-
-#### Feedback
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse">ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse</a>
-
-Methods:
-
-- <code title="post /active/v1/iris/feedback">client.Active.V1.Iris.Feedback.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisFeedbackService.NewFeedbackDeprecated">NewFeedbackDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisFeedbackNewFeedbackDeprecatedParams">ActiveV1IrisFeedbackNewFeedbackDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse">ActiveV1IrisFeedbackNewFeedbackDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
-#### Runs
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunCancelRunDeprecatedResponse">ActiveV1IrisRunCancelRunDeprecatedResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunGetRunDeprecatedResponse">ActiveV1IrisRunGetRunDeprecatedResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunStartRunDeprecatedResponse">ActiveV1IrisRunStartRunDeprecatedResponse</a>
-
-Methods:
-
-- <code title="delete /active/v1/iris/runs/{run_id}">client.Active.V1.Iris.Runs.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunService.CancelRunDeprecated">CancelRunDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, runID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunCancelRunDeprecatedParams">ActiveV1IrisRunCancelRunDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunCancelRunDeprecatedResponse">ActiveV1IrisRunCancelRunDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="get /active/v1/iris/runs/{run_id}">client.Active.V1.Iris.Runs.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunService.GetRunDeprecated">GetRunDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, runID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunGetRunDeprecatedParams">ActiveV1IrisRunGetRunDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunGetRunDeprecatedResponse">ActiveV1IrisRunGetRunDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="post /active/v1/iris/runs">client.Active.V1.Iris.Runs.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunService.StartRunDeprecated">StartRunDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunStartRunDeprecatedParams">ActiveV1IrisRunStartRunDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisRunStartRunDeprecatedResponse">ActiveV1IrisRunStartRunDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
-#### Threads
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadGetThreadDeprecatedResponse">ActiveV1IrisThreadGetThreadDeprecatedResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadListThreadsDeprecatedResponse">ActiveV1IrisThreadListThreadsDeprecatedResponse</a>
-
-Methods:
-
-- <code title="get /active/v1/iris/threads/{thread_id}">client.Active.V1.Iris.Threads.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadService.GetThreadDeprecated">GetThreadDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadGetThreadDeprecatedParams">ActiveV1IrisThreadGetThreadDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadGetThreadDeprecatedResponse">ActiveV1IrisThreadGetThreadDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="get /active/v1/iris/threads">client.Active.V1.Iris.Threads.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadService.ListThreadsDeprecated">ListThreadsDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadListThreadsDeprecatedParams">ActiveV1IrisThreadListThreadsDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadListThreadsDeprecatedResponse">ActiveV1IrisThreadListThreadsDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
-##### Messages
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadMessageListMessagesDeprecatedResponse">ActiveV1IrisThreadMessageListMessagesDeprecatedResponse</a>
-
-Methods:
-
-- <code title="get /active/v1/iris/threads/{thread_id}/messages">client.Active.V1.Iris.Threads.Messages.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadMessageService.ListMessagesDeprecated">ListMessagesDeprecated</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadMessageListMessagesDeprecatedParams">ActiveV1IrisThreadMessageListMessagesDeprecatedParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1IrisThreadMessageListMessagesDeprecatedResponse">ActiveV1IrisThreadMessageListMessagesDeprecatedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
 ### MarketData
 
 #### Snapshot
@@ -488,81 +440,81 @@ Methods:
 
 ### OmniAI
 
-Params Types:
-
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Capability">Capability</a>
-
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActionButton">ActionButton</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ButtonActionUnion">ButtonActionUnion</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#CancelRunResponse">CancelRunResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Capability">Capability</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ChartKindUnion">ChartKindUnion</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ChartPoint">ChartPoint</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ChartSeries">ChartSeries</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartUnion">ContentPartUnion</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartChart">ContentPartChart</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartSuggestedActions">ContentPartSuggestedActions</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartText">ContentPartText</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartThinking">ContentPartThinking</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#CancelResponsePayload">CancelResponsePayload</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartChartPayload">ContentPartChartPayload</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartCustomPayload">ContentPartCustomPayload</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartStructuredActionPayload">ContentPartStructuredActionPayload</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartSuggestedActionsPayload">ContentPartSuggestedActionsPayload</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartTextPayload">ContentPartTextPayload</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContentPartThinkingPayload">ContentPartThinkingPayload</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#CreateFeedbackResponse">CreateFeedbackResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#DataChart">DataChart</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#GetRunResponse">GetRunResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#GetThreadResponse">GetThreadResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ListMessagesResponse">ListMessagesResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ListThreadsResponse">ListThreadsResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#CreateMessageResponse">CreateMessageResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#CreateThreadResponse">CreateThreadResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ErrorStatus">ErrorStatus</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Message">Message</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#MessageContent">MessageContent</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#MessageContentPartUnion">MessageContentPartUnion</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#MessageList">MessageList</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#MessageOutcome">MessageOutcome</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#MessageRole">MessageRole</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#NavigateAction">NavigateAction</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OpenChartAction">OpenChartAction</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OpenChatWindowAction">OpenChatWindowAction</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OpenScreenerAction">OpenScreenerAction</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OrderPayload">OrderPayload</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OrderStrategyType">OrderStrategyType</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PrefillOrderAction">PrefillOrderAction</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PromptButtonAction">PromptButtonAction</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Run">Run</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#RunStatus">RunStatus</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#StartRunResponse">StartRunResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#StructuredActionButtonAction">StructuredActionButtonAction</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#SymbolChart">SymbolChart</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Response">Response</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ResponseContent">ResponseContent</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ResponseContentPartUnion">ResponseContentPartUnion</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ResponseStatus">ResponseStatus</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#StructuredActionUnion">StructuredActionUnion</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Thread">Thread</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ThreadList">ThreadList</a>
 
-#### Feedback
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIFeedbackNewFeedbackResponse">ActiveV1OmniAIFeedbackNewFeedbackResponse</a>
-
-Methods:
-
-- <code title="post /active/v1/omni-ai/feedback">client.Active.V1.OmniAI.Feedback.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIFeedbackService.NewFeedback">NewFeedback</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIFeedbackNewFeedbackParams">ActiveV1OmniAIFeedbackNewFeedbackParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIFeedbackNewFeedbackResponse">ActiveV1OmniAIFeedbackNewFeedbackResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
-#### Runs
+#### Messages
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunCancelRunResponse">ActiveV1OmniAIRunCancelRunResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunGetRunResponse">ActiveV1OmniAIRunGetRunResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunStartRunResponse">ActiveV1OmniAIRunStartRunResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIMessageGetMessageResponse">ActiveV1OmniAIMessageGetMessageResponse</a>
 
 Methods:
 
-- <code title="delete /active/v1/omni-ai/runs/{run_id}">client.Active.V1.OmniAI.Runs.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunService.CancelRun">CancelRun</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, runID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunCancelRunParams">ActiveV1OmniAIRunCancelRunParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunCancelRunResponse">ActiveV1OmniAIRunCancelRunResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="get /active/v1/omni-ai/runs/{run_id}">client.Active.V1.OmniAI.Runs.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunService.GetRun">GetRun</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, runID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunGetRunParams">ActiveV1OmniAIRunGetRunParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunGetRunResponse">ActiveV1OmniAIRunGetRunResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-- <code title="post /active/v1/omni-ai/runs">client.Active.V1.OmniAI.Runs.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunService.StartRun">StartRun</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunStartRunParams">ActiveV1OmniAIRunStartRunParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIRunStartRunResponse">ActiveV1OmniAIRunStartRunResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/omni-ai/messages/{message_id}">client.Active.V1.OmniAI.Messages.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIMessageService.GetMessage">GetMessage</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, messageID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIMessageGetMessageParams">ActiveV1OmniAIMessageGetMessageParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIMessageGetMessageResponse">ActiveV1OmniAIMessageGetMessageResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+##### Feedback
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIMessageFeedbackNewFeedbackResponse">ActiveV1OmniAIMessageFeedbackNewFeedbackResponse</a>
+
+Methods:
+
+- <code title="post /active/v1/omni-ai/messages/{message_id}/feedback">client.Active.V1.OmniAI.Messages.Feedback.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIMessageFeedbackService.NewFeedback">NewFeedback</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, messageID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIMessageFeedbackNewFeedbackParams">ActiveV1OmniAIMessageFeedbackNewFeedbackParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIMessageFeedbackNewFeedbackResponse">ActiveV1OmniAIMessageFeedbackNewFeedbackResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+#### Responses
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIResponseCancelResponseResponse">ActiveV1OmniAIResponseCancelResponseResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIResponseGetResponseResponse">ActiveV1OmniAIResponseGetResponseResponse</a>
+
+Methods:
+
+- <code title="delete /active/v1/omni-ai/responses/{response_id}">client.Active.V1.OmniAI.Responses.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIResponseService.CancelResponse">CancelResponse</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, responseID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIResponseCancelResponseParams">ActiveV1OmniAIResponseCancelResponseParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIResponseCancelResponseResponse">ActiveV1OmniAIResponseCancelResponseResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/omni-ai/responses/{response_id}">client.Active.V1.OmniAI.Responses.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIResponseService.GetResponse">GetResponse</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, responseID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIResponseGetResponseParams">ActiveV1OmniAIResponseGetResponseParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIResponseGetResponseResponse">ActiveV1OmniAIResponseGetResponseResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 #### Threads
 
 Response Types:
 
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadNewThreadResponse">ActiveV1OmniAIThreadNewThreadResponse</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadGetThreadResponse">ActiveV1OmniAIThreadGetThreadResponse</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadListThreadsResponse">ActiveV1OmniAIThreadListThreadsResponse</a>
 
 Methods:
 
+- <code title="post /active/v1/omni-ai/threads">client.Active.V1.OmniAI.Threads.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadService.NewThread">NewThread</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadNewThreadParams">ActiveV1OmniAIThreadNewThreadParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadNewThreadResponse">ActiveV1OmniAIThreadNewThreadResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /active/v1/omni-ai/threads/{thread_id}">client.Active.V1.OmniAI.Threads.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadService.GetThread">GetThread</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadGetThreadParams">ActiveV1OmniAIThreadGetThreadParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadGetThreadResponse">ActiveV1OmniAIThreadGetThreadResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /active/v1/omni-ai/threads">client.Active.V1.OmniAI.Threads.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadService.ListThreads">ListThreads</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadListThreadsParams">ActiveV1OmniAIThreadListThreadsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadListThreadsResponse">ActiveV1OmniAIThreadListThreadsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
@@ -570,11 +522,23 @@ Methods:
 
 Response Types:
 
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadMessageNewMessageResponse">ActiveV1OmniAIThreadMessageNewMessageResponse</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadMessageListMessagesResponse">ActiveV1OmniAIThreadMessageListMessagesResponse</a>
 
 Methods:
 
+- <code title="post /active/v1/omni-ai/threads/{thread_id}/messages">client.Active.V1.OmniAI.Threads.Messages.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadMessageService.NewMessage">NewMessage</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadMessageNewMessageParams">ActiveV1OmniAIThreadMessageNewMessageParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadMessageNewMessageResponse">ActiveV1OmniAIThreadMessageNewMessageResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /active/v1/omni-ai/threads/{thread_id}/messages">client.Active.V1.OmniAI.Threads.Messages.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadMessageService.ListMessages">ListMessages</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadMessageListMessagesParams">ActiveV1OmniAIThreadMessageListMessagesParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadMessageListMessagesResponse">ActiveV1OmniAIThreadMessageListMessagesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+##### Response
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadResponseGetThreadResponseResponse">ActiveV1OmniAIThreadResponseGetThreadResponseResponse</a>
+
+Methods:
+
+- <code title="get /active/v1/omni-ai/threads/{thread_id}/response">client.Active.V1.OmniAI.Threads.Response.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadResponseService.GetThreadResponse">GetThreadResponse</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadResponseGetThreadResponseParams">ActiveV1OmniAIThreadResponseGetThreadResponseParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1OmniAIThreadResponseGetThreadResponseResponse">ActiveV1OmniAIThreadResponseGetThreadResponseResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ### SavedScreeners
 
