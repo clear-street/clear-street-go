@@ -3,7 +3,7 @@ package param
 import (
 	"encoding/json"
 	"fmt"
-	shimjson "github.com/stainless-sdks/clear-street-go/internal/encoding/json"
+	shimjson "github.com/clear-street/clear-street-go/internal/encoding/json"
 	"time"
 )
 

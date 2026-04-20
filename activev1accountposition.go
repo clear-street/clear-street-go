@@ -10,13 +10,13 @@ import (
 	"net/url"
 	"slices"
 
-	"github.com/stainless-sdks/clear-street-go/internal/apijson"
-	"github.com/stainless-sdks/clear-street-go/internal/apiquery"
-	"github.com/stainless-sdks/clear-street-go/internal/requestconfig"
-	"github.com/stainless-sdks/clear-street-go/option"
-	"github.com/stainless-sdks/clear-street-go/packages/param"
-	"github.com/stainless-sdks/clear-street-go/packages/respjson"
-	"github.com/stainless-sdks/clear-street-go/shared"
+	"github.com/clear-street/clear-street-go/internal/apijson"
+	"github.com/clear-street/clear-street-go/internal/apiquery"
+	"github.com/clear-street/clear-street-go/internal/requestconfig"
+	"github.com/clear-street/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/packages/param"
+	"github.com/clear-street/clear-street-go/packages/respjson"
+	"github.com/clear-street/clear-street-go/shared"
 )
 
 // View account positions.
@@ -40,7 +40,9 @@ func NewActiveV1AccountPositionService(opts ...option.RequestOption) (r ActiveV1
 	return
 }
 
-// Retrieves all positions for the specified trading account.
+// Delete a position within an account for an instrument.
+//
+// Retrieves orders generated to close the position.
 func (r *ActiveV1AccountPositionService) ClosePosition(ctx context.Context, securityID string, params ActiveV1AccountPositionClosePositionParams, opts ...option.RequestOption) (res *ActiveV1AccountPositionClosePositionResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if securityID == "" {
@@ -52,6 +54,8 @@ func (r *ActiveV1AccountPositionService) ClosePosition(ctx context.Context, secu
 	return res, err
 }
 
+// Delete all positions within an account.
+//
 // Closes all positions for the specified trading account.
 func (r *ActiveV1AccountPositionService) ClosePositions(ctx context.Context, accountID int64, body ActiveV1AccountPositionClosePositionsParams, opts ...option.RequestOption) (res *ActiveV1AccountPositionClosePositionsResponse, err error) {
 	opts = slices.Concat(r.options, opts)

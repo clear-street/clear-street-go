@@ -11,13 +11,13 @@ import (
 	"slices"
 	"time"
 
-	"github.com/stainless-sdks/clear-street-go/internal/apijson"
-	"github.com/stainless-sdks/clear-street-go/internal/apiquery"
-	"github.com/stainless-sdks/clear-street-go/internal/requestconfig"
-	"github.com/stainless-sdks/clear-street-go/option"
-	"github.com/stainless-sdks/clear-street-go/packages/param"
-	"github.com/stainless-sdks/clear-street-go/packages/respjson"
-	"github.com/stainless-sdks/clear-street-go/shared"
+	"github.com/clear-street/clear-street-go/internal/apijson"
+	"github.com/clear-street/clear-street-go/internal/apiquery"
+	"github.com/clear-street/clear-street-go/internal/requestconfig"
+	"github.com/clear-street/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/packages/param"
+	"github.com/clear-street/clear-street-go/packages/respjson"
+	"github.com/clear-street/clear-street-go/shared"
 )
 
 // Retrieve details and lists of tradable instruments.
@@ -41,6 +41,8 @@ func NewActiveV1InstrumentEventService(opts ...option.RequestOption) (r ActiveV1
 	return
 }
 
+// List instrument events across all securities.
+//
 // Retrieves all instrument events grouped by date.
 func (r *ActiveV1InstrumentEventService) GetAllInstrumentEvents(ctx context.Context, query ActiveV1InstrumentEventGetAllInstrumentEventsParams, opts ...option.RequestOption) (res *ActiveV1InstrumentEventGetAllInstrumentEventsResponse, err error) {
 	opts = slices.Concat(r.options, opts)

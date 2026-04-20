@@ -3,7 +3,7 @@
 package clearstreet
 
 import (
-	"github.com/stainless-sdks/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/option"
 )
 
 // ActiveService contains methods and other services that help with interacting

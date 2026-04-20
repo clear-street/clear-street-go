@@ -9,13 +9,13 @@ import (
 	"slices"
 	"time"
 
-	"github.com/stainless-sdks/clear-street-go/internal/apijson"
-	"github.com/stainless-sdks/clear-street-go/internal/apiquery"
-	"github.com/stainless-sdks/clear-street-go/internal/requestconfig"
-	"github.com/stainless-sdks/clear-street-go/option"
-	"github.com/stainless-sdks/clear-street-go/packages/param"
-	"github.com/stainless-sdks/clear-street-go/packages/respjson"
-	"github.com/stainless-sdks/clear-street-go/shared"
+	"github.com/clear-street/clear-street-go/internal/apijson"
+	"github.com/clear-street/clear-street-go/internal/apiquery"
+	"github.com/clear-street/clear-street-go/internal/requestconfig"
+	"github.com/clear-street/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/packages/param"
+	"github.com/clear-street/clear-street-go/packages/respjson"
+	"github.com/clear-street/clear-street-go/shared"
 )
 
 // Retrieve details and lists of tradable instruments.
@@ -181,6 +181,12 @@ type ActiveV1NewsGetNewsParams struct {
 	//
 	// Any of "NEWS", "PRESS_RELEASE".
 	NewsType ActiveV1NewsGetNewsParamsNewsType `query:"news_type,omitzero" json:"-"`
+	// Comma-separated sector values to filter by.
+	//
+	// Any of "BASIC_MATERIALS", "COMMUNICATION_SERVICES", "CONSUMER_CYCLICAL",
+	// "CONSUMER_DEFENSIVE", "ENERGY", "FINANCIAL_SERVICES", "HEALTHCARE",
+	// "INDUSTRIALS", "REAL_ESTATE", "TECHNOLOGY", "UTILITIES".
+	Sectors []string `query:"sectors,omitzero" json:"-"`
 	// Filter by security ID(s). Accepts single value or indexed array.
 	//
 	// Examples:

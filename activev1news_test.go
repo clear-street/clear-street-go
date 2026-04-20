@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stainless-sdks/clear-street-go"
-	"github.com/stainless-sdks/clear-street-go/internal/testutil"
-	"github.com/stainless-sdks/clear-street-go/option"
+	"github.com/clear-street/clear-street-go"
+	"github.com/clear-street/clear-street-go/internal/testutil"
+	"github.com/clear-street/clear-street-go/option"
 )
 
 func TestActiveV1NewsGetNewsWithOptionalParams(t *testing.T) {
@@ -35,6 +35,7 @@ func TestActiveV1NewsGetNewsWithOptionalParams(t *testing.T) {
 		PageSize:          clearstreet.Int(1),
 		PageToken:         clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 		SearchQuery:       clearstreet.String("search_query"),
+		Sectors:           []string{"BASIC_MATERIALS"},
 		SecurityID:        []string{"string"},
 		SecurityIDSource:  []string{"string"},
 		To:                clearstreet.String("to"),

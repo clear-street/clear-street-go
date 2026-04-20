@@ -1,7 +1,7 @@
 package apijson
 
 import (
-	"github.com/stainless-sdks/clear-street-go/packages/respjson"
+	"github.com/clear-street/clear-street-go/packages/respjson"
 	"reflect"
 )
 

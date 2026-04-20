@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	shimjson "github.com/stainless-sdks/clear-street-go/internal/encoding/json"
+	shimjson "github.com/clear-street/clear-street-go/internal/encoding/json"
 
 	"github.com/tidwall/sjson"
 )

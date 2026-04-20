@@ -7,7 +7,7 @@ package apijson
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/stainless-sdks/clear-street-go/packages/param"
+	"github.com/clear-street/clear-street-go/packages/param"
 	"reflect"
 	"strconv"
 	"sync"

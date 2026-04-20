@@ -18,10 +18,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/stainless-sdks/clear-street-go/internal"
-	"github.com/stainless-sdks/clear-street-go/internal/apierror"
-	"github.com/stainless-sdks/clear-street-go/internal/apiform"
-	"github.com/stainless-sdks/clear-street-go/internal/apiquery"
+	"github.com/clear-street/clear-street-go/internal"
+	"github.com/clear-street/clear-street-go/internal/apierror"
+	"github.com/clear-street/clear-street-go/internal/apiform"
+	"github.com/clear-street/clear-street-go/internal/apiquery"
 )
 
 func getDefaultHeaders() map[string]string {
@@ -121,7 +121,13 @@ func NewRequestConfig(ctx context.Context, method string, u string, body any, ds
 		}
 		params := q.Encode()
 		if params != "" {
-			u = u + "?" + params
+			parsed, _ := url.Parse(u)
+			if parsed.RawQuery != "" {
+				parsed.RawQuery = parsed.RawQuery + "&" + params
+				u = parsed.String()
+			} else {
+				u = u + "?" + params
+			}
 		}
 	}
 	if body, ok := body.([]byte); ok {

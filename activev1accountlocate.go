@@ -4,21 +4,20 @@ package clearstreet
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"slices"
 	"time"
 
-	"github.com/stainless-sdks/clear-street-go/internal/apijson"
-	"github.com/stainless-sdks/clear-street-go/internal/apiquery"
-	shimjson "github.com/stainless-sdks/clear-street-go/internal/encoding/json"
-	"github.com/stainless-sdks/clear-street-go/internal/requestconfig"
-	"github.com/stainless-sdks/clear-street-go/option"
-	"github.com/stainless-sdks/clear-street-go/packages/param"
-	"github.com/stainless-sdks/clear-street-go/packages/respjson"
-	"github.com/stainless-sdks/clear-street-go/shared"
+	"github.com/clear-street/clear-street-go/internal/apijson"
+	"github.com/clear-street/clear-street-go/internal/apiquery"
+	shimjson "github.com/clear-street/clear-street-go/internal/encoding/json"
+	"github.com/clear-street/clear-street-go/internal/requestconfig"
+	"github.com/clear-street/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/packages/param"
+	"github.com/clear-street/clear-street-go/packages/respjson"
+	"github.com/clear-street/clear-street-go/shared"
 )
 
 // Manage locate requests for short selling.
@@ -209,7 +208,7 @@ func (r ActiveV1AccountLocateNewLocateRequestParams) MarshalJSON() (data []byte,
 	return shimjson.Marshal(r.Body)
 }
 func (r *ActiveV1AccountLocateNewLocateRequestParams) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &r.Body)
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Request to create a new locate order

@@ -12,14 +12,14 @@ import (
 	"slices"
 	"time"
 
-	"github.com/stainless-sdks/clear-street-go/internal/apijson"
-	"github.com/stainless-sdks/clear-street-go/internal/apiquery"
-	shimjson "github.com/stainless-sdks/clear-street-go/internal/encoding/json"
-	"github.com/stainless-sdks/clear-street-go/internal/requestconfig"
-	"github.com/stainless-sdks/clear-street-go/option"
-	"github.com/stainless-sdks/clear-street-go/packages/param"
-	"github.com/stainless-sdks/clear-street-go/packages/respjson"
-	"github.com/stainless-sdks/clear-street-go/shared"
+	"github.com/clear-street/clear-street-go/internal/apijson"
+	"github.com/clear-street/clear-street-go/internal/apiquery"
+	shimjson "github.com/clear-street/clear-street-go/internal/encoding/json"
+	"github.com/clear-street/clear-street-go/internal/requestconfig"
+	"github.com/clear-street/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/packages/param"
+	"github.com/clear-street/clear-street-go/packages/respjson"
+	"github.com/clear-street/clear-street-go/shared"
 )
 
 // Place, monitor, and manage trading orders.
@@ -43,10 +43,12 @@ func NewActiveV1AccountOrderService(opts ...option.RequestOption) (r ActiveV1Acc
 	return
 }
 
+// Cancel all orders for an account
+//
 // All filter parameters can be used independently or combined. The only constraint
 // is that `security_id` and `security_id_source` must be provided together if
 // either is specified.
-func (r *ActiveV1AccountOrderService) CancelAllOrders(ctx context.Context, accountID int64, body ActiveV1AccountOrderCancelAllOrdersParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderCancelAllOrdersResponse, err error) {
+func (r *ActiveV1AccountOrderService) CancelAllOpenOrders(ctx context.Context, accountID int64, body ActiveV1AccountOrderCancelAllOpenOrdersParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderCancelAllOpenOrdersResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("active/v1/accounts/%v/orders", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
@@ -54,7 +56,7 @@ func (r *ActiveV1AccountOrderService) CancelAllOrders(ctx context.Context, accou
 }
 
 // Cancel a specific order
-func (r *ActiveV1AccountOrderService) CancelOrder(ctx context.Context, orderID string, body ActiveV1AccountOrderCancelOrderParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderCancelOrderResponse, err error) {
+func (r *ActiveV1AccountOrderService) CancelOpenOrder(ctx context.Context, orderID string, body ActiveV1AccountOrderCancelOpenOrderParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderCancelOpenOrderResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if orderID == "" {
 		err = errors.New("missing required order_id parameter")
@@ -65,7 +67,7 @@ func (r *ActiveV1AccountOrderService) CancelOrder(ctx context.Context, orderID s
 	return res, err
 }
 
-// Get order by ID
+// Get Order By ID
 func (r *ActiveV1AccountOrderService) GetOrderByID(ctx context.Context, orderID string, query ActiveV1AccountOrderGetOrderByIDParams, opts ...option.RequestOption) (res *ActiveV1AccountOrderGetOrderByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if orderID == "" {
@@ -454,9 +456,14 @@ const (
 //
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type OrderStrategyUnion struct {
-	EndAt   time.Time `json:"end_at"`
+	// This field is from variant [OrderStrategySor], [OrderStrategyVwap],
+	// [OrderStrategyTwap], [OrderStrategyAp], [OrderStrategyPov], [OrderStrategyDark].
+	EndAt time.Time `json:"end_at"`
+	// This field is from variant [OrderStrategySor], [OrderStrategyVwap],
+	// [OrderStrategyTwap], [OrderStrategyAp], [OrderStrategyPov], [OrderStrategyDark].
 	StartAt time.Time `json:"start_at"`
-	// This field is from variant [OrderStrategySor].
+	// This field is from variant [OrderStrategySor], [OrderStrategyVwap],
+	// [OrderStrategyTwap], [OrderStrategyAp], [OrderStrategyPov], [OrderStrategyDark].
 	Urgency Urgency `json:"urgency"`
 	Type    string  `json:"type"`
 	// This field is from variant [OrderStrategyVwap].
@@ -541,7 +548,7 @@ type OrderStrategySor struct {
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
-	SorStrategy
+	BaseStrategyParamsResp
 }
 
 // Returns the unmodified JSON received from the API
@@ -738,7 +745,7 @@ func (u *OrderStrategyUnionParam) UnmarshalJSON(data []byte) error {
 // Smart Order Router (default) - routes to best available venue
 type OrderStrategySorParam struct {
 	Type string `json:"type,omitzero" api:"required"`
-	SorStrategyParam
+	BaseStrategyParams
 }
 
 func (r OrderStrategySorParam) MarshalJSON() (data []byte, err error) {
@@ -899,62 +906,6 @@ const (
 	SideOther     Side = "OTHER"
 )
 
-// Base parameters common to most algorithmic strategies
-type SorStrategy struct {
-	// UTC timestamp to end execution (defaults to market close)
-	EndAt time.Time `json:"end_at" api:"nullable" format:"date-time"`
-	// UTC timestamp to start execution (defaults to order placement time)
-	StartAt time.Time `json:"start_at" api:"nullable" format:"date-time"`
-	// Urgency level for execution aggressiveness
-	//
-	// Any of "SUPER_PASSIVE", "PASSIVE", "MODERATE", "AGGRESSIVE", "SUPER_AGGRESSIVE".
-	Urgency Urgency `json:"urgency"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		EndAt       respjson.Field
-		StartAt     respjson.Field
-		Urgency     respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SorStrategy) RawJSON() string { return r.JSON.raw }
-func (r *SorStrategy) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// ToParam converts this SorStrategy to a SorStrategyParam.
-//
-// Warning: the fields of the param type will not be present. ToParam should only
-// be used at the last possible moment before sending a request. Test for this with
-// SorStrategyParam.Overrides()
-func (r SorStrategy) ToParam() SorStrategyParam {
-	return param.Override[SorStrategyParam](json.RawMessage(r.RawJSON()))
-}
-
-// Base parameters common to most algorithmic strategies
-type SorStrategyParam struct {
-	// UTC timestamp to end execution (defaults to market close)
-	EndAt param.Opt[time.Time] `json:"end_at,omitzero" format:"date-time"`
-	// UTC timestamp to start execution (defaults to order placement time)
-	StartAt param.Opt[time.Time] `json:"start_at,omitzero" format:"date-time"`
-	// Urgency level for execution aggressiveness
-	//
-	// Any of "SUPER_PASSIVE", "PASSIVE", "MODERATE", "AGGRESSIVE", "SUPER_AGGRESSIVE".
-	Urgency Urgency `json:"urgency,omitzero"`
-	paramObj
-}
-
-func (r SorStrategyParam) MarshalJSON() (data []byte, err error) {
-	type shadow SorStrategyParam
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *SorStrategyParam) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 // Time in force
 type TimeInForce string
 
@@ -1087,7 +1038,7 @@ func (r VwapStrategyParam) MarshalJSON() (data []byte, err error) {
 	return param.MarshalObject(r, shadow{&r, false})
 }
 
-type ActiveV1AccountOrderCancelAllOrdersResponse struct {
+type ActiveV1AccountOrderCancelAllOpenOrdersResponse struct {
 	Data OrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -1099,12 +1050,12 @@ type ActiveV1AccountOrderCancelAllOrdersResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ActiveV1AccountOrderCancelAllOrdersResponse) RawJSON() string { return r.JSON.raw }
-func (r *ActiveV1AccountOrderCancelAllOrdersResponse) UnmarshalJSON(data []byte) error {
+func (r ActiveV1AccountOrderCancelAllOpenOrdersResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1AccountOrderCancelAllOpenOrdersResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1AccountOrderCancelOrderResponse struct {
+type ActiveV1AccountOrderCancelOpenOrderResponse struct {
 	// A trading order with its current state and execution details.
 	//
 	// This is the unified API representation of an order across its lifecycle,
@@ -1121,8 +1072,8 @@ type ActiveV1AccountOrderCancelOrderResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ActiveV1AccountOrderCancelOrderResponse) RawJSON() string { return r.JSON.raw }
-func (r *ActiveV1AccountOrderCancelOrderResponse) UnmarshalJSON(data []byte) error {
+func (r ActiveV1AccountOrderCancelOpenOrderResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1AccountOrderCancelOpenOrderResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -1204,7 +1155,7 @@ func (r *ActiveV1AccountOrderSubmitOrdersResponse) UnmarshalJSON(data []byte) er
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type ActiveV1AccountOrderCancelAllOrdersParams struct {
+type ActiveV1AccountOrderCancelAllOpenOrdersParams struct {
 	// Filter by security ID(s). Accepts single value or indexed array.
 	//
 	// Examples:
@@ -1224,22 +1175,22 @@ type ActiveV1AccountOrderCancelAllOrdersParams struct {
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
-	SecurityType ActiveV1AccountOrderCancelAllOrdersParamsSecurityType `query:"security_type,omitzero" json:"-"`
+	SecurityType ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType `query:"security_type,omitzero" json:"-"`
 	// Filter by order side (BUY or SELL)
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side ActiveV1AccountOrderCancelAllOrdersParamsSide `query:"side,omitzero" json:"-"`
+	Side ActiveV1AccountOrderCancelAllOpenOrdersParamsSide `query:"side,omitzero" json:"-"`
 	// Filter by order type (e.g., MARKET, LIMIT)
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
 	// "TRAILING_STOP_LIMIT", "OTHER".
-	Type ActiveV1AccountOrderCancelAllOrdersParamsType `query:"type,omitzero" json:"-"`
+	Type ActiveV1AccountOrderCancelAllOpenOrdersParamsType `query:"type,omitzero" json:"-"`
 	paramObj
 }
 
-// URLQuery serializes [ActiveV1AccountOrderCancelAllOrdersParams]'s query
+// URLQuery serializes [ActiveV1AccountOrderCancelAllOpenOrdersParams]'s query
 // parameters as `url.Values`.
-func (r ActiveV1AccountOrderCancelAllOrdersParams) URLQuery() (v url.Values, err error) {
+func (r ActiveV1AccountOrderCancelAllOpenOrdersParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -1247,43 +1198,43 @@ func (r ActiveV1AccountOrderCancelAllOrdersParams) URLQuery() (v url.Values, err
 }
 
 // Filter by security type (e.g., COMMON_STOCK, OPTION)
-type ActiveV1AccountOrderCancelAllOrdersParamsSecurityType string
+type ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType string
 
 const (
-	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeCommonStock    ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "COMMON_STOCK"
-	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypePreferredStock ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "PREFERRED_STOCK"
-	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeCorporateBond  ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "CORPORATE_BOND"
-	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeOption         ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "OPTION"
-	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeFuture         ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "FUTURE"
-	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeWarrant        ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "WARRANT"
-	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeCash           ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "CASH"
-	ActiveV1AccountOrderCancelAllOrdersParamsSecurityTypeOther          ActiveV1AccountOrderCancelAllOrdersParamsSecurityType = "OTHER"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeCommonStock    ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "COMMON_STOCK"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypePreferredStock ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "PREFERRED_STOCK"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeCorporateBond  ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "CORPORATE_BOND"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeOption         ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "OPTION"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeFuture         ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "FUTURE"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeWarrant        ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "WARRANT"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeCash           ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "CASH"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeOther          ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "OTHER"
 )
 
 // Filter by order side (BUY or SELL)
-type ActiveV1AccountOrderCancelAllOrdersParamsSide string
+type ActiveV1AccountOrderCancelAllOpenOrdersParamsSide string
 
 const (
-	ActiveV1AccountOrderCancelAllOrdersParamsSideBuy       ActiveV1AccountOrderCancelAllOrdersParamsSide = "BUY"
-	ActiveV1AccountOrderCancelAllOrdersParamsSideSell      ActiveV1AccountOrderCancelAllOrdersParamsSide = "SELL"
-	ActiveV1AccountOrderCancelAllOrdersParamsSideSellShort ActiveV1AccountOrderCancelAllOrdersParamsSide = "SELL_SHORT"
-	ActiveV1AccountOrderCancelAllOrdersParamsSideOther     ActiveV1AccountOrderCancelAllOrdersParamsSide = "OTHER"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSideBuy       ActiveV1AccountOrderCancelAllOpenOrdersParamsSide = "BUY"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSideSell      ActiveV1AccountOrderCancelAllOpenOrdersParamsSide = "SELL"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSideSellShort ActiveV1AccountOrderCancelAllOpenOrdersParamsSide = "SELL_SHORT"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsSideOther     ActiveV1AccountOrderCancelAllOpenOrdersParamsSide = "OTHER"
 )
 
 // Filter by order type (e.g., MARKET, LIMIT)
-type ActiveV1AccountOrderCancelAllOrdersParamsType string
+type ActiveV1AccountOrderCancelAllOpenOrdersParamsType string
 
 const (
-	ActiveV1AccountOrderCancelAllOrdersParamsTypeMarket            ActiveV1AccountOrderCancelAllOrdersParamsType = "MARKET"
-	ActiveV1AccountOrderCancelAllOrdersParamsTypeLimit             ActiveV1AccountOrderCancelAllOrdersParamsType = "LIMIT"
-	ActiveV1AccountOrderCancelAllOrdersParamsTypeStop              ActiveV1AccountOrderCancelAllOrdersParamsType = "STOP"
-	ActiveV1AccountOrderCancelAllOrdersParamsTypeStopLimit         ActiveV1AccountOrderCancelAllOrdersParamsType = "STOP_LIMIT"
-	ActiveV1AccountOrderCancelAllOrdersParamsTypeTrailingStop      ActiveV1AccountOrderCancelAllOrdersParamsType = "TRAILING_STOP"
-	ActiveV1AccountOrderCancelAllOrdersParamsTypeTrailingStopLimit ActiveV1AccountOrderCancelAllOrdersParamsType = "TRAILING_STOP_LIMIT"
-	ActiveV1AccountOrderCancelAllOrdersParamsTypeOther             ActiveV1AccountOrderCancelAllOrdersParamsType = "OTHER"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsTypeMarket            ActiveV1AccountOrderCancelAllOpenOrdersParamsType = "MARKET"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsTypeLimit             ActiveV1AccountOrderCancelAllOpenOrdersParamsType = "LIMIT"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsTypeStop              ActiveV1AccountOrderCancelAllOpenOrdersParamsType = "STOP"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsTypeStopLimit         ActiveV1AccountOrderCancelAllOpenOrdersParamsType = "STOP_LIMIT"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsTypeTrailingStop      ActiveV1AccountOrderCancelAllOpenOrdersParamsType = "TRAILING_STOP"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsTypeTrailingStopLimit ActiveV1AccountOrderCancelAllOpenOrdersParamsType = "TRAILING_STOP_LIMIT"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsTypeOther             ActiveV1AccountOrderCancelAllOpenOrdersParamsType = "OTHER"
 )
 
-type ActiveV1AccountOrderCancelOrderParams struct {
+type ActiveV1AccountOrderCancelOpenOrderParams struct {
 	AccountID int64 `path:"account_id" api:"required" json:"-"`
 	paramObj
 }
@@ -1390,7 +1341,7 @@ func (r ActiveV1AccountOrderSubmitOrdersParams) MarshalJSON() (data []byte, err 
 	return shimjson.Marshal(r.Body)
 }
 func (r *ActiveV1AccountOrderSubmitOrdersParams) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &r.Body)
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Only one field can be non-zero.

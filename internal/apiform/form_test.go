@@ -2,7 +2,7 @@ package apiform
 
 import (
 	"bytes"
-	"github.com/stainless-sdks/clear-street-go/packages/param"
+	"github.com/clear-street/clear-street-go/packages/param"
 	"io"
 	"mime/multipart"
 	"strings"
@@ -121,6 +121,11 @@ type StructUnion struct {
 	OfA      UnionStructA         `form:",omitzero,inline"`
 	OfB      UnionStructB         `form:",omitzero,inline"`
 	param.APIUnion
+}
+
+type ConstantStruct struct {
+	Anchor  string `form:"anchor" default:"created_at"`
+	Seconds int    `form:"seconds"`
 }
 
 type MultipartMarshalerParent struct {
@@ -552,6 +557,37 @@ Content-Disposition: form-data; name="union"
 `,
 		UnionStruct{
 			Union: UnionTime(time.Date(2010, 05, 23, 0, 0, 0, 0, time.UTC)),
+		},
+	},
+	"constant_zero_value": {
+		`--xxx
+Content-Disposition: form-data; name="anchor"
+
+created_at
+--xxx
+Content-Disposition: form-data; name="seconds"
+
+3600
+--xxx--
+`,
+		ConstantStruct{
+			Seconds: 3600,
+		},
+	},
+	"constant_explicit_value": {
+		`--xxx
+Content-Disposition: form-data; name="anchor"
+
+created_at_override
+--xxx
+Content-Disposition: form-data; name="seconds"
+
+3600
+--xxx--
+`,
+		ConstantStruct{
+			Anchor:  "created_at_override",
+			Seconds: 3600,
 		},
 	},
 	"deeply-nested-struct,brackets": {
