@@ -20,7 +20,9 @@ import (
 
 // Thread-centric AI assistant for conversational trading. Create threads to start
 // conversations, poll response objects for in-progress output, and read finalized
-// messages from thread history. Every endpoint requires an explicit account_id.
+// messages from thread history. Thread/message/response endpoints require an
+// explicit account_id. Entitlement endpoints are caller-scoped and use
+// trading_account_ids.
 //
 // ActiveV1OmniAIResponseService contains methods and other services that help with
 // interacting with the clear-street API.
