@@ -21,7 +21,9 @@ import (
 
 // Thread-centric AI assistant for conversational trading. Create threads to start
 // conversations, poll response objects for in-progress output, and read finalized
-// messages from thread history. Every endpoint requires an explicit account_id.
+// messages from thread history. Thread/message/response endpoints require an
+// explicit account_id. Entitlement endpoints are caller-scoped and use
+// trading_account_ids.
 //
 // ActiveV1OmniAIThreadMessageService contains methods and other services that help
 // with interacting with the clear-street API.
@@ -119,7 +121,8 @@ func (r *ActiveV1OmniAIThreadMessageListMessagesResponse) UnmarshalJSON(data []b
 type ActiveV1OmniAIThreadMessageNewMessageParams struct {
 	AccountID int64  `json:"account_id" api:"required"`
 	Text      string `json:"text" api:"required"`
-	// Any of "PREFILL_ORDER", "OPEN_CHART", "OPEN_SCREENER".
+	// Any of "PREFILL_ORDER", "OPEN_CHART", "OPEN_SCREENER",
+	// "OPEN_ENTITLEMENT_CONSENT".
 	Capabilities []string `json:"capabilities,omitzero"`
 	paramObj
 }

@@ -20,15 +20,33 @@ type ActiveV1OmniAIService struct {
 	options []option.RequestOption
 	// Thread-centric AI assistant for conversational trading. Create threads to start
 	// conversations, poll response objects for in-progress output, and read finalized
-	// messages from thread history. Every endpoint requires an explicit account_id.
+	// messages from thread history. Thread/message/response endpoints require an
+	// explicit account_id. Entitlement endpoints are caller-scoped and use
+	// trading_account_ids.
+	EntitlementAgreements ActiveV1OmniAIEntitlementAgreementService
+	// Thread-centric AI assistant for conversational trading. Create threads to start
+	// conversations, poll response objects for in-progress output, and read finalized
+	// messages from thread history. Thread/message/response endpoints require an
+	// explicit account_id. Entitlement endpoints are caller-scoped and use
+	// trading_account_ids.
+	Entitlements ActiveV1OmniAIEntitlementService
+	// Thread-centric AI assistant for conversational trading. Create threads to start
+	// conversations, poll response objects for in-progress output, and read finalized
+	// messages from thread history. Thread/message/response endpoints require an
+	// explicit account_id. Entitlement endpoints are caller-scoped and use
+	// trading_account_ids.
 	Messages ActiveV1OmniAIMessageService
 	// Thread-centric AI assistant for conversational trading. Create threads to start
 	// conversations, poll response objects for in-progress output, and read finalized
-	// messages from thread history. Every endpoint requires an explicit account_id.
+	// messages from thread history. Thread/message/response endpoints require an
+	// explicit account_id. Entitlement endpoints are caller-scoped and use
+	// trading_account_ids.
 	Responses ActiveV1OmniAIResponseService
 	// Thread-centric AI assistant for conversational trading. Create threads to start
 	// conversations, poll response objects for in-progress output, and read finalized
-	// messages from thread history. Every endpoint requires an explicit account_id.
+	// messages from thread history. Thread/message/response endpoints require an
+	// explicit account_id. Entitlement endpoints are caller-scoped and use
+	// trading_account_ids.
 	Threads ActiveV1OmniAIThreadService
 }
 
@@ -38,10 +56,39 @@ type ActiveV1OmniAIService struct {
 func NewActiveV1OmniAIService(opts ...option.RequestOption) (r ActiveV1OmniAIService) {
 	r = ActiveV1OmniAIService{}
 	r.options = opts
+	r.EntitlementAgreements = NewActiveV1OmniAIEntitlementAgreementService(opts...)
+	r.Entitlements = NewActiveV1OmniAIEntitlementService(opts...)
 	r.Messages = NewActiveV1OmniAIMessageService(opts...)
 	r.Responses = NewActiveV1OmniAIResponseService(opts...)
 	r.Threads = NewActiveV1OmniAIThreadService(opts...)
 	return
+}
+
+// Button metadata shared by chart and suggested-actions payloads.
+type ActionButton struct {
+	// Stable button identifier within the content part.
+	ButtonID string `json:"buttonId" api:"required"`
+	// User-visible label.
+	Label string `json:"label" api:"required"`
+	// Follow-up prompt to submit as the next user message.
+	Prompt PromptButtonAction `json:"prompt" api:"nullable"`
+	// Structured action in the same message to execute on click.
+	StructuredAction StructuredActionButtonAction `json:"structuredAction" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ButtonID         respjson.Field
+		Label            respjson.Field
+		Prompt           respjson.Field
+		StructuredAction respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ActionButton) RawJSON() string { return r.JSON.raw }
+func (r *ActionButton) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type CancelResponsePayload struct {
@@ -60,9 +107,75 @@ func (r *CancelResponsePayload) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Typed chart payload rendered inline in assistant content.
+type ChartPayload struct {
+	// Stable chart identifier scoped to the content part.
+	ChartID string `json:"chartId" api:"required"`
+	// Buttons associated with this chart.
+	ActionButtons []ActionButton `json:"actionButtons"`
+	// Explicit series-driven chart definition.
+	DataChart DataChart `json:"dataChart" api:"nullable"`
+	// Symbol-driven chart definition.
+	SymbolChart SymbolChart `json:"symbolChart" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ChartID       respjson.Field
+		ActionButtons respjson.Field
+		DataChart     respjson.Field
+		SymbolChart   respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ChartPayload) RawJSON() string { return r.JSON.raw }
+func (r *ChartPayload) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Single chart coordinate.
+type ChartPoint struct {
+	X string  `json:"x" api:"required"`
+	Y float64 `json:"y" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		X           respjson.Field
+		Y           respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ChartPoint) RawJSON() string { return r.JSON.raw }
+func (r *ChartPoint) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Named data series within a chart.
+type ChartSeries struct {
+	Name   string       `json:"name" api:"required"`
+	Points []ChartPoint `json:"points"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Points      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ChartSeries) RawJSON() string { return r.JSON.raw }
+func (r *ChartSeries) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // Chart payload content part.
 type ContentPartChartPayload struct {
-	Payload any `json:"payload" api:"required"`
+	// Typed chart payload rendered inline in assistant content.
+	Payload ChartPayload `json:"payload" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Payload     respjson.Field
@@ -119,7 +232,8 @@ func (r *ContentPartStructuredActionPayload) UnmarshalJSON(data []byte) error {
 
 // Suggested actions payload content part.
 type ContentPartSuggestedActionsPayload struct {
-	Payload any `json:"payload" api:"required"`
+	// Suggested follow-up buttons rendered at the end of an assistant message.
+	Payload SuggestedActionsPayload `json:"payload" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Payload     respjson.Field
@@ -228,6 +342,23 @@ func (r *CreateThreadResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Chart represented by explicit data series.
+type DataChart struct {
+	Series []ChartSeries `json:"series"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Series      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r DataChart) RawJSON() string { return r.JSON.raw }
+func (r *DataChart) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // Shared sanitized error payload.
 type ErrorStatus struct {
 	Code    string `json:"code" api:"required"`
@@ -319,8 +450,9 @@ type MessageContentPartUnion struct {
 	Action StructuredActionUnion `json:"action"`
 	// This field is from variant [MessageContentPartObject2].
 	ActionID string `json:"action_id"`
-	Payload  any    `json:"payload"`
-	JSON     struct {
+	// This field is a union of [ChartPayload], [SuggestedActionsPayload], [any]
+	Payload MessageContentPartUnionPayload `json:"payload"`
+	JSON    struct {
 		Text     respjson.Field
 		Type     respjson.Field
 		Action   respjson.Field
@@ -359,6 +491,39 @@ func (u MessageContentPartUnion) AsMessageContentPartObject5() (v MessageContent
 func (u MessageContentPartUnion) RawJSON() string { return u.JSON.raw }
 
 func (r *MessageContentPartUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// MessageContentPartUnionPayload is an implicit subunion of
+// [MessageContentPartUnion]. MessageContentPartUnionPayload provides convenient
+// access to the sub-properties of the union.
+//
+// For type safety it is recommended to directly use a variant of the
+// [MessageContentPartUnion].
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfContentPartCustomPayloadPayload]
+type MessageContentPartUnionPayload struct {
+	// This field will be present if the value is a [any] instead of an object.
+	OfContentPartCustomPayloadPayload any `json:",inline"`
+	// This field is from variant [ChartPayload].
+	ChartID       string         `json:"chartId"`
+	ActionButtons []ActionButton `json:"actionButtons"`
+	// This field is from variant [ChartPayload].
+	DataChart DataChart `json:"dataChart"`
+	// This field is from variant [ChartPayload].
+	SymbolChart SymbolChart `json:"symbolChart"`
+	JSON        struct {
+		OfContentPartCustomPayloadPayload respjson.Field
+		ChartID                           respjson.Field
+		ActionButtons                     respjson.Field
+		DataChart                         respjson.Field
+		SymbolChart                       respjson.Field
+		raw                               string
+	} `json:"-"`
+}
+
+func (r *MessageContentPartUnionPayload) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -500,6 +665,29 @@ func (r *OpenChartAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Action to open entitlement consent flow for one or more accounts.
+type OpenEntitlementConsentAction struct {
+	AgreementKey              string   `json:"agreement_key" api:"required"`
+	Reason                    string   `json:"reason" api:"required"`
+	RequestedEntitlementCodes []string `json:"requested_entitlement_codes" api:"required"`
+	TradingAccountIDs         []int64  `json:"trading_account_ids" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AgreementKey              respjson.Field
+		Reason                    respjson.Field
+		RequestedEntitlementCodes respjson.Field
+		TradingAccountIDs         respjson.Field
+		ExtraFields               map[string]respjson.Field
+		raw                       string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OpenEntitlementConsentAction) RawJSON() string { return r.JSON.raw }
+func (r *OpenEntitlementConsentAction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // Action to open a stock screener with filters.
 type OpenScreenerAction struct {
 	// Filter criteria for the screener
@@ -630,6 +818,24 @@ func (r *PrefillOrderAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Prompt-style button behavior.
+type PromptButtonAction struct {
+	// Prompt text to submit as the next user turn.
+	Prompt string `json:"prompt" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Prompt      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PromptButtonAction) RawJSON() string { return r.JSON.raw }
+func (r *PromptButtonAction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // Dynamic pollable response.
 type Response struct {
 	ID string `json:"id" api:"required" format:"uuid"`
@@ -697,8 +903,9 @@ type ResponseContentPartUnion struct {
 	Action StructuredActionUnion `json:"action"`
 	// This field is from variant [ResponseContentPartObject3].
 	ActionID string `json:"action_id"`
-	Payload  any    `json:"payload"`
-	JSON     struct {
+	// This field is a union of [ChartPayload], [SuggestedActionsPayload], [any]
+	Payload ResponseContentPartUnionPayload `json:"payload"`
+	JSON    struct {
 		Text     respjson.Field
 		Type     respjson.Field
 		Thoughts respjson.Field
@@ -743,6 +950,39 @@ func (u ResponseContentPartUnion) AsResponseContentPartObject6() (v ResponseCont
 func (u ResponseContentPartUnion) RawJSON() string { return u.JSON.raw }
 
 func (r *ResponseContentPartUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ResponseContentPartUnionPayload is an implicit subunion of
+// [ResponseContentPartUnion]. ResponseContentPartUnionPayload provides convenient
+// access to the sub-properties of the union.
+//
+// For type safety it is recommended to directly use a variant of the
+// [ResponseContentPartUnion].
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfContentPartCustomPayloadPayload]
+type ResponseContentPartUnionPayload struct {
+	// This field will be present if the value is a [any] instead of an object.
+	OfContentPartCustomPayloadPayload any `json:",inline"`
+	// This field is from variant [ChartPayload].
+	ChartID       string         `json:"chartId"`
+	ActionButtons []ActionButton `json:"actionButtons"`
+	// This field is from variant [ChartPayload].
+	DataChart DataChart `json:"dataChart"`
+	// This field is from variant [ChartPayload].
+	SymbolChart SymbolChart `json:"symbolChart"`
+	JSON        struct {
+		OfContentPartCustomPayloadPayload respjson.Field
+		ChartID                           respjson.Field
+		ActionButtons                     respjson.Field
+		DataChart                         respjson.Field
+		SymbolChart                       respjson.Field
+		raw                               string
+	} `json:"-"`
+}
+
+func (r *ResponseContentPartUnionPayload) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -873,7 +1113,7 @@ const (
 
 // StructuredActionUnion contains all possible properties and values from
 // [StructuredActionPrefillOrder], [StructuredActionOpenChart],
-// [StructuredActionOpenScreener].
+// [StructuredActionOpenScreener], [StructuredActionOpenEntitlementConsent].
 //
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type StructuredActionUnion struct {
@@ -898,19 +1138,31 @@ type StructuredActionUnion struct {
 	SortBy string `json:"sort_by"`
 	// This field is from variant [StructuredActionOpenScreener].
 	SortDirection string `json:"sort_direction"`
-	JSON          struct {
-		Orders        respjson.Field
-		AccountID     respjson.Field
-		ActionType    respjson.Field
-		Symbol        respjson.Field
-		Extras        respjson.Field
-		Timeframe     respjson.Field
-		Filters       respjson.Field
-		FieldFilter   respjson.Field
-		PageSize      respjson.Field
-		SortBy        respjson.Field
-		SortDirection respjson.Field
-		raw           string
+	// This field is from variant [StructuredActionOpenEntitlementConsent].
+	AgreementKey string `json:"agreement_key"`
+	// This field is from variant [StructuredActionOpenEntitlementConsent].
+	Reason string `json:"reason"`
+	// This field is from variant [StructuredActionOpenEntitlementConsent].
+	RequestedEntitlementCodes []string `json:"requested_entitlement_codes"`
+	// This field is from variant [StructuredActionOpenEntitlementConsent].
+	TradingAccountIDs []int64 `json:"trading_account_ids"`
+	JSON              struct {
+		Orders                    respjson.Field
+		AccountID                 respjson.Field
+		ActionType                respjson.Field
+		Symbol                    respjson.Field
+		Extras                    respjson.Field
+		Timeframe                 respjson.Field
+		Filters                   respjson.Field
+		FieldFilter               respjson.Field
+		PageSize                  respjson.Field
+		SortBy                    respjson.Field
+		SortDirection             respjson.Field
+		AgreementKey              respjson.Field
+		Reason                    respjson.Field
+		RequestedEntitlementCodes respjson.Field
+		TradingAccountIDs         respjson.Field
+		raw                       string
 	} `json:"-"`
 }
 
@@ -925,6 +1177,11 @@ func (u StructuredActionUnion) AsOpenChart() (v StructuredActionOpenChart) {
 }
 
 func (u StructuredActionUnion) AsOpenScreener() (v StructuredActionOpenScreener) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u StructuredActionUnion) AsOpenEntitlementConsent() (v StructuredActionOpenEntitlementConsent) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
@@ -990,6 +1247,80 @@ type StructuredActionOpenScreener struct {
 // Returns the unmodified JSON received from the API
 func (r StructuredActionOpenScreener) RawJSON() string { return r.JSON.raw }
 func (r *StructuredActionOpenScreener) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Open entitlement consent flow
+type StructuredActionOpenEntitlementConsent struct {
+	// Any of "open_entitlement_consent".
+	ActionType string `json:"action_type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionType  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	OpenEntitlementConsentAction
+}
+
+// Returns the unmodified JSON received from the API
+func (r StructuredActionOpenEntitlementConsent) RawJSON() string { return r.JSON.raw }
+func (r *StructuredActionOpenEntitlementConsent) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Structured-action button behavior.
+type StructuredActionButtonAction struct {
+	// UUID of a `structured_action` content part in the same message.
+	ActionID string `json:"actionId" api:"nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionID    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r StructuredActionButtonAction) RawJSON() string { return r.JSON.raw }
+func (r *StructuredActionButtonAction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Suggested follow-up buttons rendered at the end of an assistant message.
+type SuggestedActionsPayload struct {
+	// Ordered message-level buttons.
+	ActionButtons []ActionButton `json:"actionButtons"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionButtons respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SuggestedActionsPayload) RawJSON() string { return r.JSON.raw }
+func (r *SuggestedActionsPayload) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Chart for a single symbol and timeframe.
+type SymbolChart struct {
+	Symbol    string `json:"symbol" api:"required"`
+	Timeframe string `json:"timeframe" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Symbol      respjson.Field
+		Timeframe   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SymbolChart) RawJSON() string { return r.JSON.raw }
+func (r *SymbolChart) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
