@@ -43,6 +43,14 @@ func (r *ActiveV1VersionService) GetVersion(ctx context.Context, opts ...option.
 	return res, err
 }
 
+// Allows clients to set their preferred API version.
+func (r *ActiveV1VersionService) UpdateVersion(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1VersionUpdateVersionResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "active/v1/version"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, nil, &res, opts...)
+	return res, err
+}
+
 // API version information
 type Version struct {
 	// API version string
@@ -76,5 +84,23 @@ type ActiveV1VersionGetVersionResponse struct {
 // Returns the unmodified JSON received from the API
 func (r ActiveV1VersionGetVersionResponse) RawJSON() string { return r.JSON.raw }
 func (r *ActiveV1VersionGetVersionResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ActiveV1VersionUpdateVersionResponse struct {
+	// API version information
+	Data Version `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r ActiveV1VersionUpdateVersionResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1VersionUpdateVersionResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }

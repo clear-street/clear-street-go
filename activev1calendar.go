@@ -15,7 +15,19 @@ import (
 type ActiveV1CalendarService struct {
 	options []option.RequestOption
 	// Access financial calendars for events like earnings, dividends, and splits.
+	Dividends ActiveV1CalendarDividendService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	Earnings ActiveV1CalendarEarningService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	Economic ActiveV1CalendarEconomicService
+	// Access financial calendars for events like earnings, dividends, and splits.
 	MarketHours ActiveV1CalendarMarketHourService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	MergersAcquisitions ActiveV1CalendarMergersAcquisitionService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	Splits ActiveV1CalendarSplitService
+	// Access financial calendars for events like earnings, dividends, and splits.
+	Summary ActiveV1CalendarSummaryService
 }
 
 // NewActiveV1CalendarService generates a new service that applies the given
@@ -24,6 +36,12 @@ type ActiveV1CalendarService struct {
 func NewActiveV1CalendarService(opts ...option.RequestOption) (r ActiveV1CalendarService) {
 	r = ActiveV1CalendarService{}
 	r.options = opts
+	r.Dividends = NewActiveV1CalendarDividendService(opts...)
+	r.Earnings = NewActiveV1CalendarEarningService(opts...)
+	r.Economic = NewActiveV1CalendarEconomicService(opts...)
 	r.MarketHours = NewActiveV1CalendarMarketHourService(opts...)
+	r.MergersAcquisitions = NewActiveV1CalendarMergersAcquisitionService(opts...)
+	r.Splits = NewActiveV1CalendarSplitService(opts...)
+	r.Summary = NewActiveV1CalendarSummaryService(opts...)
 	return
 }
