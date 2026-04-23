@@ -21,7 +21,9 @@ import (
 
 // Thread-centric AI assistant for conversational trading. Create threads to start
 // conversations, poll response objects for in-progress output, and read finalized
-// messages from thread history. Every endpoint requires an explicit account_id.
+// messages from thread history. Thread/message/response endpoints require an
+// explicit account_id. Entitlement endpoints are caller-scoped and use
+// trading_account_ids.
 //
 // ActiveV1OmniAIThreadService contains methods and other services that help with
 // interacting with the clear-street API.
@@ -33,11 +35,15 @@ type ActiveV1OmniAIThreadService struct {
 	options []option.RequestOption
 	// Thread-centric AI assistant for conversational trading. Create threads to start
 	// conversations, poll response objects for in-progress output, and read finalized
-	// messages from thread history. Every endpoint requires an explicit account_id.
+	// messages from thread history. Thread/message/response endpoints require an
+	// explicit account_id. Entitlement endpoints are caller-scoped and use
+	// trading_account_ids.
 	Messages ActiveV1OmniAIThreadMessageService
 	// Thread-centric AI assistant for conversational trading. Create threads to start
 	// conversations, poll response objects for in-progress output, and read finalized
-	// messages from thread history. Every endpoint requires an explicit account_id.
+	// messages from thread history. Thread/message/response endpoints require an
+	// explicit account_id. Entitlement endpoints are caller-scoped and use
+	// trading_account_ids.
 	Response ActiveV1OmniAIThreadResponseService
 }
 
@@ -161,7 +167,8 @@ type ActiveV1OmniAIThreadNewThreadParams struct {
 	Thesis param.Opt[string]                       `json:"thesis,omitzero"`
 	// Deep-insights target payload.
 	Target ActiveV1OmniAIThreadNewThreadParamsTarget `json:"target,omitzero"`
-	// Any of "PREFILL_ORDER", "OPEN_CHART", "OPEN_SCREENER".
+	// Any of "PREFILL_ORDER", "OPEN_CHART", "OPEN_SCREENER",
+	// "OPEN_ENTITLEMENT_CONSENT".
 	Capabilities []string `json:"capabilities,omitzero"`
 	paramObj
 }
