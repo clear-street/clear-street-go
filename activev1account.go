@@ -32,8 +32,6 @@ type ActiveV1AccountService struct {
 	options []option.RequestOption
 	// Manage trading accounts and view balances.
 	Balances ActiveV1AccountBalanceService
-	// Manage locate requests for short selling.
-	Locates ActiveV1AccountLocateService
 	// Place, monitor, and manage trading orders.
 	Orders ActiveV1AccountOrderService
 	// Manage trading accounts and view balances.
@@ -49,7 +47,6 @@ func NewActiveV1AccountService(opts ...option.RequestOption) (r ActiveV1AccountS
 	r = ActiveV1AccountService{}
 	r.options = opts
 	r.Balances = NewActiveV1AccountBalanceService(opts...)
-	r.Locates = NewActiveV1AccountLocateService(opts...)
 	r.Orders = NewActiveV1AccountOrderService(opts...)
 	r.PortfolioHistory = NewActiveV1AccountPortfolioHistoryService(opts...)
 	r.Positions = NewActiveV1AccountPositionService(opts...)
