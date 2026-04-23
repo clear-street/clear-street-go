@@ -304,10 +304,12 @@ func (r *DmaStrategyParam) UnmarshalJSON(data []byte) error {
 // combining data from execution reports, order status queries, and parent/child
 // tracking.
 type Order struct {
-	// Client-provided unique identifier for this order
+	// Engine-assigned unique identifier for this order (UUID).
 	ID string `json:"id" api:"required"`
 	// Account placing the order
 	AccountID int64 `json:"account_id" api:"required"`
+	// Client-provided identifier echoed back (FIX tag 11).
+	ClientOrderID string `json:"client_order_id" api:"required"`
 	// Timestamp when order was created (UTC)
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Cumulative filled quantity
@@ -391,6 +393,7 @@ type Order struct {
 	JSON struct {
 		ID                    respjson.Field
 		AccountID             respjson.Field
+		ClientOrderID         respjson.Field
 		CreatedAt             respjson.Field
 		FilledQuantity        respjson.Field
 		LeavesQuantity        respjson.Field
