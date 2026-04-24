@@ -20,7 +20,7 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// Manage trading accounts and view balances.
+// Manage trading accounts, balances, and portfolio history.
 //
 // ActiveV1AccountService contains methods and other services that help with
 // interacting with the clear-street API.
@@ -30,11 +30,11 @@ import (
 // the [NewActiveV1AccountService] method instead.
 type ActiveV1AccountService struct {
 	options []option.RequestOption
-	// Manage trading accounts and view balances.
+	// Manage trading accounts, balances, and portfolio history.
 	Balances ActiveV1AccountBalanceService
 	// Place, monitor, and manage trading orders.
 	Orders ActiveV1AccountOrderService
-	// Manage trading accounts and view balances.
+	// Manage trading accounts, balances, and portfolio history.
 	PortfolioHistory ActiveV1AccountPortfolioHistoryService
 	// View account positions.
 	Positions ActiveV1AccountPositionService

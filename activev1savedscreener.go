@@ -19,7 +19,7 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// Retrieve details and lists of tradable instruments.
+// Search and manage saved screeners.
 //
 // ActiveV1SavedScreenerService contains methods and other services that help with
 // interacting with the clear-street API.

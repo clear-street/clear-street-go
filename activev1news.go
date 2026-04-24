@@ -18,7 +18,7 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// Retrieve details and lists of tradable instruments.
+// Retrieve market news and related instrument metadata.
 //
 // ActiveV1NewsService contains methods and other services that help with
 // interacting with the clear-street API.

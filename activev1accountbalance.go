@@ -19,7 +19,7 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// Manage trading accounts and view balances.
+// Manage trading accounts, balances, and portfolio history.
 //
 // ActiveV1AccountBalanceService contains methods and other services that help with
 // interacting with the clear-street API.
