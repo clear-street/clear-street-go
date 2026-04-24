@@ -255,6 +255,9 @@ func (r *ScreenerFilter) UnmarshalJSON(data []byte) error {
 
 // An instrument returned by the screener
 type ScreenerItem struct {
+	// The OEMS instrument ID (`instrument.instruments.id`). Always present regardless
+	// of `field_filter`.
+	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// The latest price for the instrument
 	Price string `json:"price" api:"required"`
 	// The identifier for the instrument
@@ -360,6 +363,7 @@ type ScreenerItem struct {
 	YtdChangePct string `json:"ytd_change_pct" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		InstrumentID         respjson.Field
 		Price                respjson.Field
 		SecurityID           respjson.Field
 		SecurityIDSource     respjson.Field
