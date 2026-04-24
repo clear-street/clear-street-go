@@ -17,7 +17,7 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// Retrieve details and lists of tradable instruments.
+// Create and manage watchlists.
 //
 // ActiveV1WatchlistItemService contains methods and other services that help with
 // interacting with the clear-street API.
