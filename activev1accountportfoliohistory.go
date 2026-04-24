@@ -18,7 +18,7 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// Manage trading accounts and view balances.
+// Manage trading accounts, balances, and portfolio history.
 //
 // ActiveV1AccountPortfolioHistoryService contains methods and other services that
 // help with interacting with the clear-street API.
@@ -81,7 +81,8 @@ type PortfolioHistorySegment struct {
 	// P&L after netting all realized and unrealized P&L, adjustments, dividends,
 	// change in accruals, income and expenses
 	NetPnl string `json:"net_pnl" api:"nullable"`
-	// Sum of the profit and loss from the previous trading day.
+	// P&L attributable to start-of-day (carried) positions from market movement during
+	// this trading day.
 	PositionPnl string `json:"position_pnl" api:"nullable"`
 	// Amount sold MTM
 	SoldNotional string `json:"sold_notional" api:"nullable"`

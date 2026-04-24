@@ -14,7 +14,7 @@ import (
 // the [NewActiveV1Service] method instead.
 type ActiveV1Service struct {
 	options []option.RequestOption
-	// Manage trading accounts and view balances.
+	// Manage trading accounts, balances, and portfolio history.
 	Accounts ActiveV1AccountService
 	// Manage API keys for authentication.
 	APIKeys   ActiveV1APIKeyService
@@ -24,16 +24,16 @@ type ActiveV1Service struct {
 	// Retrieve details and lists of tradable instruments.
 	Instruments ActiveV1InstrumentService
 	MarketData  ActiveV1MarketDataService
-	// Retrieve details and lists of tradable instruments.
+	// Retrieve market news and related instrument metadata.
 	News   ActiveV1NewsService
 	OmniAI ActiveV1OmniAIService
-	// Retrieve details and lists of tradable instruments.
+	// Search and manage saved screeners.
 	SavedScreeners ActiveV1SavedScreenerService
-	// Retrieve details and lists of tradable instruments.
+	// Search and manage saved screeners.
 	Screener ActiveV1ScreenerService
 	// Endpoints for API service metadata.
 	Version ActiveV1VersionService
-	// Retrieve details and lists of tradable instruments.
+	// Create and manage watchlists.
 	Watchlists ActiveV1WatchlistService
 	// Active Websocket.
 	Ws ActiveV1WService
