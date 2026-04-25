@@ -15,6 +15,8 @@ import (
 type ActiveV1MarketDataService struct {
 	options []option.RequestOption
 	// Real-time market data snapshots.
+	DailySummary ActiveV1MarketDataDailySummaryService
+	// Real-time market data snapshots.
 	Snapshot ActiveV1MarketDataSnapshotService
 }
 
@@ -24,6 +26,7 @@ type ActiveV1MarketDataService struct {
 func NewActiveV1MarketDataService(opts ...option.RequestOption) (r ActiveV1MarketDataService) {
 	r = ActiveV1MarketDataService{}
 	r.options = opts
+	r.DailySummary = NewActiveV1MarketDataDailySummaryService(opts...)
 	r.Snapshot = NewActiveV1MarketDataSnapshotService(opts...)
 	return
 }
