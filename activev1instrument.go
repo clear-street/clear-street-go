@@ -33,8 +33,10 @@ type ActiveV1InstrumentService struct {
 	// Retrieve details and lists of tradable instruments.
 	AnalystReporting ActiveV1InstrumentAnalystReportingService
 	// Retrieve details and lists of tradable instruments.
-	Events  ActiveV1InstrumentEventService
-	Options ActiveV1InstrumentOptionService
+	Events ActiveV1InstrumentEventService
+	// Retrieve details and lists of tradable instruments.
+	Fundamentals ActiveV1InstrumentFundamentalService
+	Options      ActiveV1InstrumentOptionService
 }
 
 // NewActiveV1InstrumentService generates a new service that applies the given
@@ -45,6 +47,7 @@ func NewActiveV1InstrumentService(opts ...option.RequestOption) (r ActiveV1Instr
 	r.options = opts
 	r.AnalystReporting = NewActiveV1InstrumentAnalystReportingService(opts...)
 	r.Events = NewActiveV1InstrumentEventService(opts...)
+	r.Fundamentals = NewActiveV1InstrumentFundamentalService(opts...)
 	r.Options = NewActiveV1InstrumentOptionService(opts...)
 	return
 }
