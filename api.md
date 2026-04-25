@@ -263,6 +263,17 @@ Methods:
 - <code title="get /active/v1/instruments/events">client.Active.V1.Instruments.Events.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentEventService.GetAllInstrumentEvents">GetAllInstrumentEvents</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentEventGetAllInstrumentEventsParams">ActiveV1InstrumentEventGetAllInstrumentEventsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentEventGetAllInstrumentEventsResponse">ActiveV1InstrumentEventGetAllInstrumentEventsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /active/v1/instruments/{security_id_source}/{security_id}/events">client.Active.V1.Instruments.Events.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentEventService.GetInstrumentEvents">GetInstrumentEvents</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, securityID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentEventGetInstrumentEventsParams">ActiveV1InstrumentEventGetInstrumentEventsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentEventGetInstrumentEventsResponse">ActiveV1InstrumentEventGetInstrumentEventsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
+#### Fundamentals
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#InstrumentFundamentals">InstrumentFundamentals</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentFundamentalGetInstrumentFundamentalsResponse">ActiveV1InstrumentFundamentalGetInstrumentFundamentalsResponse</a>
+
+Methods:
+
+- <code title="get /active/v1/instruments/{id}/fundamentals">client.Active.V1.Instruments.Fundamentals.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentFundamentalService.GetInstrumentFundamentals">GetInstrumentFundamentals</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, id <a href="https://pkg.go.dev/builtin#string">string</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentFundamentalGetInstrumentFundamentalsResponse">ActiveV1InstrumentFundamentalGetInstrumentFundamentalsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
 #### Options
 
 ##### Contracts
@@ -276,6 +287,18 @@ Methods:
 - <code title="get /active/v1/instruments/options/contracts">client.Active.V1.Instruments.Options.Contracts.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentOptionContractService.GetOptionContracts">GetOptionContracts</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentOptionContractGetOptionContractsParams">ActiveV1InstrumentOptionContractGetOptionContractsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentOptionContractGetOptionContractsResponse">ActiveV1InstrumentOptionContractGetOptionContractsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ### MarketData
+
+#### DailySummary
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#DailySummary">DailySummary</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#DailySummaryList">DailySummaryList</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1MarketDataDailySummaryGetDailySummariesResponse">ActiveV1MarketDataDailySummaryGetDailySummariesResponse</a>
+
+Methods:
+
+- <code title="get /active/v1/market-data/daily-summary">client.Active.V1.MarketData.DailySummary.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1MarketDataDailySummaryService.GetDailySummaries">GetDailySummaries</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1MarketDataDailySummaryGetDailySummariesParams">ActiveV1MarketDataDailySummaryGetDailySummariesParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1MarketDataDailySummaryGetDailySummariesResponse">ActiveV1MarketDataDailySummaryGetDailySummariesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 #### Snapshot
 
