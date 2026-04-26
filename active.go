@@ -14,7 +14,8 @@ import (
 // the [NewActiveService] method instead.
 type ActiveService struct {
 	options []option.RequestOption
-	V1      ActiveV1Service
+	// Active Websocket.
+	V1 ActiveV1Service
 }
 
 // NewActiveService generates a new service that applies the given options to each
