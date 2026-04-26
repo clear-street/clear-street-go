@@ -3,9 +3,16 @@
 package clearstreet
 
 import (
+	"context"
+	"net/http"
+	"slices"
+
+	"github.com/clear-street/clear-street-go/internal/requestconfig"
 	"github.com/clear-street/clear-street-go/option"
 )
 
+// Active Websocket.
+//
 // ActiveV1Service contains methods and other services that help with interacting
 // with the clear-street API.
 //
@@ -35,8 +42,6 @@ type ActiveV1Service struct {
 	Version ActiveV1VersionService
 	// Create and manage watchlists.
 	Watchlists ActiveV1WatchlistService
-	// Active Websocket.
-	Ws ActiveV1WService
 }
 
 // NewActiveV1Service generates a new service that applies the given options to
@@ -57,8 +62,16 @@ func NewActiveV1Service(opts ...option.RequestOption) (r ActiveV1Service) {
 	r.Screener = NewActiveV1ScreenerService(opts...)
 	r.Version = NewActiveV1VersionService(opts...)
 	r.Watchlists = NewActiveV1WatchlistService(opts...)
-	r.Ws = NewActiveV1WService(opts...)
 	return
+}
+
+// Upgrade the HTTP connection to a WebSocket and echo incoming messages.
+func (r *ActiveV1Service) Ws(ctx context.Context, opts ...option.RequestOption) (err error) {
+	opts = slices.Concat(r.options, opts)
+	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
+	path := "active/v1/ws"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, nil, opts...)
+	return err
 }
 
 type APIDecimal64 = string

@@ -36,7 +36,8 @@ type ActiveV1InstrumentService struct {
 	Events ActiveV1InstrumentEventService
 	// Retrieve details and lists of tradable instruments.
 	Fundamentals ActiveV1InstrumentFundamentalService
-	Options      ActiveV1InstrumentOptionService
+	// Retrieve details and lists of tradable instruments.
+	Options ActiveV1InstrumentOptionService
 }
 
 // NewActiveV1InstrumentService generates a new service that applies the given
@@ -68,6 +69,22 @@ func (r *ActiveV1InstrumentService) GetInstrumentByID(ctx context.Context, secur
 func (r *ActiveV1InstrumentService) GetInstruments(ctx context.Context, query ActiveV1InstrumentGetInstrumentsParams, opts ...option.RequestOption) (res *ActiveV1InstrumentGetInstrumentsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "active/v1/instruments"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
+// Fast in-memory typeahead search over the loaded instrument universe.
+//
+// Supports three independent match dimensions in a single `q` parameter: ticker
+// symbol (exact > prefix > substring), alt-id exact (CUSIP / ISIN / OPRA root /
+// CMS), and company name (token + character-trigram). Results are ranked by a
+// composite score that includes ADV (log-scaled), listing status, marginable / ETB
+// flags, and OTC / restricted / liquidation-only penalties. Defaults to the
+// `EQUITY` asset class (common stock + ETFs + exchange-traded mutual funds); pass
+// `asset_class=OPTION` for option chains.
+func (r *ActiveV1InstrumentService) Search(ctx context.Context, query ActiveV1InstrumentSearchParams, opts ...option.RequestOption) (res *ActiveV1InstrumentSearchResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "active/v1/instruments/search"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
@@ -223,12 +240,20 @@ type InstrumentCore struct {
 	Symbol string `json:"symbol" api:"required"`
 	// The MIC code of the primary listing venue
 	Venue string `json:"venue" api:"required"`
+	// Average daily share volume from the security definition.
+	Adv string `json:"adv" api:"nullable"`
 	// The expiration date for options instruments
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The percent of a long position's value you must post as margin
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
 	// The full name of the instrument or its issuer
 	Name string `json:"name" api:"nullable"`
+	// Notional ADV (`adv × previous_close`). The primary liquidity signal used by
+	// `/instruments/search` ranking. Computed at response time so it stays consistent
+	// with whatever `adv` and `previous_close` show.
+	NotionalAdv string `json:"notional_adv" api:"nullable"`
+	// Last close price from the security definition.
+	PreviousClose string `json:"previous_close" api:"nullable"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
@@ -254,9 +279,12 @@ type InstrumentCore struct {
 		SecurityIDs         respjson.Field
 		Symbol              respjson.Field
 		Venue               respjson.Field
+		Adv                 respjson.Field
 		Expiry              respjson.Field
 		LongMarginRate      respjson.Field
 		Name                respjson.Field
+		NotionalAdv         respjson.Field
+		PreviousClose       respjson.Field
 		SecurityType        respjson.Field
 		ShortMarginRate     respjson.Field
 		StrikePrice         respjson.Field
@@ -485,6 +513,23 @@ func (r *ActiveV1InstrumentGetInstrumentsResponse) UnmarshalJSON(data []byte) er
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type ActiveV1InstrumentSearchResponse struct {
+	Data InstrumentCoreList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r ActiveV1InstrumentSearchResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1InstrumentSearchResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ActiveV1InstrumentGetInstrumentByIDParams struct {
 	// Security identifier source
 	//
@@ -577,3 +622,36 @@ const (
 	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeCash           ActiveV1InstrumentGetInstrumentsParamsSecurityType = "CASH"
 	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeOther          ActiveV1InstrumentGetInstrumentsParamsSecurityType = "OTHER"
 )
+
+type ActiveV1InstrumentSearchParams struct {
+	// Search term applied case-insensitively to ticker symbols, alt-IDs
+	// (CUSIP/ISIN/OPRA-root/CMS), and company names.
+	Q string `query:"q" api:"required" json:"-"`
+	// Comma-separated asset classes (EQUITY|OPTION|WARRANT|BOND|FX|OTHER). Defaults to
+	// EQUITY.
+	AssetClass param.Opt[string] `query:"asset_class,omitzero" json:"-"`
+	// Optional listing-country filter (e.g., US).
+	Country param.Opt[string] `query:"country,omitzero" json:"-"`
+	// Optional ISO currency filter (e.g., USD).
+	Currency param.Opt[string] `query:"currency,omitzero" json:"-"`
+	// Opaque continuation cursor for show-more paging — pass the `next_page_token`
+	// from a prior response. Same wire format as `page_token` on other paginated
+	// endpoints.
+	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
+	// Include inactive instruments. Default false.
+	IncludeInactive param.Opt[bool] `query:"include_inactive,omitzero" json:"-"`
+	// Include restricted instruments. Default true (penalized in ranking).
+	IncludeRestricted param.Opt[bool] `query:"include_restricted,omitzero" json:"-"`
+	// Maximum hits to return. Bounded [1, 100]. Default 20.
+	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [ActiveV1InstrumentSearchParams]'s query parameters as
+// `url.Values`.
+func (r ActiveV1InstrumentSearchParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}

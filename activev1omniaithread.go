@@ -39,12 +39,6 @@ type ActiveV1OmniAIThreadService struct {
 	// explicit account_id. Entitlement endpoints are caller-scoped and use
 	// trading_account_ids.
 	Messages ActiveV1OmniAIThreadMessageService
-	// Thread-centric AI assistant for conversational trading. Create threads to start
-	// conversations, poll response objects for in-progress output, and read finalized
-	// messages from thread history. Thread/message/response endpoints require an
-	// explicit account_id. Entitlement endpoints are caller-scoped and use
-	// trading_account_ids.
-	Response ActiveV1OmniAIThreadResponseService
 }
 
 // NewActiveV1OmniAIThreadService generates a new service that applies the given
@@ -54,7 +48,6 @@ func NewActiveV1OmniAIThreadService(opts ...option.RequestOption) (r ActiveV1Omn
 	r = ActiveV1OmniAIThreadService{}
 	r.options = opts
 	r.Messages = NewActiveV1OmniAIThreadMessageService(opts...)
-	r.Response = NewActiveV1OmniAIThreadResponseService(opts...)
 	return
 }
 
@@ -100,6 +93,25 @@ func (r *ActiveV1OmniAIThreadService) GetThread(ctx context.Context, threadID st
 func (r *ActiveV1OmniAIThreadService) ListThreads(ctx context.Context, query ActiveV1OmniAIThreadListThreadsParams, opts ...option.RequestOption) (res *ActiveV1OmniAIThreadListThreadsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "active/v1/omni-ai/threads"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
+// Get the active response for a thread.
+//
+// Convenience endpoint to look up the currently active response for a thread
+// without knowing the `response_id`. Useful when reloading a thread whose last
+// finalized message is a `USER` message — this indicates an assistant turn is
+// likely in progress.
+//
+// Returns **404** if no active response exists (the thread is idle).
+func (r *ActiveV1OmniAIThreadService) Response(ctx context.Context, threadID string, query ActiveV1OmniAIThreadResponseParams, opts ...option.RequestOption) (res *ActiveV1OmniAIThreadResponseResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	if threadID == "" {
+		err = errors.New("missing required thread_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("active/v1/omni-ai/threads/%s/response", threadID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
@@ -154,6 +166,24 @@ type ActiveV1OmniAIThreadListThreadsResponse struct {
 // Returns the unmodified JSON received from the API
 func (r ActiveV1OmniAIThreadListThreadsResponse) RawJSON() string { return r.JSON.raw }
 func (r *ActiveV1OmniAIThreadListThreadsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ActiveV1OmniAIThreadResponseResponse struct {
+	// Dynamic pollable response.
+	Data Response `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r ActiveV1OmniAIThreadResponseResponse) RawJSON() string { return r.JSON.raw }
+func (r *ActiveV1OmniAIThreadResponseResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -243,6 +273,21 @@ type ActiveV1OmniAIThreadListThreadsParams struct {
 // URLQuery serializes [ActiveV1OmniAIThreadListThreadsParams]'s query parameters
 // as `url.Values`.
 func (r ActiveV1OmniAIThreadListThreadsParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+type ActiveV1OmniAIThreadResponseParams struct {
+	// Account ID for the request
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [ActiveV1OmniAIThreadResponseParams]'s query parameters as
+// `url.Values`.
+func (r ActiveV1OmniAIThreadResponseParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

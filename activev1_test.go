@@ -13,7 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestActiveV1OmniAIThreadResponseGetThreadResponse(t *testing.T) {
+func TestActiveV1Ws(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,13 +26,7 @@ func TestActiveV1OmniAIThreadResponseGetThreadResponse(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.OmniAI.Threads.Response.GetThreadResponse(
-		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.ActiveV1OmniAIThreadResponseGetThreadResponseParams{
-			AccountID: 0,
-		},
-	)
+	err := client.Active.V1.Ws(context.TODO())
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {
