@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.2.0 (2026-04-26)
+
+Full Changelog: [v0.1.0...v0.2.0](https://github.com/clear-street/clear-street-go/compare/v0.1.0...v0.2.0)
+
+### Features
+
+* **api:** api update ([d1f28e2](https://github.com/clear-street/clear-street-go/commit/d1f28e27efea32da5f11dcb8b43f73f93e14b05d))
+* **api:** api update ([40011f6](https://github.com/clear-street/clear-street-go/commit/40011f6c85699821f54cdaff4d4b6743c2db17e5))
+* **api:** api update ([6ceb112](https://github.com/clear-street/clear-street-go/commit/6ceb112bb81d10fe95cb53d6f6fe1a97bd17fcc3))
+* **api:** api update ([0ec281a](https://github.com/clear-street/clear-street-go/commit/0ec281a0c3059c9ef458a566db583063c8876085))
+* **api:** api update ([c2a9950](https://github.com/clear-street/clear-street-go/commit/c2a9950222d64b3f9ba624c9ccd16e32f5bb1fd2))
+* **api:** api update ([e09b7d0](https://github.com/clear-street/clear-street-go/commit/e09b7d02c631985d0aa85e751d6c79d584e46402))
+* **api:** api update ([b82af17](https://github.com/clear-street/clear-street-go/commit/b82af17e55d8a214c5fc0adea20b7ef0ff4c14dc))
+* **api:** api update ([3d0388e](https://github.com/clear-street/clear-street-go/commit/3d0388e934c36dcef7fbacbcaaed67fa73c98447))
+* **api:** manual updates ([047c23a](https://github.com/clear-street/clear-street-go/commit/047c23ad8c6558c509ca88a63cd8f8cb025ddd07))
+* **go:** add default http client with timeout ([3583795](https://github.com/clear-street/clear-street-go/commit/358379505ac6d25062d9a3294095e1948c8acf4e))
+
+
+### Chores
+
+* **internal:** more robust bootstrap script ([e53f2ed](https://github.com/clear-street/clear-street-go/commit/e53f2edec21b4058cbdbf3fde7765e6942ebb0b7))
+
 ## 0.1.0 (2026-04-17)
 
 Full Changelog: [v0.0.1...v0.1.0](https://github.com/clear-street/clear-street-go/compare/v0.0.1...v0.1.0)
