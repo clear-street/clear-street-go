@@ -22,7 +22,9 @@ import (
 type ActiveV1Service struct {
 	options []option.RequestOption
 	// Manage trading accounts, balances, and portfolio history.
-	Accounts  ActiveV1AccountService
+	Accounts ActiveV1AccountService
+	// Manage API keys for authentication.
+	APIKeys   ActiveV1APIKeyService
 	Calendars ActiveV1CalendarService
 	// Access financial calendars for events like earnings, dividends, and splits.
 	Clock ActiveV1ClockService
@@ -49,6 +51,7 @@ func NewActiveV1Service(opts ...option.RequestOption) (r ActiveV1Service) {
 	r = ActiveV1Service{}
 	r.options = opts
 	r.Accounts = NewActiveV1AccountService(opts...)
+	r.APIKeys = NewActiveV1APIKeyService(opts...)
 	r.Calendars = NewActiveV1CalendarService(opts...)
 	r.Clock = NewActiveV1ClockService(opts...)
 	r.Instruments = NewActiveV1InstrumentService(opts...)
