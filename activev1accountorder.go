@@ -1336,12 +1336,12 @@ func (r *ActiveV1AccountOrderReplaceOrderParams) UnmarshalJSON(data []byte) erro
 }
 
 type ActiveV1AccountOrderSubmitOrdersParams struct {
-	Body []ActiveV1AccountOrderSubmitOrdersParamsBodyUnion
+	Orders []ActiveV1AccountOrderSubmitOrdersParamsOrderUnion
 	paramObj
 }
 
 func (r ActiveV1AccountOrderSubmitOrdersParams) MarshalJSON() (data []byte, err error) {
-	return shimjson.Marshal(r.Body)
+	return shimjson.Marshal(r.Orders)
 }
 func (r *ActiveV1AccountOrderSubmitOrdersParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
@@ -1350,25 +1350,25 @@ func (r *ActiveV1AccountOrderSubmitOrdersParams) UnmarshalJSON(data []byte) erro
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
-type ActiveV1AccountOrderSubmitOrdersParamsBodyUnion struct {
-	OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequest *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest `json:",omitzero,inline"`
-	OfActiveV1AccountOrderSubmitOrderssBodyNewOrderRequest         *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest         `json:",omitzero,inline"`
+type ActiveV1AccountOrderSubmitOrdersParamsOrderUnion struct {
+	OfActiveV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequest *ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest `json:",omitzero,inline"`
+	OfActiveV1AccountOrderSubmitOrderssOrderNewOrderRequest         *ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderRequest         `json:",omitzero,inline"`
 	paramUnion
 }
 
-func (u ActiveV1AccountOrderSubmitOrdersParamsBodyUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequest, u.OfActiveV1AccountOrderSubmitOrderssBodyNewOrderRequest)
+func (u ActiveV1AccountOrderSubmitOrdersParamsOrderUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfActiveV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequest, u.OfActiveV1AccountOrderSubmitOrderssOrderNewOrderRequest)
 }
-func (u *ActiveV1AccountOrderSubmitOrdersParamsBodyUnion) UnmarshalJSON(data []byte) error {
+func (u *ActiveV1AccountOrderSubmitOrdersParamsOrderUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
 }
 
 // Multileg strategy order request
 //
 // The properties Legs, OrderType, TimeInForce are required.
-type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest struct {
+type ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest struct {
 	// Legs that compose the strategy.
-	Legs []ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg `json:"legs,omitzero" api:"required"`
+	Legs []ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg `json:"legs,omitzero" api:"required"`
 	// Type of order (currently MARKET or LIMIT for multileg strategy submission)
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
@@ -1390,18 +1390,18 @@ type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest struct {
 	paramObj
 }
 
-func (r ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest
+func (r ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
+func (r *ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // A single leg in a multileg strategy request.
 //
 // The properties InstrumentType, Ratio, Security, Side are required.
-type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg struct {
+type ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
 	// Security type for the leg.
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
@@ -1410,7 +1410,7 @@ type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg struct
 	// Ratio for the leg.
 	Ratio string `json:"ratio" api:"required"`
 	// Security identifier for the leg.
-	Security ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion `json:"security,omitzero" api:"required"`
+	Security ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecurityUnion `json:"security,omitzero" api:"required"`
 	// Leg side.
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
@@ -1424,16 +1424,16 @@ type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg struct
 	paramObj
 }
 
-func (r ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg
+func (r ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg) UnmarshalJSON(data []byte) error {
+func (r *ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 func init() {
-	apijson.RegisterFieldValidator[ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg](
+	apijson.RegisterFieldValidator[ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg](
 		"position_effect", "OPEN", "CLOSE",
 	)
 }
@@ -1441,21 +1441,21 @@ func init() {
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
-type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion struct {
-	OfString                                                                                param.Opt[string]                                                                           `json:",omitzero,inline"`
-	OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequestLegSecuritySecurityIDPair *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecuritySecurityIDPair `json:",omitzero,inline"`
+type ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecurityUnion struct {
+	OfString                                                                                 param.Opt[string]                                                                            `json:",omitzero,inline"`
+	OfActiveV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequestLegSecuritySecurityIDPair *ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecuritySecurityIDPair `json:",omitzero,inline"`
 	paramUnion
 }
 
-func (u ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfString, u.OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequestLegSecuritySecurityIDPair)
+func (u ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecurityUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfString, u.OfActiveV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequestLegSecuritySecurityIDPair)
 }
-func (u *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion) UnmarshalJSON(data []byte) error {
+func (u *ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecurityUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
 }
 
 // The properties ID, Source are required.
-type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecuritySecurityIDPair struct {
+type ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecuritySecurityIDPair struct {
 	ID string `json:"id" api:"required"`
 	// Security identifier source
 	//
@@ -1471,11 +1471,11 @@ type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurit
 	paramObj
 }
 
-func (r ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecuritySecurityIDPair) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecuritySecurityIDPair
+func (r ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecuritySecurityIDPair) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecuritySecurityIDPair
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecuritySecurityIDPair) UnmarshalJSON(data []byte) error {
+func (r *ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecuritySecurityIDPair) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -1483,7 +1483,7 @@ func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSec
 //
 // The properties InstrumentType, OrderType, Quantity, Side, TimeInForce are
 // required.
-type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest struct {
+type ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderRequest struct {
 	// Type of security
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
@@ -1557,16 +1557,16 @@ type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest struct {
 	paramObj
 }
 
-func (r ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest
+func (r ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderRequest) MarshalJSON() (data []byte, err error) {
+	type shadow ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderRequest
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest) UnmarshalJSON(data []byte) error {
+func (r *ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderRequest) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 func init() {
-	apijson.RegisterFieldValidator[ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest](
+	apijson.RegisterFieldValidator[ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderRequest](
 		"position_effect", "OPEN", "CLOSE",
 	)
 }
