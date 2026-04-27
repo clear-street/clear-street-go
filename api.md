@@ -146,6 +146,27 @@ Methods:
 - <code title="delete /active/v1/accounts/{account_id}/positions">client.Active.V1.Accounts.Positions.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1AccountPositionService.ClosePositions">ClosePositions</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1AccountPositionClosePositionsParams">ActiveV1AccountPositionClosePositionsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1AccountPositionClosePositionsResponse">ActiveV1AccountPositionClosePositionsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /active/v1/accounts/{account_id}/positions">client.Active.V1.Accounts.Positions.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1AccountPositionService.GetPositions">GetPositions</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1AccountPositionGetPositionsParams">ActiveV1AccountPositionGetPositionsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1AccountPositionGetPositionsResponse">ActiveV1AccountPositionGetPositionsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
+### APIKeys
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#APIKey">APIKey</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#APIKeyListEntry">APIKeyListEntry</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#APIKeyListEntryList">APIKeyListEntryList</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Revocation">Revocation</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#RevocationList">RevocationList</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyNewResponse">ActiveV1APIKeyNewResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyListResponse">ActiveV1APIKeyListResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyRevokeResponse">ActiveV1APIKeyRevokeResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyRevokeAllResponse">ActiveV1APIKeyRevokeAllResponse</a>
+
+Methods:
+
+- <code title="post /active/v1/api_keys">client.Active.V1.APIKeys.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyService.New">New</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyNewParams">ActiveV1APIKeyNewParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyNewResponse">ActiveV1APIKeyNewResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /active/v1/api_keys">client.Active.V1.APIKeys.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyService.List">List</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyListResponse">ActiveV1APIKeyListResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="delete /active/v1/api_keys/{id}">client.Active.V1.APIKeys.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyService.Revoke">Revoke</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, id <a href="https://pkg.go.dev/builtin#string">string</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyRevokeResponse">ActiveV1APIKeyRevokeResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="delete /active/v1/api_keys">client.Active.V1.APIKeys.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyService.RevokeAll">RevokeAll</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1APIKeyRevokeAllResponse">ActiveV1APIKeyRevokeAllResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
 ### Calendars
 
 #### MarketHours
@@ -192,7 +213,6 @@ Response Types:
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#AnalystRating">AnalystRating</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ContractType">ContractType</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ExerciseStyle">ExerciseStyle</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#FiscalPeriodType">FiscalPeriodType</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Instrument">Instrument</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#InstrumentCore">InstrumentCore</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#InstrumentCoreList">InstrumentCoreList</a>
@@ -224,30 +244,6 @@ Response Types:
 Methods:
 
 - <code title="get /active/v1/instruments/{security_id_source}/{security_id}/analyst-reporting">client.Active.V1.Instruments.AnalystReporting.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentAnalystReportingService.GetInstrumentAnalystConsensus">GetInstrumentAnalystConsensus</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, securityID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusParams">ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusResponse">ActiveV1InstrumentAnalystReportingGetInstrumentAnalystConsensusResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
-#### BalanceSheets
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#InstrumentBalanceSheetStatement">InstrumentBalanceSheetStatement</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#InstrumentBalanceSheetStatementList">InstrumentBalanceSheetStatementList</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentBalanceSheetGetInstrumentBalanceSheetStatementsResponse">ActiveV1InstrumentBalanceSheetGetInstrumentBalanceSheetStatementsResponse</a>
-
-Methods:
-
-- <code title="get /active/v1/instruments/{security_id_source}/{security_id}/balance-sheets">client.Active.V1.Instruments.BalanceSheets.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentBalanceSheetService.GetInstrumentBalanceSheetStatements">GetInstrumentBalanceSheetStatements</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, securityID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentBalanceSheetGetInstrumentBalanceSheetStatementsParams">ActiveV1InstrumentBalanceSheetGetInstrumentBalanceSheetStatementsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentBalanceSheetGetInstrumentBalanceSheetStatementsResponse">ActiveV1InstrumentBalanceSheetGetInstrumentBalanceSheetStatementsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
-#### CashFlowStatements
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#InstrumentCashFlowStatement">InstrumentCashFlowStatement</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#InstrumentCashFlowStatementList">InstrumentCashFlowStatementList</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentCashFlowStatementGetInstrumentCashFlowStatementsResponse">ActiveV1InstrumentCashFlowStatementGetInstrumentCashFlowStatementsResponse</a>
-
-Methods:
-
-- <code title="get /active/v1/instruments/{security_id_source}/{security_id}/cash-flow-statements">client.Active.V1.Instruments.CashFlowStatements.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentCashFlowStatementService.GetInstrumentCashFlowStatements">GetInstrumentCashFlowStatements</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, securityID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentCashFlowStatementGetInstrumentCashFlowStatementsParams">ActiveV1InstrumentCashFlowStatementGetInstrumentCashFlowStatementsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentCashFlowStatementGetInstrumentCashFlowStatementsResponse">ActiveV1InstrumentCashFlowStatementGetInstrumentCashFlowStatementsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 #### Events
 
@@ -283,18 +279,6 @@ Response Types:
 Methods:
 
 - <code title="get /active/v1/instruments/{id}/fundamentals">client.Active.V1.Instruments.Fundamentals.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentFundamentalService.GetInstrumentFundamentals">GetInstrumentFundamentals</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, id <a href="https://pkg.go.dev/builtin#string">string</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentFundamentalGetInstrumentFundamentalsResponse">ActiveV1InstrumentFundamentalGetInstrumentFundamentalsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
-
-#### IncomeStatements
-
-Response Types:
-
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#InstrumentIncomeStatement">InstrumentIncomeStatement</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#InstrumentIncomeStatementList">InstrumentIncomeStatementList</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentIncomeStatementGetInstrumentIncomeStatementsResponse">ActiveV1InstrumentIncomeStatementGetInstrumentIncomeStatementsResponse</a>
-
-Methods:
-
-- <code title="get /active/v1/instruments/{security_id_source}/{security_id}/income-statements">client.Active.V1.Instruments.IncomeStatements.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentIncomeStatementService.GetInstrumentIncomeStatements">GetInstrumentIncomeStatements</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, securityID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentIncomeStatementGetInstrumentIncomeStatementsParams">ActiveV1InstrumentIncomeStatementGetInstrumentIncomeStatementsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ActiveV1InstrumentIncomeStatementGetInstrumentIncomeStatementsResponse">ActiveV1InstrumentIncomeStatementGetInstrumentIncomeStatementsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 #### Options
 
