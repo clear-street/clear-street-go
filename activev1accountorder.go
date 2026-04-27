@@ -314,6 +314,11 @@ type Order struct {
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Cumulative filled quantity
 	FilledQuantity string `json:"filled_quantity" api:"required"`
+	// Type of security
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
+	// "WARRANT", "CASH", "OTHER".
+	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// Remaining unfilled quantity
 	LeavesQuantity string `json:"leaves_quantity" api:"required"`
 	// Type of order (MARKET, LIMIT, etc.)
@@ -337,11 +342,6 @@ type Order struct {
 	// "LEGAL_ENTITY_IDENTIFIER", "SYNTHETIC", "FIDESSA_INSTRUMENT_MNEMONIC",
 	// "INDEX_NAME", "UNIFORM_SYMBOL", "DIGITAL_TOKEN_IDENTIFIER", "MASSIVE", "OTHER".
 	SecurityIDSource SecurityIDSource `json:"security_id_source" api:"required"`
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `json:"security_type" api:"required"`
 	// Side of the order (BUY, SELL, SELL_SHORT)
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
@@ -396,12 +396,12 @@ type Order struct {
 		ClientOrderID         respjson.Field
 		CreatedAt             respjson.Field
 		FilledQuantity        respjson.Field
+		InstrumentType        respjson.Field
 		LeavesQuantity        respjson.Field
 		OrderType             respjson.Field
 		Quantity              respjson.Field
 		SecurityID            respjson.Field
 		SecurityIDSource      respjson.Field
-		SecurityType          respjson.Field
 		Side                  respjson.Field
 		Status                respjson.Field
 		Symbol                respjson.Field
@@ -1159,6 +1159,11 @@ func (r *ActiveV1AccountOrderSubmitOrdersResponse) UnmarshalJSON(data []byte) er
 }
 
 type ActiveV1AccountOrderCancelAllOpenOrdersParams struct {
+	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
+	// "WARRANT", "CASH", "OTHER".
+	InstrumentType ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Filter by security ID(s). Accepts single value or indexed array.
 	//
 	// Examples:
@@ -1174,11 +1179,6 @@ type ActiveV1AccountOrderCancelAllOpenOrdersParams struct {
 	// - Single: `security_id_source=CUSIP`
 	// - Multiple: `security_id_source[0]=CUSIP&security_id_source[1]=FIGI`
 	SecurityIDSource []string `query:"security_id_source,omitzero" json:"-"`
-	// Filter by security type (e.g., COMMON_STOCK, OPTION)
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
-	SecurityType ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType `query:"security_type,omitzero" json:"-"`
 	// Filter by order side (BUY or SELL)
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
@@ -1200,18 +1200,18 @@ func (r ActiveV1AccountOrderCancelAllOpenOrdersParams) URLQuery() (v url.Values,
 	})
 }
 
-// Filter by security type (e.g., COMMON_STOCK, OPTION)
-type ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType string
+// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
+type ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentType string
 
 const (
-	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeCommonStock    ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "COMMON_STOCK"
-	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypePreferredStock ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "PREFERRED_STOCK"
-	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeCorporateBond  ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "CORPORATE_BOND"
-	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeOption         ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "OPTION"
-	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeFuture         ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "FUTURE"
-	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeWarrant        ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "WARRANT"
-	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeCash           ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "CASH"
-	ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeOther          ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityType = "OTHER"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock    ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentTypePreferredStock ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "PREFERRED_STOCK"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeCorporateBond  ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "CORPORATE_BOND"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeOption         ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeFuture         ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "FUTURE"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeWarrant        ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "WARRANT"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeCash           ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
+	ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeOther          ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "OTHER"
 )
 
 // Filter by order side (BUY or SELL)
@@ -1258,6 +1258,11 @@ type ActiveV1AccountOrderGetOrdersParams struct {
 	Symbol param.Opt[string] `query:"symbol,omitzero" json:"-"`
 	// The end date and time for the query range, inclusive (ISO 8601 format)
 	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
+	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
+	// "WARRANT", "CASH", "OTHER".
+	InstrumentType ActiveV1AccountOrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Filter by security ID(s). Accepts single value or indexed array.
 	//
 	// Examples:
@@ -1273,11 +1278,6 @@ type ActiveV1AccountOrderGetOrdersParams struct {
 	// - Single: `security_id_source=CUSIP`
 	// - Multiple: `security_id_source[0]=CUSIP&security_id_source[1]=FIGI`
 	SecurityIDSource []string `query:"security_id_source,omitzero" json:"-"`
-	// Security type filter (e.g., COMMON_STOCK, PREFERRED_STOCK)
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
-	SecurityType ActiveV1AccountOrderGetOrdersParamsSecurityType `query:"security_type,omitzero" json:"-"`
 	// Comma-separated order statuses to filter by
 	//
 	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
@@ -1296,18 +1296,18 @@ func (r ActiveV1AccountOrderGetOrdersParams) URLQuery() (v url.Values, err error
 	})
 }
 
-// Security type filter (e.g., COMMON_STOCK, PREFERRED_STOCK)
-type ActiveV1AccountOrderGetOrdersParamsSecurityType string
+// Instrument type filter (e.g., COMMON_STOCK, OPTION)
+type ActiveV1AccountOrderGetOrdersParamsInstrumentType string
 
 const (
-	ActiveV1AccountOrderGetOrdersParamsSecurityTypeCommonStock    ActiveV1AccountOrderGetOrdersParamsSecurityType = "COMMON_STOCK"
-	ActiveV1AccountOrderGetOrdersParamsSecurityTypePreferredStock ActiveV1AccountOrderGetOrdersParamsSecurityType = "PREFERRED_STOCK"
-	ActiveV1AccountOrderGetOrdersParamsSecurityTypeCorporateBond  ActiveV1AccountOrderGetOrdersParamsSecurityType = "CORPORATE_BOND"
-	ActiveV1AccountOrderGetOrdersParamsSecurityTypeOption         ActiveV1AccountOrderGetOrdersParamsSecurityType = "OPTION"
-	ActiveV1AccountOrderGetOrdersParamsSecurityTypeFuture         ActiveV1AccountOrderGetOrdersParamsSecurityType = "FUTURE"
-	ActiveV1AccountOrderGetOrdersParamsSecurityTypeWarrant        ActiveV1AccountOrderGetOrdersParamsSecurityType = "WARRANT"
-	ActiveV1AccountOrderGetOrdersParamsSecurityTypeCash           ActiveV1AccountOrderGetOrdersParamsSecurityType = "CASH"
-	ActiveV1AccountOrderGetOrdersParamsSecurityTypeOther          ActiveV1AccountOrderGetOrdersParamsSecurityType = "OTHER"
+	ActiveV1AccountOrderGetOrdersParamsInstrumentTypeCommonStock    ActiveV1AccountOrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
+	ActiveV1AccountOrderGetOrdersParamsInstrumentTypePreferredStock ActiveV1AccountOrderGetOrdersParamsInstrumentType = "PREFERRED_STOCK"
+	ActiveV1AccountOrderGetOrdersParamsInstrumentTypeCorporateBond  ActiveV1AccountOrderGetOrdersParamsInstrumentType = "CORPORATE_BOND"
+	ActiveV1AccountOrderGetOrdersParamsInstrumentTypeOption         ActiveV1AccountOrderGetOrdersParamsInstrumentType = "OPTION"
+	ActiveV1AccountOrderGetOrdersParamsInstrumentTypeFuture         ActiveV1AccountOrderGetOrdersParamsInstrumentType = "FUTURE"
+	ActiveV1AccountOrderGetOrdersParamsInstrumentTypeWarrant        ActiveV1AccountOrderGetOrdersParamsInstrumentType = "WARRANT"
+	ActiveV1AccountOrderGetOrdersParamsInstrumentTypeCash           ActiveV1AccountOrderGetOrdersParamsInstrumentType = "CASH"
+	ActiveV1AccountOrderGetOrdersParamsInstrumentTypeOther          ActiveV1AccountOrderGetOrdersParamsInstrumentType = "OTHER"
 )
 
 type ActiveV1AccountOrderReplaceOrderParams struct {
@@ -1400,17 +1400,17 @@ func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest) Unma
 
 // A single leg in a multileg strategy request.
 //
-// The properties Ratio, Security, SecurityType, Side are required.
+// The properties InstrumentType, Ratio, Security, Side are required.
 type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg struct {
-	// Ratio for the leg.
-	Ratio string `json:"ratio" api:"required"`
-	// Security identifier for the leg.
-	Security ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion `json:"security,omitzero" api:"required"`
 	// Security type for the leg.
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
 	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `json:"security_type,omitzero" api:"required"`
+	InstrumentType SecurityType `json:"instrument_type,omitzero" api:"required"`
+	// Ratio for the leg.
+	Ratio string `json:"ratio" api:"required"`
+	// Security identifier for the leg.
+	Security ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion `json:"security,omitzero" api:"required"`
 	// Leg side.
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
@@ -1481,9 +1481,14 @@ func (r *ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSec
 
 // Single-leg order request
 //
-// The properties OrderType, Quantity, SecurityType, Side, TimeInForce are
+// The properties InstrumentType, OrderType, Quantity, Side, TimeInForce are
 // required.
 type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest struct {
+	// Type of security
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
+	// "WARRANT", "CASH", "OTHER".
+	InstrumentType SecurityType `json:"instrument_type,omitzero" api:"required"`
 	// Type of order
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
@@ -1492,11 +1497,6 @@ type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest struct {
 	// Quantity to trade. For COMMON_STOCK: shares (may be fractional if supported).
 	// For OPTION (single-leg): contracts (must be an integer)
 	Quantity string `json:"quantity" api:"required"`
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `json:"security_type,omitzero" api:"required"`
 	// Side of the order
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
@@ -1528,11 +1528,11 @@ type ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderRequest struct {
 	// Trading symbol. For equities, use the ticker symbol (e.g., "AAPL"). For options,
 	// use the OSI symbol (e.g., "AAPL 250117C00190000"). If provided without
 	// security_id, the system will derive security_id and source based on
-	// security_type (CMS for equities, OPRA for options).
+	// instrument_type (CMS for equities, OPRA for options).
 	Symbol param.Opt[string] `json:"symbol,omitzero"`
 	// Trailing offset amount (required for trailing orders)
 	TrailingOffsetAmt param.Opt[string] `json:"trailing_offset_amt,omitzero"`
-	// Required when security_type is OPTION. Specifies whether the order opens or
+	// Required when instrument_type is OPTION. Specifies whether the order opens or
 	// closes a position.
 	//
 	// Any of "OPEN", "CLOSE".

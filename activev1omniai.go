@@ -723,6 +723,11 @@ func (r *OpenScreenerAction) UnmarshalJSON(data []byte) error {
 // This schema aligns with the NewOrderRequest schema used for order submission,
 // containing the fields needed to prefill an order ticket or submit via API.
 type OrderPayload struct {
+	// Type of security
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
+	// "WARRANT", "CASH", "OTHER".
+	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// Order type
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
@@ -730,11 +735,6 @@ type OrderPayload struct {
 	OrderType OrderType `json:"order_type" api:"required"`
 	// Quantity (shares for stocks, contracts for options)
 	Quantity string `json:"quantity" api:"required"`
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `json:"security_type" api:"required"`
 	// Order side
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
@@ -757,17 +757,17 @@ type OrderPayload struct {
 	Strategy OrderStrategyType `json:"strategy" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		OrderType    respjson.Field
-		Quantity     respjson.Field
-		SecurityType respjson.Field
-		Side         respjson.Field
-		Symbol       respjson.Field
-		TimeInForce  respjson.Field
-		LimitPrice   respjson.Field
-		StopPrice    respjson.Field
-		Strategy     respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
+		InstrumentType respjson.Field
+		OrderType      respjson.Field
+		Quantity       respjson.Field
+		Side           respjson.Field
+		Symbol         respjson.Field
+		TimeInForce    respjson.Field
+		LimitPrice     respjson.Field
+		StopPrice      respjson.Field
+		Strategy       respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
 	} `json:"-"`
 }
 

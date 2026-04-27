@@ -31,9 +31,9 @@ func TestActiveV1AccountOrderCancelAllOpenOrdersWithOptionalParams(t *testing.T)
 		context.TODO(),
 		0,
 		clearstreet.ActiveV1AccountOrderCancelAllOpenOrdersParams{
+			InstrumentType:   clearstreet.ActiveV1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock,
 			SecurityID:       []string{"string"},
 			SecurityIDSource: []string{"string"},
-			SecurityType:     clearstreet.ActiveV1AccountOrderCancelAllOpenOrdersParamsSecurityTypeCommonStock,
 			Side:             clearstreet.ActiveV1AccountOrderCancelAllOpenOrdersParamsSideBuy,
 			Type:             clearstreet.ActiveV1AccountOrderCancelAllOpenOrdersParamsTypeMarket,
 		},
@@ -123,11 +123,11 @@ func TestActiveV1AccountOrderGetOrdersWithOptionalParams(t *testing.T) {
 		0,
 		clearstreet.ActiveV1AccountOrderGetOrdersParams{
 			From:             clearstreet.Time(time.Now()),
+			InstrumentType:   clearstreet.ActiveV1AccountOrderGetOrdersParamsInstrumentTypeCommonStock,
 			PageSize:         clearstreet.Int(1),
 			PageToken:        clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 			SecurityID:       []string{"string"},
 			SecurityIDSource: []string{"string"},
-			SecurityType:     clearstreet.ActiveV1AccountOrderGetOrdersParamsSecurityTypeCommonStock,
 			Status:           []string{"PENDING_NEW"},
 			Symbol:           clearstreet.String("symbol"),
 			To:               clearstreet.Time(time.Now()),
@@ -195,29 +195,29 @@ func TestActiveV1AccountOrderSubmitOrders(t *testing.T) {
 			Body: []clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyUnion{{
 				OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequest: &clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest{
 					Legs: []clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg{{
-						Ratio: "ratio",
+						InstrumentType: clearstreet.SecurityTypeOption,
+						Ratio:          "ratio",
 						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion{
 							OfString: clearstreet.String("0193bb84-447a-706f-996f-097254663f02"),
 						},
-						SecurityType:   clearstreet.SecurityTypeOption,
 						Side:           clearstreet.SideBuy,
 						ID:             clearstreet.String("1"),
 						PositionEffect: "OPEN",
 					}, {
-						Ratio: "ratio",
+						InstrumentType: clearstreet.SecurityTypeOption,
+						Ratio:          "ratio",
 						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion{
 							OfString: clearstreet.String("0193bb84-4db4-78ec-b4fd-cba8be61cf8a"),
 						},
-						SecurityType:   clearstreet.SecurityTypeOption,
 						Side:           clearstreet.SideSell,
 						ID:             clearstreet.String("2"),
 						PositionEffect: "OPEN",
 					}, {
-						Ratio: "ratio",
+						InstrumentType: clearstreet.SecurityTypeOption,
+						Ratio:          "ratio",
 						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion{
 							OfString: clearstreet.String("0193bb84-5264-7f20-8fd3-35df82cd6ef0"),
 						},
-						SecurityType:   clearstreet.SecurityTypeOption,
 						Side:           clearstreet.SideBuy,
 						ID:             clearstreet.String("3"),
 						PositionEffect: "OPEN",
