@@ -305,6 +305,8 @@ type ScreenerItem struct {
 	GapFrom52wLowPct string `json:"gap_from_52w_low_pct" api:"nullable"`
 	// The specific industry of the instrument's issuer
 	Industry string `json:"industry" api:"nullable"`
+	// The type of instrument
+	InstrumentType string `json:"instrument_type" api:"nullable"`
 	// The date the instrument was first listed
 	ListDate time.Time `json:"list_date" api:"nullable" format:"date"`
 	// The total market capitalization
@@ -339,8 +341,6 @@ type ScreenerItem struct {
 	PriceToEarningsTtm string `json:"price_to_earnings_ttm" api:"nullable"`
 	// The business sector of the instrument's issuer
 	Sector string `json:"sector" api:"nullable"`
-	// The type of security
-	SecurityType string `json:"security_type" api:"nullable"`
 	// Percent change from six months ago close to previous day close
 	SixMonthChangePct string `json:"six_month_change_pct" api:"nullable"`
 	// The closing price approximately six months ago
@@ -382,6 +382,7 @@ type ScreenerItem struct {
 		GapFrom52wHighPct    respjson.Field
 		GapFrom52wLowPct     respjson.Field
 		Industry             respjson.Field
+		InstrumentType       respjson.Field
 		ListDate             respjson.Field
 		MarketCap            respjson.Field
 		MonthAvgVolume       respjson.Field
@@ -399,7 +400,6 @@ type ScreenerItem struct {
 		PrevDayClose         respjson.Field
 		PriceToEarningsTtm   respjson.Field
 		Sector               respjson.Field
-		SecurityType         respjson.Field
 		SixMonthChangePct    respjson.Field
 		SixMonthsAgoClose    respjson.Field
 		SixMonthsAgoOpen     respjson.Field

@@ -244,6 +244,11 @@ type InstrumentCore struct {
 	Adv string `json:"adv" api:"nullable"`
 	// The expiration date for options instruments
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
+	// The type of security (e.g., Common Stock, ETF)
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
+	// "WARRANT", "CASH", "OTHER".
+	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// The percent of a long position's value you must post as margin
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
 	// The full name of the instrument or its issuer
@@ -254,11 +259,6 @@ type InstrumentCore struct {
 	NotionalAdv string `json:"notional_adv" api:"nullable"`
 	// Last close price from the security definition.
 	PreviousClose string `json:"previous_close" api:"nullable"`
-	// The type of security (e.g., Common Stock, ETF)
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
-	SecurityType SecurityType `json:"security_type" api:"nullable"`
 	// The percent of a short position's value you must post as margin
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
 	// The strike price for options instruments
@@ -281,11 +281,11 @@ type InstrumentCore struct {
 		Venue               respjson.Field
 		Adv                 respjson.Field
 		Expiry              respjson.Field
+		InstrumentType      respjson.Field
 		LongMarginRate      respjson.Field
 		Name                respjson.Field
 		NotionalAdv         respjson.Field
 		PreviousClose       respjson.Field
-		SecurityType        respjson.Field
 		ShortMarginRate     respjson.Field
 		StrikePrice         respjson.Field
 		ExtraFields         map[string]respjson.Field
@@ -560,7 +560,7 @@ type ActiveV1InstrumentGetInstrumentsParams struct {
 	// Filter by easy to borrow status
 	EasyToBorrow param.Opt[bool] `query:"easy_to_borrow,omitzero" json:"-"`
 	// Filter IDs to those containing this substring. For options, and when
-	// security_type is omitted and no security_id/security_id_source filters are
+	// instrument_type is omitted and no security_id/security_id_source filters are
 	// provided, this is required.
 	IDFilter param.Opt[string] `query:"id_filter,omitzero" json:"-"`
 	// Filter by liquidation only status
@@ -577,6 +577,11 @@ type ActiveV1InstrumentGetInstrumentsParams struct {
 	// Token for retrieving the next page of results. Contains encoded pagination state
 	// (limit + offset). When provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
+	// Filter by instrument type. If omitted, returns all types.
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
+	// "WARRANT", "CASH", "OTHER".
+	InstrumentType ActiveV1InstrumentGetInstrumentsParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Filter by security ID(s). Accepts single value or indexed array.
 	//
 	// Examples:
@@ -592,11 +597,6 @@ type ActiveV1InstrumentGetInstrumentsParams struct {
 	// - Single: `security_id_source=CUSIP`
 	// - Multiple: `security_id_source[0]=CUSIP&security_id_source[1]=FIGI`
 	SecurityIDSource []string `query:"security_id_source,omitzero" json:"-"`
-	// Filter by security type. If omitted, returns all types.
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
-	SecurityType ActiveV1InstrumentGetInstrumentsParamsSecurityType `query:"security_type,omitzero" json:"-"`
 	paramObj
 }
 
@@ -609,18 +609,18 @@ func (r ActiveV1InstrumentGetInstrumentsParams) URLQuery() (v url.Values, err er
 	})
 }
 
-// Filter by security type. If omitted, returns all types.
-type ActiveV1InstrumentGetInstrumentsParamsSecurityType string
+// Filter by instrument type. If omitted, returns all types.
+type ActiveV1InstrumentGetInstrumentsParamsInstrumentType string
 
 const (
-	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeCommonStock    ActiveV1InstrumentGetInstrumentsParamsSecurityType = "COMMON_STOCK"
-	ActiveV1InstrumentGetInstrumentsParamsSecurityTypePreferredStock ActiveV1InstrumentGetInstrumentsParamsSecurityType = "PREFERRED_STOCK"
-	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeCorporateBond  ActiveV1InstrumentGetInstrumentsParamsSecurityType = "CORPORATE_BOND"
-	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeOption         ActiveV1InstrumentGetInstrumentsParamsSecurityType = "OPTION"
-	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeFuture         ActiveV1InstrumentGetInstrumentsParamsSecurityType = "FUTURE"
-	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeWarrant        ActiveV1InstrumentGetInstrumentsParamsSecurityType = "WARRANT"
-	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeCash           ActiveV1InstrumentGetInstrumentsParamsSecurityType = "CASH"
-	ActiveV1InstrumentGetInstrumentsParamsSecurityTypeOther          ActiveV1InstrumentGetInstrumentsParamsSecurityType = "OTHER"
+	ActiveV1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock    ActiveV1InstrumentGetInstrumentsParamsInstrumentType = "COMMON_STOCK"
+	ActiveV1InstrumentGetInstrumentsParamsInstrumentTypePreferredStock ActiveV1InstrumentGetInstrumentsParamsInstrumentType = "PREFERRED_STOCK"
+	ActiveV1InstrumentGetInstrumentsParamsInstrumentTypeCorporateBond  ActiveV1InstrumentGetInstrumentsParamsInstrumentType = "CORPORATE_BOND"
+	ActiveV1InstrumentGetInstrumentsParamsInstrumentTypeOption         ActiveV1InstrumentGetInstrumentsParamsInstrumentType = "OPTION"
+	ActiveV1InstrumentGetInstrumentsParamsInstrumentTypeFuture         ActiveV1InstrumentGetInstrumentsParamsInstrumentType = "FUTURE"
+	ActiveV1InstrumentGetInstrumentsParamsInstrumentTypeWarrant        ActiveV1InstrumentGetInstrumentsParamsInstrumentType = "WARRANT"
+	ActiveV1InstrumentGetInstrumentsParamsInstrumentTypeCash           ActiveV1InstrumentGetInstrumentsParamsInstrumentType = "CASH"
+	ActiveV1InstrumentGetInstrumentsParamsInstrumentTypeOther          ActiveV1InstrumentGetInstrumentsParamsInstrumentType = "OTHER"
 )
 
 type ActiveV1InstrumentSearchParams struct {
