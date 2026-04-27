@@ -120,6 +120,8 @@ type Position struct {
 	DailyUnrealizedPnlPct string `json:"daily_unrealized_pnl_pct" api:"nullable"`
 	// The current market price of the instrument
 	MarketPrice string `json:"market_price" api:"nullable"`
+	// OEMS instrument identifier of the underlying instrument, if resolvable
+	UnderlierInstrumentID string `json:"underlier_instrument_id" api:"nullable" format:"uuid"`
 	// The total unrealized profit or loss for this position based on current market
 	// value
 	UnrealizedPnl string `json:"unrealized_pnl" api:"nullable"`
@@ -143,6 +145,7 @@ type Position struct {
 		DailyUnrealizedPnl    respjson.Field
 		DailyUnrealizedPnlPct respjson.Field
 		MarketPrice           respjson.Field
+		UnderlierInstrumentID respjson.Field
 		UnrealizedPnl         respjson.Field
 		UnrealizedPnlPct      respjson.Field
 		ExtraFields           map[string]respjson.Field
