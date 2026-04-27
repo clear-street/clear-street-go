@@ -51,16 +51,15 @@ func (r *ActiveV1WatchlistService) NewWatchlist(ctx context.Context, body Active
 }
 
 // Delete a watchlist and all its items
-func (r *ActiveV1WatchlistService) DeleteWatchlist(ctx context.Context, watchlistID string, opts ...option.RequestOption) (err error) {
+func (r *ActiveV1WatchlistService) DeleteWatchlist(ctx context.Context, watchlistID string, opts ...option.RequestOption) (res *ActiveV1WatchlistDeleteWatchlistResponse, err error) {
 	opts = slices.Concat(r.options, opts)
-	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if watchlistID == "" {
 		err = errors.New("missing required watchlist_id parameter")
-		return err
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/watchlists/%s", watchlistID)
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return err
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
+	return res, err
 }
 
 // Get a watchlist by ID with all its items
@@ -180,6 +179,8 @@ func (r ActiveV1WatchlistNewWatchlistResponse) RawJSON() string { return r.JSON.
 func (r *ActiveV1WatchlistNewWatchlistResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+type ActiveV1WatchlistDeleteWatchlistResponse = any
 
 type ActiveV1WatchlistGetWatchlistByIDResponse struct {
 	// Detailed watchlist with all items

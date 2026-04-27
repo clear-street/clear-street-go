@@ -51,7 +51,7 @@ func TestActiveV1WatchlistDeleteWatchlist(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	err := client.Active.V1.Watchlists.DeleteWatchlist(context.TODO(), "550e8400-e29b-41d4-a716-446655440000")
+	_, err := client.Active.V1.Watchlists.DeleteWatchlist(context.TODO(), "550e8400-e29b-41d4-a716-446655440000")
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {
