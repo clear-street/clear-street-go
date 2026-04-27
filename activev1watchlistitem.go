@@ -51,20 +51,19 @@ func (r *ActiveV1WatchlistItemService) AddWatchlistItem(ctx context.Context, wat
 }
 
 // Delete an instrument from a watchlist
-func (r *ActiveV1WatchlistItemService) DeleteWatchlistItem(ctx context.Context, itemID string, body ActiveV1WatchlistItemDeleteWatchlistItemParams, opts ...option.RequestOption) (err error) {
+func (r *ActiveV1WatchlistItemService) DeleteWatchlistItem(ctx context.Context, itemID string, body ActiveV1WatchlistItemDeleteWatchlistItemParams, opts ...option.RequestOption) (res *ActiveV1WatchlistItemDeleteWatchlistItemResponse, err error) {
 	opts = slices.Concat(r.options, opts)
-	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	if body.WatchlistID == "" {
 		err = errors.New("missing required watchlist_id parameter")
-		return err
+		return nil, err
 	}
 	if itemID == "" {
 		err = errors.New("missing required item_id parameter")
-		return err
+		return nil, err
 	}
 	path := fmt.Sprintf("active/v1/watchlists/%s/items/%s", body.WatchlistID, itemID)
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, nil, opts...)
-	return err
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
+	return res, err
 }
 
 // Response data for adding a watchlist item
@@ -102,6 +101,8 @@ func (r ActiveV1WatchlistItemAddWatchlistItemResponse) RawJSON() string { return
 func (r *ActiveV1WatchlistItemAddWatchlistItemResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+type ActiveV1WatchlistItemDeleteWatchlistItemResponse = any
 
 type ActiveV1WatchlistItemAddWatchlistItemParams struct {
 	// OEMS instrument ID (mutually exclusive with security_id/security_id_source)
