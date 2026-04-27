@@ -59,6 +59,7 @@ func TestActiveV1InstrumentGetInstrumentsWithOptionalParams(t *testing.T) {
 	_, err := client.Active.V1.Instruments.GetInstruments(context.TODO(), clearstreet.ActiveV1InstrumentGetInstrumentsParams{
 		EasyToBorrow:        clearstreet.Bool(true),
 		IDFilter:            clearstreet.String("id_filter"),
+		InstrumentType:      clearstreet.ActiveV1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock,
 		IsLiquidationOnly:   clearstreet.Bool(true),
 		IsMarginable:        clearstreet.Bool(true),
 		IsRestricted:        clearstreet.Bool(true),
@@ -68,7 +69,6 @@ func TestActiveV1InstrumentGetInstrumentsWithOptionalParams(t *testing.T) {
 		PageToken:           clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 		SecurityID:          []string{"string"},
 		SecurityIDSource:    []string{"string"},
-		SecurityType:        clearstreet.ActiveV1InstrumentGetInstrumentsParamsSecurityTypeCommonStock,
 	})
 	if err != nil {
 		var apierr *clearstreet.Error
