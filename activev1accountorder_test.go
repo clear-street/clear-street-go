@@ -192,12 +192,12 @@ func TestActiveV1AccountOrderSubmitOrders(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.ActiveV1AccountOrderSubmitOrdersParams{
-			Orders: []clearstreet.ActiveV1AccountOrderSubmitOrdersParamsOrderUnion{{
-				OfActiveV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequest: &clearstreet.ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest{
-					Legs: []clearstreet.ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg{{
+			Body: []clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyUnion{{
+				OfActiveV1AccountOrderSubmitOrderssBodyNewOrderMultilegRequest: &clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequest{
+					Legs: []clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLeg{{
 						InstrumentType: clearstreet.SecurityTypeOption,
 						Ratio:          "ratio",
-						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecurityUnion{
+						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion{
 							OfString: clearstreet.String("0193bb84-447a-706f-996f-097254663f02"),
 						},
 						Side:           clearstreet.SideBuy,
@@ -206,7 +206,7 @@ func TestActiveV1AccountOrderSubmitOrders(t *testing.T) {
 					}, {
 						InstrumentType: clearstreet.SecurityTypeOption,
 						Ratio:          "ratio",
-						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecurityUnion{
+						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion{
 							OfString: clearstreet.String("0193bb84-4db4-78ec-b4fd-cba8be61cf8a"),
 						},
 						Side:           clearstreet.SideSell,
@@ -215,7 +215,7 @@ func TestActiveV1AccountOrderSubmitOrders(t *testing.T) {
 					}, {
 						InstrumentType: clearstreet.SecurityTypeOption,
 						Ratio:          "ratio",
-						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLegSecurityUnion{
+						Security: clearstreet.ActiveV1AccountOrderSubmitOrdersParamsBodyNewOrderMultilegRequestLegSecurityUnion{
 							OfString: clearstreet.String("0193bb84-5264-7f20-8fd3-35df82cd6ef0"),
 						},
 						Side:           clearstreet.SideBuy,
