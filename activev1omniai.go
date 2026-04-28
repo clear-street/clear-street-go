@@ -749,6 +749,8 @@ type OrderPayload struct {
 	TimeInForce TimeInForce `json:"time_in_force" api:"required"`
 	// Limit price (required for LIMIT and STOP_LIMIT orders)
 	LimitPrice string `json:"limit_price" api:"nullable"`
+	// Existing order identifier. Required for cancel actions.
+	OrderID string `json:"order_id" api:"nullable"`
 	// Stop price (required for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price" api:"nullable"`
 	// Execution strategy (simplified enum, not the full strategy params for now)
@@ -764,6 +766,7 @@ type OrderPayload struct {
 		Symbol         respjson.Field
 		TimeInForce    respjson.Field
 		LimitPrice     respjson.Field
+		OrderID        respjson.Field
 		StopPrice      respjson.Field
 		Strategy       respjson.Field
 		ExtraFields    map[string]respjson.Field
@@ -799,14 +802,16 @@ const (
 // API. This action provides parsed order data that can be used to prefill an order
 // ticket UI or submitted directly via the orders API after user confirmation.
 type PrefillOrderAction struct {
+	// Order operation represented by this prefill action.
+	//
+	// Any of "NEW", "CANCEL".
+	ActionType PrefillOrderActionType `json:"action_type" api:"required"`
 	// The orders to prefill
 	Orders []OrderPayload `json:"orders" api:"required"`
-	// Account to prefill for (if known from context)
-	AccountID int64 `json:"account_id" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		ActionType  respjson.Field
 		Orders      respjson.Field
-		AccountID   respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -817,6 +822,14 @@ func (r PrefillOrderAction) RawJSON() string { return r.JSON.raw }
 func (r *PrefillOrderAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Operation represented by a prefill order action.
+type PrefillOrderActionType string
+
+const (
+	PrefillOrderActionTypeNew    PrefillOrderActionType = "NEW"
+	PrefillOrderActionTypeCancel PrefillOrderActionType = "CANCEL"
+)
 
 // Prompt-style button behavior.
 type PromptButtonAction struct {
@@ -1118,51 +1131,19 @@ const (
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type StructuredActionUnion struct {
 	// This field is from variant [StructuredActionPrefillOrder].
-	Orders []OrderPayload `json:"orders"`
-	// This field is from variant [StructuredActionPrefillOrder].
-	AccountID  int64  `json:"account_id"`
-	ActionType string `json:"action_type"`
+	PrefillOrder PrefillOrderAction `json:"prefill_order"`
 	// This field is from variant [StructuredActionOpenChart].
-	Symbol string `json:"symbol"`
-	// This field is from variant [StructuredActionOpenChart].
-	Extras any `json:"extras"`
-	// This field is from variant [StructuredActionOpenChart].
-	Timeframe string `json:"timeframe"`
+	OpenChart OpenChartAction `json:"open_chart"`
 	// This field is from variant [StructuredActionOpenScreener].
-	Filters []ScreenerFilter `json:"filters"`
-	// This field is from variant [StructuredActionOpenScreener].
-	FieldFilter []string `json:"field_filter"`
-	// This field is from variant [StructuredActionOpenScreener].
-	PageSize int64 `json:"page_size"`
-	// This field is from variant [StructuredActionOpenScreener].
-	SortBy string `json:"sort_by"`
-	// This field is from variant [StructuredActionOpenScreener].
-	SortDirection string `json:"sort_direction"`
+	OpenScreener OpenScreenerAction `json:"open_screener"`
 	// This field is from variant [StructuredActionOpenEntitlementConsent].
-	AgreementKey string `json:"agreement_key"`
-	// This field is from variant [StructuredActionOpenEntitlementConsent].
-	Reason string `json:"reason"`
-	// This field is from variant [StructuredActionOpenEntitlementConsent].
-	RequestedEntitlementCodes []string `json:"requested_entitlement_codes"`
-	// This field is from variant [StructuredActionOpenEntitlementConsent].
-	TradingAccountIDs []int64 `json:"trading_account_ids"`
-	JSON              struct {
-		Orders                    respjson.Field
-		AccountID                 respjson.Field
-		ActionType                respjson.Field
-		Symbol                    respjson.Field
-		Extras                    respjson.Field
-		Timeframe                 respjson.Field
-		Filters                   respjson.Field
-		FieldFilter               respjson.Field
-		PageSize                  respjson.Field
-		SortBy                    respjson.Field
-		SortDirection             respjson.Field
-		AgreementKey              respjson.Field
-		Reason                    respjson.Field
-		RequestedEntitlementCodes respjson.Field
-		TradingAccountIDs         respjson.Field
-		raw                       string
+	OpenEntitlementConsent OpenEntitlementConsentAction `json:"open_entitlement_consent"`
+	JSON                   struct {
+		PrefillOrder           respjson.Field
+		OpenChart              respjson.Field
+		OpenScreener           respjson.Field
+		OpenEntitlementConsent respjson.Field
+		raw                    string
 	} `json:"-"`
 }
 
@@ -1195,15 +1176,14 @@ func (r *StructuredActionUnion) UnmarshalJSON(data []byte) error {
 
 // Prefill an order ticket for user confirmation
 type StructuredActionPrefillOrder struct {
-	// Any of "prefill_order".
-	ActionType string `json:"action_type" api:"required"`
+	// Prefill an order ticket for user confirmation
+	PrefillOrder PrefillOrderAction `json:"prefill_order" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ActionType  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		PrefillOrder respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
 	} `json:"-"`
-	PrefillOrderAction
 }
 
 // Returns the unmodified JSON received from the API
@@ -1214,15 +1194,14 @@ func (r *StructuredActionPrefillOrder) UnmarshalJSON(data []byte) error {
 
 // Open a chart for a symbol
 type StructuredActionOpenChart struct {
-	// Any of "open_chart".
-	ActionType string `json:"action_type" api:"required"`
+	// Open a chart for a symbol
+	OpenChart OpenChartAction `json:"open_chart" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ActionType  respjson.Field
+		OpenChart   respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
-	OpenChartAction
 }
 
 // Returns the unmodified JSON received from the API
@@ -1233,15 +1212,14 @@ func (r *StructuredActionOpenChart) UnmarshalJSON(data []byte) error {
 
 // Open a stock screener with filters
 type StructuredActionOpenScreener struct {
-	// Any of "open_screener".
-	ActionType string `json:"action_type" api:"required"`
+	// Open a stock screener with filters
+	OpenScreener OpenScreenerAction `json:"open_screener" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ActionType  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		OpenScreener respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
 	} `json:"-"`
-	OpenScreenerAction
 }
 
 // Returns the unmodified JSON received from the API
@@ -1252,15 +1230,14 @@ func (r *StructuredActionOpenScreener) UnmarshalJSON(data []byte) error {
 
 // Open entitlement consent flow
 type StructuredActionOpenEntitlementConsent struct {
-	// Any of "open_entitlement_consent".
-	ActionType string `json:"action_type" api:"required"`
+	// Open entitlement consent flow
+	OpenEntitlementConsent OpenEntitlementConsentAction `json:"open_entitlement_consent" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ActionType  respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		OpenEntitlementConsent respjson.Field
+		ExtraFields            map[string]respjson.Field
+		raw                    string
 	} `json:"-"`
-	OpenEntitlementConsentAction
 }
 
 // Returns the unmodified JSON received from the API
