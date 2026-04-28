@@ -33,9 +33,15 @@ type ActiveV1InstrumentService struct {
 	// Retrieve details and lists of tradable instruments.
 	AnalystReporting ActiveV1InstrumentAnalystReportingService
 	// Retrieve details and lists of tradable instruments.
+	BalanceSheets ActiveV1InstrumentBalanceSheetService
+	// Retrieve details and lists of tradable instruments.
+	CashFlowStatements ActiveV1InstrumentCashFlowStatementService
+	// Retrieve details and lists of tradable instruments.
 	Events ActiveV1InstrumentEventService
 	// Retrieve details and lists of tradable instruments.
 	Fundamentals ActiveV1InstrumentFundamentalService
+	// Retrieve details and lists of tradable instruments.
+	IncomeStatements ActiveV1InstrumentIncomeStatementService
 	// Retrieve details and lists of tradable instruments.
 	Options ActiveV1InstrumentOptionService
 }
@@ -47,8 +53,11 @@ func NewActiveV1InstrumentService(opts ...option.RequestOption) (r ActiveV1Instr
 	r = ActiveV1InstrumentService{}
 	r.options = opts
 	r.AnalystReporting = NewActiveV1InstrumentAnalystReportingService(opts...)
+	r.BalanceSheets = NewActiveV1InstrumentBalanceSheetService(opts...)
+	r.CashFlowStatements = NewActiveV1InstrumentCashFlowStatementService(opts...)
 	r.Events = NewActiveV1InstrumentEventService(opts...)
 	r.Fundamentals = NewActiveV1InstrumentFundamentalService(opts...)
+	r.IncomeStatements = NewActiveV1InstrumentIncomeStatementService(opts...)
 	r.Options = NewActiveV1InstrumentOptionService(opts...)
 	return
 }
@@ -114,6 +123,16 @@ type ExerciseStyle string
 const (
 	ExerciseStyleAmerican ExerciseStyle = "AMERICAN"
 	ExerciseStyleEuropean ExerciseStyle = "EUROPEAN"
+)
+
+// Fiscal period type for earnings reports
+type FiscalPeriodType string
+
+const (
+	FiscalPeriodTypeQuarterly FiscalPeriodType = "QUARTERLY"
+	FiscalPeriodTypeAnnual    FiscalPeriodType = "ANNUAL"
+	FiscalPeriodTypeTtm       FiscalPeriodType = "TTM"
+	FiscalPeriodTypeBiannual  FiscalPeriodType = "BIANNUAL"
 )
 
 // Represents a tradable financial instrument, including supplemental information
