@@ -171,7 +171,7 @@ func (r *ActiveV1MarketDataSnapshotGetSnapshotsResponse) UnmarshalJSON(data []by
 }
 
 type ActiveV1MarketDataSnapshotGetSnapshotsParams struct {
-	// Comma-separated OEMS instrument UUIDs
+	// Comma-separated OEMS instrument UUIDs.
 	IDs param.Opt[string] `query:"ids,omitzero" json:"-"`
 	// Filter by security ID(s). Accepts single value or indexed array.
 	//
