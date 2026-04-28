@@ -84,7 +84,7 @@ func TestActiveV1WatchlistGetWatchlistByID(t *testing.T) {
 	}
 }
 
-func TestActiveV1WatchlistGetWatchlists(t *testing.T) {
+func TestActiveV1WatchlistGetWatchlistsWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -97,7 +97,10 @@ func TestActiveV1WatchlistGetWatchlists(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.Active.V1.Watchlists.GetWatchlists(context.TODO())
+	_, err := client.Active.V1.Watchlists.GetWatchlists(context.TODO(), clearstreet.ActiveV1WatchlistGetWatchlistsParams{
+		PageSize:  clearstreet.Int(1),
+		PageToken: clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+	})
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {
