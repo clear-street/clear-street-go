@@ -7,10 +7,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"time"
 
 	"github.com/clear-street/clear-street-go/internal/apijson"
+	"github.com/clear-street/clear-street-go/internal/apiquery"
 	"github.com/clear-street/clear-street-go/internal/requestconfig"
 	"github.com/clear-street/clear-street-go/option"
 	"github.com/clear-street/clear-street-go/packages/param"
@@ -75,10 +77,10 @@ func (r *ActiveV1WatchlistService) GetWatchlistByID(ctx context.Context, watchli
 }
 
 // List watchlists for the authenticated user
-func (r *ActiveV1WatchlistService) GetWatchlists(ctx context.Context, opts ...option.RequestOption) (res *ActiveV1WatchlistGetWatchlistsResponse, err error) {
+func (r *ActiveV1WatchlistService) GetWatchlists(ctx context.Context, query ActiveV1WatchlistGetWatchlistsParams, opts ...option.RequestOption) (res *ActiveV1WatchlistGetWatchlistsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "active/v1/watchlists"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
 
@@ -229,4 +231,21 @@ func (r ActiveV1WatchlistNewWatchlistParams) MarshalJSON() (data []byte, err err
 }
 func (r *ActiveV1WatchlistNewWatchlistParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+type ActiveV1WatchlistGetWatchlistsParams struct {
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next page of results. Contains encoded pagination state
+	// (limit + offset). When provided, page_size is ignored.
+	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [ActiveV1WatchlistGetWatchlistsParams]'s query parameters as
+// `url.Values`.
+func (r ActiveV1WatchlistGetWatchlistsParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
 }
