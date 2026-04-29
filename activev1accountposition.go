@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+	"time"
 
 	"github.com/clear-street/clear-street-go/internal/apijson"
 	"github.com/clear-street/clear-street-go/internal/apiquery"
@@ -111,6 +112,8 @@ type Position struct {
 	AvgPrice string `json:"avg_price" api:"nullable"`
 	// The closing price used to value the position for the last trading day
 	ClosingPrice string `json:"closing_price" api:"nullable"`
+	// The market date associated with `closing_price`
+	ClosingPriceDate time.Time `json:"closing_price_date" api:"nullable" format:"date"`
 	// The total cost basis for this position
 	CostBasis string `json:"cost_basis" api:"nullable"`
 	// The unrealized profit or loss for this position relative to the previous close
@@ -141,6 +144,7 @@ type Position struct {
 		Symbol                respjson.Field
 		AvgPrice              respjson.Field
 		ClosingPrice          respjson.Field
+		ClosingPriceDate      respjson.Field
 		CostBasis             respjson.Field
 		DailyUnrealizedPnl    respjson.Field
 		DailyUnrealizedPnlPct respjson.Field
