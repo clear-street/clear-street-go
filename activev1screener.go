@@ -167,6 +167,300 @@ const (
 	FieldTypeDate          FieldType = "DATE"
 )
 
+// Operator specification with optional behavioral arguments.
+type FilterOpSpec struct {
+	// The operator to apply.
+	//
+	// Any of "LT", "LTE", "GT", "GTE", "EQ", "BETWEEN", "NOT_BETWEEN", "ONE_OF",
+	// "REGEX", "BEGINS_WITH", "ENDS_WITH", "CONTAINS", "IS_NULL", "IS_NOT_NULL".
+	Name FilterOperator `json:"name" api:"required"`
+	// Optional arguments that modify operator behavior.
+	Args []OperatorArg `json:"args"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Args        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r FilterOpSpec) RawJSON() string { return r.JSON.raw }
+func (r *FilterOpSpec) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this FilterOpSpec to a FilterOpSpecParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// FilterOpSpecParam.Overrides()
+func (r FilterOpSpec) ToParam() FilterOpSpecParam {
+	return param.Override[FilterOpSpecParam](json.RawMessage(r.RawJSON()))
+}
+
+// Operator specification with optional behavioral arguments.
+//
+// The property Name is required.
+type FilterOpSpecParam struct {
+	// The operator to apply.
+	//
+	// Any of "LT", "LTE", "GT", "GTE", "EQ", "BETWEEN", "NOT_BETWEEN", "ONE_OF",
+	// "REGEX", "BEGINS_WITH", "ENDS_WITH", "CONTAINS", "IS_NULL", "IS_NOT_NULL".
+	Name FilterOperator `json:"name,omitzero" api:"required"`
+	// Optional arguments that modify operator behavior.
+	Args []OperatorArg `json:"args,omitzero"`
+	paramObj
+}
+
+func (r FilterOpSpecParam) MarshalJSON() (data []byte, err error) {
+	type shadow FilterOpSpecParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FilterOpSpecParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Operator for screener search filters.
+type FilterOperator string
+
+const (
+	FilterOperatorLt         FilterOperator = "LT"
+	FilterOperatorLte        FilterOperator = "LTE"
+	FilterOperatorGt         FilterOperator = "GT"
+	FilterOperatorGte        FilterOperator = "GTE"
+	FilterOperatorEq         FilterOperator = "EQ"
+	FilterOperatorBetween    FilterOperator = "BETWEEN"
+	FilterOperatorNotBetween FilterOperator = "NOT_BETWEEN"
+	FilterOperatorOneOf      FilterOperator = "ONE_OF"
+	FilterOperatorRegex      FilterOperator = "REGEX"
+	FilterOperatorBeginsWith FilterOperator = "BEGINS_WITH"
+	FilterOperatorEndsWith   FilterOperator = "ENDS_WITH"
+	FilterOperatorContains   FilterOperator = "CONTAINS"
+	FilterOperatorIsNull     FilterOperator = "IS_NULL"
+	FilterOperatorIsNotNull  FilterOperator = "IS_NOT_NULL"
+)
+
+// A filter value: either a literal or a variable reference.
+type FilterValue struct {
+	Value FilterValueValueUnion `json:"value" api:"nullable"`
+	// A variable reference.
+	Variable Variable `json:"variable" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Value       respjson.Field
+		Variable    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r FilterValue) RawJSON() string { return r.JSON.raw }
+func (r *FilterValue) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this FilterValue to a FilterValueParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// FilterValueParam.Overrides()
+func (r FilterValue) ToParam() FilterValueParam {
+	return param.Override[FilterValueParam](json.RawMessage(r.RawJSON()))
+}
+
+// FilterValueValueUnion contains all possible properties and values from
+// [float64], [string].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfFloat OfString]
+type FilterValueValueUnion struct {
+	// This field will be present if the value is a [float64] instead of an object.
+	OfFloat float64 `json:",inline"`
+	// This field will be present if the value is a [string] instead of an object.
+	OfString string `json:",inline"`
+	JSON     struct {
+		OfFloat  respjson.Field
+		OfString respjson.Field
+		raw      string
+	} `json:"-"`
+}
+
+func (u FilterValueValueUnion) AsFloat() (v float64) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u FilterValueValueUnion) AsString() (v string) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u FilterValueValueUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *FilterValueValueUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A filter value: either a literal or a variable reference.
+type FilterValueParam struct {
+	Value FilterValueValueUnionParam `json:"value,omitzero"`
+	// A variable reference.
+	Variable VariableParam `json:"variable,omitzero"`
+	paramObj
+}
+
+func (r FilterValueParam) MarshalJSON() (data []byte, err error) {
+	type shadow FilterValueParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *FilterValueParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type FilterValueValueUnionParam struct {
+	OfFloat  param.Opt[float64] `json:",omitzero,inline"`
+	OfString param.Opt[string]  `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u FilterValueValueUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfFloat, u.OfString)
+}
+func (u *FilterValueValueUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+// Arithmetic modifier applied to a variable value.
+type Modifier struct {
+	Args []ModifierArgUnion `json:"args" api:"required"`
+	// The modifier operation.
+	//
+	// Any of "ADD", "SUB".
+	Name ModifierOp `json:"name" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Args        respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Modifier) RawJSON() string { return r.JSON.raw }
+func (r *Modifier) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this Modifier to a ModifierParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ModifierParam.Overrides()
+func (r Modifier) ToParam() ModifierParam {
+	return param.Override[ModifierParam](json.RawMessage(r.RawJSON()))
+}
+
+// ModifierArgUnion contains all possible properties and values from [float64],
+// [string].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfFloat OfString]
+type ModifierArgUnion struct {
+	// This field will be present if the value is a [float64] instead of an object.
+	OfFloat float64 `json:",inline"`
+	// This field will be present if the value is a [string] instead of an object.
+	OfString string `json:",inline"`
+	JSON     struct {
+		OfFloat  respjson.Field
+		OfString respjson.Field
+		raw      string
+	} `json:"-"`
+}
+
+func (u ModifierArgUnion) AsFloat() (v float64) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ModifierArgUnion) AsString() (v string) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u ModifierArgUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *ModifierArgUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Arithmetic modifier applied to a variable value.
+//
+// The properties Args, Name are required.
+type ModifierParam struct {
+	Args []ModifierArgUnionParam `json:"args,omitzero" api:"required"`
+	// The modifier operation.
+	//
+	// Any of "ADD", "SUB".
+	Name ModifierOp `json:"name,omitzero" api:"required"`
+	paramObj
+}
+
+func (r ModifierParam) MarshalJSON() (data []byte, err error) {
+	type shadow ModifierParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ModifierParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type ModifierArgUnionParam struct {
+	OfFloat  param.Opt[float64] `json:",omitzero,inline"`
+	OfString param.Opt[string]  `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u ModifierArgUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfFloat, u.OfString)
+}
+func (u *ModifierArgUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+// Modifier operation applied to a variable.
+type ModifierOp string
+
+const (
+	ModifierOpAdd ModifierOp = "ADD"
+	ModifierOpSub ModifierOp = "SUB"
+)
+
+// Argument that modifies operator behavior.
+type OperatorArg string
+
+const (
+	OperatorArgLeftInclusive   OperatorArg = "LEFT_INCLUSIVE"
+	OperatorArgRightInclusive  OperatorArg = "RIGHT_INCLUSIVE"
+	OperatorArgLeftExclusive   OperatorArg = "LEFT_EXCLUSIVE"
+	OperatorArgRightExclusive  OperatorArg = "RIGHT_EXCLUSIVE"
+	OperatorArgCaseInsensitive OperatorArg = "CASE_INSENSITIVE"
+)
+
 // A single column in the screener search response.
 type ScreenerColumn struct {
 	// Field reference (same shape as filter/sort field references)
@@ -427,6 +721,141 @@ type ScreenerRow []ScreenerColumn
 
 type ScreenerRowList []ScreenerRow
 
+// A single filter condition.
+//
+// When `op` and `right` are both absent, the filter is "unenabled": it persists a
+// `left` field reference without applying any predicate. Unenabled filters are
+// skipped during search execution but still round-trip through save/load so
+// callers can preserve draft state.
+type SearchFilter struct {
+	// The field to filter on.
+	Left FieldRef `json:"left" api:"required"`
+	// The operator and optional arguments. Omit together with `right` for an unenabled
+	// filter.
+	Op FilterOpSpec `json:"op" api:"nullable"`
+	// The value(s) to compare against. Omit together with `op` for an unenabled
+	// filter.
+	Right []FilterValue `json:"right" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Left        respjson.Field
+		Op          respjson.Field
+		Right       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SearchFilter) RawJSON() string { return r.JSON.raw }
+func (r *SearchFilter) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this SearchFilter to a SearchFilterParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// SearchFilterParam.Overrides()
+func (r SearchFilter) ToParam() SearchFilterParam {
+	return param.Override[SearchFilterParam](json.RawMessage(r.RawJSON()))
+}
+
+// A single filter condition.
+//
+// When `op` and `right` are both absent, the filter is "unenabled": it persists a
+// `left` field reference without applying any predicate. Unenabled filters are
+// skipped during search execution but still round-trip through save/load so
+// callers can preserve draft state.
+//
+// The property Left is required.
+type SearchFilterParam struct {
+	// The field to filter on.
+	Left FieldRefParam `json:"left,omitzero" api:"required"`
+	// The value(s) to compare against. Omit together with `op` for an unenabled
+	// filter.
+	Right []FilterValueParam `json:"right,omitzero"`
+	// The operator and optional arguments. Omit together with `right` for an unenabled
+	// filter.
+	Op FilterOpSpecParam `json:"op,omitzero"`
+	paramObj
+}
+
+func (r SearchFilterParam) MarshalJSON() (data []byte, err error) {
+	type shadow SearchFilterParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *SearchFilterParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A variable reference (field or built-in like `today`).
+type Variable struct {
+	// The variable name.
+	Name string `json:"name" api:"required"`
+	// Optional historical lookback window.
+	//
+	// Any of "ONE_WEEK", "ONE_MONTH", "THREE_MONTHS", "SIX_MONTHS", "YTD", "ONE_YEAR".
+	Lookback FieldLookback `json:"lookback" api:"nullable"`
+	// Optional arithmetic modifier.
+	Modifier Modifier `json:"modifier" api:"nullable"`
+	// Optional reporting period.
+	//
+	// Any of "QUARTER", "TTM".
+	Period FieldPeriod `json:"period" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Name        respjson.Field
+		Lookback    respjson.Field
+		Modifier    respjson.Field
+		Period      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Variable) RawJSON() string { return r.JSON.raw }
+func (r *Variable) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this Variable to a VariableParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// VariableParam.Overrides()
+func (r Variable) ToParam() VariableParam {
+	return param.Override[VariableParam](json.RawMessage(r.RawJSON()))
+}
+
+// A variable reference (field or built-in like `today`).
+//
+// The property Name is required.
+type VariableParam struct {
+	// The variable name.
+	Name string `json:"name" api:"required"`
+	// Optional historical lookback window.
+	//
+	// Any of "ONE_WEEK", "ONE_MONTH", "THREE_MONTHS", "SIX_MONTHS", "YTD", "ONE_YEAR".
+	Lookback FieldLookback `json:"lookback,omitzero"`
+	// Optional arithmetic modifier.
+	Modifier ModifierParam `json:"modifier,omitzero"`
+	// Optional reporting period.
+	//
+	// Any of "QUARTER", "TTM".
+	Period FieldPeriod `json:"period,omitzero"`
+	paramObj
+}
+
+func (r VariableParam) MarshalJSON() (data []byte, err error) {
+	type shadow VariableParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *VariableParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type ActiveV1ScreenerGetScreenerResponse struct {
 	Data ScreenerItemList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -507,7 +936,7 @@ type ActiveV1ScreenerSearchScreenerParams struct {
 	// Subset of fields to include in the response.
 	FieldFilter []FieldRefParam `json:"field_filter,omitzero"`
 	// Filter conditions to apply.
-	Filters []ActiveV1ScreenerSearchScreenerParamsFilter `json:"filters,omitzero"`
+	Filters []SearchFilterParam `json:"filters,omitzero"`
 	// Multi-field sort specifications. When present, takes precedence over
 	// sort_by/sort_direction.
 	Sorts []ActiveV1ScreenerSearchScreenerParamsSort `json:"sorts,omitzero"`
@@ -526,159 +955,6 @@ func (r ActiveV1ScreenerSearchScreenerParams) MarshalJSON() (data []byte, err er
 }
 func (r *ActiveV1ScreenerSearchScreenerParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-// A single filter condition.
-//
-// The properties Left, Op, Right are required.
-type ActiveV1ScreenerSearchScreenerParamsFilter struct {
-	// The field to filter on.
-	Left FieldRefParam `json:"left,omitzero" api:"required"`
-	// The operator and optional arguments.
-	Op ActiveV1ScreenerSearchScreenerParamsFilterOp `json:"op,omitzero" api:"required"`
-	// The value(s) to compare against.
-	Right []ActiveV1ScreenerSearchScreenerParamsFilterRight `json:"right,omitzero" api:"required"`
-	paramObj
-}
-
-func (r ActiveV1ScreenerSearchScreenerParamsFilter) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1ScreenerSearchScreenerParamsFilter
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *ActiveV1ScreenerSearchScreenerParamsFilter) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// The operator and optional arguments.
-//
-// The property Name is required.
-type ActiveV1ScreenerSearchScreenerParamsFilterOp struct {
-	// The operator to apply.
-	//
-	// Any of "LT", "LTE", "GT", "GTE", "EQ", "BETWEEN", "NOT_BETWEEN", "ONE_OF",
-	// "REGEX", "BEGINS_WITH", "ENDS_WITH", "CONTAINS", "IS_NULL", "IS_NOT_NULL".
-	Name string `json:"name,omitzero" api:"required"`
-	// Optional arguments that modify operator behavior.
-	//
-	// Any of "LEFT_INCLUSIVE", "RIGHT_INCLUSIVE", "LEFT_EXCLUSIVE", "RIGHT_EXCLUSIVE",
-	// "CASE_INSENSITIVE".
-	Args []string `json:"args,omitzero"`
-	paramObj
-}
-
-func (r ActiveV1ScreenerSearchScreenerParamsFilterOp) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1ScreenerSearchScreenerParamsFilterOp
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *ActiveV1ScreenerSearchScreenerParamsFilterOp) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func init() {
-	apijson.RegisterFieldValidator[ActiveV1ScreenerSearchScreenerParamsFilterOp](
-		"name", "LT", "LTE", "GT", "GTE", "EQ", "BETWEEN", "NOT_BETWEEN", "ONE_OF", "REGEX", "BEGINS_WITH", "ENDS_WITH", "CONTAINS", "IS_NULL", "IS_NOT_NULL",
-	)
-}
-
-// A filter value: either a literal or a variable reference.
-type ActiveV1ScreenerSearchScreenerParamsFilterRight struct {
-	Value ActiveV1ScreenerSearchScreenerParamsFilterRightValueUnion `json:"value,omitzero"`
-	// A variable reference.
-	Variable ActiveV1ScreenerSearchScreenerParamsFilterRightVariable `json:"variable,omitzero"`
-	paramObj
-}
-
-func (r ActiveV1ScreenerSearchScreenerParamsFilterRight) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1ScreenerSearchScreenerParamsFilterRight
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *ActiveV1ScreenerSearchScreenerParamsFilterRight) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type ActiveV1ScreenerSearchScreenerParamsFilterRightValueUnion struct {
-	OfFloat  param.Opt[float64] `json:",omitzero,inline"`
-	OfString param.Opt[string]  `json:",omitzero,inline"`
-	paramUnion
-}
-
-func (u ActiveV1ScreenerSearchScreenerParamsFilterRightValueUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfFloat, u.OfString)
-}
-func (u *ActiveV1ScreenerSearchScreenerParamsFilterRightValueUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, u)
-}
-
-// A variable reference.
-//
-// The property Name is required.
-type ActiveV1ScreenerSearchScreenerParamsFilterRightVariable struct {
-	// The variable name.
-	Name string `json:"name" api:"required"`
-	// Optional arithmetic modifier.
-	Modifier ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier `json:"modifier,omitzero"`
-	// Optional historical lookback window.
-	//
-	// Any of "ONE_WEEK", "ONE_MONTH", "THREE_MONTHS", "SIX_MONTHS", "YTD", "ONE_YEAR".
-	Lookback FieldLookback `json:"lookback,omitzero"`
-	// Optional reporting period.
-	//
-	// Any of "QUARTER", "TTM".
-	Period FieldPeriod `json:"period,omitzero"`
-	paramObj
-}
-
-func (r ActiveV1ScreenerSearchScreenerParamsFilterRightVariable) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1ScreenerSearchScreenerParamsFilterRightVariable
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *ActiveV1ScreenerSearchScreenerParamsFilterRightVariable) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Optional arithmetic modifier.
-//
-// The properties Args, Name are required.
-type ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier struct {
-	Args []ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifierArgUnion `json:"args,omitzero" api:"required"`
-	// The modifier operation.
-	//
-	// Any of "ADD", "SUB".
-	Name string `json:"name,omitzero" api:"required"`
-	paramObj
-}
-
-func (r ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier) MarshalJSON() (data []byte, err error) {
-	type shadow ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func init() {
-	apijson.RegisterFieldValidator[ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifier](
-		"name", "ADD", "SUB",
-	)
-}
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifierArgUnion struct {
-	OfFloat  param.Opt[float64] `json:",omitzero,inline"`
-	OfString param.Opt[string]  `json:",omitzero,inline"`
-	paramUnion
-}
-
-func (u ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifierArgUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfFloat, u.OfString)
-}
-func (u *ActiveV1ScreenerSearchScreenerParamsFilterRightVariableModifierArgUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, u)
 }
 
 // Sort direction (defaults to DESC).
