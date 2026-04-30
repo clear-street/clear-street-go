@@ -14,6 +14,7 @@ import (
 	"github.com/clear-street/clear-street-go/internal/apiquery"
 	"github.com/clear-street/clear-street-go/internal/requestconfig"
 	"github.com/clear-street/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/packages/param"
 	"github.com/clear-street/clear-street-go/packages/respjson"
 	"github.com/clear-street/clear-street-go/shared"
 )
@@ -129,8 +130,9 @@ func (r *ActiveV1AccountPortfolioHistoryGetPortfolioHistoryResponse) UnmarshalJS
 }
 
 type ActiveV1AccountPortfolioHistoryGetPortfolioHistoryParams struct {
-	EndDate   time.Time `query:"end_date" api:"required" format:"date" json:"-"`
 	StartDate time.Time `query:"start_date" api:"required" format:"date" json:"-"`
+	// Defaults to today in America/New_York when omitted.
+	EndDate param.Opt[time.Time] `query:"end_date,omitzero" format:"date" json:"-"`
 	paramObj
 }
 
