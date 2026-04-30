@@ -375,6 +375,13 @@ type Order struct {
 	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// Limit price (for LIMIT and STOP_LIMIT orders)
 	LimitPrice string `json:"limit_price" api:"nullable"`
+	// Parent order queue state, present when the order is awaiting release or
+	// released.
+	//
+	// Any of "AWAITING_RELEASE", "RELEASED".
+	QueueState QueueState `json:"queue_state" api:"nullable"`
+	// Scheduled release time for orders awaiting release.
+	ReleasesAt time.Time `json:"releases_at" api:"nullable" format:"date-time"`
 	// Stop price (for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price" api:"nullable"`
 	// Execution strategy for this order
@@ -413,6 +420,8 @@ type Order struct {
 		ExpiresAt             respjson.Field
 		LimitOffset           respjson.Field
 		LimitPrice            respjson.Field
+		QueueState            respjson.Field
+		ReleasesAt            respjson.Field
 		StopPrice             respjson.Field
 		Strategy              respjson.Field
 		TrailingOffsetAmt     respjson.Field
@@ -898,6 +907,14 @@ func (r PovStrategyParam) MarshalJSON() (data []byte, err error) {
 	}
 	return param.MarshalObject(r, shadow{&r, false})
 }
+
+// Parent order queue or hold state.
+type QueueState string
+
+const (
+	QueueStateAwaitingRelease QueueState = "AWAITING_RELEASE"
+	QueueStateReleased        QueueState = "RELEASED"
+)
 
 // Side of an order
 type Side string
