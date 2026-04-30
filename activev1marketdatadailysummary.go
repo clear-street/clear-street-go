@@ -64,35 +64,32 @@ func (r *ActiveV1MarketDataDailySummaryService) GetDailySummaries(ctx context.Co
 //
 //   - Unresolvable `instrument_id` → all other fields `None` (including `symbol`).
 //   - Resolvable `instrument_id` with no realtime cache entry → `symbol` populated,
-//     OHLV/price/`quote_date` `None`.
-//   - `quote_date` reflects the session the OHLV represents (today during trading
+//     OHLV/`trade_date` `None`.
+//   - `trade_date` reflects the session the OHLV represents (today during trading
 //     hours, the last trading date during weekends/holidays).
 type DailySummary struct {
 	// OEMS instrument identifier. Always populated; echoes the request ID.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
-	// Current market price.
-	CurrentPrice string `json:"current_price" api:"nullable"`
 	// Session high.
 	High string `json:"high" api:"nullable"`
 	// Session low.
 	Low string `json:"low" api:"nullable"`
 	// Opening price for the session.
 	Open string `json:"open" api:"nullable"`
-	// Session date the OHLV represents, US/Eastern.
-	QuoteDate time.Time `json:"quote_date" api:"nullable" format:"date"`
 	// Display symbol for the security. `None` for unresolvable IDs.
 	Symbol string `json:"symbol" api:"nullable"`
+	// Session date the OHLV represents, US/Eastern.
+	TradeDate time.Time `json:"trade_date" api:"nullable" format:"date"`
 	// Session cumulative trading volume.
 	Volume int64 `json:"volume" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		InstrumentID respjson.Field
-		CurrentPrice respjson.Field
 		High         respjson.Field
 		Low          respjson.Field
 		Open         respjson.Field
-		QuoteDate    respjson.Field
 		Symbol       respjson.Field
+		TradeDate    respjson.Field
 		Volume       respjson.Field
 		ExtraFields  map[string]respjson.Field
 		raw          string
