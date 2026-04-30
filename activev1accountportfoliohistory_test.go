@@ -14,7 +14,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestActiveV1AccountPortfolioHistoryGetPortfolioHistory(t *testing.T) {
+func TestActiveV1AccountPortfolioHistoryGetPortfolioHistoryWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -31,8 +31,8 @@ func TestActiveV1AccountPortfolioHistoryGetPortfolioHistory(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.ActiveV1AccountPortfolioHistoryGetPortfolioHistoryParams{
-			EndDate:   time.Now(),
 			StartDate: time.Now(),
+			EndDate:   clearstreet.Time(time.Now()),
 		},
 	)
 	if err != nil {

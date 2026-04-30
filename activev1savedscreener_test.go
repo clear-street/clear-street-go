@@ -27,14 +27,49 @@ func TestActiveV1SavedScreenerNewScreenerWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.Active.V1.SavedScreeners.NewScreener(context.TODO(), clearstreet.ActiveV1SavedScreenerNewScreenerParams{
-		FieldFilter: []string{"string"},
-		Filters: []clearstreet.SavedScreenerFilterParam{{
-			FieldName: "field_name",
-			Operation: "operation",
-			Value:     "value",
+		FieldFilter: []clearstreet.FieldRefParam{{
+			Name:      "market_cap",
+			Lookback:  clearstreet.FieldLookbackOneWeek,
+			Period:    clearstreet.FieldPeriodQuarter,
+			ValueType: clearstreet.FieldTypeDecimal,
 		}},
-		Name:          clearstreet.String("name"),
-		SortBy:        clearstreet.String("sort_by"),
+		Filters: []clearstreet.SearchFilterParam{{
+			Left: clearstreet.FieldRefParam{
+				Name:      "market_cap",
+				Lookback:  clearstreet.FieldLookbackOneWeek,
+				Period:    clearstreet.FieldPeriodQuarter,
+				ValueType: clearstreet.FieldTypeDecimal,
+			},
+			Op: clearstreet.FilterOpSpecParam{
+				Name: clearstreet.FilterOperatorGte,
+				Args: []clearstreet.OperatorArg{clearstreet.OperatorArgLeftInclusive},
+			},
+			Right: []clearstreet.FilterValueParam{{
+				Value: clearstreet.FilterValueValueUnionParam{
+					OfFloat: clearstreet.Float(1000000000),
+				},
+				Variable: clearstreet.VariableParam{
+					Name:     "today",
+					Lookback: clearstreet.FieldLookbackOneWeek,
+					Modifier: clearstreet.ModifierParam{
+						Args: []clearstreet.ModifierArgUnionParam{{
+							OfFloat: clearstreet.Float(30),
+						}, {
+							OfString: clearstreet.String("DAY"),
+						}},
+						Name: clearstreet.ModifierOpSub,
+					},
+					Period: clearstreet.FieldPeriodQuarter,
+				},
+			}},
+		}},
+		Name: clearstreet.String("name"),
+		SortBy: clearstreet.FieldRefParam{
+			Name:      "market_cap",
+			Lookback:  clearstreet.FieldLookbackOneWeek,
+			Period:    clearstreet.FieldPeriodQuarter,
+			ValueType: clearstreet.FieldTypeDecimal,
+		},
 		SortDirection: clearstreet.ActiveV1SavedScreenerNewScreenerParamsSortDirectionAsc,
 	})
 	if err != nil {
@@ -132,14 +167,49 @@ func TestActiveV1SavedScreenerReplaceScreenerWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"550e8400-e29b-41d4-a716-446655440000",
 		clearstreet.ActiveV1SavedScreenerReplaceScreenerParams{
-			FieldFilter: []string{"string"},
-			Filters: []clearstreet.SavedScreenerFilterParam{{
-				FieldName: "field_name",
-				Operation: "operation",
-				Value:     "value",
+			FieldFilter: []clearstreet.FieldRefParam{{
+				Name:      "market_cap",
+				Lookback:  clearstreet.FieldLookbackOneWeek,
+				Period:    clearstreet.FieldPeriodQuarter,
+				ValueType: clearstreet.FieldTypeDecimal,
 			}},
-			Name:          clearstreet.String("name"),
-			SortBy:        clearstreet.String("sort_by"),
+			Filters: []clearstreet.SearchFilterParam{{
+				Left: clearstreet.FieldRefParam{
+					Name:      "market_cap",
+					Lookback:  clearstreet.FieldLookbackOneWeek,
+					Period:    clearstreet.FieldPeriodQuarter,
+					ValueType: clearstreet.FieldTypeDecimal,
+				},
+				Op: clearstreet.FilterOpSpecParam{
+					Name: clearstreet.FilterOperatorGte,
+					Args: []clearstreet.OperatorArg{clearstreet.OperatorArgLeftInclusive},
+				},
+				Right: []clearstreet.FilterValueParam{{
+					Value: clearstreet.FilterValueValueUnionParam{
+						OfFloat: clearstreet.Float(1000000000),
+					},
+					Variable: clearstreet.VariableParam{
+						Name:     "today",
+						Lookback: clearstreet.FieldLookbackOneWeek,
+						Modifier: clearstreet.ModifierParam{
+							Args: []clearstreet.ModifierArgUnionParam{{
+								OfFloat: clearstreet.Float(30),
+							}, {
+								OfString: clearstreet.String("DAY"),
+							}},
+							Name: clearstreet.ModifierOpSub,
+						},
+						Period: clearstreet.FieldPeriodQuarter,
+					},
+				}},
+			}},
+			Name: clearstreet.String("name"),
+			SortBy: clearstreet.FieldRefParam{
+				Name:      "market_cap",
+				Lookback:  clearstreet.FieldLookbackOneWeek,
+				Period:    clearstreet.FieldPeriodQuarter,
+				ValueType: clearstreet.FieldTypeDecimal,
+			},
 			SortDirection: clearstreet.ActiveV1SavedScreenerReplaceScreenerParamsSortDirectionAsc,
 		},
 	)

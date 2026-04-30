@@ -4,7 +4,6 @@ package clearstreet
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -104,78 +103,17 @@ func (r *ActiveV1SavedScreenerService) ReplaceScreener(ctx context.Context, scre
 	return res, err
 }
 
-// A single filter criterion for a screener
-type SavedScreenerFilter struct {
-	// The field name to filter on
-	FieldName string `json:"field_name" api:"required"`
-	// The filter operation (lt, lte, gt, gte, eq, rgx, bw, ew)
-	Operation string `json:"operation" api:"required"`
-	// The filter value
-	Value string `json:"value" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		FieldName   respjson.Field
-		Operation   respjson.Field
-		Value       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SavedScreenerFilter) RawJSON() string { return r.JSON.raw }
-func (r *SavedScreenerFilter) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// ToParam converts this SavedScreenerFilter to a SavedScreenerFilterParam.
-//
-// Warning: the fields of the param type will not be present. ToParam should only
-// be used at the last possible moment before sending a request. Test for this with
-// SavedScreenerFilterParam.Overrides()
-func (r SavedScreenerFilter) ToParam() SavedScreenerFilterParam {
-	return param.Override[SavedScreenerFilterParam](json.RawMessage(r.RawJSON()))
-}
-
-// A single filter criterion for a screener
-//
-// The properties FieldName, Operation, Value are required.
-type SavedScreenerFilterParam struct {
-	// The field name to filter on
-	FieldName string `json:"field_name" api:"required"`
-	// The filter operation (lt, lte, gt, gte, eq, rgx, bw, ew)
-	Operation string `json:"operation" api:"required"`
-	// The filter value
-	Value string `json:"value" api:"required"`
-	paramObj
-}
-
-func (r SavedScreenerFilterParam) MarshalJSON() (data []byte, err error) {
-	type shadow SavedScreenerFilterParam
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *SavedScreenerFilterParam) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 // A saved screener configuration entry
 type ScreenerEntry struct {
-	// Unique identifier for this screener
-	ID string `json:"id" api:"required" format:"uuid"`
-	// When this screener was created
-	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
-	// Filter criteria for this screener
-	Filters []SavedScreenerFilter `json:"filters" api:"required"`
-	// The name of this screener configuration
-	Name string `json:"name" api:"required"`
-	// When this screener was last updated
-	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
-	// List of field names to include when running this screener
-	FieldFilter []string `json:"field_filter" api:"nullable"`
-	// Field name to sort results by
-	SortBy string `json:"sort_by" api:"nullable"`
-	// Sort direction for results
-	SortDirection string `json:"sort_direction" api:"nullable"`
+	ID          string         `json:"id" api:"required" format:"uuid"`
+	CreatedAt   time.Time      `json:"created_at" api:"required" format:"date-time"`
+	Filters     []SearchFilter `json:"filters" api:"required"`
+	Name        string         `json:"name" api:"required"`
+	UpdatedAt   time.Time      `json:"updated_at" api:"required" format:"date-time"`
+	FieldFilter []FieldRef     `json:"field_filter" api:"nullable"`
+	// A reference to a screener field.
+	SortBy        FieldRef `json:"sort_by" api:"nullable"`
+	SortDirection string   `json:"sort_direction" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID            respjson.Field
@@ -273,16 +211,16 @@ func (r *ActiveV1SavedScreenerReplaceScreenerResponse) UnmarshalJSON(data []byte
 type ActiveV1SavedScreenerNewScreenerParams struct {
 	// The name for this screener configuration
 	Name param.Opt[string] `json:"name,omitzero"`
-	// Field name to sort results by
-	SortBy param.Opt[string] `json:"sort_by,omitzero"`
-	// List of field names to include when running this screener
-	FieldFilter []string `json:"field_filter,omitzero"`
-	// Filter criteria for this screener
-	Filters []SavedScreenerFilterParam `json:"filters,omitzero"`
+	// Structured field references to include when running this screener
+	FieldFilter []FieldRefParam `json:"field_filter,omitzero"`
+	// Structured search filter criteria
+	Filters []SearchFilterParam `json:"filters,omitzero"`
 	// Sort direction for results
 	//
 	// Any of "ASC", "DESC".
 	SortDirection ActiveV1SavedScreenerNewScreenerParamsSortDirection `json:"sort_direction,omitzero"`
+	// Structured field reference to sort results by
+	SortBy FieldRefParam `json:"sort_by,omitzero"`
 	paramObj
 }
 
@@ -305,16 +243,16 @@ const (
 type ActiveV1SavedScreenerReplaceScreenerParams struct {
 	// The name for this screener configuration
 	Name param.Opt[string] `json:"name,omitzero"`
-	// Field name to sort results by
-	SortBy param.Opt[string] `json:"sort_by,omitzero"`
-	// List of field names to include when running this screener
-	FieldFilter []string `json:"field_filter,omitzero"`
-	// Filter criteria for this screener
-	Filters []SavedScreenerFilterParam `json:"filters,omitzero"`
+	// Structured field references to include when running this screener
+	FieldFilter []FieldRefParam `json:"field_filter,omitzero"`
+	// Structured search filter criteria
+	Filters []SearchFilterParam `json:"filters,omitzero"`
 	// Sort direction for results
 	//
 	// Any of "ASC", "DESC".
 	SortDirection ActiveV1SavedScreenerReplaceScreenerParamsSortDirection `json:"sort_direction,omitzero"`
+	// Structured field reference to sort results by
+	SortBy FieldRefParam `json:"sort_by,omitzero"`
 	paramObj
 }
 
