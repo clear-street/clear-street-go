@@ -52,6 +52,9 @@ type MarketDataSnapshot struct {
 	InstrumentID string `json:"instrument_id" api:"required"`
 	// Display symbol for the security.
 	Symbol string `json:"symbol" api:"required"`
+	// Cumulative traded volume reported on the most recent trade, in shares for
+	// equities or contracts for options. Absent when no trade is available.
+	CumulativeVolume int64 `json:"cumulative_volume" api:"nullable"`
 	// Most recent quote if available.
 	LastQuote SnapshotQuote `json:"last_quote" api:"nullable"`
 	// Most recent last-sale trade if available.
@@ -62,14 +65,15 @@ type MarketDataSnapshot struct {
 	Session SnapshotSession `json:"session" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		InstrumentID respjson.Field
-		Symbol       respjson.Field
-		LastQuote    respjson.Field
-		LastTrade    respjson.Field
-		Name         respjson.Field
-		Session      respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
+		InstrumentID     respjson.Field
+		Symbol           respjson.Field
+		CumulativeVolume respjson.Field
+		LastQuote        respjson.Field
+		LastTrade        respjson.Field
+		Name             respjson.Field
+		Session          respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
 	} `json:"-"`
 }
 
