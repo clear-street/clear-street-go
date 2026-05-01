@@ -234,6 +234,8 @@ type InstrumentCore struct {
 	IsShortProhibited bool `json:"is_short_prohibited" api:"required"`
 	// Indicates if the instrument is on the Regulation SHO Threshold Security List
 	IsThresholdSecurity bool `json:"is_threshold_security" api:"required"`
+	// Indicates if the instrument is tradable
+	IsTradable bool `json:"is_tradable" api:"required"`
 	// Deprecated. Use `security_ids`.
 	//
 	// A primary security identifier for this instrument.
@@ -293,6 +295,7 @@ type InstrumentCore struct {
 		IsRestricted        respjson.Field
 		IsShortProhibited   respjson.Field
 		IsThresholdSecurity respjson.Field
+		IsTradable          respjson.Field
 		SecurityID          respjson.Field
 		SecurityIDSource    respjson.Field
 		SecurityIDs         respjson.Field
