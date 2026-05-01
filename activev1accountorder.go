@@ -371,6 +371,8 @@ type Order struct {
 	// Timestamp when the order will expire (UTC). Present when time_in_force is
 	// GOOD_TILL_DATE.
 	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
+	// Whether the order is eligible for extended-hours trading.
+	ExtendedHours bool `json:"extended_hours" api:"nullable"`
 	// Limit offset for trailing stop-limit orders (signed)
 	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// Limit price (for LIMIT and STOP_LIMIT orders)
@@ -418,6 +420,7 @@ type Order struct {
 		AverageFillPrice      respjson.Field
 		Details               respjson.Field
 		ExpiresAt             respjson.Field
+		ExtendedHours         respjson.Field
 		LimitOffset           respjson.Field
 		LimitPrice            respjson.Field
 		QueueState            respjson.Field
