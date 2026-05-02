@@ -398,41 +398,46 @@ type Order struct {
 	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
 	// Trailing watermark timestamp for trailing orders
 	TrailingWatermarkTs time.Time `json:"trailing_watermark_ts" api:"nullable" format:"date-time"`
+	// OEMS instrument ID of the option's underlying instrument. Populated only for
+	// OPTIONS orders; `null` for non-options and for options whose underlier cannot be
+	// resolved from the instrument cache.
+	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                    respjson.Field
-		AccountID             respjson.Field
-		ClientOrderID         respjson.Field
-		CreatedAt             respjson.Field
-		FilledQuantity        respjson.Field
-		InstrumentType        respjson.Field
-		LeavesQuantity        respjson.Field
-		OrderType             respjson.Field
-		Quantity              respjson.Field
-		SecurityID            respjson.Field
-		SecurityIDSource      respjson.Field
-		Side                  respjson.Field
-		Status                respjson.Field
-		Symbol                respjson.Field
-		TimeInForce           respjson.Field
-		UpdatedAt             respjson.Field
-		Venue                 respjson.Field
-		AverageFillPrice      respjson.Field
-		Details               respjson.Field
-		ExpiresAt             respjson.Field
-		ExtendedHours         respjson.Field
-		LimitOffset           respjson.Field
-		LimitPrice            respjson.Field
-		QueueState            respjson.Field
-		ReleasesAt            respjson.Field
-		StopPrice             respjson.Field
-		Strategy              respjson.Field
-		TrailingOffsetAmt     respjson.Field
-		TrailingOffsetAmtType respjson.Field
-		TrailingWatermarkPx   respjson.Field
-		TrailingWatermarkTs   respjson.Field
-		ExtraFields           map[string]respjson.Field
-		raw                   string
+		ID                     respjson.Field
+		AccountID              respjson.Field
+		ClientOrderID          respjson.Field
+		CreatedAt              respjson.Field
+		FilledQuantity         respjson.Field
+		InstrumentType         respjson.Field
+		LeavesQuantity         respjson.Field
+		OrderType              respjson.Field
+		Quantity               respjson.Field
+		SecurityID             respjson.Field
+		SecurityIDSource       respjson.Field
+		Side                   respjson.Field
+		Status                 respjson.Field
+		Symbol                 respjson.Field
+		TimeInForce            respjson.Field
+		UpdatedAt              respjson.Field
+		Venue                  respjson.Field
+		AverageFillPrice       respjson.Field
+		Details                respjson.Field
+		ExpiresAt              respjson.Field
+		ExtendedHours          respjson.Field
+		LimitOffset            respjson.Field
+		LimitPrice             respjson.Field
+		QueueState             respjson.Field
+		ReleasesAt             respjson.Field
+		StopPrice              respjson.Field
+		Strategy               respjson.Field
+		TrailingOffsetAmt      respjson.Field
+		TrailingOffsetAmtType  respjson.Field
+		TrailingWatermarkPx    respjson.Field
+		TrailingWatermarkTs    respjson.Field
+		UnderlyingInstrumentID respjson.Field
+		ExtraFields            map[string]respjson.Field
+		raw                    string
 	} `json:"-"`
 }
 
@@ -1278,6 +1283,9 @@ type ActiveV1AccountOrderGetOrdersParams struct {
 	Symbol param.Opt[string] `query:"symbol,omitzero" json:"-"`
 	// The end date and time for the query range, inclusive (ISO 8601 format)
 	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
+	// Comma-separated OEMS instrument UUIDs. Matches options orders whose resolved
+	// underlier is any of the given IDs.
+	UnderlyingInstrumentIDs param.Opt[string] `query:"underlying_instrument_ids,omitzero" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
