@@ -91,6 +91,8 @@ type Account struct {
 	Kind AccountKind `json:"kind" api:"required"`
 	// The date the account was opened
 	OpenDate time.Time `json:"open_date" api:"required" format:"date"`
+	// The options level of the account
+	OptionsLevel int64 `json:"options_level" api:"required"`
 	// The short name of the account
 	ShortName string `json:"short_name" api:"required"`
 	// The current status of the account
@@ -115,6 +117,7 @@ type Account struct {
 		FullName              respjson.Field
 		Kind                  respjson.Field
 		OpenDate              respjson.Field
+		OptionsLevel          respjson.Field
 		ShortName             respjson.Field
 		Status                respjson.Field
 		Subkind               respjson.Field
