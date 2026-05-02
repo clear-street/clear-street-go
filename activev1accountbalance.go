@@ -84,6 +84,8 @@ type AccountBalances struct {
 	UnsettledCredits string `json:"unsettled_credits" api:"required"`
 	// Trade-date unsettled cash debits.
 	UnsettledDebits string `json:"unsettled_debits" api:"required"`
+	// The amount of cash currently available to withdraw.
+	WithdrawableCash string `json:"withdrawable_cash" api:"required"`
 	// Margin-account-only details.
 	MarginDetails MarginDetails `json:"margin_details" api:"nullable"`
 	// Applied multiplier for margin calculations.
@@ -107,6 +109,7 @@ type AccountBalances struct {
 		TradeCash           respjson.Field
 		UnsettledCredits    respjson.Field
 		UnsettledDebits     respjson.Field
+		WithdrawableCash    respjson.Field
 		MarginDetails       respjson.Field
 		Multiplier          respjson.Field
 		ShortMarketValue    respjson.Field
