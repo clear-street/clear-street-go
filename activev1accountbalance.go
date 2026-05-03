@@ -227,6 +227,9 @@ func (r *MarginDetailsUsage) UnmarshalJSON(data []byte) error {
 }
 
 type MarginTopContributor struct {
+	// Day-trade buying power consumed by fills against this underlying on the current
+	// trade date. Populated only for pattern day trader accounts.
+	DayTradeBuyingPowerUsage string `json:"day_trade_buying_power_usage" api:"required"`
 	// Initial margin requirement attributable to this underlying.
 	InitialMarginRequirement string `json:"initial_margin_requirement" api:"required"`
 	// Maintenance margin requirement attributable to this underlying.
@@ -237,6 +240,7 @@ type MarginTopContributor struct {
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"required" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		DayTradeBuyingPowerUsage     respjson.Field
 		InitialMarginRequirement     respjson.Field
 		MaintenanceMarginRequirement respjson.Field
 		MarketValue                  respjson.Field
