@@ -57,7 +57,7 @@ func main() {
 		option.WithAPIKey("My API Key"),
 		option.WithEnvironmentStaging(), // defaults to option.WithEnvironmentProduction()
 	)
-	response, err := client.Active.V1.Accounts.GetAccounts(context.TODO(), clearstreet.ActiveV1AccountGetAccountsParams{})
+	response, err := client.V1.Accounts.GetAccounts(context.TODO(), clearstreet.V1AccountGetAccountsParams{})
 	if err != nil {
 		panic(err.Error())
 	}
@@ -267,7 +267,7 @@ client := clearstreet.NewClient(
 	option.WithHeader("X-Some-Header", "custom_header_info"),
 )
 
-client.Active.V1.Accounts.GetAccounts(context.TODO(), ...,
+client.V1.Accounts.GetAccounts(context.TODO(), ...,
 	// Override the header
 	option.WithHeader("X-Some-Header", "some_other_custom_header_info"),
 	// Add an undocumented field to the request body, using sjson syntax
@@ -298,14 +298,14 @@ When the API returns a non-success status code, we return an error with type
 To handle errors, we recommend that you use the `errors.As` pattern:
 
 ```go
-_, err := client.Active.V1.Accounts.GetAccounts(context.TODO(), clearstreet.ActiveV1AccountGetAccountsParams{})
+_, err := client.V1.Accounts.GetAccounts(context.TODO(), clearstreet.V1AccountGetAccountsParams{})
 if err != nil {
 	var apierr *clearstreet.Error
 	if errors.As(err, &apierr) {
 		println(string(apierr.DumpRequest(true)))  // Prints the serialized HTTP request
 		println(string(apierr.DumpResponse(true))) // Prints the serialized HTTP response
 	}
-	panic(err.Error()) // GET "/active/v1/accounts": 400 Bad Request { ... }
+	panic(err.Error()) // GET "/v1/accounts": 400 Bad Request { ... }
 }
 ```
 
@@ -323,9 +323,9 @@ To set a per-retry timeout, use `option.WithRequestTimeout()`.
 // This sets the timeout for the request, including all the retries.
 ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 defer cancel()
-client.Active.V1.Accounts.GetAccounts(
+client.V1.Accounts.GetAccounts(
 	ctx,
-	clearstreet.ActiveV1AccountGetAccountsParams{},
+	clearstreet.V1AccountGetAccountsParams{},
 	// This sets the per-retry timeout
 	option.WithRequestTimeout(20*time.Second),
 )
@@ -359,9 +359,9 @@ client := clearstreet.NewClient(
 )
 
 // Override per-request:
-client.Active.V1.Accounts.GetAccounts(
+client.V1.Accounts.GetAccounts(
 	context.TODO(),
-	clearstreet.ActiveV1AccountGetAccountsParams{},
+	clearstreet.V1AccountGetAccountsParams{},
 	option.WithMaxRetries(5),
 )
 ```
@@ -374,9 +374,9 @@ you need to examine response headers, status codes, or other details.
 ```go
 // Create a variable to store the HTTP response
 var response *http.Response
-response, err := client.Active.V1.Accounts.GetAccounts(
+response, err := client.V1.Accounts.GetAccounts(
 	context.TODO(),
-	clearstreet.ActiveV1AccountGetAccountsParams{},
+	clearstreet.V1AccountGetAccountsParams{},
 	option.WithResponseInto(&response),
 )
 if err != nil {
