@@ -4,6 +4,7 @@ package clearstreet_test
 
 import (
 	"context"
+	"errors"
 	"os"
 	"testing"
 
@@ -12,7 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestUsage(t *testing.T) {
+func TestV1CalendarMarketHourGetMarketHoursCalendarWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -25,9 +26,15 @@ func TestUsage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	response, err := client.V1.Accounts.GetAccounts(context.TODO(), clearstreet.V1AccountGetAccountsParams{})
+	_, err := client.V1.Calendars.MarketHours.GetMarketHoursCalendar(context.TODO(), clearstreet.V1CalendarMarketHourGetMarketHoursCalendarParams{
+		Date:   "date",
+		Market: clearstreet.MarketTypeUsEquities,
+	})
 	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
 		t.Fatalf("err should be nil: %s", err.Error())
 	}
-	t.Logf("%+v\n", response)
 }
