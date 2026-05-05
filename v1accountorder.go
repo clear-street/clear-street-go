@@ -1460,7 +1460,7 @@ type V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest struct {
 	// Allow trading outside regular trading hours. Some brokers disallow options
 	// outside RTH.
 	ExtendedHours param.Opt[bool] `json:"extended_hours,omitzero"`
-	// OEMS instrument UUID. Either `symbol` or `instrument_id` must be provided.
+	// OEMS instrument UUID
 	InstrumentID param.Opt[string] `json:"instrument_id,omitzero" format:"uuid"`
 	// Limit offset for trailing stop-limit orders (signed)
 	LimitOffset param.Opt[string] `json:"limit_offset,omitzero"`
