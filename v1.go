@@ -71,8 +71,6 @@ func (r *V1Service) Ws(ctx context.Context, opts ...option.RequestOption) (err e
 	return err
 }
 
-type APIDecimal64 = string
-
 // Security type
 type SecurityType string
 
