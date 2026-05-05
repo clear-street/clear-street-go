@@ -8,12 +8,10 @@
 
 Params Types:
 
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#APIDecimal64">APIDecimal64</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#SecurityType">SecurityType</a>
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#APIDecimal64">APIDecimal64</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#SecurityType">SecurityType</a>
 
 Methods:
@@ -65,39 +63,21 @@ Methods:
 
 Params Types:
 
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ApStrategyParam">ApStrategyParam</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#BaseStrategyParams">BaseStrategyParams</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#DarkStrategyParam">DarkStrategyParam</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#DmaStrategyParam">DmaStrategyParam</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OrderStrategyUnionParam">OrderStrategyUnionParam</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OrderType">OrderType</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PovStrategyParam">PovStrategyParam</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Side">Side</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#TimeInForce">TimeInForce</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#TrailingOffsetType">TrailingOffsetType</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#TwapStrategyParam">TwapStrategyParam</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Urgency">Urgency</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#VwapStrategyParam">VwapStrategyParam</a>
 
 Response Types:
 
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ApStrategy">ApStrategy</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#BaseStrategyParamsResp">BaseStrategyParamsResp</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#DarkStrategy">DarkStrategy</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#DmaStrategy">DmaStrategy</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Order">Order</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OrderList">OrderList</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OrderStatus">OrderStatus</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OrderStrategyUnion">OrderStrategyUnion</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OrderType">OrderType</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PovStrategy">PovStrategy</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#QueueState">QueueState</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Side">Side</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#TimeInForce">TimeInForce</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#TrailingOffsetType">TrailingOffsetType</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#TwapStrategy">TwapStrategy</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Urgency">Urgency</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#VwapStrategy">VwapStrategy</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountOrderCancelAllOpenOrdersResponse">V1AccountOrderCancelAllOpenOrdersResponse</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountOrderCancelOpenOrderResponse">V1AccountOrderCancelOpenOrderResponse</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountOrderGetOrderByIDResponse">V1AccountOrderGetOrderByIDResponse</a>
@@ -374,7 +354,6 @@ Response Types:
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OpenEntitlementConsentAction">OpenEntitlementConsentAction</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OpenScreenerAction">OpenScreenerAction</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OrderPayload">OrderPayload</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OrderStrategyType">OrderStrategyType</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PrefillOrderAction">PrefillOrderAction</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PrefillOrderActionType">PrefillOrderActionType</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PromptButtonAction">PromptButtonAction</a>
