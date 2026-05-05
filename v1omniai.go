@@ -753,10 +753,6 @@ type OrderPayload struct {
 	OrderID string `json:"order_id" api:"nullable"`
 	// Stop price (required for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price" api:"nullable"`
-	// Execution strategy (simplified enum, not the full strategy params for now)
-	//
-	// Any of "SOR", "VWAP", "TWAP", "DARK", "DMA", "AP", "POV".
-	Strategy OrderStrategyType `json:"strategy" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		InstrumentType respjson.Field
@@ -768,7 +764,6 @@ type OrderPayload struct {
 		LimitPrice     respjson.Field
 		OrderID        respjson.Field
 		StopPrice      respjson.Field
-		Strategy       respjson.Field
 		ExtraFields    map[string]respjson.Field
 		raw            string
 	} `json:"-"`
@@ -779,22 +774,6 @@ func (r OrderPayload) RawJSON() string { return r.JSON.raw }
 func (r *OrderPayload) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Simplified order strategy type for prefill actions.
-//
-// This is a simplified enum compared to the full OrderStrategy with params,
-// suitable for indicating the desired strategy without full configuration.
-type OrderStrategyType string
-
-const (
-	OrderStrategyTypeSor  OrderStrategyType = "SOR"
-	OrderStrategyTypeVwap OrderStrategyType = "VWAP"
-	OrderStrategyTypeTwap OrderStrategyType = "TWAP"
-	OrderStrategyTypeDark OrderStrategyType = "DARK"
-	OrderStrategyTypeDma  OrderStrategyType = "DMA"
-	OrderStrategyTypeAp   OrderStrategyType = "AP"
-	OrderStrategyTypePov  OrderStrategyType = "POV"
-)
 
 // Action to prefill order details for user confirmation.
 //
