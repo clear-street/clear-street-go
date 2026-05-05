@@ -912,10 +912,12 @@ const (
 )
 
 type V1ScreenerSearchScreenerParams struct {
-	// Maximum number of results per page.
+	// The number of items to return per page (only used when page_token is not
+	// provided)
 	PageSize param.Opt[int64] `json:"page_size,omitzero"`
-	// Opaque token for cursor-based pagination.
-	PageToken param.Opt[string] `json:"page_token,omitzero"`
+	// Token for retrieving the next page of results. Contains encoded pagination state
+	// (limit + offset). When provided, page_size is ignored.
+	PageToken param.Opt[string] `json:"page_token,omitzero" format:"byte"`
 	// Whether string sorts should be case-sensitive (default: false).
 	SortCaseSensitive param.Opt[bool] `json:"sort_case_sensitive,omitzero"`
 	// Subset of fields to include in the response.

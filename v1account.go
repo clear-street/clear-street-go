@@ -85,10 +85,6 @@ type Account struct {
 	AccountHolderEntityID int64 `json:"account_holder_entity_id" api:"required"`
 	// The full legal name of the account
 	FullName string `json:"full_name" api:"required"`
-	// The type of account
-	//
-	// Any of "CUSTOMER", "OTHER".
-	Kind AccountKind `json:"kind" api:"required"`
 	// The date the account was opened
 	OpenDate time.Time `json:"open_date" api:"required" format:"date"`
 	// The options level of the account
@@ -102,7 +98,11 @@ type Account struct {
 	// The sub-type of account
 	//
 	// Any of "CASH", "MARGIN", "OTHER".
-	Subkind AccountSubkind `json:"subkind" api:"required"`
+	Subtype AccountSubtype `json:"subtype" api:"required"`
+	// The type of account
+	//
+	// Any of "CUSTOMER", "OTHER".
+	Type AccountType `json:"type" api:"required"`
 	// The date the account was closed, if applicable
 	CloseDate time.Time `json:"close_date" api:"nullable" format:"date"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -110,12 +110,12 @@ type Account struct {
 		ID                    respjson.Field
 		AccountHolderEntityID respjson.Field
 		FullName              respjson.Field
-		Kind                  respjson.Field
 		OpenDate              respjson.Field
 		OptionsLevel          respjson.Field
 		ShortName             respjson.Field
 		Status                respjson.Field
-		Subkind               respjson.Field
+		Subtype               respjson.Field
+		Type                  respjson.Field
 		CloseDate             respjson.Field
 		ExtraFields           map[string]respjson.Field
 		raw                   string
@@ -127,14 +127,6 @@ func (r Account) RawJSON() string { return r.JSON.raw }
 func (r *Account) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// Account kind classification
-type AccountKind string
-
-const (
-	AccountKindCustomer AccountKind = "CUSTOMER"
-	AccountKindOther    AccountKind = "OTHER"
-)
 
 type AccountList []Account
 
@@ -164,13 +156,21 @@ const (
 	AccountStatusClosed   AccountStatus = "CLOSED"
 )
 
-// Account sub-kind classification providing more granular categorization
-type AccountSubkind string
+// Account subtype classification providing more granular categorization
+type AccountSubtype string
 
 const (
-	AccountSubkindCash   AccountSubkind = "CASH"
-	AccountSubkindMargin AccountSubkind = "MARGIN"
-	AccountSubkindOther  AccountSubkind = "OTHER"
+	AccountSubtypeCash   AccountSubtype = "CASH"
+	AccountSubtypeMargin AccountSubtype = "MARGIN"
+	AccountSubtypeOther  AccountSubtype = "OTHER"
+)
+
+// Account type classification
+type AccountType string
+
+const (
+	AccountTypeCustomer AccountType = "CUSTOMER"
+	AccountTypeOther    AccountType = "OTHER"
 )
 
 // Risk settings for an account

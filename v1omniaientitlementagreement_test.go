@@ -13,7 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestV1OmniAIEntitlementAgreementListEntitlementAgreements(t *testing.T) {
+func TestV1OmniAIEntitlementAgreementGetEntitlementAgreements(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,7 +26,7 @@ func TestV1OmniAIEntitlementAgreementListEntitlementAgreements(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.OmniAI.EntitlementAgreements.ListEntitlementAgreements(context.TODO())
+	_, err := client.V1.OmniAI.EntitlementAgreements.GetEntitlementAgreements(context.TODO())
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {
