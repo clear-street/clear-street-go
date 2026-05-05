@@ -162,7 +162,7 @@ func TestV1AccountOrderReplaceOrderWithOptionalParams(t *testing.T) {
 			LimitPrice:  clearstreet.String("150.50"),
 			Quantity:    clearstreet.String("125"),
 			StopPrice:   clearstreet.String("148.00"),
-			TimeInForce: clearstreet.TimeInForceDay,
+			TimeInForce: clearstreet.V1AccountOrderReplaceOrderParamsTimeInForceDay,
 		},
 	)
 	if err != nil {
@@ -215,8 +215,8 @@ func TestV1AccountOrderSubmitOrders(t *testing.T) {
 						ID:             clearstreet.String("3"),
 						PositionEffect: "OPEN",
 					}},
-					OrderType:   clearstreet.OrderTypeLimit,
-					TimeInForce: clearstreet.TimeInForceDay,
+					OrderType:   "LIMIT",
+					TimeInForce: "DAY",
 					ID:          clearstreet.String("my-mleg-ref-20251001-001"),
 					LimitPrice:  clearstreet.String("0.50"),
 					Quantity:    clearstreet.String("1"),

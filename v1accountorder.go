@@ -572,8 +572,8 @@ type V1AccountOrderReplaceOrderParams struct {
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
 	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
-	TimeInForce TimeInForce `json:"time_in_force,omitzero"`
+	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
+	TimeInForce V1AccountOrderReplaceOrderParamsTimeInForce `json:"time_in_force,omitzero"`
 	paramObj
 }
 
@@ -584,6 +584,22 @@ func (r V1AccountOrderReplaceOrderParams) MarshalJSON() (data []byte, err error)
 func (r *V1AccountOrderReplaceOrderParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// New time in force for the order
+type V1AccountOrderReplaceOrderParamsTimeInForce string
+
+const (
+	V1AccountOrderReplaceOrderParamsTimeInForceDay                 V1AccountOrderReplaceOrderParamsTimeInForce = "DAY"
+	V1AccountOrderReplaceOrderParamsTimeInForceGoodTillCancel      V1AccountOrderReplaceOrderParamsTimeInForce = "GOOD_TILL_CANCEL"
+	V1AccountOrderReplaceOrderParamsTimeInForceImmediateOrCancel   V1AccountOrderReplaceOrderParamsTimeInForce = "IMMEDIATE_OR_CANCEL"
+	V1AccountOrderReplaceOrderParamsTimeInForceFillOrKill          V1AccountOrderReplaceOrderParamsTimeInForce = "FILL_OR_KILL"
+	V1AccountOrderReplaceOrderParamsTimeInForceGoodTillDate        V1AccountOrderReplaceOrderParamsTimeInForce = "GOOD_TILL_DATE"
+	V1AccountOrderReplaceOrderParamsTimeInForceAtTheOpening        V1AccountOrderReplaceOrderParamsTimeInForce = "AT_THE_OPENING"
+	V1AccountOrderReplaceOrderParamsTimeInForceAtTheClose          V1AccountOrderReplaceOrderParamsTimeInForce = "AT_THE_CLOSE"
+	V1AccountOrderReplaceOrderParamsTimeInForceGoodTillCrossing    V1AccountOrderReplaceOrderParamsTimeInForce = "GOOD_TILL_CROSSING"
+	V1AccountOrderReplaceOrderParamsTimeInForceGoodThroughCrossing V1AccountOrderReplaceOrderParamsTimeInForce = "GOOD_THROUGH_CROSSING"
+	V1AccountOrderReplaceOrderParamsTimeInForceAtCrossing          V1AccountOrderReplaceOrderParamsTimeInForce = "AT_CROSSING"
+)
 
 type V1AccountOrderSubmitOrdersParams struct {
 	Orders []V1AccountOrderSubmitOrdersParamsOrderUnion
@@ -622,14 +638,14 @@ type V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest struct {
 	// Type of order (currently MARKET or LIMIT for multileg strategy submission)
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
-	// "TRAILING_STOP_LIMIT", "OTHER".
-	OrderType OrderType `json:"order_type,omitzero" api:"required"`
+	// "TRAILING_STOP_LIMIT".
+	OrderType string `json:"order_type,omitzero" api:"required"`
 	// Time in force
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
 	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
-	TimeInForce TimeInForce `json:"time_in_force,omitzero" api:"required"`
+	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
+	TimeInForce string `json:"time_in_force,omitzero" api:"required"`
 	// Optional client-provided unique ID (idempotency). Required to be unique per
 	// account.
 	ID param.Opt[string] `json:"id,omitzero"`
@@ -646,6 +662,15 @@ func (r V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest) MarshalJSO
 }
 func (r *V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest](
+		"order_type", "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP", "TRAILING_STOP_LIMIT",
+	)
+	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest](
+		"time_in_force", "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL", "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING", "GOOD_THROUGH_CROSSING", "AT_CROSSING",
+	)
 }
 
 // A single leg in a multileg strategy request.
@@ -701,8 +726,8 @@ type V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest struct {
 	// Type of order
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
-	// "TRAILING_STOP_LIMIT", "OTHER".
-	OrderType OrderType `json:"order_type,omitzero" api:"required"`
+	// "TRAILING_STOP_LIMIT".
+	OrderType string `json:"order_type,omitzero" api:"required"`
 	// Quantity to trade. For COMMON_STOCK: shares (may be fractional if supported).
 	// For OPTION (single-leg): contracts (must be an integer)
 	Quantity string `json:"quantity" api:"required"`
@@ -714,8 +739,8 @@ type V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest struct {
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
 	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
-	TimeInForce TimeInForce `json:"time_in_force,omitzero" api:"required"`
+	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
+	TimeInForce string `json:"time_in_force,omitzero" api:"required"`
 	// Optional client-provided unique ID (idempotency). Required to be unique per
 	// account.
 	ID param.Opt[string] `json:"id,omitzero"`
@@ -760,6 +785,12 @@ func (r *V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest) UnmarshalJSON(dat
 }
 
 func init() {
+	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest](
+		"order_type", "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP", "TRAILING_STOP_LIMIT",
+	)
+	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest](
+		"time_in_force", "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL", "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING", "GOOD_THROUGH_CROSSING", "AT_CROSSING",
+	)
 	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest](
 		"position_effect", "OPEN", "CLOSE",
 	)
