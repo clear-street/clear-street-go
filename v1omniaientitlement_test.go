@@ -63,7 +63,7 @@ func TestV1OmniAIEntitlementDeleteEntitlement(t *testing.T) {
 	}
 }
 
-func TestV1OmniAIEntitlementListEntitlementsWithOptionalParams(t *testing.T) {
+func TestV1OmniAIEntitlementGetEntitlementsWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -76,7 +76,7 @@ func TestV1OmniAIEntitlementListEntitlementsWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.OmniAI.Entitlements.ListEntitlements(context.TODO(), clearstreet.V1OmniAIEntitlementListEntitlementsParams{
+	_, err := client.V1.OmniAI.Entitlements.GetEntitlements(context.TODO(), clearstreet.V1OmniAIEntitlementGetEntitlementsParams{
 		TradingAccountID: clearstreet.Int(0),
 	})
 	if err != nil {

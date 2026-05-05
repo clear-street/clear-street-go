@@ -65,7 +65,7 @@ func (r *V1OmniAIEntitlementService) DeleteEntitlement(ctx context.Context, enti
 }
 
 // List caller's active entitlement grants.
-func (r *V1OmniAIEntitlementService) ListEntitlements(ctx context.Context, query V1OmniAIEntitlementListEntitlementsParams, opts ...option.RequestOption) (res *V1OmniAIEntitlementListEntitlementsResponse, err error) {
+func (r *V1OmniAIEntitlementService) GetEntitlements(ctx context.Context, query V1OmniAIEntitlementGetEntitlementsParams, opts ...option.RequestOption) (res *V1OmniAIEntitlementGetEntitlementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/omni-ai/entitlements"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
@@ -150,7 +150,7 @@ func (r *V1OmniAIEntitlementDeleteEntitlementResponse) UnmarshalJSON(data []byte
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1OmniAIEntitlementListEntitlementsResponse struct {
+type V1OmniAIEntitlementGetEntitlementsResponse struct {
 	Data EntitlementResourceList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -162,8 +162,8 @@ type V1OmniAIEntitlementListEntitlementsResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1OmniAIEntitlementListEntitlementsResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1OmniAIEntitlementListEntitlementsResponse) UnmarshalJSON(data []byte) error {
+func (r V1OmniAIEntitlementGetEntitlementsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OmniAIEntitlementGetEntitlementsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -182,14 +182,14 @@ func (r *V1OmniAIEntitlementNewEntitlementsParams) UnmarshalJSON(data []byte) er
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1OmniAIEntitlementListEntitlementsParams struct {
+type V1OmniAIEntitlementGetEntitlementsParams struct {
 	TradingAccountID param.Opt[int64] `query:"trading_account_id,omitzero" json:"-"`
 	paramObj
 }
 
-// URLQuery serializes [V1OmniAIEntitlementListEntitlementsParams]'s query
+// URLQuery serializes [V1OmniAIEntitlementGetEntitlementsParams]'s query
 // parameters as `url.Values`.
-func (r V1OmniAIEntitlementListEntitlementsParams) URLQuery() (v url.Values, err error) {
+func (r V1OmniAIEntitlementGetEntitlementsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

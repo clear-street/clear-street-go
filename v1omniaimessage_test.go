@@ -13,7 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestV1OmniAIMessageFeedbackWithOptionalParams(t *testing.T) {
+func TestV1OmniAIMessageGetMessageByID(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,14 +26,11 @@ func TestV1OmniAIMessageFeedbackWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.OmniAI.Messages.Feedback(
+	_, err := client.V1.OmniAI.Messages.GetMessageByID(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.V1OmniAIMessageFeedbackParams{
+		clearstreet.V1OmniAIMessageGetMessageByIDParams{
 			AccountID: 0,
-			Score:     0,
-			Comment:   clearstreet.String("comment"),
-			Metadata:  map[string]any{},
 		},
 	)
 	if err != nil {
@@ -45,7 +42,7 @@ func TestV1OmniAIMessageFeedbackWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestV1OmniAIMessageGetMessage(t *testing.T) {
+func TestV1OmniAIMessageSubmitFeedbackWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -58,11 +55,14 @@ func TestV1OmniAIMessageGetMessage(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.OmniAI.Messages.GetMessage(
+	_, err := client.V1.OmniAI.Messages.SubmitFeedback(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.V1OmniAIMessageGetMessageParams{
+		clearstreet.V1OmniAIMessageSubmitFeedbackParams{
 			AccountID: 0,
+			Score:     0,
+			Comment:   clearstreet.String("comment"),
+			Metadata:  map[string]any{},
 		},
 	)
 	if err != nil {

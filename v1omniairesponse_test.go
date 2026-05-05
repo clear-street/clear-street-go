@@ -42,7 +42,7 @@ func TestV1OmniAIResponseCancelResponse(t *testing.T) {
 	}
 }
 
-func TestV1OmniAIResponseGetResponse(t *testing.T) {
+func TestV1OmniAIResponseGetResponseByID(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -55,10 +55,10 @@ func TestV1OmniAIResponseGetResponse(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.OmniAI.Responses.GetResponse(
+	_, err := client.V1.OmniAI.Responses.GetResponseByID(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.V1OmniAIResponseGetResponseParams{
+		clearstreet.V1OmniAIResponseGetResponseByIDParams{
 			AccountID: 0,
 		},
 	)
