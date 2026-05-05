@@ -186,8 +186,7 @@ type InstrumentCore struct {
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// The percent of a long position's value you must post as margin
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
@@ -442,10 +441,9 @@ type V1InstrumentGetInstrumentsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
-	// Filter by instrument type. If omitted, returns all types.
+	// Filter by instrument type. If omitted, returns all supported instrument types.
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
 	InstrumentType V1InstrumentGetInstrumentsParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	paramObj
 }
@@ -459,16 +457,13 @@ func (r V1InstrumentGetInstrumentsParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
-// Filter by instrument type. If omitted, returns all types.
+// Filter by instrument type. If omitted, returns all supported instrument types.
 type V1InstrumentGetInstrumentsParamsInstrumentType string
 
 const (
 	V1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock    V1InstrumentGetInstrumentsParamsInstrumentType = "COMMON_STOCK"
 	V1InstrumentGetInstrumentsParamsInstrumentTypePreferredStock V1InstrumentGetInstrumentsParamsInstrumentType = "PREFERRED_STOCK"
-	V1InstrumentGetInstrumentsParamsInstrumentTypeCorporateBond  V1InstrumentGetInstrumentsParamsInstrumentType = "CORPORATE_BOND"
 	V1InstrumentGetInstrumentsParamsInstrumentTypeOption         V1InstrumentGetInstrumentsParamsInstrumentType = "OPTION"
-	V1InstrumentGetInstrumentsParamsInstrumentTypeFuture         V1InstrumentGetInstrumentsParamsInstrumentType = "FUTURE"
-	V1InstrumentGetInstrumentsParamsInstrumentTypeWarrant        V1InstrumentGetInstrumentsParamsInstrumentType = "WARRANT"
 	V1InstrumentGetInstrumentsParamsInstrumentTypeCash           V1InstrumentGetInstrumentsParamsInstrumentType = "CASH"
 	V1InstrumentGetInstrumentsParamsInstrumentTypeOther          V1InstrumentGetInstrumentsParamsInstrumentType = "OTHER"
 )

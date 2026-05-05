@@ -122,8 +122,7 @@ type Order struct {
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Type of security
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
 	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// Remaining unfilled quantity
 	LeavesQuantity string `json:"leaves_quantity" api:"required"`
@@ -436,8 +435,7 @@ type V1AccountOrderCancelAllOpenOrdersParams struct {
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
 	InstrumentType V1AccountOrderCancelAllOpenOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Filter by order side (BUY or SELL)
 	//
@@ -466,10 +464,7 @@ type V1AccountOrderCancelAllOpenOrdersParamsInstrumentType string
 const (
 	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock    V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
 	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypePreferredStock V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "PREFERRED_STOCK"
-	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeCorporateBond  V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "CORPORATE_BOND"
 	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeOption         V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
-	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeFuture         V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "FUTURE"
-	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeWarrant        V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "WARRANT"
 	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeCash           V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
 	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeOther          V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "OTHER"
 )
@@ -525,8 +520,7 @@ type V1AccountOrderGetOrdersParams struct {
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
 	InstrumentType V1AccountOrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Comma-separated order statuses to filter by
 	//
@@ -552,10 +546,7 @@ type V1AccountOrderGetOrdersParamsInstrumentType string
 const (
 	V1AccountOrderGetOrdersParamsInstrumentTypeCommonStock    V1AccountOrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
 	V1AccountOrderGetOrdersParamsInstrumentTypePreferredStock V1AccountOrderGetOrdersParamsInstrumentType = "PREFERRED_STOCK"
-	V1AccountOrderGetOrdersParamsInstrumentTypeCorporateBond  V1AccountOrderGetOrdersParamsInstrumentType = "CORPORATE_BOND"
 	V1AccountOrderGetOrdersParamsInstrumentTypeOption         V1AccountOrderGetOrdersParamsInstrumentType = "OPTION"
-	V1AccountOrderGetOrdersParamsInstrumentTypeFuture         V1AccountOrderGetOrdersParamsInstrumentType = "FUTURE"
-	V1AccountOrderGetOrdersParamsInstrumentTypeWarrant        V1AccountOrderGetOrdersParamsInstrumentType = "WARRANT"
 	V1AccountOrderGetOrdersParamsInstrumentTypeCash           V1AccountOrderGetOrdersParamsInstrumentType = "CASH"
 	V1AccountOrderGetOrdersParamsInstrumentTypeOther          V1AccountOrderGetOrdersParamsInstrumentType = "OTHER"
 )
@@ -679,8 +670,7 @@ func init() {
 type V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
 	// Security type for the leg.
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
 	InstrumentType SecurityType `json:"instrument_type,omitzero" api:"required"`
 	// Ratio for the leg.
 	Ratio string `json:"ratio" api:"required"`
@@ -720,8 +710,7 @@ func init() {
 type V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest struct {
 	// Type of security
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
 	InstrumentType SecurityType `json:"instrument_type,omitzero" api:"required"`
 	// Type of order
 	//

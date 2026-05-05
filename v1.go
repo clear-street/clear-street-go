@@ -77,10 +77,7 @@ type SecurityType string
 const (
 	SecurityTypeCommonStock    SecurityType = "COMMON_STOCK"
 	SecurityTypePreferredStock SecurityType = "PREFERRED_STOCK"
-	SecurityTypeCorporateBond  SecurityType = "CORPORATE_BOND"
 	SecurityTypeOption         SecurityType = "OPTION"
-	SecurityTypeFuture         SecurityType = "FUTURE"
-	SecurityTypeWarrant        SecurityType = "WARRANT"
 	SecurityTypeCash           SecurityType = "CASH"
 	SecurityTypeOther          SecurityType = "OTHER"
 )
