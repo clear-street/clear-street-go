@@ -725,8 +725,7 @@ func (r *OpenScreenerAction) UnmarshalJSON(data []byte) error {
 type OrderPayload struct {
 	// Type of security
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "CORPORATE_BOND", "OPTION", "FUTURE",
-	// "WARRANT", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
 	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// Order type
 	//
