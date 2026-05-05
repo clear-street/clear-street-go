@@ -178,11 +178,11 @@ type Order struct {
 	// Stop price (for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price" api:"nullable"`
 	// Trailing offset amount for trailing orders
-	TrailingOffsetAmt string `json:"trailing_offset_amt" api:"nullable"`
+	TrailingOffset string `json:"trailing_offset" api:"nullable"`
 	// Trailing offset type for trailing orders
 	//
-	// Any of "PRICE", "PERCENT_BPS".
-	TrailingOffsetAmtType TrailingOffsetType `json:"trailing_offset_amt_type" api:"nullable"`
+	// Any of "PRICE", "BPS".
+	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
 	// Trailing watermark price for trailing orders
 	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
 	// Trailing watermark timestamp for trailing orders
@@ -218,8 +218,8 @@ type Order struct {
 		QueueState             respjson.Field
 		ReleasesAt             respjson.Field
 		StopPrice              respjson.Field
-		TrailingOffsetAmt      respjson.Field
-		TrailingOffsetAmtType  respjson.Field
+		TrailingOffset         respjson.Field
+		TrailingOffsetType     respjson.Field
 		TrailingWatermarkPx    respjson.Field
 		TrailingWatermarkTs    respjson.Field
 		UnderlyingInstrumentID respjson.Field
@@ -309,8 +309,8 @@ const (
 type TrailingOffsetType string
 
 const (
-	TrailingOffsetTypePrice      TrailingOffsetType = "PRICE"
-	TrailingOffsetTypePercentBps TrailingOffsetType = "PERCENT_BPS"
+	TrailingOffsetTypePrice TrailingOffsetType = "PRICE"
+	TrailingOffsetTypeBps   TrailingOffsetType = "BPS"
 )
 
 type V1AccountOrderCancelAllOpenOrdersResponse struct {
@@ -752,7 +752,7 @@ type V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest struct {
 	// `instrument_id` must be provided.
 	Symbol param.Opt[string] `json:"symbol,omitzero"`
 	// Trailing offset amount (required for trailing orders)
-	TrailingOffsetAmt param.Opt[string] `json:"trailing_offset_amt,omitzero"`
+	TrailingOffset param.Opt[string] `json:"trailing_offset,omitzero"`
 	// Required when instrument_type is OPTION. Specifies whether the order opens or
 	// closes a position.
 	//
@@ -760,8 +760,8 @@ type V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest struct {
 	PositionEffect string `json:"position_effect,omitzero"`
 	// Trailing offset type (PRICE or PERCENT_BPS)
 	//
-	// Any of "PRICE", "PERCENT_BPS".
-	TrailingOffsetAmtType TrailingOffsetType `json:"trailing_offset_amt_type,omitzero"`
+	// Any of "PRICE", "BPS".
+	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type,omitzero"`
 	paramObj
 }
 
