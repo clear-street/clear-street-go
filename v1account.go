@@ -87,7 +87,7 @@ type Account struct {
 	FullName string `json:"full_name" api:"required"`
 	// The type of account
 	//
-	// Any of "HOUSE", "PAB", "CUSTOMER", "COUNTERPARTY", "OTHER".
+	// Any of "CUSTOMER", "OTHER".
 	Kind AccountKind `json:"kind" api:"required"`
 	// The date the account was opened
 	OpenDate time.Time `json:"open_date" api:"required" format:"date"`
@@ -101,12 +101,7 @@ type Account struct {
 	Status AccountStatus `json:"status" api:"required"`
 	// The sub-type of account
 	//
-	// Any of "AFFILIATE", "ALLOCATION", "ARRANGING", "BANK", "BLOCK_TRADING",
-	// "CARRY_BROKER", "CASH", "CLIENT", "COLLATERAL", "COURTESY_MASTER", "CROSS",
-	// "DEPOSIT", "DVP", "ERROR", "EXECUTION", "FACILITATION", "FUNDING_SOURCE",
-	// "HEDGE", "MARGIN", "MUTUAL_FUND", "OPERATING", "OTHER", "RELATED_MASTER",
-	// "REPO", "SECURITIES_LENDING", "SHADOW_AWAY", "TRADING",
-	// "TRIPARTY_COLLATERAL_AWAY", "UNKNOWN".
+	// Any of "CASH", "MARGIN", "OTHER".
 	Subkind AccountSubkind `json:"subkind" api:"required"`
 	// The date the account was closed, if applicable
 	CloseDate time.Time `json:"close_date" api:"nullable" format:"date"`
@@ -137,11 +132,8 @@ func (r *Account) UnmarshalJSON(data []byte) error {
 type AccountKind string
 
 const (
-	AccountKindHouse        AccountKind = "HOUSE"
-	AccountKindPab          AccountKind = "PAB"
-	AccountKindCustomer     AccountKind = "CUSTOMER"
-	AccountKindCounterparty AccountKind = "COUNTERPARTY"
-	AccountKindOther        AccountKind = "OTHER"
+	AccountKindCustomer AccountKind = "CUSTOMER"
+	AccountKindOther    AccountKind = "OTHER"
 )
 
 type AccountList []Account
@@ -176,35 +168,9 @@ const (
 type AccountSubkind string
 
 const (
-	AccountSubkindAffiliate              AccountSubkind = "AFFILIATE"
-	AccountSubkindAllocation             AccountSubkind = "ALLOCATION"
-	AccountSubkindArranging              AccountSubkind = "ARRANGING"
-	AccountSubkindBank                   AccountSubkind = "BANK"
-	AccountSubkindBlockTrading           AccountSubkind = "BLOCK_TRADING"
-	AccountSubkindCarryBroker            AccountSubkind = "CARRY_BROKER"
-	AccountSubkindCash                   AccountSubkind = "CASH"
-	AccountSubkindClient                 AccountSubkind = "CLIENT"
-	AccountSubkindCollateral             AccountSubkind = "COLLATERAL"
-	AccountSubkindCourtesyMaster         AccountSubkind = "COURTESY_MASTER"
-	AccountSubkindCross                  AccountSubkind = "CROSS"
-	AccountSubkindDeposit                AccountSubkind = "DEPOSIT"
-	AccountSubkindDvp                    AccountSubkind = "DVP"
-	AccountSubkindError                  AccountSubkind = "ERROR"
-	AccountSubkindExecution              AccountSubkind = "EXECUTION"
-	AccountSubkindFacilitation           AccountSubkind = "FACILITATION"
-	AccountSubkindFundingSource          AccountSubkind = "FUNDING_SOURCE"
-	AccountSubkindHedge                  AccountSubkind = "HEDGE"
-	AccountSubkindMargin                 AccountSubkind = "MARGIN"
-	AccountSubkindMutualFund             AccountSubkind = "MUTUAL_FUND"
-	AccountSubkindOperating              AccountSubkind = "OPERATING"
-	AccountSubkindOther                  AccountSubkind = "OTHER"
-	AccountSubkindRelatedMaster          AccountSubkind = "RELATED_MASTER"
-	AccountSubkindRepo                   AccountSubkind = "REPO"
-	AccountSubkindSecuritiesLending      AccountSubkind = "SECURITIES_LENDING"
-	AccountSubkindShadowAway             AccountSubkind = "SHADOW_AWAY"
-	AccountSubkindTrading                AccountSubkind = "TRADING"
-	AccountSubkindTripartyCollateralAway AccountSubkind = "TRIPARTY_COLLATERAL_AWAY"
-	AccountSubkindUnknown                AccountSubkind = "UNKNOWN"
+	AccountSubkindCash   AccountSubkind = "CASH"
+	AccountSubkindMargin AccountSubkind = "MARGIN"
+	AccountSubkindOther  AccountSubkind = "OTHER"
 )
 
 // Risk settings for an account
