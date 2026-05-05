@@ -63,7 +63,7 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 }
 
 // Upgrade the HTTP connection to a WebSocket and echo incoming messages.
-func (r *V1Service) Ws(ctx context.Context, opts ...option.RequestOption) (err error) {
+func (r *V1Service) WebsocketHandler(ctx context.Context, opts ...option.RequestOption) (err error) {
 	opts = slices.Concat(r.options, opts)
 	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
 	path := "v1/ws"

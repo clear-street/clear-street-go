@@ -77,7 +77,7 @@ func TestV1InstrumentGetInstrumentsWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestV1InstrumentSearchWithOptionalParams(t *testing.T) {
+func TestV1InstrumentSearchInstrumentsWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -90,15 +90,15 @@ func TestV1InstrumentSearchWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Instruments.Search(context.TODO(), clearstreet.V1InstrumentSearchParams{
+	_, err := client.V1.Instruments.SearchInstruments(context.TODO(), clearstreet.V1InstrumentSearchInstrumentsParams{
 		Q:                 "q",
 		AssetClass:        clearstreet.String("asset_class"),
 		Country:           clearstreet.String("country"),
 		Currency:          clearstreet.String("currency"),
-		Cursor:            clearstreet.String("cursor"),
 		IncludeInactive:   clearstreet.Bool(true),
 		IncludeRestricted: clearstreet.Bool(true),
-		Limit:             clearstreet.Int(0),
+		PageSize:          clearstreet.Int(1),
+		PageToken:         clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

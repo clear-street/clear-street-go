@@ -43,14 +43,14 @@ func NewV1InstrumentOptionService(opts ...option.RequestOption) (r V1InstrumentO
 //
 // Returns options contracts for a given underlier with options-specific metadata.
 // Exactly one underlier identifier must be provided.
-func (r *V1InstrumentOptionService) Contracts(ctx context.Context, query V1InstrumentOptionContractsParams, opts ...option.RequestOption) (res *V1InstrumentOptionContractsResponse, err error) {
+func (r *V1InstrumentOptionService) GetOptionContracts(ctx context.Context, query V1InstrumentOptionGetOptionContractsParams, opts ...option.RequestOption) (res *V1InstrumentOptionGetOptionContractsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/instruments/options/contracts"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
 
-type V1InstrumentOptionContractsResponse struct {
+type V1InstrumentOptionGetOptionContractsResponse struct {
 	Data OptionsContractList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -62,12 +62,12 @@ type V1InstrumentOptionContractsResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1InstrumentOptionContractsResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1InstrumentOptionContractsResponse) UnmarshalJSON(data []byte) error {
+func (r V1InstrumentOptionGetOptionContractsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1InstrumentOptionGetOptionContractsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1InstrumentOptionContractsParams struct {
+type V1InstrumentOptionGetOptionContractsParams struct {
 	// Filter to contracts expiring on this date (YYYY-MM-DD)
 	Expiry   param.Opt[time.Time] `query:"expiry,omitzero" format:"date" json:"-"`
 	PageSize param.Opt[int64]     `query:"page_size,omitzero" json:"-"`
@@ -77,7 +77,7 @@ type V1InstrumentOptionContractsParams struct {
 	// Underlier symbol (e.g., AAPL, SPX)
 	Underlier param.Opt[string] `query:"underlier,omitzero" json:"-"`
 	// OEMS instrument UUID or symbol of the underlying equity/index
-	UnderlierInstrumentID param.Opt[string] `query:"underlier_instrument_id,omitzero" format:"uuid" json:"-"`
+	UnderlyingInstrumentID param.Opt[string] `query:"underlying_instrument_id,omitzero" format:"uuid" json:"-"`
 	// Filter by contract type: CALL or PUT
 	//
 	// Any of "CALL", "PUT".
@@ -85,9 +85,9 @@ type V1InstrumentOptionContractsParams struct {
 	paramObj
 }
 
-// URLQuery serializes [V1InstrumentOptionContractsParams]'s query parameters as
-// `url.Values`.
-func (r V1InstrumentOptionContractsParams) URLQuery() (v url.Values, err error) {
+// URLQuery serializes [V1InstrumentOptionGetOptionContractsParams]'s query
+// parameters as `url.Values`.
+func (r V1InstrumentOptionGetOptionContractsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

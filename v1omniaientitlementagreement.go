@@ -40,7 +40,7 @@ func NewV1OmniAIEntitlementAgreementService(opts ...option.RequestOption) (r V1O
 }
 
 // List current signable entitlement agreements for consent UX.
-func (r *V1OmniAIEntitlementAgreementService) ListEntitlementAgreements(ctx context.Context, opts ...option.RequestOption) (res *V1OmniAIEntitlementAgreementListEntitlementAgreementsResponse, err error) {
+func (r *V1OmniAIEntitlementAgreementService) GetEntitlementAgreements(ctx context.Context, opts ...option.RequestOption) (res *V1OmniAIEntitlementAgreementGetEntitlementAgreementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/omni-ai/entitlement-agreements"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
@@ -77,7 +77,7 @@ func (r *EntitlementAgreementResource) UnmarshalJSON(data []byte) error {
 
 type EntitlementAgreementResourceList []EntitlementAgreementResource
 
-type V1OmniAIEntitlementAgreementListEntitlementAgreementsResponse struct {
+type V1OmniAIEntitlementAgreementGetEntitlementAgreementsResponse struct {
 	Data EntitlementAgreementResourceList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -89,9 +89,9 @@ type V1OmniAIEntitlementAgreementListEntitlementAgreementsResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1OmniAIEntitlementAgreementListEntitlementAgreementsResponse) RawJSON() string {
+func (r V1OmniAIEntitlementAgreementGetEntitlementAgreementsResponse) RawJSON() string {
 	return r.JSON.raw
 }
-func (r *V1OmniAIEntitlementAgreementListEntitlementAgreementsResponse) UnmarshalJSON(data []byte) error {
+func (r *V1OmniAIEntitlementAgreementGetEntitlementAgreementsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }

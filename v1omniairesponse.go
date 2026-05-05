@@ -69,7 +69,7 @@ func (r *V1OmniAIResponseService) CancelResponse(ctx context.Context, responseID
 //
 // Once terminal, the finalized assistant message is available in thread history
 // via `GET /omni-ai/threads/{thread_id}/messages`.
-func (r *V1OmniAIResponseService) GetResponse(ctx context.Context, responseID string, query V1OmniAIResponseGetResponseParams, opts ...option.RequestOption) (res *V1OmniAIResponseGetResponseResponse, err error) {
+func (r *V1OmniAIResponseService) GetResponseByID(ctx context.Context, responseID string, query V1OmniAIResponseGetResponseByIDParams, opts ...option.RequestOption) (res *V1OmniAIResponseGetResponseByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if responseID == "" {
 		err = errors.New("missing required response_id parameter")
@@ -97,7 +97,7 @@ func (r *V1OmniAIResponseCancelResponseResponse) UnmarshalJSON(data []byte) erro
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1OmniAIResponseGetResponseResponse struct {
+type V1OmniAIResponseGetResponseByIDResponse struct {
 	// Dynamic pollable response.
 	Data Response `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -110,8 +110,8 @@ type V1OmniAIResponseGetResponseResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1OmniAIResponseGetResponseResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1OmniAIResponseGetResponseResponse) UnmarshalJSON(data []byte) error {
+func (r V1OmniAIResponseGetResponseByIDResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OmniAIResponseGetResponseByIDResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -130,15 +130,15 @@ func (r V1OmniAIResponseCancelResponseParams) URLQuery() (v url.Values, err erro
 	})
 }
 
-type V1OmniAIResponseGetResponseParams struct {
+type V1OmniAIResponseGetResponseByIDParams struct {
 	// Account ID for the request
 	AccountID int64 `query:"account_id" api:"required" json:"-"`
 	paramObj
 }
 
-// URLQuery serializes [V1OmniAIResponseGetResponseParams]'s query parameters as
-// `url.Values`.
-func (r V1OmniAIResponseGetResponseParams) URLQuery() (v url.Values, err error) {
+// URLQuery serializes [V1OmniAIResponseGetResponseByIDParams]'s query parameters
+// as `url.Values`.
+func (r V1OmniAIResponseGetResponseByIDParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

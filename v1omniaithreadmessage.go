@@ -72,7 +72,7 @@ func (r *V1OmniAIThreadMessageService) NewMessage(ctx context.Context, threadID 
 //
 // If the last finalized message has role `USER`, an active response likely exists
 // and should be polled separately.
-func (r *V1OmniAIThreadMessageService) ListMessages(ctx context.Context, threadID string, query V1OmniAIThreadMessageListMessagesParams, opts ...option.RequestOption) (res *V1OmniAIThreadMessageListMessagesResponse, err error) {
+func (r *V1OmniAIThreadMessageService) GetMessages(ctx context.Context, threadID string, query V1OmniAIThreadMessageGetMessagesParams, opts ...option.RequestOption) (res *V1OmniAIThreadMessageGetMessagesResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
 		err = errors.New("missing required thread_id parameter")
@@ -101,7 +101,7 @@ func (r *V1OmniAIThreadMessageNewMessageResponse) UnmarshalJSON(data []byte) err
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1OmniAIThreadMessageListMessagesResponse struct {
+type V1OmniAIThreadMessageGetMessagesResponse struct {
 	Data MessageList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -113,8 +113,8 @@ type V1OmniAIThreadMessageListMessagesResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1OmniAIThreadMessageListMessagesResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1OmniAIThreadMessageListMessagesResponse) UnmarshalJSON(data []byte) error {
+func (r V1OmniAIThreadMessageGetMessagesResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OmniAIThreadMessageGetMessagesResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -135,7 +135,7 @@ func (r *V1OmniAIThreadMessageNewMessageParams) UnmarshalJSON(data []byte) error
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1OmniAIThreadMessageListMessagesParams struct {
+type V1OmniAIThreadMessageGetMessagesParams struct {
 	// Account ID for the request
 	AccountID int64            `query:"account_id" api:"required" json:"-"`
 	PageSize  param.Opt[int64] `query:"page_size,omitzero" json:"-"`
@@ -145,9 +145,9 @@ type V1OmniAIThreadMessageListMessagesParams struct {
 	paramObj
 }
 
-// URLQuery serializes [V1OmniAIThreadMessageListMessagesParams]'s query parameters
+// URLQuery serializes [V1OmniAIThreadMessageGetMessagesParams]'s query parameters
 // as `url.Values`.
-func (r V1OmniAIThreadMessageListMessagesParams) URLQuery() (v url.Values, err error) {
+func (r V1OmniAIThreadMessageGetMessagesParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

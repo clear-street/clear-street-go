@@ -74,25 +74,13 @@ func (r *V1OmniAIThreadService) NewThread(ctx context.Context, body V1OmniAIThre
 // Returns metadata (title, timestamps) for a single thread. Does not include
 // messages — use `GET /omni-ai/threads/{thread_id}/messages` for conversation
 // history.
-func (r *V1OmniAIThreadService) GetThread(ctx context.Context, threadID string, query V1OmniAIThreadGetThreadParams, opts ...option.RequestOption) (res *V1OmniAIThreadGetThreadResponse, err error) {
+func (r *V1OmniAIThreadService) GetThreadByID(ctx context.Context, threadID string, query V1OmniAIThreadGetThreadByIDParams, opts ...option.RequestOption) (res *V1OmniAIThreadGetThreadByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
 		err = errors.New("missing required thread_id parameter")
 		return nil, err
 	}
 	path := fmt.Sprintf("v1/omni-ai/threads/%s", threadID)
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
-	return res, err
-}
-
-// List conversation threads.
-//
-// Returns thread metadata ordered by most recently created first. Use `page_size`
-// and `page_token` for pagination. Thread objects contain only metadata (title,
-// timestamps) — use the messages endpoint for conversation history.
-func (r *V1OmniAIThreadService) ListThreads(ctx context.Context, query V1OmniAIThreadListThreadsParams, opts ...option.RequestOption) (res *V1OmniAIThreadListThreadsResponse, err error) {
-	opts = slices.Concat(r.options, opts)
-	path := "v1/omni-ai/threads"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
@@ -105,13 +93,25 @@ func (r *V1OmniAIThreadService) ListThreads(ctx context.Context, query V1OmniAIT
 // likely in progress.
 //
 // Returns **404** if no active response exists (the thread is idle).
-func (r *V1OmniAIThreadService) Response(ctx context.Context, threadID string, query V1OmniAIThreadResponseParams, opts ...option.RequestOption) (res *V1OmniAIThreadResponseResponse, err error) {
+func (r *V1OmniAIThreadService) GetThreadResponse(ctx context.Context, threadID string, query V1OmniAIThreadGetThreadResponseParams, opts ...option.RequestOption) (res *V1OmniAIThreadGetThreadResponseResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
 		err = errors.New("missing required thread_id parameter")
 		return nil, err
 	}
 	path := fmt.Sprintf("v1/omni-ai/threads/%s/response", threadID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
+// List conversation threads.
+//
+// Returns thread metadata ordered by most recently created first. Use `page_size`
+// and `page_token` for pagination. Thread objects contain only metadata (title,
+// timestamps) — use the messages endpoint for conversation history.
+func (r *V1OmniAIThreadService) GetThreads(ctx context.Context, query V1OmniAIThreadGetThreadsParams, opts ...option.RequestOption) (res *V1OmniAIThreadGetThreadsResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "v1/omni-ai/threads"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
@@ -134,7 +134,7 @@ func (r *V1OmniAIThreadNewThreadResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1OmniAIThreadGetThreadResponse struct {
+type V1OmniAIThreadGetThreadByIDResponse struct {
 	// Thread metadata returned by list/get thread endpoints.
 	Data Thread `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -147,29 +147,12 @@ type V1OmniAIThreadGetThreadResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1OmniAIThreadGetThreadResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1OmniAIThreadGetThreadResponse) UnmarshalJSON(data []byte) error {
+func (r V1OmniAIThreadGetThreadByIDResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OmniAIThreadGetThreadByIDResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1OmniAIThreadListThreadsResponse struct {
-	Data ThreadList `json:"data" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Data        respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-	shared.BaseResponse
-}
-
-// Returns the unmodified JSON received from the API
-func (r V1OmniAIThreadListThreadsResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1OmniAIThreadListThreadsResponse) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-type V1OmniAIThreadResponseResponse struct {
+type V1OmniAIThreadGetThreadResponseResponse struct {
 	// Dynamic pollable response.
 	Data Response `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -182,8 +165,25 @@ type V1OmniAIThreadResponseResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1OmniAIThreadResponseResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1OmniAIThreadResponseResponse) UnmarshalJSON(data []byte) error {
+func (r V1OmniAIThreadGetThreadResponseResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OmniAIThreadGetThreadResponseResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1OmniAIThreadGetThreadsResponse struct {
+	Data ThreadList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1OmniAIThreadGetThreadsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OmniAIThreadGetThreadsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -245,22 +245,37 @@ func init() {
 	)
 }
 
-type V1OmniAIThreadGetThreadParams struct {
+type V1OmniAIThreadGetThreadByIDParams struct {
 	// Account ID for the request
 	AccountID int64 `query:"account_id" api:"required" json:"-"`
 	paramObj
 }
 
-// URLQuery serializes [V1OmniAIThreadGetThreadParams]'s query parameters as
+// URLQuery serializes [V1OmniAIThreadGetThreadByIDParams]'s query parameters as
 // `url.Values`.
-func (r V1OmniAIThreadGetThreadParams) URLQuery() (v url.Values, err error) {
+func (r V1OmniAIThreadGetThreadByIDParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-type V1OmniAIThreadListThreadsParams struct {
+type V1OmniAIThreadGetThreadResponseParams struct {
+	// Account ID for the request
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1OmniAIThreadGetThreadResponseParams]'s query parameters
+// as `url.Values`.
+func (r V1OmniAIThreadGetThreadResponseParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+type V1OmniAIThreadGetThreadsParams struct {
 	// Account ID for the request
 	AccountID int64            `query:"account_id" api:"required" json:"-"`
 	PageSize  param.Opt[int64] `query:"page_size,omitzero" json:"-"`
@@ -270,24 +285,9 @@ type V1OmniAIThreadListThreadsParams struct {
 	paramObj
 }
 
-// URLQuery serializes [V1OmniAIThreadListThreadsParams]'s query parameters as
+// URLQuery serializes [V1OmniAIThreadGetThreadsParams]'s query parameters as
 // `url.Values`.
-func (r V1OmniAIThreadListThreadsParams) URLQuery() (v url.Values, err error) {
-	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
-		NestedFormat: apiquery.NestedQueryFormatBrackets,
-	})
-}
-
-type V1OmniAIThreadResponseParams struct {
-	// Account ID for the request
-	AccountID int64 `query:"account_id" api:"required" json:"-"`
-	paramObj
-}
-
-// URLQuery serializes [V1OmniAIThreadResponseParams]'s query parameters as
-// `url.Values`.
-func (r V1OmniAIThreadResponseParams) URLQuery() (v url.Values, err error) {
+func (r V1OmniAIThreadGetThreadsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

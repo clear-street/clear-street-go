@@ -91,7 +91,7 @@ func (r *V1InstrumentService) GetInstruments(ctx context.Context, query V1Instru
 // flags, and OTC / restricted / liquidation-only penalties. Defaults to the
 // `EQUITY` asset class (common stock + ETFs + exchange-traded mutual funds); pass
 // `asset_class=OPTION` for option chains.
-func (r *V1InstrumentService) Search(ctx context.Context, query V1InstrumentSearchParams, opts ...option.RequestOption) (res *V1InstrumentSearchResponse, err error) {
+func (r *V1InstrumentService) SearchInstruments(ctx context.Context, query V1InstrumentSearchInstrumentsParams, opts ...option.RequestOption) (res *V1InstrumentSearchInstrumentsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/instruments/search"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
@@ -320,26 +320,26 @@ type OptionsContract struct {
 	// Open interest (number of outstanding contracts), if available
 	OpenInterest int64 `json:"open_interest" api:"nullable"`
 	// OEMS instrument ID of the underlying instrument, if resolvable
-	UnderlierInstrumentID string `json:"underlier_instrument_id" api:"nullable" format:"uuid"`
+	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                    respjson.Field
-		ContractType          respjson.Field
-		Currency              respjson.Field
-		Exchange              respjson.Field
-		ExerciseStyle         respjson.Field
-		Expiry                respjson.Field
-		IsLiquidationOnly     respjson.Field
-		IsMarginable          respjson.Field
-		IsRestricted          respjson.Field
-		ListingType           respjson.Field
-		Multiplier            respjson.Field
-		StrikePrice           respjson.Field
-		Symbol                respjson.Field
-		OpenInterest          respjson.Field
-		UnderlierInstrumentID respjson.Field
-		ExtraFields           map[string]respjson.Field
-		raw                   string
+		ID                     respjson.Field
+		ContractType           respjson.Field
+		Currency               respjson.Field
+		Exchange               respjson.Field
+		ExerciseStyle          respjson.Field
+		Expiry                 respjson.Field
+		IsLiquidationOnly      respjson.Field
+		IsMarginable           respjson.Field
+		IsRestricted           respjson.Field
+		ListingType            respjson.Field
+		Multiplier             respjson.Field
+		StrikePrice            respjson.Field
+		Symbol                 respjson.Field
+		OpenInterest           respjson.Field
+		UnderlyingInstrumentID respjson.Field
+		ExtraFields            map[string]respjson.Field
+		raw                    string
 	} `json:"-"`
 }
 
@@ -386,7 +386,7 @@ func (r *V1InstrumentGetInstrumentsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1InstrumentSearchResponse struct {
+type V1InstrumentSearchInstrumentsResponse struct {
 	Data InstrumentCoreList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -398,8 +398,8 @@ type V1InstrumentSearchResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1InstrumentSearchResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1InstrumentSearchResponse) UnmarshalJSON(data []byte) error {
+func (r V1InstrumentSearchInstrumentsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1InstrumentSearchInstrumentsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -468,7 +468,7 @@ const (
 	V1InstrumentGetInstrumentsParamsInstrumentTypeOther          V1InstrumentGetInstrumentsParamsInstrumentType = "OTHER"
 )
 
-type V1InstrumentSearchParams struct {
+type V1InstrumentSearchInstrumentsParams struct {
 	// Search term applied case-insensitively to ticker symbols, alt-IDs
 	// (CUSIP/ISIN/OPRA-root/CMS), and company names.
 	Q string `query:"q" api:"required" json:"-"`
@@ -479,22 +479,20 @@ type V1InstrumentSearchParams struct {
 	Country param.Opt[string] `query:"country,omitzero" json:"-"`
 	// Optional ISO currency filter (e.g., USD).
 	Currency param.Opt[string] `query:"currency,omitzero" json:"-"`
-	// Opaque continuation cursor for show-more paging — pass the `next_page_token`
-	// from a prior response. Same wire format as `page_token` on other paginated
-	// endpoints.
-	Cursor param.Opt[string] `query:"cursor,omitzero" json:"-"`
 	// Include inactive instruments. Default false.
 	IncludeInactive param.Opt[bool] `query:"include_inactive,omitzero" json:"-"`
 	// Include restricted instruments. Default true (penalized in ranking).
-	IncludeRestricted param.Opt[bool] `query:"include_restricted,omitzero" json:"-"`
-	// Maximum hits to return. Bounded [1, 100]. Default 20.
-	Limit param.Opt[int64] `query:"limit,omitzero" json:"-"`
+	IncludeRestricted param.Opt[bool]  `query:"include_restricted,omitzero" json:"-"`
+	PageSize          param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next page of results. Contains encoded pagination state
+	// (limit + offset). When provided, page_size is ignored.
+	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	paramObj
 }
 
-// URLQuery serializes [V1InstrumentSearchParams]'s query parameters as
+// URLQuery serializes [V1InstrumentSearchInstrumentsParams]'s query parameters as
 // `url.Values`.
-func (r V1InstrumentSearchParams) URLQuery() (v url.Values, err error) {
+func (r V1InstrumentSearchInstrumentsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

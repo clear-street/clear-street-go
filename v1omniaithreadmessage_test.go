@@ -44,7 +44,7 @@ func TestV1OmniAIThreadMessageNewMessageWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestV1OmniAIThreadMessageListMessagesWithOptionalParams(t *testing.T) {
+func TestV1OmniAIThreadMessageGetMessagesWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -57,10 +57,10 @@ func TestV1OmniAIThreadMessageListMessagesWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.OmniAI.Threads.Messages.ListMessages(
+	_, err := client.V1.OmniAI.Threads.Messages.GetMessages(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.V1OmniAIThreadMessageListMessagesParams{
+		clearstreet.V1OmniAIThreadMessageGetMessagesParams{
 			AccountID: 0,
 			PageSize:  clearstreet.Int(1),
 			PageToken: clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),

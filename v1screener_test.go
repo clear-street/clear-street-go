@@ -106,7 +106,7 @@ func TestV1ScreenerSearchScreenerWithOptionalParams(t *testing.T) {
 			}},
 		}},
 		PageSize:  clearstreet.Int(25),
-		PageToken: clearstreet.String("page_token"),
+		PageToken: clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 		SortBy: clearstreet.FieldRefParam{
 			Name:      "market_cap",
 			Lookback:  clearstreet.FieldLookbackOneWeek,
