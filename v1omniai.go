@@ -359,6 +359,20 @@ func (r *DataChart) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Stable entitlement agreement family key.
+type EntitlementAgreementKey string
+
+const (
+	EntitlementAgreementKeyOmniAccountDataAccess EntitlementAgreementKey = "omni_account_data_access"
+)
+
+// Stable entitlement code granted by an agreement.
+type EntitlementCode string
+
+const (
+	EntitlementCodeOmniAccountData EntitlementCode = "omni.account_data"
+)
+
 // Shared sanitized error payload.
 type ErrorStatus struct {
 	Code    string `json:"code" api:"required"`
@@ -667,10 +681,13 @@ func (r *OpenChartAction) UnmarshalJSON(data []byte) error {
 
 // Action to open entitlement consent flow for one or more accounts.
 type OpenEntitlementConsentAction struct {
-	AgreementKey              string   `json:"agreement_key" api:"required"`
-	Reason                    string   `json:"reason" api:"required"`
-	RequestedEntitlementCodes []string `json:"requested_entitlement_codes" api:"required"`
-	TradingAccountIDs         []int64  `json:"trading_account_ids" api:"required"`
+	// Stable entitlement agreement family key.
+	//
+	// Any of "omni_account_data_access".
+	AgreementKey              EntitlementAgreementKey `json:"agreement_key" api:"required"`
+	Reason                    string                  `json:"reason" api:"required"`
+	RequestedEntitlementCodes []EntitlementCode       `json:"requested_entitlement_codes" api:"required"`
+	TradingAccountIDs         []int64                 `json:"trading_account_ids" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AgreementKey              respjson.Field
@@ -1281,16 +1298,14 @@ func (r *SymbolChart) UnmarshalJSON(data []byte) error {
 
 // Thread metadata returned by list/get thread endpoints.
 type Thread struct {
-	ID          string `json:"id" api:"required" format:"uuid"`
-	CreatedAt   string `json:"created_at" api:"required"`
-	Description string `json:"description" api:"required"`
-	Title       string `json:"title" api:"required"`
-	UpdatedAt   string `json:"updated_at" api:"required"`
+	ID        string `json:"id" api:"required" format:"uuid"`
+	CreatedAt string `json:"created_at" api:"required"`
+	Title     string `json:"title" api:"required"`
+	UpdatedAt string `json:"updated_at" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
 		CreatedAt   respjson.Field
-		Description respjson.Field
 		Title       respjson.Field
 		UpdatedAt   respjson.Field
 		ExtraFields map[string]respjson.Field
