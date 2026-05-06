@@ -63,7 +63,7 @@ func NewV1InstrumentService(opts ...option.RequestOption) (r V1InstrumentService
 }
 
 // Retrieves detailed information for a specific instrument.
-func (r *V1InstrumentService) GetInstrumentByID(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentGetInstrumentByIDParams, opts ...option.RequestOption) (res *V1InstrumentGetInstrumentByIDResponse, err error) {
+func (r *V1InstrumentService) GetInstrumentByID(ctx context.Context, instrumentID string, query V1InstrumentGetInstrumentByIDParams, opts ...option.RequestOption) (res *V1InstrumentGetInstrumentByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")

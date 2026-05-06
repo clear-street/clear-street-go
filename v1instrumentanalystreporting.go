@@ -42,7 +42,7 @@ func NewV1InstrumentAnalystReportingService(opts ...option.RequestOption) (r V1I
 }
 
 // Retrieves analyst ratings and price targets for an instrument.
-func (r *V1InstrumentAnalystReportingService) GetInstrumentAnalystConsensus(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentAnalystReportingGetInstrumentAnalystConsensusParams, opts ...option.RequestOption) (res *V1InstrumentAnalystReportingGetInstrumentAnalystConsensusResponse, err error) {
+func (r *V1InstrumentAnalystReportingService) GetInstrumentAnalystConsensus(ctx context.Context, instrumentID string, query V1InstrumentAnalystReportingGetInstrumentAnalystConsensusParams, opts ...option.RequestOption) (res *V1InstrumentAnalystReportingGetInstrumentAnalystConsensusResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")

@@ -50,7 +50,7 @@ func NewV1InstrumentBalanceSheetService(opts ...option.RequestOption) (r V1Instr
 //
 // - `from_date`: None (no lower bound)
 // - `to_date`: None (no upper bound)
-func (r *V1InstrumentBalanceSheetService) GetInstrumentBalanceSheetStatements(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentBalanceSheetGetInstrumentBalanceSheetStatementsParams, opts ...option.RequestOption) (res *V1InstrumentBalanceSheetGetInstrumentBalanceSheetStatementsResponse, err error) {
+func (r *V1InstrumentBalanceSheetService) GetInstrumentBalanceSheetStatements(ctx context.Context, instrumentID string, query V1InstrumentBalanceSheetGetInstrumentBalanceSheetStatementsParams, opts ...option.RequestOption) (res *V1InstrumentBalanceSheetGetInstrumentBalanceSheetStatementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
