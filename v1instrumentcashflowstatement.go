@@ -46,7 +46,7 @@ func NewV1InstrumentCashFlowStatementService(opts ...option.RequestOption) (r V1
 // Retrieves historical cash flow statements for the specified instrument. Cash
 // flow statements show cash inflows and outflows from operating, investing, and
 // financing activities.
-func (r *V1InstrumentCashFlowStatementService) GetInstrumentCashFlowStatements(ctx context.Context, instrumentID string, query V1InstrumentCashFlowStatementGetInstrumentCashFlowStatementsParams, opts ...option.RequestOption) (res *V1InstrumentCashFlowStatementGetInstrumentCashFlowStatementsResponse, err error) {
+func (r *V1InstrumentCashFlowStatementService) GetInstrumentCashFlowStatements(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentCashFlowStatementGetInstrumentCashFlowStatementsParams, opts ...option.RequestOption) (res *V1InstrumentCashFlowStatementGetInstrumentCashFlowStatementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")

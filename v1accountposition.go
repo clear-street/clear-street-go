@@ -44,7 +44,7 @@ func NewV1AccountPositionService(opts ...option.RequestOption) (r V1AccountPosit
 // Delete a position within an account for an instrument.
 //
 // Retrieves orders generated to close the position.
-func (r *V1AccountPositionService) ClosePosition(ctx context.Context, instrumentID string, params V1AccountPositionClosePositionParams, opts ...option.RequestOption) (res *V1AccountPositionClosePositionResponse, err error) {
+func (r *V1AccountPositionService) ClosePosition(ctx context.Context, instrumentID InstrumentIDOrSymbol, params V1AccountPositionClosePositionParams, opts ...option.RequestOption) (res *V1AccountPositionClosePositionResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
