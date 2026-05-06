@@ -28,7 +28,7 @@ func TestV1OmniAIEntitlementNewEntitlements(t *testing.T) {
 	)
 	_, err := client.V1.OmniAI.Entitlements.NewEntitlements(context.TODO(), clearstreet.V1OmniAIEntitlementNewEntitlementsParams{
 		AgreementID:               "01JZ0000000000000000000000",
-		RequestedEntitlementCodes: []clearstreet.EntitlementCode{clearstreet.EntitlementCodeOmniAccountData},
+		RequestedEntitlementCodes: []string{"omni.account_data"},
 		TradingAccountIDs:         []int64{100019, 100021},
 	})
 	if err != nil {

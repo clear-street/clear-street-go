@@ -48,7 +48,7 @@ func NewV1InstrumentIncomeStatementService(opts ...option.RequestOption) (r V1In
 //
 // - `from_date`: None (no lower bound)
 // - `to_date`: None (no upper bound)
-func (r *V1InstrumentIncomeStatementService) GetInstrumentIncomeStatements(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentIncomeStatementGetInstrumentIncomeStatementsParams, opts ...option.RequestOption) (res *V1InstrumentIncomeStatementGetInstrumentIncomeStatementsResponse, err error) {
+func (r *V1InstrumentIncomeStatementService) GetInstrumentIncomeStatements(ctx context.Context, instrumentID string, query V1InstrumentIncomeStatementGetInstrumentIncomeStatementsParams, opts ...option.RequestOption) (res *V1InstrumentIncomeStatementGetInstrumentIncomeStatementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")

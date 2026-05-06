@@ -48,16 +48,13 @@ func (r *V1OmniAIEntitlementAgreementService) GetEntitlementAgreements(ctx conte
 }
 
 type EntitlementAgreementResource struct {
-	AgreementID string `json:"agreement_id" api:"required"`
-	// Stable entitlement agreement family key.
-	//
-	// Any of "omni_account_data_access".
-	AgreementKey     EntitlementAgreementKey `json:"agreement_key" api:"required"`
-	DocumentContent  string                  `json:"document_content" api:"required"`
-	DocumentSha256   string                  `json:"document_sha256" api:"required"`
-	EntitlementCodes []EntitlementCode       `json:"entitlement_codes" api:"required"`
-	Title            string                  `json:"title" api:"required"`
-	Version          int64                   `json:"version" api:"required"`
+	AgreementID      string   `json:"agreement_id" api:"required"`
+	AgreementKey     string   `json:"agreement_key" api:"required"`
+	DocumentContent  string   `json:"document_content" api:"required"`
+	DocumentSha256   string   `json:"document_sha256" api:"required"`
+	EntitlementCodes []string `json:"entitlement_codes" api:"required"`
+	Title            string   `json:"title" api:"required"`
+	Version          int64    `json:"version" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AgreementID      respjson.Field

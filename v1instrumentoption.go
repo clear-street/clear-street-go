@@ -77,7 +77,7 @@ type V1InstrumentOptionGetOptionContractsParams struct {
 	// Underlier symbol (e.g., AAPL, SPX)
 	Underlier param.Opt[string] `query:"underlier,omitzero" json:"-"`
 	// OEMS instrument UUID or symbol of the underlying equity/index
-	UnderlyingInstrumentID param.Opt[InstrumentIDOrSymbol] `query:"underlying_instrument_id,omitzero" format:"uuid" json:"-"`
+	UnderlyingInstrumentID param.Opt[string] `query:"underlying_instrument_id,omitzero" format:"uuid" json:"-"`
 	// Filter by contract type: CALL or PUT
 	//
 	// Any of "CALL", "PUT".
