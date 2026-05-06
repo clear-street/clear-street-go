@@ -4,6 +4,25 @@
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared#BaseResponse">BaseResponse</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared#ResponseMetadata">ResponseMetadata</a>
 
+# Active
+
+## V1
+
+### Accounts
+
+#### Exercises
+
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ExerciseAction">ExerciseAction</a>
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ExerciseAction">ExerciseAction</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ExerciseInstruction">ExerciseInstruction</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ExerciseInstructionList">ExerciseInstructionList</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#ExerciseStatus">ExerciseStatus</a>
+
 # V1
 
 Params Types:
@@ -12,6 +31,7 @@ Params Types:
 
 Response Types:
 
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#SecurityIDSource">SecurityIDSource</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#SecurityType">SecurityType</a>
 
 Methods:
@@ -58,6 +78,20 @@ Response Types:
 Methods:
 
 - <code title="get /v1/accounts/{account_id}/balances">client.V1.Accounts.Balances.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountBalanceService.GetAccountBalances">GetAccountBalances</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountBalanceGetAccountBalancesParams">V1AccountBalanceGetAccountBalancesParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountBalanceGetAccountBalancesResponse">V1AccountBalanceGetAccountBalancesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+### Exercises
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseCancelExerciseResponse">V1AccountExerciseCancelExerciseResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseGetExercisesResponse">V1AccountExerciseGetExercisesResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseSubmitExercisesResponse">V1AccountExerciseSubmitExercisesResponse</a>
+
+Methods:
+
+- <code title="delete /v1/accounts/{account_id}/exercises/{exercise_id}">client.V1.Accounts.Exercises.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseService.CancelExercise">CancelExercise</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, exerciseID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseCancelExerciseParams">V1AccountExerciseCancelExerciseParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseCancelExerciseResponse">V1AccountExerciseCancelExerciseResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /v1/accounts/{account_id}/exercises">client.V1.Accounts.Exercises.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseService.GetExercises">GetExercises</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseGetExercisesParams">V1AccountExerciseGetExercisesParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseGetExercisesResponse">V1AccountExerciseGetExercisesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="post /v1/accounts/{account_id}/exercises">client.V1.Accounts.Exercises.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseService.SubmitExercises">SubmitExercises</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseSubmitExercisesParams">V1AccountExerciseSubmitExercisesParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountExerciseSubmitExercisesResponse">V1AccountExerciseSubmitExercisesResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ### Orders
 

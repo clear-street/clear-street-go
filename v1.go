@@ -71,6 +71,51 @@ func (r *V1Service) WebsocketHandler(ctx context.Context, opts ...option.Request
 	return err
 }
 
+// Security identifier source
+type SecurityIDSource string
+
+const (
+	SecurityIDSourceCms                           SecurityIDSource = "CMS"
+	SecurityIDSourceClst                          SecurityIDSource = "CLST"
+	SecurityIDSourceOpra                          SecurityIDSource = "OPRA"
+	SecurityIDSourceFigi                          SecurityIDSource = "FIGI"
+	SecurityIDSourceCusip                         SecurityIDSource = "CUSIP"
+	SecurityIDSourceCurrency                      SecurityIDSource = "CURRENCY"
+	SecurityIDSourceFmp                           SecurityIDSource = "FMP"
+	SecurityIDSourceOems                          SecurityIDSource = "OEMS"
+	SecurityIDSourceSedol                         SecurityIDSource = "SEDOL"
+	SecurityIDSourceQuik                          SecurityIDSource = "QUIK"
+	SecurityIDSourceIsin                          SecurityIDSource = "ISIN"
+	SecurityIDSourceRic                           SecurityIDSource = "RIC"
+	SecurityIDSourceCountry                       SecurityIDSource = "COUNTRY"
+	SecurityIDSourceExchange                      SecurityIDSource = "EXCHANGE"
+	SecurityIDSourceCta                           SecurityIDSource = "CTA"
+	SecurityIDSourceBloomberg                     SecurityIDSource = "BLOOMBERG"
+	SecurityIDSourceWertpapier                    SecurityIDSource = "WERTPAPIER"
+	SecurityIDSourceDutch                         SecurityIDSource = "DUTCH"
+	SecurityIDSourceValoren                       SecurityIDSource = "VALOREN"
+	SecurityIDSourceSicovam                       SecurityIDSource = "SICOVAM"
+	SecurityIDSourceBelgian                       SecurityIDSource = "BELGIAN"
+	SecurityIDSourceCommon                        SecurityIDSource = "COMMON"
+	SecurityIDSourceClearingHouse                 SecurityIDSource = "CLEARING_HOUSE"
+	SecurityIDSourceIsdaFpmlSpecification         SecurityIDSource = "ISDA_FPML_SPECIFICATION"
+	SecurityIDSourceIsdaFpmlURL                   SecurityIDSource = "ISDA_FPML_URL"
+	SecurityIDSourceLetterOfCredit                SecurityIDSource = "LETTER_OF_CREDIT"
+	SecurityIDSourceMarketplaceAssignedIdentifier SecurityIDSource = "MARKETPLACE_ASSIGNED_IDENTIFIER"
+	SecurityIDSourceMarkitRedEntityClip           SecurityIDSource = "MARKIT_RED_ENTITY_CLIP"
+	SecurityIDSourceMarkitRedPairClip             SecurityIDSource = "MARKIT_RED_PAIR_CLIP"
+	SecurityIDSourceCftc                          SecurityIDSource = "CFTC"
+	SecurityIDSourceIsdaCommodityReferencePrice   SecurityIDSource = "ISDA_COMMODITY_REFERENCE_PRICE"
+	SecurityIDSourceLegalEntityIdentifier         SecurityIDSource = "LEGAL_ENTITY_IDENTIFIER"
+	SecurityIDSourceSynthetic                     SecurityIDSource = "SYNTHETIC"
+	SecurityIDSourceFidessaInstrumentMnemonic     SecurityIDSource = "FIDESSA_INSTRUMENT_MNEMONIC"
+	SecurityIDSourceIndexName                     SecurityIDSource = "INDEX_NAME"
+	SecurityIDSourceUniformSymbol                 SecurityIDSource = "UNIFORM_SYMBOL"
+	SecurityIDSourceDigitalTokenIdentifier        SecurityIDSource = "DIGITAL_TOKEN_IDENTIFIER"
+	SecurityIDSourceMassive                       SecurityIDSource = "MASSIVE"
+	SecurityIDSourceOther                         SecurityIDSource = "OTHER"
+)
+
 // Security type
 type SecurityType string
 
