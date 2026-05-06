@@ -106,7 +106,7 @@ type V1WatchlistItemDeleteWatchlistItemResponse = any
 
 type V1WatchlistItemAddWatchlistItemParams struct {
 	// OEMS instrument UUID
-	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
+	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"required" format:"uuid"`
 	paramObj
 }
 

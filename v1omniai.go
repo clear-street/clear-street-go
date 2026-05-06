@@ -735,74 +735,71 @@ func (r *OpenScreenerAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Order payload for prefilling an order ticket.
+// PrefillOrderActionUnion contains all possible properties and values from
+// [PrefillOrderActionObject], [PrefillOrderActionObject2].
 //
-// This schema aligns with the NewOrderRequest schema used for order submission,
-// containing the fields needed to prefill an order ticket or submit via API.
-type OrderPayload struct {
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType SecurityType `json:"instrument_type" api:"required"`
-	// Order type
-	//
-	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
-	// "TRAILING_STOP_LIMIT", "OTHER".
-	OrderType OrderType `json:"order_type" api:"required"`
-	// Quantity (shares for stocks, contracts for options)
-	Quantity string `json:"quantity" api:"required"`
-	// Order side
-	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side Side `json:"side" api:"required"`
-	// Trading symbol (e.g., "AAPL" for equities, OSI for options)
-	Symbol string `json:"symbol" api:"required"`
-	// Time in force
-	//
-	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
-	TimeInForce TimeInForce `json:"time_in_force" api:"required"`
-	// Limit price (required for LIMIT and STOP_LIMIT orders)
-	LimitPrice string `json:"limit_price" api:"nullable"`
-	// Existing order identifier. Required for cancel actions.
-	OrderID string `json:"order_id" api:"nullable"`
-	// Stop price (required for STOP and STOP_LIMIT orders)
-	StopPrice string `json:"stop_price" api:"nullable"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		InstrumentType respjson.Field
-		OrderType      respjson.Field
-		Quantity       respjson.Field
-		Side           respjson.Field
-		Symbol         respjson.Field
-		TimeInForce    respjson.Field
-		LimitPrice     respjson.Field
-		OrderID        respjson.Field
-		StopPrice      respjson.Field
-		ExtraFields    map[string]respjson.Field
-		raw            string
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type PrefillOrderActionUnion struct {
+	ActionType string `json:"action_type"`
+	// This field is a union of [[]NewOrderRequest], [[]CancelOrderRequest]
+	Orders PrefillOrderActionUnionOrders `json:"orders"`
+	JSON   struct {
+		ActionType respjson.Field
+		Orders     respjson.Field
+		raw        string
 	} `json:"-"`
 }
 
+func (u PrefillOrderActionUnion) AsPrefillOrderActionObject() (v PrefillOrderActionObject) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u PrefillOrderActionUnion) AsPrefillOrderActionObject2() (v PrefillOrderActionObject2) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
 // Returns the unmodified JSON received from the API
-func (r OrderPayload) RawJSON() string { return r.JSON.raw }
-func (r *OrderPayload) UnmarshalJSON(data []byte) error {
+func (u PrefillOrderActionUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *PrefillOrderActionUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Action to prefill order details for user confirmation.
+// PrefillOrderActionUnionOrders is an implicit subunion of
+// [PrefillOrderActionUnion]. PrefillOrderActionUnionOrders provides convenient
+// access to the sub-properties of the union.
 //
-// The user must review and authorize the order before submission to the trading
-// API. This action provides parsed order data that can be used to prefill an order
-// ticket UI or submitted directly via the orders API after user confirmation.
-type PrefillOrderAction struct {
-	// Order operation represented by this prefill action.
-	//
-	// Any of "NEW", "CANCEL".
-	ActionType PrefillOrderActionType `json:"action_type" api:"required"`
-	// The orders to prefill
-	Orders []OrderPayload `json:"orders" api:"required"`
+// For type safety it is recommended to directly use a variant of the
+// [PrefillOrderActionUnion].
+//
+// If the underlying value is not a json object, one of the following properties
+// will be valid: OfNewOrderRequestArray OfCancelOrderRequestArray]
+type PrefillOrderActionUnionOrders struct {
+	// This field will be present if the value is a [[]NewOrderRequest] instead of an
+	// object.
+	OfNewOrderRequestArray []NewOrderRequest `json:",inline"`
+	// This field will be present if the value is a [[]CancelOrderRequest] instead of
+	// an object.
+	OfCancelOrderRequestArray []CancelOrderRequest `json:",inline"`
+	JSON                      struct {
+		OfNewOrderRequestArray    respjson.Field
+		OfCancelOrderRequestArray respjson.Field
+		raw                       string
+	} `json:"-"`
+}
+
+func (r *PrefillOrderActionUnionOrders) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Create one or more new orders.
+type PrefillOrderActionObject struct {
+	// Any of "NEW".
+	ActionType string `json:"action_type" api:"required"`
+	// Orders to prefill using the same shape accepted by the orders API.
+	Orders []NewOrderRequest `json:"orders" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ActionType  respjson.Field
@@ -813,18 +810,31 @@ type PrefillOrderAction struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r PrefillOrderAction) RawJSON() string { return r.JSON.raw }
-func (r *PrefillOrderAction) UnmarshalJSON(data []byte) error {
+func (r PrefillOrderActionObject) RawJSON() string { return r.JSON.raw }
+func (r *PrefillOrderActionObject) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Operation represented by a prefill order action.
-type PrefillOrderActionType string
+// Cancel one or more existing orders.
+type PrefillOrderActionObject2 struct {
+	// Any of "CANCEL".
+	ActionType string `json:"action_type" api:"required"`
+	// Orders to cancel using the same identifiers required by the cancel-order API.
+	Orders []CancelOrderRequest `json:"orders" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionType  respjson.Field
+		Orders      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
 
-const (
-	PrefillOrderActionTypeNew    PrefillOrderActionType = "NEW"
-	PrefillOrderActionTypeCancel PrefillOrderActionType = "CANCEL"
-)
+// Returns the unmodified JSON received from the API
+func (r PrefillOrderActionObject2) RawJSON() string { return r.JSON.raw }
+func (r *PrefillOrderActionObject2) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Prompt-style button behavior.
 type PromptButtonAction struct {
@@ -1126,7 +1136,7 @@ const (
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type StructuredActionUnion struct {
 	// This field is from variant [StructuredActionPrefillOrder].
-	PrefillOrder PrefillOrderAction `json:"prefill_order"`
+	PrefillOrder PrefillOrderActionUnion `json:"prefill_order"`
 	// This field is from variant [StructuredActionOpenChart].
 	OpenChart OpenChartAction `json:"open_chart"`
 	// This field is from variant [StructuredActionOpenScreener].
@@ -1172,7 +1182,7 @@ func (r *StructuredActionUnion) UnmarshalJSON(data []byte) error {
 // Prefill an order ticket for user confirmation
 type StructuredActionPrefillOrder struct {
 	// Prefill an order ticket for user confirmation
-	PrefillOrder PrefillOrderAction `json:"prefill_order" api:"required"`
+	PrefillOrder PrefillOrderActionUnion `json:"prefill_order" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		PrefillOrder respjson.Field

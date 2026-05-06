@@ -58,7 +58,7 @@ func (r *V1InstrumentEventService) GetAllInstrumentEvents(ctx context.Context, q
 //
 // - `from_date`: today - 365 days
 // - `to_date`: today + 60 days
-func (r *V1InstrumentEventService) GetInstrumentEvents(ctx context.Context, instrumentID string, query V1InstrumentEventGetInstrumentEventsParams, opts ...option.RequestOption) (res *V1InstrumentEventGetInstrumentEventsResponse, err error) {
+func (r *V1InstrumentEventService) GetInstrumentEvents(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentEventGetInstrumentEventsParams, opts ...option.RequestOption) (res *V1InstrumentEventGetInstrumentEventsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
