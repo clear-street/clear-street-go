@@ -18,7 +18,6 @@ import (
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
 	options []option.RequestOption
-	Active  ActiveService
 	// Active Websocket.
 	V1 V1Service
 }
@@ -50,7 +49,6 @@ func NewClient(opts ...option.RequestOption) (r Client) {
 
 	r = Client{options: opts}
 
-	r.Active = NewActiveService(opts...)
 	r.V1 = NewV1Service(opts...)
 
 	return

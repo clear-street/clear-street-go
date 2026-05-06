@@ -39,7 +39,7 @@ func NewV1InstrumentFundamentalService(opts ...option.RequestOption) (r V1Instru
 }
 
 // Retrieves supplemental fundamentals and company profile data for an instrument.
-func (r *V1InstrumentFundamentalService) GetInstrumentFundamentals(ctx context.Context, instrumentID string, opts ...option.RequestOption) (res *V1InstrumentFundamentalGetInstrumentFundamentalsResponse, err error) {
+func (r *V1InstrumentFundamentalService) GetInstrumentFundamentals(ctx context.Context, instrumentID InstrumentIDOrSymbol, opts ...option.RequestOption) (res *V1InstrumentFundamentalGetInstrumentFundamentalsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
