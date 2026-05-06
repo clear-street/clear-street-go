@@ -13,7 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestV1AccountExerciseCancelExercise(t *testing.T) {
+func TestV1AccountPositionInstructionCancelPositionInstruction(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,10 +26,10 @@ func TestV1AccountExerciseCancelExercise(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Accounts.Exercises.CancelExercise(
+	_, err := client.V1.Accounts.Positions.Instructions.CancelPositionInstruction(
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
-		clearstreet.V1AccountExerciseCancelExerciseParams{
+		clearstreet.V1AccountPositionInstructionCancelPositionInstructionParams{
 			AccountID: 0,
 		},
 	)
@@ -42,7 +42,7 @@ func TestV1AccountExerciseCancelExercise(t *testing.T) {
 	}
 }
 
-func TestV1AccountExerciseGetExercisesWithOptionalParams(t *testing.T) {
+func TestV1AccountPositionInstructionGetPositionInstructionsWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -55,10 +55,10 @@ func TestV1AccountExerciseGetExercisesWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Accounts.Exercises.GetExercises(
+	_, err := client.V1.Accounts.Positions.Instructions.GetPositionInstructions(
 		context.TODO(),
 		0,
-		clearstreet.V1AccountExerciseGetExercisesParams{
+		clearstreet.V1AccountPositionInstructionGetPositionInstructionsParams{
 			InstrumentID: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
 		},
 	)
@@ -71,7 +71,7 @@ func TestV1AccountExerciseGetExercisesWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestV1AccountExerciseSubmitExercises(t *testing.T) {
+func TestV1AccountPositionInstructionSubmitPositionInstructions(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -84,15 +84,15 @@ func TestV1AccountExerciseSubmitExercises(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Accounts.Exercises.SubmitExercises(
+	_, err := client.V1.Accounts.Positions.Instructions.SubmitPositionInstructions(
 		context.TODO(),
 		0,
-		clearstreet.V1AccountExerciseSubmitExercisesParams{
-			Exercises: []clearstreet.V1AccountExerciseSubmitExercisesParamsExercise{{
-				Action:           clearstreet.ExerciseActionExercise,
-				InstrumentID:     "0195f6d0-a1b2-7c3d-8e4f-5a6b7c8d9e02",
-				Quantity:         "1",
-				ClientExerciseID: clearstreet.String("ui-20260424-001"),
+		clearstreet.V1AccountPositionInstructionSubmitPositionInstructionsParams{
+			Instructions: []clearstreet.V1AccountPositionInstructionSubmitPositionInstructionsParamsInstruction{{
+				InstructionType: clearstreet.PositionInstructionTypeExercise,
+				InstrumentID:    "0195f6d0-a1b2-7c3d-8e4f-5a6b7c8d9e02",
+				Quantity:        "1",
+				InstructionID:   clearstreet.String("ui-20260424-001"),
 			}},
 		},
 	)
