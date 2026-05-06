@@ -32,8 +32,6 @@ type V1AccountService struct {
 	options []option.RequestOption
 	// Manage trading accounts, balances, and portfolio history.
 	Balances V1AccountBalanceService
-	// Submit and monitor option exercise, DNE, CEA, and cancel instructions.
-	Exercises V1AccountExerciseService
 	// Place, monitor, and manage trading orders.
 	Orders V1AccountOrderService
 	// Manage trading accounts, balances, and portfolio history.
@@ -49,7 +47,6 @@ func NewV1AccountService(opts ...option.RequestOption) (r V1AccountService) {
 	r = V1AccountService{}
 	r.options = opts
 	r.Balances = NewV1AccountBalanceService(opts...)
-	r.Exercises = NewV1AccountExerciseService(opts...)
 	r.Orders = NewV1AccountOrderService(opts...)
 	r.PortfolioHistory = NewV1AccountPortfolioHistoryService(opts...)
 	r.Positions = NewV1AccountPositionService(opts...)

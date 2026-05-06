@@ -14,7 +14,7 @@ import (
 // the [NewActiveV1AccountService] method instead.
 type ActiveV1AccountService struct {
 	options   []option.RequestOption
-	Exercises ActiveV1AccountExerciseService
+	Positions ActiveV1AccountPositionService
 }
 
 // NewActiveV1AccountService generates a new service that applies the given options
@@ -23,6 +23,6 @@ type ActiveV1AccountService struct {
 func NewActiveV1AccountService(opts ...option.RequestOption) (r ActiveV1AccountService) {
 	r = ActiveV1AccountService{}
 	r.options = opts
-	r.Exercises = NewActiveV1AccountExerciseService(opts...)
+	r.Positions = NewActiveV1AccountPositionService(opts...)
 	return
 }
