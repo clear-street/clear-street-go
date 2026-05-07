@@ -1162,6 +1162,30 @@ const (
 	ResponseStatusCanceled  ResponseStatus = "canceled"
 )
 
+// A single filter criterion for the screener.
+type ScreenerFilter struct {
+	// Field to filter on (e.g., "market_cap", "sector", "price")
+	Field string `json:"field" api:"required"`
+	// Comparison operator (e.g., "eq", "gte", "lte", "in")
+	Operator string `json:"operator" api:"required"`
+	// Filter value
+	Value any `json:"value" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Field       respjson.Field
+		Operator    respjson.Field
+		Value       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ScreenerFilter) RawJSON() string { return r.JSON.raw }
+func (r *ScreenerFilter) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // StructuredActionUnion contains all possible properties and values from
 // [StructuredActionPrefillOrder], [StructuredActionOpenChart],
 // [StructuredActionOpenScreener], [StructuredActionOpenEntitlementConsent].

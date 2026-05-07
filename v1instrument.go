@@ -488,10 +488,6 @@ func (r V1InstrumentGetInstrumentByIDParams) URLQuery() (v url.Values, err error
 type V1InstrumentGetInstrumentsParams struct {
 	// Filter by easy to borrow status
 	EasyToBorrow param.Opt[bool] `query:"easy_to_borrow,omitzero" json:"-"`
-	// Filter IDs to those containing this substring. For options, and when
-	// instrument_type is omitted and no instrument_ids filters are provided, this is
-	// required.
-	IDFilter param.Opt[string] `query:"id_filter,omitzero" json:"-"`
 	// Filter by liquidation only status
 	IsLiquidationOnly param.Opt[bool] `query:"is_liquidation_only,omitzero" json:"-"`
 	// Filter by marginable status
@@ -508,7 +504,9 @@ type V1InstrumentGetInstrumentsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
-	// Filter by instrument type. If omitted, returns all supported instrument types.
+	// Filter by instrument type. OPTION is not supported on this endpoint; use GET
+	// /instruments/options/contracts to list option contracts. If omitted, returns all
+	// supported instrument types except options.
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
 	InstrumentType V1InstrumentGetInstrumentsParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
@@ -524,7 +522,9 @@ func (r V1InstrumentGetInstrumentsParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
-// Filter by instrument type. If omitted, returns all supported instrument types.
+// Filter by instrument type. OPTION is not supported on this endpoint; use GET
+// /instruments/options/contracts to list option contracts. If omitted, returns all
+// supported instrument types except options.
 type V1InstrumentGetInstrumentsParamsInstrumentType string
 
 const (

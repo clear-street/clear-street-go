@@ -32,10 +32,6 @@ type V1Service struct {
 	// Retrieve market news and related instrument metadata.
 	News   V1NewsService
 	OmniAI V1OmniAIService
-	// Search and manage saved screeners.
-	SavedScreeners V1SavedScreenerService
-	// Search and manage saved screeners.
-	Screener V1ScreenerService
 	// Endpoints for API service metadata.
 	Version V1VersionService
 	// Create and manage watchlists.
@@ -55,8 +51,6 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 	r.MarketData = NewV1MarketDataService(opts...)
 	r.News = NewV1NewsService(opts...)
 	r.OmniAI = NewV1OmniAIService(opts...)
-	r.SavedScreeners = NewV1SavedScreenerService(opts...)
-	r.Screener = NewV1ScreenerService(opts...)
 	r.Version = NewV1VersionService(opts...)
 	r.Watchlists = NewV1WatchlistService(opts...)
 	return
