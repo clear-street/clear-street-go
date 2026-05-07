@@ -30,6 +30,8 @@ import (
 // the [NewV1AccountPositionService] method instead.
 type V1AccountPositionService struct {
 	options []option.RequestOption
+	// Submit and monitor option exercise, DNE, CEA, and cancel instructions.
+	Instructions V1AccountPositionInstructionService
 }
 
 // NewV1AccountPositionService generates a new service that applies the given
@@ -38,6 +40,7 @@ type V1AccountPositionService struct {
 func NewV1AccountPositionService(opts ...option.RequestOption) (r V1AccountPositionService) {
 	r = V1AccountPositionService{}
 	r.options = opts
+	r.Instructions = NewV1AccountPositionInstructionService(opts...)
 	return
 }
 
