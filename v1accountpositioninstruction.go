@@ -93,9 +93,6 @@ type PositionInstruction struct {
 	InstructionType PositionInstructionType `json:"instruction_type" api:"required"`
 	// OEMS instrument identifier the instruction is for.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
-	// OSI option symbol (e.g. `AAPL 280121C00195000`). Display-only; resolved from the
-	// instrument cache.
-	Osi string `json:"osi" api:"required"`
 	// Quantity of contracts.
 	Quantity string `json:"quantity" api:"required"`
 	// Current lifecycle status.
@@ -103,8 +100,9 @@ type PositionInstruction struct {
 	// Any of "SENT", "ACCEPTED", "REJECTED", "ENGINE_REJECTED", "CANCEL_REQUESTED",
 	// "CANCELLED", "CANCEL_FAILED", "UNKNOWN".
 	Status PositionInstructionStatus `json:"status" api:"required"`
-	// Trading symbol resolved from the instrument cache. Empty if the instrument
-	// cannot be resolved (e.g. expired option).
+	// Trading symbol resolved from the instrument cache (OSI for options, since
+	// exercises are options-only). Empty if the instrument cannot be resolved (e.g.
+	// expired option). Display-only.
 	Symbol string `json:"symbol" api:"required"`
 	// Quantity accepted by OCC. Populated after `ACCEPTED`.
 	AcceptedQuantity string `json:"accepted_quantity" api:"nullable"`
@@ -123,7 +121,6 @@ type PositionInstruction struct {
 		InstructionID    respjson.Field
 		InstructionType  respjson.Field
 		InstrumentID     respjson.Field
-		Osi              respjson.Field
 		Quantity         respjson.Field
 		Status           respjson.Field
 		Symbol           respjson.Field
