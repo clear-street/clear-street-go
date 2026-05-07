@@ -368,12 +368,16 @@ type Order struct {
 	ReleasesAt time.Time `json:"releases_at" api:"nullable" format:"date-time"`
 	// Stop price (for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price" api:"nullable"`
+	// Current trailing limit price computed by the trailing strategy
+	TrailingLimitPx string `json:"trailing_limit_px" api:"nullable"`
 	// Trailing offset amount for trailing orders
 	TrailingOffset string `json:"trailing_offset" api:"nullable"`
 	// Trailing offset type for trailing orders
 	//
 	// Any of "PRICE", "BPS".
 	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
+	// Current trailing stop price computed by the trailing strategy
+	TrailingStopPx string `json:"trailing_stop_px" api:"nullable"`
 	// Trailing watermark price for trailing orders
 	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
 	// Trailing watermark timestamp for trailing orders
@@ -409,8 +413,10 @@ type Order struct {
 		QueueState             respjson.Field
 		ReleasesAt             respjson.Field
 		StopPrice              respjson.Field
+		TrailingLimitPx        respjson.Field
 		TrailingOffset         respjson.Field
 		TrailingOffsetType     respjson.Field
+		TrailingStopPx         respjson.Field
 		TrailingWatermarkPx    respjson.Field
 		TrailingWatermarkTs    respjson.Field
 		UnderlyingInstrumentID respjson.Field
