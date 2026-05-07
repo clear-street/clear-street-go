@@ -63,7 +63,7 @@ func NewV1InstrumentService(opts ...option.RequestOption) (r V1InstrumentService
 }
 
 // Retrieves detailed information for a specific instrument.
-func (r *V1InstrumentService) GetInstrumentByID(ctx context.Context, instrumentID string, query V1InstrumentGetInstrumentByIDParams, opts ...option.RequestOption) (res *V1InstrumentGetInstrumentByIDResponse, err error) {
+func (r *V1InstrumentService) GetInstrumentByID(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentGetInstrumentByIDParams, opts ...option.RequestOption) (res *V1InstrumentGetInstrumentByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
@@ -82,15 +82,16 @@ func (r *V1InstrumentService) GetInstruments(ctx context.Context, query V1Instru
 	return res, err
 }
 
-// Fast in-memory typeahead search over the loaded instrument universe.
+// Search instruments by symbol, alternate identifier, or company name.
 //
-// Supports three independent match dimensions in a single `q` parameter: ticker
-// symbol (exact > prefix > substring), alt-id exact (CUSIP / ISIN / OPRA root /
-// CMS), and company name (token + character-trigram). Results are ranked by a
-// composite score that includes ADV (log-scaled), listing status, marginable / ETB
-// flags, and OTC / restricted / liquidation-only penalties. Defaults to the
-// `EQUITY` asset class (common stock + ETFs + exchange-traded mutual funds); pass
-// `asset_class=OPTION` for option chains.
+// The `q` parameter is case-insensitive and supports ticker symbols, alternate
+// identifiers such as CUSIP, ISIN, OPRA root, and CMS identifiers, and company
+// names for non-option instruments. Results are ranked by match quality plus
+// instrument quality signals including log-scaled ADV, listing status,
+// marginability, easy-to-borrow status, and OTC, restricted, and liquidation-only
+// penalties. Defaults to the `EQUITY` asset class (common stocks, preferred
+// shares, ADRs, ETFs, and exchange-traded mutual funds). Pass `asset_class=OPTION`
+// to search option contracts by symbol or alternate identifier.
 func (r *V1InstrumentService) SearchInstruments(ctx context.Context, query V1InstrumentSearchInstrumentsParams, opts ...option.RequestOption) (res *V1InstrumentSearchInstrumentsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/instruments/search"
@@ -137,16 +138,82 @@ const (
 
 // Represents a tradable financial instrument.
 type Instrument struct {
+	// Unique OEMS instrument identifier (UUID)
+	ID string `json:"id" api:"required" format:"uuid"`
+	// The ISO country code of the instrument's issue
+	CountryOfIssue string `json:"country_of_issue" api:"required"`
+	// The ISO currency code in which the instrument is traded
+	Currency string `json:"currency" api:"required"`
+	// Indicates if the instrument is classified as Easy-To-Borrow
+	EasyToBorrow bool `json:"easy_to_borrow" api:"required"`
+	// Indicates if the instrument is liquidation only and cannot be bought
+	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
+	// Indicates if the instrument is marginable
+	IsMarginable bool `json:"is_marginable" api:"required"`
+	// Indicates if the instrument is restricted from trading
+	IsRestricted bool `json:"is_restricted" api:"required"`
+	// Indicates if short selling is prohibited for the instrument
+	IsShortProhibited bool `json:"is_short_prohibited" api:"required"`
+	// Indicates if the instrument is on the Regulation SHO Threshold Security List
+	IsThresholdSecurity bool `json:"is_threshold_security" api:"required"`
+	// Indicates if the instrument is tradable
+	IsTradable bool `json:"is_tradable" api:"required"`
+	// The trading symbol for the instrument
+	Symbol string `json:"symbol" api:"required"`
+	// The MIC code of the primary listing venue
+	Venue string `json:"venue" api:"required"`
+	// Average daily share volume from the security definition.
+	Adv string `json:"adv" api:"nullable"`
+	// The expiration date for options instruments
+	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
+	// The type of security (e.g., Common Stock, ETF)
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
+	// The percent of a long position's value you must post as margin
+	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
+	// The full name of the instrument or its issuer
+	Name string `json:"name" api:"nullable"`
+	// Notional ADV (`adv × previous_close`). The primary liquidity signal used by
+	// `/instruments/search` ranking. Computed at response time so it stays consistent
+	// with whatever `adv` and `previous_close` show.
+	NotionalAdv string `json:"notional_adv" api:"nullable"`
 	// Available options expiration dates for this instrument. Present only when
 	// `include_options_expiry_dates=true` in the request.
 	OptionsExpiryDates []time.Time `json:"options_expiry_dates" api:"nullable" format:"date"`
+	// Last close price from the security definition.
+	PreviousClose string `json:"previous_close" api:"nullable"`
+	// The percent of a short position's value you must post as margin
+	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
+	// The strike price for options instruments
+	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		OptionsExpiryDates respjson.Field
-		ExtraFields        map[string]respjson.Field
-		raw                string
+		ID                  respjson.Field
+		CountryOfIssue      respjson.Field
+		Currency            respjson.Field
+		EasyToBorrow        respjson.Field
+		IsLiquidationOnly   respjson.Field
+		IsMarginable        respjson.Field
+		IsRestricted        respjson.Field
+		IsShortProhibited   respjson.Field
+		IsThresholdSecurity respjson.Field
+		IsTradable          respjson.Field
+		Symbol              respjson.Field
+		Venue               respjson.Field
+		Adv                 respjson.Field
+		Expiry              respjson.Field
+		InstrumentType      respjson.Field
+		LongMarginRate      respjson.Field
+		Name                respjson.Field
+		NotionalAdv         respjson.Field
+		OptionsExpiryDates  respjson.Field
+		PreviousClose       respjson.Field
+		ShortMarginRate     respjson.Field
+		StrikePrice         respjson.Field
+		ExtraFields         map[string]respjson.Field
+		raw                 string
 	} `json:"-"`
-	InstrumentCore
 }
 
 // Returns the unmodified JSON received from the API
@@ -421,10 +488,6 @@ func (r V1InstrumentGetInstrumentByIDParams) URLQuery() (v url.Values, err error
 type V1InstrumentGetInstrumentsParams struct {
 	// Filter by easy to borrow status
 	EasyToBorrow param.Opt[bool] `query:"easy_to_borrow,omitzero" json:"-"`
-	// Filter IDs to those containing this substring. For options, and when
-	// instrument_type is omitted and no instrument_ids filters are provided, this is
-	// required.
-	IDFilter param.Opt[string] `query:"id_filter,omitzero" json:"-"`
 	// Filter by liquidation only status
 	IsLiquidationOnly param.Opt[bool] `query:"is_liquidation_only,omitzero" json:"-"`
 	// Filter by marginable status
@@ -441,7 +504,9 @@ type V1InstrumentGetInstrumentsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
-	// Filter by instrument type. If omitted, returns all supported instrument types.
+	// Filter by instrument type. OPTION is not supported on this endpoint; use GET
+	// /instruments/options/contracts to list option contracts. If omitted, returns all
+	// supported instrument types except options.
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
 	InstrumentType V1InstrumentGetInstrumentsParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
@@ -457,7 +522,9 @@ func (r V1InstrumentGetInstrumentsParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
-// Filter by instrument type. If omitted, returns all supported instrument types.
+// Filter by instrument type. OPTION is not supported on this endpoint; use GET
+// /instruments/options/contracts to list option contracts. If omitted, returns all
+// supported instrument types except options.
 type V1InstrumentGetInstrumentsParamsInstrumentType string
 
 const (
@@ -469,8 +536,9 @@ const (
 )
 
 type V1InstrumentSearchInstrumentsParams struct {
-	// Search term applied case-insensitively to ticker symbols, alt-IDs
-	// (CUSIP/ISIN/OPRA-root/CMS), and company names.
+	// Search term applied case-insensitively to ticker symbols, alternate identifiers
+	// (CUSIP, ISIN, OPRA root, CMS), and company names for non-option instruments.
+	// Option searches match symbols and alternate identifiers.
 	Q string `query:"q" api:"required" json:"-"`
 	// Comma-separated asset classes (EQUITY|OPTION|WARRANT|BOND|FX|OTHER). Defaults to
 	// EQUITY.

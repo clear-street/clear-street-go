@@ -13,7 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestV1OmniAIEntitlementNewEntitlements(t *testing.T) {
+func TestV1AccountPositionInstructionCancelPositionInstruction(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,11 +26,13 @@ func TestV1OmniAIEntitlementNewEntitlements(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.OmniAI.Entitlements.NewEntitlements(context.TODO(), clearstreet.V1OmniAIEntitlementNewEntitlementsParams{
-		AgreementID:               "01JZ0000000000000000000000",
-		RequestedEntitlementCodes: []clearstreet.EntitlementCode{clearstreet.EntitlementCodeOmniAccountData},
-		TradingAccountIDs:         []int64{100019, 100021},
-	})
+	_, err := client.V1.Accounts.Positions.Instructions.CancelPositionInstruction(
+		context.TODO(),
+		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		clearstreet.V1AccountPositionInstructionCancelPositionInstructionParams{
+			AccountID: 0,
+		},
+	)
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {
@@ -40,7 +42,7 @@ func TestV1OmniAIEntitlementNewEntitlements(t *testing.T) {
 	}
 }
 
-func TestV1OmniAIEntitlementDeleteEntitlement(t *testing.T) {
+func TestV1AccountPositionInstructionGetPositionInstructionsWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -53,7 +55,13 @@ func TestV1OmniAIEntitlementDeleteEntitlement(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.OmniAI.Entitlements.DeleteEntitlement(context.TODO(), "entitlement_id")
+	_, err := client.V1.Accounts.Positions.Instructions.GetPositionInstructions(
+		context.TODO(),
+		0,
+		clearstreet.V1AccountPositionInstructionGetPositionInstructionsParams{
+			InstrumentID: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		},
+	)
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {
@@ -63,7 +71,7 @@ func TestV1OmniAIEntitlementDeleteEntitlement(t *testing.T) {
 	}
 }
 
-func TestV1OmniAIEntitlementGetEntitlementsWithOptionalParams(t *testing.T) {
+func TestV1AccountPositionInstructionSubmitPositionInstructions(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -76,9 +84,18 @@ func TestV1OmniAIEntitlementGetEntitlementsWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.OmniAI.Entitlements.GetEntitlements(context.TODO(), clearstreet.V1OmniAIEntitlementGetEntitlementsParams{
-		TradingAccountID: clearstreet.Int(0),
-	})
+	_, err := client.V1.Accounts.Positions.Instructions.SubmitPositionInstructions(
+		context.TODO(),
+		0,
+		clearstreet.V1AccountPositionInstructionSubmitPositionInstructionsParams{
+			Instructions: []clearstreet.V1AccountPositionInstructionSubmitPositionInstructionsParamsInstruction{{
+				InstructionType: clearstreet.PositionInstructionTypeExercise,
+				InstrumentID:    "0195f6d0-a1b2-7c3d-8e4f-5a6b7c8d9e02",
+				Quantity:        "1",
+				InstructionID:   clearstreet.String("ui-20260424-001"),
+			}},
+		},
+	)
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {

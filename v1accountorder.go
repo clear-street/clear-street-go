@@ -4,6 +4,7 @@ package clearstreet
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -102,6 +103,196 @@ func (r *V1AccountOrderService) SubmitOrders(ctx context.Context, accountID int6
 	return res, err
 }
 
+// Request to cancel an existing order
+//
+// Note: In the API, order cancellation is done via DELETE request without a body.
+// The order_id and account_id come from the URL path parameters.
+type CancelOrderRequest struct {
+	// Account ID (from path parameter)
+	AccountID int64 `json:"account_id" api:"required"`
+	// Order ID to cancel (from path parameter)
+	OrderID string `json:"order_id" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AccountID   respjson.Field
+		OrderID     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CancelOrderRequest) RawJSON() string { return r.JSON.raw }
+func (r *CancelOrderRequest) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type InstrumentIDOrSymbol = string
+
+// Request to submit a new order (PlaceOrderRequest from spec)
+type NewOrderRequest struct {
+	// Type of security
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	InstrumentType SecurityType `json:"instrument_type" api:"required"`
+	// Type of order
+	//
+	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
+	// "TRAILING_STOP_LIMIT".
+	OrderType RequestOrderType `json:"order_type" api:"required"`
+	// Quantity to trade. For COMMON_STOCK: shares (may be fractional if supported).
+	// For OPTION (single-leg): contracts (must be an integer)
+	Quantity string `json:"quantity" api:"required"`
+	// Side of the order
+	//
+	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	Side Side `json:"side" api:"required"`
+	// Time in force
+	//
+	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
+	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
+	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
+	TimeInForce RequestTimeInForce `json:"time_in_force" api:"required"`
+	// Optional client-provided unique ID (idempotency). Required to be unique per
+	// account.
+	ID string `json:"id" api:"nullable"`
+	// The timestamp when the order should expire (UTC). Required when time_in_force is
+	// GOOD_TILL_DATE.
+	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
+	// Allow trading outside regular trading hours. Some brokers disallow options
+	// outside RTH.
+	ExtendedHours bool `json:"extended_hours" api:"nullable"`
+	// OEMS instrument UUID
+	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"nullable" format:"uuid"`
+	// Limit offset for trailing stop-limit orders (signed)
+	LimitOffset string `json:"limit_offset" api:"nullable"`
+	// Limit price (required for LIMIT and STOP_LIMIT orders)
+	LimitPrice string `json:"limit_price" api:"nullable"`
+	// Required when instrument_type is OPTION. Specifies whether the order opens or
+	// closes a position.
+	//
+	// Any of "OPEN", "CLOSE".
+	PositionEffect PositionEffect `json:"position_effect"`
+	// Stop price (required for STOP and STOP_LIMIT orders)
+	StopPrice string `json:"stop_price" api:"nullable"`
+	// Trading symbol. For equities, use the ticker symbol (e.g., "AAPL"). For options,
+	// use the OSI symbol (e.g., "AAPL 250117C00190000"). Either `symbol` or
+	// `instrument_id` must be provided.
+	Symbol string `json:"symbol" api:"nullable"`
+	// Trailing offset amount (required for trailing orders)
+	TrailingOffset string `json:"trailing_offset" api:"nullable"`
+	// Trailing offset type (PRICE or PERCENT_BPS)
+	//
+	// Any of "PRICE", "BPS".
+	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		InstrumentType     respjson.Field
+		OrderType          respjson.Field
+		Quantity           respjson.Field
+		Side               respjson.Field
+		TimeInForce        respjson.Field
+		ID                 respjson.Field
+		ExpiresAt          respjson.Field
+		ExtendedHours      respjson.Field
+		InstrumentID       respjson.Field
+		LimitOffset        respjson.Field
+		LimitPrice         respjson.Field
+		PositionEffect     respjson.Field
+		StopPrice          respjson.Field
+		Symbol             respjson.Field
+		TrailingOffset     respjson.Field
+		TrailingOffsetType respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r NewOrderRequest) RawJSON() string { return r.JSON.raw }
+func (r *NewOrderRequest) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this NewOrderRequest to a NewOrderRequestParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// NewOrderRequestParam.Overrides()
+func (r NewOrderRequest) ToParam() NewOrderRequestParam {
+	return param.Override[NewOrderRequestParam](json.RawMessage(r.RawJSON()))
+}
+
+// Request to submit a new order (PlaceOrderRequest from spec)
+//
+// The properties InstrumentType, OrderType, Quantity, Side, TimeInForce are
+// required.
+type NewOrderRequestParam struct {
+	// Type of security
+	//
+	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	InstrumentType SecurityType `json:"instrument_type,omitzero" api:"required"`
+	// Type of order
+	//
+	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
+	// "TRAILING_STOP_LIMIT".
+	OrderType RequestOrderType `json:"order_type,omitzero" api:"required"`
+	// Quantity to trade. For COMMON_STOCK: shares (may be fractional if supported).
+	// For OPTION (single-leg): contracts (must be an integer)
+	Quantity string `json:"quantity" api:"required"`
+	// Side of the order
+	//
+	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	Side Side `json:"side,omitzero" api:"required"`
+	// Time in force
+	//
+	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
+	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
+	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
+	TimeInForce RequestTimeInForce `json:"time_in_force,omitzero" api:"required"`
+	// Optional client-provided unique ID (idempotency). Required to be unique per
+	// account.
+	ID param.Opt[string] `json:"id,omitzero"`
+	// The timestamp when the order should expire (UTC). Required when time_in_force is
+	// GOOD_TILL_DATE.
+	ExpiresAt param.Opt[time.Time] `json:"expires_at,omitzero" format:"date-time"`
+	// Allow trading outside regular trading hours. Some brokers disallow options
+	// outside RTH.
+	ExtendedHours param.Opt[bool] `json:"extended_hours,omitzero"`
+	// Limit offset for trailing stop-limit orders (signed)
+	LimitOffset param.Opt[string] `json:"limit_offset,omitzero"`
+	// Limit price (required for LIMIT and STOP_LIMIT orders)
+	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
+	// Stop price (required for STOP and STOP_LIMIT orders)
+	StopPrice param.Opt[string] `json:"stop_price,omitzero"`
+	// Trading symbol. For equities, use the ticker symbol (e.g., "AAPL"). For options,
+	// use the OSI symbol (e.g., "AAPL 250117C00190000"). Either `symbol` or
+	// `instrument_id` must be provided.
+	Symbol param.Opt[string] `json:"symbol,omitzero"`
+	// Trailing offset amount (required for trailing orders)
+	TrailingOffset param.Opt[string] `json:"trailing_offset,omitzero"`
+	// OEMS instrument UUID
+	InstrumentID param.Opt[InstrumentIDOrSymbol] `json:"instrument_id,omitzero" format:"uuid"`
+	// Required when instrument_type is OPTION. Specifies whether the order opens or
+	// closes a position.
+	//
+	// Any of "OPEN", "CLOSE".
+	PositionEffect PositionEffect `json:"position_effect,omitzero"`
+	// Trailing offset type (PRICE or PERCENT_BPS)
+	//
+	// Any of "PRICE", "BPS".
+	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type,omitzero"`
+	paramObj
+}
+
+func (r NewOrderRequestParam) MarshalJSON() (data []byte, err error) {
+	type shadow NewOrderRequestParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *NewOrderRequestParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // A trading order with its current state and execution details.
 //
 // This is the unified API representation of an order across its lifecycle,
@@ -177,12 +368,16 @@ type Order struct {
 	ReleasesAt time.Time `json:"releases_at" api:"nullable" format:"date-time"`
 	// Stop price (for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price" api:"nullable"`
+	// Current trailing limit price computed by the trailing strategy
+	TrailingLimitPx string `json:"trailing_limit_px" api:"nullable"`
 	// Trailing offset amount for trailing orders
 	TrailingOffset string `json:"trailing_offset" api:"nullable"`
 	// Trailing offset type for trailing orders
 	//
 	// Any of "PRICE", "BPS".
 	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
+	// Current trailing stop price computed by the trailing strategy
+	TrailingStopPx string `json:"trailing_stop_px" api:"nullable"`
 	// Trailing watermark price for trailing orders
 	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
 	// Trailing watermark timestamp for trailing orders
@@ -218,8 +413,10 @@ type Order struct {
 		QueueState             respjson.Field
 		ReleasesAt             respjson.Field
 		StopPrice              respjson.Field
+		TrailingLimitPx        respjson.Field
 		TrailingOffset         respjson.Field
 		TrailingOffsetType     respjson.Field
+		TrailingStopPx         respjson.Field
 		TrailingWatermarkPx    respjson.Field
 		TrailingWatermarkTs    respjson.Field
 		UnderlyingInstrumentID respjson.Field
@@ -270,12 +467,48 @@ const (
 	OrderTypeOther             OrderType = "OTHER"
 )
 
+// Position effect for options orders
+type PositionEffect string
+
+const (
+	PositionEffectOpen  PositionEffect = "OPEN"
+	PositionEffectClose PositionEffect = "CLOSE"
+)
+
 // Parent order queue or hold state.
 type QueueState string
 
 const (
 	QueueStateAwaitingRelease QueueState = "AWAITING_RELEASE"
 	QueueStateReleased        QueueState = "RELEASED"
+)
+
+// Strict order-type enum for order submission/replacement requests.
+type RequestOrderType string
+
+const (
+	RequestOrderTypeMarket            RequestOrderType = "MARKET"
+	RequestOrderTypeLimit             RequestOrderType = "LIMIT"
+	RequestOrderTypeStop              RequestOrderType = "STOP"
+	RequestOrderTypeStopLimit         RequestOrderType = "STOP_LIMIT"
+	RequestOrderTypeTrailingStop      RequestOrderType = "TRAILING_STOP"
+	RequestOrderTypeTrailingStopLimit RequestOrderType = "TRAILING_STOP_LIMIT"
+)
+
+// Strict time-in-force enum for order submission/replacement requests.
+type RequestTimeInForce string
+
+const (
+	RequestTimeInForceDay                 RequestTimeInForce = "DAY"
+	RequestTimeInForceGoodTillCancel      RequestTimeInForce = "GOOD_TILL_CANCEL"
+	RequestTimeInForceImmediateOrCancel   RequestTimeInForce = "IMMEDIATE_OR_CANCEL"
+	RequestTimeInForceFillOrKill          RequestTimeInForce = "FILL_OR_KILL"
+	RequestTimeInForceGoodTillDate        RequestTimeInForce = "GOOD_TILL_DATE"
+	RequestTimeInForceAtTheOpening        RequestTimeInForce = "AT_THE_OPENING"
+	RequestTimeInForceAtTheClose          RequestTimeInForce = "AT_THE_CLOSE"
+	RequestTimeInForceGoodTillCrossing    RequestTimeInForce = "GOOD_TILL_CROSSING"
+	RequestTimeInForceGoodThroughCrossing RequestTimeInForce = "GOOD_THROUGH_CROSSING"
+	RequestTimeInForceAtCrossing          RequestTimeInForce = "AT_CROSSING"
 )
 
 // Side of an order
@@ -564,7 +797,7 @@ type V1AccountOrderReplaceOrderParams struct {
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
 	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
 	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
-	TimeInForce V1AccountOrderReplaceOrderParamsTimeInForce `json:"time_in_force,omitzero"`
+	TimeInForce RequestTimeInForce `json:"time_in_force,omitzero"`
 	paramObj
 }
 
@@ -575,22 +808,6 @@ func (r V1AccountOrderReplaceOrderParams) MarshalJSON() (data []byte, err error)
 func (r *V1AccountOrderReplaceOrderParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-// New time in force for the order
-type V1AccountOrderReplaceOrderParamsTimeInForce string
-
-const (
-	V1AccountOrderReplaceOrderParamsTimeInForceDay                 V1AccountOrderReplaceOrderParamsTimeInForce = "DAY"
-	V1AccountOrderReplaceOrderParamsTimeInForceGoodTillCancel      V1AccountOrderReplaceOrderParamsTimeInForce = "GOOD_TILL_CANCEL"
-	V1AccountOrderReplaceOrderParamsTimeInForceImmediateOrCancel   V1AccountOrderReplaceOrderParamsTimeInForce = "IMMEDIATE_OR_CANCEL"
-	V1AccountOrderReplaceOrderParamsTimeInForceFillOrKill          V1AccountOrderReplaceOrderParamsTimeInForce = "FILL_OR_KILL"
-	V1AccountOrderReplaceOrderParamsTimeInForceGoodTillDate        V1AccountOrderReplaceOrderParamsTimeInForce = "GOOD_TILL_DATE"
-	V1AccountOrderReplaceOrderParamsTimeInForceAtTheOpening        V1AccountOrderReplaceOrderParamsTimeInForce = "AT_THE_OPENING"
-	V1AccountOrderReplaceOrderParamsTimeInForceAtTheClose          V1AccountOrderReplaceOrderParamsTimeInForce = "AT_THE_CLOSE"
-	V1AccountOrderReplaceOrderParamsTimeInForceGoodTillCrossing    V1AccountOrderReplaceOrderParamsTimeInForce = "GOOD_TILL_CROSSING"
-	V1AccountOrderReplaceOrderParamsTimeInForceGoodThroughCrossing V1AccountOrderReplaceOrderParamsTimeInForce = "GOOD_THROUGH_CROSSING"
-	V1AccountOrderReplaceOrderParamsTimeInForceAtCrossing          V1AccountOrderReplaceOrderParamsTimeInForce = "AT_CROSSING"
-)
 
 type V1AccountOrderSubmitOrdersParams struct {
 	Orders []V1AccountOrderSubmitOrdersParamsOrderUnion
@@ -609,12 +826,12 @@ func (r *V1AccountOrderSubmitOrdersParams) UnmarshalJSON(data []byte) error {
 // Use [param.IsOmitted] to confirm if a field is set.
 type V1AccountOrderSubmitOrdersParamsOrderUnion struct {
 	OfV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequest *V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest `json:",omitzero,inline"`
-	OfV1AccountOrderSubmitOrderssOrderNewOrderRequest         *V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest         `json:",omitzero,inline"`
+	OfNewOrderRequest                                         *NewOrderRequestParam                                         `json:",omitzero,inline"`
 	paramUnion
 }
 
 func (u V1AccountOrderSubmitOrdersParamsOrderUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequest, u.OfV1AccountOrderSubmitOrderssOrderNewOrderRequest)
+	return param.MarshalUnion(u, u.OfV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequest, u.OfNewOrderRequest)
 }
 func (u *V1AccountOrderSubmitOrdersParamsOrderUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -630,13 +847,13 @@ type V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest struct {
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
 	// "TRAILING_STOP_LIMIT".
-	OrderType string `json:"order_type,omitzero" api:"required"`
+	OrderType RequestOrderType `json:"order_type,omitzero" api:"required"`
 	// Time in force
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
 	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
 	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
-	TimeInForce string `json:"time_in_force,omitzero" api:"required"`
+	TimeInForce RequestTimeInForce `json:"time_in_force,omitzero" api:"required"`
 	// Optional client-provided unique ID (idempotency). Required to be unique per
 	// account.
 	ID param.Opt[string] `json:"id,omitzero"`
@@ -653,15 +870,6 @@ func (r V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest) MarshalJSO
 }
 func (r *V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func init() {
-	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest](
-		"order_type", "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP", "TRAILING_STOP_LIMIT",
-	)
-	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest](
-		"time_in_force", "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL", "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING", "GOOD_THROUGH_CROSSING", "AT_CROSSING",
-	)
 }
 
 // A single leg in a multileg strategy request.
@@ -685,7 +893,7 @@ type V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
 	// Optional leg position effect.
 	//
 	// Any of "OPEN", "CLOSE".
-	PositionEffect string `json:"position_effect,omitzero"`
+	PositionEffect PositionEffect `json:"position_effect,omitzero"`
 	paramObj
 }
 
@@ -695,92 +903,4 @@ func (r V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) Marshal
 }
 func (r *V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
-}
-
-func init() {
-	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg](
-		"position_effect", "OPEN", "CLOSE",
-	)
-}
-
-// Single-leg order request
-//
-// The properties InstrumentType, OrderType, Quantity, Side, TimeInForce are
-// required.
-type V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest struct {
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType SecurityType `json:"instrument_type,omitzero" api:"required"`
-	// Type of order
-	//
-	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
-	// "TRAILING_STOP_LIMIT".
-	OrderType string `json:"order_type,omitzero" api:"required"`
-	// Quantity to trade. For COMMON_STOCK: shares (may be fractional if supported).
-	// For OPTION (single-leg): contracts (must be an integer)
-	Quantity string `json:"quantity" api:"required"`
-	// Side of the order
-	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side Side `json:"side,omitzero" api:"required"`
-	// Time in force
-	//
-	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
-	TimeInForce string `json:"time_in_force,omitzero" api:"required"`
-	// Optional client-provided unique ID (idempotency). Required to be unique per
-	// account.
-	ID param.Opt[string] `json:"id,omitzero"`
-	// The timestamp when the order should expire (UTC). Required when time_in_force is
-	// GOOD_TILL_DATE.
-	ExpiresAt param.Opt[time.Time] `json:"expires_at,omitzero" format:"date-time"`
-	// Allow trading outside regular trading hours. Some brokers disallow options
-	// outside RTH.
-	ExtendedHours param.Opt[bool] `json:"extended_hours,omitzero"`
-	// OEMS instrument UUID
-	InstrumentID param.Opt[string] `json:"instrument_id,omitzero" format:"uuid"`
-	// Limit offset for trailing stop-limit orders (signed)
-	LimitOffset param.Opt[string] `json:"limit_offset,omitzero"`
-	// Limit price (required for LIMIT and STOP_LIMIT orders)
-	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
-	// Stop price (required for STOP and STOP_LIMIT orders)
-	StopPrice param.Opt[string] `json:"stop_price,omitzero"`
-	// Trading symbol. For equities, use the ticker symbol (e.g., "AAPL"). For options,
-	// use the OSI symbol (e.g., "AAPL 250117C00190000"). Either `symbol` or
-	// `instrument_id` must be provided.
-	Symbol param.Opt[string] `json:"symbol,omitzero"`
-	// Trailing offset amount (required for trailing orders)
-	TrailingOffset param.Opt[string] `json:"trailing_offset,omitzero"`
-	// Required when instrument_type is OPTION. Specifies whether the order opens or
-	// closes a position.
-	//
-	// Any of "OPEN", "CLOSE".
-	PositionEffect string `json:"position_effect,omitzero"`
-	// Trailing offset type (PRICE or PERCENT_BPS)
-	//
-	// Any of "PRICE", "BPS".
-	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type,omitzero"`
-	paramObj
-}
-
-func (r V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest) MarshalJSON() (data []byte, err error) {
-	type shadow V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-func init() {
-	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest](
-		"order_type", "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP", "TRAILING_STOP_LIMIT",
-	)
-	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest](
-		"time_in_force", "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL", "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING", "GOOD_THROUGH_CROSSING", "AT_CROSSING",
-	)
-	apijson.RegisterFieldValidator[V1AccountOrderSubmitOrdersParamsOrderNewOrderRequest](
-		"position_effect", "OPEN", "CLOSE",
-	)
 }

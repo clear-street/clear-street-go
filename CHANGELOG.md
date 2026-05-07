@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.4.0 (2026-05-07)
+
+Full Changelog: [v0.3.0...v0.4.0](https://github.com/clear-street/clear-street-go/compare/v0.3.0...v0.4.0)
+
+### Features
+
+* **api:** api update ([19c5aec](https://github.com/clear-street/clear-street-go/commit/19c5aec543fd484dc1a3b75f657f96b0b51db970))
+* **api:** api update ([da080ec](https://github.com/clear-street/clear-street-go/commit/da080ecb0a3166735aa417609625dbf82b0d54e4))
+* **api:** api update ([cfed303](https://github.com/clear-street/clear-street-go/commit/cfed303404f48c20f8e9a1dce49e31061856c020))
+* **api:** api update ([6fb3402](https://github.com/clear-street/clear-street-go/commit/6fb3402d4af7cad93c01a09fa457107348fea09a))
+* **api:** api update ([24bb184](https://github.com/clear-street/clear-street-go/commit/24bb184398fff44919135f67a1938d263b231aad))
+* **api:** api update ([3c7aac4](https://github.com/clear-street/clear-street-go/commit/3c7aac4a33afaf430717edc0b2bee7b3243f44a9))
+* **api:** api update ([1771b09](https://github.com/clear-street/clear-street-go/commit/1771b09989294e261755851ef24b1e037802b0a0))
+* **api:** api update ([57e9d65](https://github.com/clear-street/clear-street-go/commit/57e9d65f454d09f3ae1a39cb5f6cb99a5568b431))
+* **api:** api update ([87d715a](https://github.com/clear-street/clear-street-go/commit/87d715a8ea96031d510c373691f2231e339a7a53))
+* **api:** manual updates ([c8e3a86](https://github.com/clear-street/clear-street-go/commit/c8e3a8621fa9e3d6fc64acb3db0ba182546d7315))
+* **api:** manual updates ([18ec96c](https://github.com/clear-street/clear-street-go/commit/18ec96cfead8bde389ec551288b2f21668ef654c))
+* **api:** manual updates ([240d0ad](https://github.com/clear-street/clear-street-go/commit/240d0ad11ba20827991f2bb0a7eef5f0018178df))
+
+
+### Performance Improvements
+
+* **ACTIVE-4584:** reduce option index memory ([03a71d9](https://github.com/clear-street/clear-street-go/commit/03a71d90235ac3f2e69558660ef5fa359350ca1a))
+
 ## 0.3.0 (2026-05-05)
 
 Full Changelog: [v0.2.0...v0.3.0](https://github.com/clear-street/clear-street-go/compare/v0.2.0...v0.3.0)
