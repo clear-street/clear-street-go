@@ -4,6 +4,27 @@
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared#BaseResponse">BaseResponse</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared#ResponseMetadata">ResponseMetadata</a>
 
+# Active
+
+## V1
+
+### Accounts
+
+#### Positions
+
+##### Instructions
+
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PositionInstructionType">PositionInstructionType</a>
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PositionInstruction">PositionInstruction</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PositionInstructionList">PositionInstructionList</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PositionInstructionStatus">PositionInstructionStatus</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#PositionInstructionType">PositionInstructionType</a>
+
 # V1
 
 Params Types:
@@ -131,6 +152,20 @@ Methods:
 - <code title="delete /v1/accounts/{account_id}/positions/{instrument_id}">client.V1.Accounts.Positions.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionService.ClosePosition">ClosePosition</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, instrumentID <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#InstrumentIDOrSymbol">InstrumentIDOrSymbol</a>, params <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionClosePositionParams">V1AccountPositionClosePositionParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionClosePositionResponse">V1AccountPositionClosePositionResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="delete /v1/accounts/{account_id}/positions">client.V1.Accounts.Positions.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionService.ClosePositions">ClosePositions</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionClosePositionsParams">V1AccountPositionClosePositionsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionClosePositionsResponse">V1AccountPositionClosePositionsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /v1/accounts/{account_id}/positions">client.V1.Accounts.Positions.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionService.GetPositions">GetPositions</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionGetPositionsParams">V1AccountPositionGetPositionsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionGetPositionsResponse">V1AccountPositionGetPositionsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+#### Instructions
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionCancelPositionInstructionResponse">V1AccountPositionInstructionCancelPositionInstructionResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionGetPositionInstructionsResponse">V1AccountPositionInstructionGetPositionInstructionsResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionSubmitPositionInstructionsResponse">V1AccountPositionInstructionSubmitPositionInstructionsResponse</a>
+
+Methods:
+
+- <code title="delete /v1/accounts/{account_id}/positions/instructions/{instruction_id}">client.V1.Accounts.Positions.Instructions.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionService.CancelPositionInstruction">CancelPositionInstruction</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, instructionID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionCancelPositionInstructionParams">V1AccountPositionInstructionCancelPositionInstructionParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionCancelPositionInstructionResponse">V1AccountPositionInstructionCancelPositionInstructionResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /v1/accounts/{account_id}/positions/instructions">client.V1.Accounts.Positions.Instructions.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionService.GetPositionInstructions">GetPositionInstructions</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionGetPositionInstructionsParams">V1AccountPositionInstructionGetPositionInstructionsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionGetPositionInstructionsResponse">V1AccountPositionInstructionGetPositionInstructionsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="post /v1/accounts/{account_id}/positions/instructions">client.V1.Accounts.Positions.Instructions.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionService.SubmitPositionInstructions">SubmitPositionInstructions</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionSubmitPositionInstructionsParams">V1AccountPositionInstructionSubmitPositionInstructionsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPositionInstructionSubmitPositionInstructionsResponse">V1AccountPositionInstructionSubmitPositionInstructionsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
 ## Calendars
 
