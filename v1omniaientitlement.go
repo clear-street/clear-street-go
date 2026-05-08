@@ -64,6 +64,14 @@ func (r *V1OmniAIEntitlementService) DeleteEntitlement(ctx context.Context, enti
 	return res, err
 }
 
+// List current signable entitlement agreements for consent UX.
+func (r *V1OmniAIEntitlementService) GetEntitlementAgreements(ctx context.Context, opts ...option.RequestOption) (res *V1OmniAIEntitlementGetEntitlementAgreementsResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "v1/omni-ai/entitlement-agreements"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
+	return res, err
+}
+
 // List caller's active entitlement grants.
 func (r *V1OmniAIEntitlementService) GetEntitlements(ctx context.Context, query V1OmniAIEntitlementGetEntitlementsParams, opts ...option.RequestOption) (res *V1OmniAIEntitlementGetEntitlementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -89,6 +97,53 @@ func (r DeleteEntitlementResponse) RawJSON() string { return r.JSON.raw }
 func (r *DeleteEntitlementResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Stable entitlement agreement family key.
+type EntitlementAgreementKey string
+
+const (
+	EntitlementAgreementKeyOmniAccountDataAccess EntitlementAgreementKey = "omni_account_data_access"
+)
+
+type EntitlementAgreementResource struct {
+	AgreementID string `json:"agreement_id" api:"required"`
+	// Stable entitlement agreement family key.
+	//
+	// Any of "omni_account_data_access".
+	AgreementKey     EntitlementAgreementKey `json:"agreement_key" api:"required"`
+	DocumentContent  string                  `json:"document_content" api:"required"`
+	DocumentSha256   string                  `json:"document_sha256" api:"required"`
+	EntitlementCodes []EntitlementCode       `json:"entitlement_codes" api:"required"`
+	Title            string                  `json:"title" api:"required"`
+	Version          int64                   `json:"version" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AgreementID      respjson.Field
+		AgreementKey     respjson.Field
+		DocumentContent  respjson.Field
+		DocumentSha256   respjson.Field
+		EntitlementCodes respjson.Field
+		Title            respjson.Field
+		Version          respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EntitlementAgreementResource) RawJSON() string { return r.JSON.raw }
+func (r *EntitlementAgreementResource) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type EntitlementAgreementResourceList []EntitlementAgreementResource
+
+// Stable entitlement code granted by an agreement.
+type EntitlementCode string
+
+const (
+	EntitlementCodeOmniAccountData EntitlementCode = "omni.account_data"
+)
 
 type EntitlementResource struct {
 	AgreementID string `json:"agreement_id" api:"required"`
@@ -150,6 +205,23 @@ type V1OmniAIEntitlementDeleteEntitlementResponse struct {
 // Returns the unmodified JSON received from the API
 func (r V1OmniAIEntitlementDeleteEntitlementResponse) RawJSON() string { return r.JSON.raw }
 func (r *V1OmniAIEntitlementDeleteEntitlementResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1OmniAIEntitlementGetEntitlementAgreementsResponse struct {
+	Data EntitlementAgreementResourceList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1OmniAIEntitlementGetEntitlementAgreementsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OmniAIEntitlementGetEntitlementAgreementsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

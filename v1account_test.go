@@ -7,11 +7,41 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/clear-street/clear-street-go"
 	"github.com/clear-street/clear-street-go/internal/testutil"
 	"github.com/clear-street/clear-street-go/option"
 )
+
+func TestV1AccountGetAccountBalancesWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.Accounts.GetAccountBalances(
+		context.TODO(),
+		0,
+		clearstreet.V1AccountGetAccountBalancesParams{
+			TopMarginContributorsLimit: clearstreet.Int(1),
+		},
+	)
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
 
 func TestV1AccountGetAccountByID(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
@@ -53,6 +83,36 @@ func TestV1AccountGetAccountsWithOptionalParams(t *testing.T) {
 		PageSize:  clearstreet.Int(1),
 		PageToken: clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 	})
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestV1AccountGetPortfolioHistoryWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.Accounts.GetPortfolioHistory(
+		context.TODO(),
+		0,
+		clearstreet.V1AccountGetPortfolioHistoryParams{
+			StartDate: time.Now(),
+			EndDate:   clearstreet.Time(time.Now()),
+		},
+	)
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {

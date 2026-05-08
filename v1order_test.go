@@ -14,7 +14,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestV1AccountOrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
+func TestV1OrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -27,14 +27,14 @@ func TestV1AccountOrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Accounts.Orders.CancelAllOpenOrders(
+	_, err := client.V1.Orders.CancelAllOpenOrders(
 		context.TODO(),
 		0,
-		clearstreet.V1AccountOrderCancelAllOpenOrdersParams{
+		clearstreet.V1OrderCancelAllOpenOrdersParams{
 			InstrumentIDs:  []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
-			InstrumentType: clearstreet.V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock,
-			Side:           clearstreet.V1AccountOrderCancelAllOpenOrdersParamsSideBuy,
-			Type:           clearstreet.V1AccountOrderCancelAllOpenOrdersParamsTypeMarket,
+			InstrumentType: clearstreet.V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock,
+			Side:           clearstreet.V1OrderCancelAllOpenOrdersParamsSideBuy,
+			Type:           clearstreet.V1OrderCancelAllOpenOrdersParamsTypeMarket,
 		},
 	)
 	if err != nil {
@@ -46,7 +46,7 @@ func TestV1AccountOrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestV1AccountOrderCancelOpenOrder(t *testing.T) {
+func TestV1OrderCancelOpenOrder(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -59,10 +59,10 @@ func TestV1AccountOrderCancelOpenOrder(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Accounts.Orders.CancelOpenOrder(
+	_, err := client.V1.Orders.CancelOpenOrder(
 		context.TODO(),
 		"order_id",
-		clearstreet.V1AccountOrderCancelOpenOrderParams{
+		clearstreet.V1OrderCancelOpenOrderParams{
 			AccountID: 0,
 		},
 	)
@@ -75,7 +75,7 @@ func TestV1AccountOrderCancelOpenOrder(t *testing.T) {
 	}
 }
 
-func TestV1AccountOrderGetOrderByID(t *testing.T) {
+func TestV1OrderGetOrderByID(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -88,10 +88,10 @@ func TestV1AccountOrderGetOrderByID(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Accounts.Orders.GetOrderByID(
+	_, err := client.V1.Orders.GetOrderByID(
 		context.TODO(),
 		"order_id",
-		clearstreet.V1AccountOrderGetOrderByIDParams{
+		clearstreet.V1OrderGetOrderByIDParams{
 			AccountID: 0,
 		},
 	)
@@ -104,7 +104,7 @@ func TestV1AccountOrderGetOrderByID(t *testing.T) {
 	}
 }
 
-func TestV1AccountOrderGetOrdersWithOptionalParams(t *testing.T) {
+func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -117,13 +117,13 @@ func TestV1AccountOrderGetOrdersWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Accounts.Orders.GetOrders(
+	_, err := client.V1.Orders.GetOrders(
 		context.TODO(),
 		0,
-		clearstreet.V1AccountOrderGetOrdersParams{
+		clearstreet.V1OrderGetOrdersParams{
 			From:                    clearstreet.Time(time.Now()),
 			InstrumentIDs:           []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
-			InstrumentType:          clearstreet.V1AccountOrderGetOrdersParamsInstrumentTypeCommonStock,
+			InstrumentType:          clearstreet.V1OrderGetOrdersParamsInstrumentTypeCommonStock,
 			PageSize:                clearstreet.Int(1),
 			PageToken:               clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 			Status:                  []string{"PENDING_NEW"},
@@ -141,7 +141,7 @@ func TestV1AccountOrderGetOrdersWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestV1AccountOrderReplaceOrderWithOptionalParams(t *testing.T) {
+func TestV1OrderReplaceOrderWithOptionalParams(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -154,10 +154,10 @@ func TestV1AccountOrderReplaceOrderWithOptionalParams(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Accounts.Orders.ReplaceOrder(
+	_, err := client.V1.Orders.ReplaceOrder(
 		context.TODO(),
 		"order_id",
-		clearstreet.V1AccountOrderReplaceOrderParams{
+		clearstreet.V1OrderReplaceOrderParams{
 			AccountID:   0,
 			LimitPrice:  clearstreet.String("150.50"),
 			Quantity:    clearstreet.String("125"),
@@ -174,7 +174,7 @@ func TestV1AccountOrderReplaceOrderWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestV1AccountOrderSubmitOrders(t *testing.T) {
+func TestV1OrderSubmitOrders(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -187,13 +187,13 @@ func TestV1AccountOrderSubmitOrders(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Accounts.Orders.SubmitOrders(
+	_, err := client.V1.Orders.SubmitOrders(
 		context.TODO(),
 		0,
-		clearstreet.V1AccountOrderSubmitOrdersParams{
-			Orders: []clearstreet.V1AccountOrderSubmitOrdersParamsOrderUnion{{
-				OfV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequest: &clearstreet.V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest{
-					Legs: []clearstreet.V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg{{
+		clearstreet.V1OrderSubmitOrdersParams{
+			Orders: []clearstreet.V1OrderSubmitOrdersParamsOrderUnion{{
+				OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest: &clearstreet.V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest{
+					Legs: []clearstreet.V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg{{
 						InstrumentType: clearstreet.SecurityTypeOption,
 						Ratio:          "ratio",
 						Security:       "0193bb84-447a-706f-996f-097254663f02",

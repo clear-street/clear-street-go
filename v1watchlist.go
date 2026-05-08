@@ -30,8 +30,6 @@ import (
 // the [NewV1WatchlistService] method instead.
 type V1WatchlistService struct {
 	options []option.RequestOption
-	// Create and manage watchlists.
-	Items V1WatchlistItemService
 }
 
 // NewV1WatchlistService generates a new service that applies the given options to
@@ -40,8 +38,19 @@ type V1WatchlistService struct {
 func NewV1WatchlistService(opts ...option.RequestOption) (r V1WatchlistService) {
 	r = V1WatchlistService{}
 	r.options = opts
-	r.Items = NewV1WatchlistItemService(opts...)
 	return
+}
+
+// Add an instrument to a watchlist
+func (r *V1WatchlistService) AddWatchlistItem(ctx context.Context, watchlistID string, body V1WatchlistAddWatchlistItemParams, opts ...option.RequestOption) (res *V1WatchlistAddWatchlistItemResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	if watchlistID == "" {
+		err = errors.New("missing required watchlist_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("v1/watchlists/%s/items", watchlistID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	return res, err
 }
 
 // Create Watchlist
@@ -64,6 +73,22 @@ func (r *V1WatchlistService) DeleteWatchlist(ctx context.Context, watchlistID st
 	return res, err
 }
 
+// Delete an instrument from a watchlist
+func (r *V1WatchlistService) DeleteWatchlistItem(ctx context.Context, itemID string, body V1WatchlistDeleteWatchlistItemParams, opts ...option.RequestOption) (res *V1WatchlistDeleteWatchlistItemResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	if body.WatchlistID == "" {
+		err = errors.New("missing required watchlist_id parameter")
+		return nil, err
+	}
+	if itemID == "" {
+		err = errors.New("missing required item_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("v1/watchlists/%s/items/%s", body.WatchlistID, itemID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, nil, &res, opts...)
+	return res, err
+}
+
 // Get a watchlist by ID with all its items
 func (r *V1WatchlistService) GetWatchlistByID(ctx context.Context, watchlistID string, opts ...option.RequestOption) (res *V1WatchlistGetWatchlistByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -82,6 +107,24 @@ func (r *V1WatchlistService) GetWatchlists(ctx context.Context, query V1Watchlis
 	path := "v1/watchlists"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
+}
+
+// Response data for adding a watchlist item
+type AddWatchlistItemData struct {
+	// ID of the created item
+	ItemID string `json:"item_id" api:"required" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ItemID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r AddWatchlistItemData) RawJSON() string { return r.JSON.raw }
+func (r *AddWatchlistItemData) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Detailed watchlist with all items
@@ -164,6 +207,24 @@ func (r *WatchlistItemEntry) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1WatchlistAddWatchlistItemResponse struct {
+	// Response data for adding a watchlist item
+	Data AddWatchlistItemData `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1WatchlistAddWatchlistItemResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1WatchlistAddWatchlistItemResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1WatchlistNewWatchlistResponse struct {
 	// Represents a user watchlist.
 	Data WatchlistEntry `json:"data" api:"required"`
@@ -183,6 +244,8 @@ func (r *V1WatchlistNewWatchlistResponse) UnmarshalJSON(data []byte) error {
 }
 
 type V1WatchlistDeleteWatchlistResponse = any
+
+type V1WatchlistDeleteWatchlistItemResponse = any
 
 type V1WatchlistGetWatchlistByIDResponse struct {
 	// Detailed watchlist with all items
@@ -219,6 +282,20 @@ func (r *V1WatchlistGetWatchlistsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1WatchlistAddWatchlistItemParams struct {
+	// OEMS instrument UUID
+	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"required" format:"uuid"`
+	paramObj
+}
+
+func (r V1WatchlistAddWatchlistItemParams) MarshalJSON() (data []byte, err error) {
+	type shadow V1WatchlistAddWatchlistItemParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1WatchlistAddWatchlistItemParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1WatchlistNewWatchlistParams struct {
 	// The desired watchlist name.
 	Name string `json:"name" api:"required"`
@@ -231,6 +308,11 @@ func (r V1WatchlistNewWatchlistParams) MarshalJSON() (data []byte, err error) {
 }
 func (r *V1WatchlistNewWatchlistParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1WatchlistDeleteWatchlistItemParams struct {
+	WatchlistID string `path:"watchlist_id" api:"required" format:"uuid" json:"-"`
+	paramObj
 }
 
 type V1WatchlistGetWatchlistsParams struct {

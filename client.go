@@ -18,8 +18,7 @@ import (
 // directly, and instead use the [NewClient] method instead.
 type Client struct {
 	options []option.RequestOption
-	// Active Websocket.
-	V1 V1Service
+	V1      V1Service
 }
 
 // DefaultClientOptions read from the environment (CLEAR_STREET_BASE_URL). This
