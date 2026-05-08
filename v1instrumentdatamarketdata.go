@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+	"time"
 
 	"github.com/clear-street/clear-street-go/internal/apijson"
 	"github.com/clear-street/clear-street-go/internal/apiquery"
@@ -16,34 +17,100 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// Real-time market data snapshots.
+// Retrieve instrument analytics, market data, news, and related reference data.
 //
-// V1MarketDataSnapshotService contains methods and other services that help with
-// interacting with the clear-street API.
+// V1InstrumentDataMarketDataService contains methods and other services that help
+// with interacting with the clear-street API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
-// the [NewV1MarketDataSnapshotService] method instead.
-type V1MarketDataSnapshotService struct {
+// the [NewV1InstrumentDataMarketDataService] method instead.
+type V1InstrumentDataMarketDataService struct {
 	options []option.RequestOption
 }
 
-// NewV1MarketDataSnapshotService generates a new service that applies the given
-// options to each request. These options are applied after the parent client's
-// options (if there is one), and before any request-specific options.
-func NewV1MarketDataSnapshotService(opts ...option.RequestOption) (r V1MarketDataSnapshotService) {
-	r = V1MarketDataSnapshotService{}
+// NewV1InstrumentDataMarketDataService generates a new service that applies the
+// given options to each request. These options are applied after the parent
+// client's options (if there is one), and before any request-specific options.
+func NewV1InstrumentDataMarketDataService(opts ...option.RequestOption) (r V1InstrumentDataMarketDataService) {
+	r = V1InstrumentDataMarketDataService{}
 	r.options = opts
 	return
 }
 
+// Returns the most recent OHLV and current price for the requested OEMS
+// instruments. Backed by the in-memory Polygon snapshot cache.
+//
+// Response contract: every request returns one row per **unique** `instrument_id`,
+// in first-seen request order. Unresolvable IDs come back with `symbol = null` and
+// every market-data field `null`; resolvable IDs with no cache entry come back
+// with `symbol` populated but market-data fields `null`.
+//
+// **Note (temporary):** ID resolution currently goes through the supplemental
+// screener (OEMS instrument_id → FMP fmp_symbol → metadata_id → realtime cache).
+// Removed when the market-data service serves daily aggregates directly, or when
+// Polygon symbology is loaded into the instrument cache.
+func (r *V1InstrumentDataMarketDataService) GetDailySummaries(ctx context.Context, query V1InstrumentDataMarketDataGetDailySummariesParams, opts ...option.RequestOption) (res *V1InstrumentDataMarketDataGetDailySummariesResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "v1/market-data/daily-summary"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
 // Get market data snapshots for one or more securities.
-func (r *V1MarketDataSnapshotService) GetSnapshots(ctx context.Context, query V1MarketDataSnapshotGetSnapshotsParams, opts ...option.RequestOption) (res *V1MarketDataSnapshotGetSnapshotsResponse, err error) {
+func (r *V1InstrumentDataMarketDataService) GetSnapshots(ctx context.Context, query V1InstrumentDataMarketDataGetSnapshotsParams, opts ...option.RequestOption) (res *V1InstrumentDataMarketDataGetSnapshotsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/market-data/snapshot"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
+
+// Daily aggregate (OHLV) summary for a single instrument.
+//
+// Returned by `GET /market-data/daily-summary`. Every field except `instrument_id`
+// is `Option`:
+//
+//   - Unresolvable `instrument_id` → all other fields `None` (including `symbol`).
+//   - Resolvable `instrument_id` with no realtime cache entry → `symbol` populated,
+//     OHLV/`trade_date` `None`.
+//   - `trade_date` reflects the session the OHLV represents (today during trading
+//     hours, the last trading date during weekends/holidays).
+type DailySummary struct {
+	// OEMS instrument identifier. Always populated; echoes the request ID.
+	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
+	// Session high.
+	High string `json:"high" api:"nullable"`
+	// Session low.
+	Low string `json:"low" api:"nullable"`
+	// Opening price for the session.
+	Open string `json:"open" api:"nullable"`
+	// Display symbol for the security. `None` for unresolvable IDs.
+	Symbol string `json:"symbol" api:"nullable"`
+	// Session date the OHLV represents, US/Eastern.
+	TradeDate time.Time `json:"trade_date" api:"nullable" format:"date"`
+	// Session cumulative trading volume.
+	Volume int64 `json:"volume" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		InstrumentID respjson.Field
+		High         respjson.Field
+		Low          respjson.Field
+		Open         respjson.Field
+		Symbol       respjson.Field
+		TradeDate    respjson.Field
+		Volume       respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r DailySummary) RawJSON() string { return r.JSON.raw }
+func (r *DailySummary) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type DailySummaryList []DailySummary
 
 // Market data snapshot for a single security.
 type MarketDataSnapshot struct {
@@ -156,7 +223,24 @@ func (r *SnapshotSession) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1MarketDataSnapshotGetSnapshotsResponse struct {
+type V1InstrumentDataMarketDataGetDailySummariesResponse struct {
+	Data DailySummaryList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1InstrumentDataMarketDataGetDailySummariesResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1InstrumentDataMarketDataGetDailySummariesResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1InstrumentDataMarketDataGetSnapshotsResponse struct {
 	Data MarketDataSnapshotList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -168,20 +252,35 @@ type V1MarketDataSnapshotGetSnapshotsResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1MarketDataSnapshotGetSnapshotsResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1MarketDataSnapshotGetSnapshotsResponse) UnmarshalJSON(data []byte) error {
+func (r V1InstrumentDataMarketDataGetSnapshotsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1InstrumentDataMarketDataGetSnapshotsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1MarketDataSnapshotGetSnapshotsParams struct {
+type V1InstrumentDataMarketDataGetDailySummariesParams struct {
+	// Comma-separated OEMS instrument UUIDs (required, 1..=100)
+	InstrumentIDs string `query:"instrument_ids" api:"required" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1InstrumentDataMarketDataGetDailySummariesParams]'s query
+// parameters as `url.Values`.
+func (r V1InstrumentDataMarketDataGetDailySummariesParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+type V1InstrumentDataMarketDataGetSnapshotsParams struct {
 	// Comma-separated OEMS instrument UUIDs.
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
-// URLQuery serializes [V1MarketDataSnapshotGetSnapshotsParams]'s query parameters
-// as `url.Values`.
-func (r V1MarketDataSnapshotGetSnapshotsParams) URLQuery() (v url.Values, err error) {
+// URLQuery serializes [V1InstrumentDataMarketDataGetSnapshotsParams]'s query
+// parameters as `url.Values`.
+func (r V1InstrumentDataMarketDataGetSnapshotsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,

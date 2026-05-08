@@ -3,16 +3,9 @@
 package clearstreet
 
 import (
-	"context"
-	"net/http"
-	"slices"
-
-	"github.com/clear-street/clear-street-go/internal/requestconfig"
 	"github.com/clear-street/clear-street-go/option"
 )
 
-// Active Websocket.
-//
 // V1Service contains methods and other services that help with interacting with
 // the clear-street API.
 //
@@ -22,20 +15,24 @@ import (
 type V1Service struct {
 	options []option.RequestOption
 	// Manage trading accounts, balances, and portfolio history.
-	Accounts  V1AccountService
-	Calendars V1CalendarService
-	// Access financial calendars for events like earnings, dividends, and splits.
-	Clock V1ClockService
-	// Retrieve details and lists of tradable instruments.
-	Instruments V1InstrumentService
-	MarketData  V1MarketDataService
-	// Retrieve market news and related instrument metadata.
-	News   V1NewsService
-	OmniAI V1OmniAIService
+	Accounts V1AccountService
 	// Endpoints for API service metadata.
-	Version V1VersionService
+	APIVersion V1APIVersionService
+	// Access clocks and financial calendars for market sessions and events.
+	Calendar V1CalendarService
+	// Retrieve instrument analytics, market data, news, and related reference data.
+	InstrumentData V1InstrumentDataService
+	// Retrieve core details and discovery endpoints for tradable instruments.
+	Instruments V1InstrumentService
+	OmniAI      V1OmniAIService
+	// Place, monitor, and manage trading orders.
+	Orders V1OrderService
+	// View positions and manage position instructions.
+	Positions V1PositionService
 	// Create and manage watchlists.
-	Watchlists V1WatchlistService
+	Watchlist V1WatchlistService
+	// Active Websocket.
+	Websocket V1WebsocketService
 }
 
 // NewV1Service generates a new service that applies the given options to each
@@ -45,24 +42,16 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 	r = V1Service{}
 	r.options = opts
 	r.Accounts = NewV1AccountService(opts...)
-	r.Calendars = NewV1CalendarService(opts...)
-	r.Clock = NewV1ClockService(opts...)
+	r.APIVersion = NewV1APIVersionService(opts...)
+	r.Calendar = NewV1CalendarService(opts...)
+	r.InstrumentData = NewV1InstrumentDataService(opts...)
 	r.Instruments = NewV1InstrumentService(opts...)
-	r.MarketData = NewV1MarketDataService(opts...)
-	r.News = NewV1NewsService(opts...)
 	r.OmniAI = NewV1OmniAIService(opts...)
-	r.Version = NewV1VersionService(opts...)
-	r.Watchlists = NewV1WatchlistService(opts...)
+	r.Orders = NewV1OrderService(opts...)
+	r.Positions = NewV1PositionService(opts...)
+	r.Watchlist = NewV1WatchlistService(opts...)
+	r.Websocket = NewV1WebsocketService(opts...)
 	return
-}
-
-// Upgrade the HTTP connection to a WebSocket and echo incoming messages.
-func (r *V1Service) WebsocketHandler(ctx context.Context, opts ...option.RequestOption) (err error) {
-	opts = slices.Concat(r.options, opts)
-	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
-	path := "v1/ws"
-	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, nil, opts...)
-	return err
 }
 
 // Security type
