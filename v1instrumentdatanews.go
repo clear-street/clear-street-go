@@ -18,30 +18,30 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// Retrieve market news and related instrument metadata.
+// Retrieve instrument analytics, market data, news, and related reference data.
 //
-// V1NewsService contains methods and other services that help with interacting
-// with the clear-street API.
+// V1InstrumentDataNewsService contains methods and other services that help with
+// interacting with the clear-street API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
-// the [NewV1NewsService] method instead.
-type V1NewsService struct {
+// the [NewV1InstrumentDataNewsService] method instead.
+type V1InstrumentDataNewsService struct {
 	options []option.RequestOption
 }
 
-// NewV1NewsService generates a new service that applies the given options to each
-// request. These options are applied after the parent client's options (if there
-// is one), and before any request-specific options.
-func NewV1NewsService(opts ...option.RequestOption) (r V1NewsService) {
-	r = V1NewsService{}
+// NewV1InstrumentDataNewsService generates a new service that applies the given
+// options to each request. These options are applied after the parent client's
+// options (if there is one), and before any request-specific options.
+func NewV1InstrumentDataNewsService(opts ...option.RequestOption) (r V1InstrumentDataNewsService) {
+	r = V1InstrumentDataNewsService{}
 	r.options = opts
 	return
 }
 
 // Retrieves news items with optional filtering by security IDs, time range,
 // publisher, type, and text query.
-func (r *V1NewsService) GetNews(ctx context.Context, query V1NewsGetNewsParams, opts ...option.RequestOption) (res *V1NewsGetNewsResponse, err error) {
+func (r *V1InstrumentDataNewsService) GetNews(ctx context.Context, query V1InstrumentDataNewsGetNewsParams, opts ...option.RequestOption) (res *V1InstrumentDataNewsGetNewsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/news"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
@@ -126,7 +126,7 @@ const (
 	NewsTypePressRelease NewsType = "PRESS_RELEASE"
 )
 
-type V1NewsGetNewsResponse struct {
+type V1InstrumentDataNewsGetNewsResponse struct {
 	Data NewsItemList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -138,12 +138,12 @@ type V1NewsGetNewsResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1NewsGetNewsResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1NewsGetNewsResponse) UnmarshalJSON(data []byte) error {
+func (r V1InstrumentDataNewsGetNewsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1InstrumentDataNewsGetNewsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1NewsGetNewsParams struct {
+type V1InstrumentDataNewsGetNewsParams struct {
 	// Comma-separated list of publishers to exclude (mutually exclusive with
 	// include_publishers).
 	ExcludePublishers param.Opt[string] `query:"exclude_publishers,omitzero" json:"-"`
@@ -165,7 +165,7 @@ type V1NewsGetNewsParams struct {
 	// Filter by news type.
 	//
 	// Any of "NEWS", "PRESS_RELEASE".
-	NewsType V1NewsGetNewsParamsNewsType `query:"news_type,omitzero" json:"-"`
+	NewsType V1InstrumentDataNewsGetNewsParamsNewsType `query:"news_type,omitzero" json:"-"`
 	// Comma-separated sector values to filter by.
 	//
 	// Any of "BASIC_MATERIALS", "COMMUNICATION_SERVICES", "CONSUMER_CYCLICAL",
@@ -175,8 +175,9 @@ type V1NewsGetNewsParams struct {
 	paramObj
 }
 
-// URLQuery serializes [V1NewsGetNewsParams]'s query parameters as `url.Values`.
-func (r V1NewsGetNewsParams) URLQuery() (v url.Values, err error) {
+// URLQuery serializes [V1InstrumentDataNewsGetNewsParams]'s query parameters as
+// `url.Values`.
+func (r V1InstrumentDataNewsGetNewsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -184,9 +185,9 @@ func (r V1NewsGetNewsParams) URLQuery() (v url.Values, err error) {
 }
 
 // Filter by news type.
-type V1NewsGetNewsParamsNewsType string
+type V1InstrumentDataNewsGetNewsParamsNewsType string
 
 const (
-	V1NewsGetNewsParamsNewsTypeNews         V1NewsGetNewsParamsNewsType = "NEWS"
-	V1NewsGetNewsParamsNewsTypePressRelease V1NewsGetNewsParamsNewsType = "PRESS_RELEASE"
+	V1InstrumentDataNewsGetNewsParamsNewsTypeNews         V1InstrumentDataNewsGetNewsParamsNewsType = "NEWS"
+	V1InstrumentDataNewsGetNewsParamsNewsTypePressRelease V1InstrumentDataNewsGetNewsParamsNewsType = "PRESS_RELEASE"
 )

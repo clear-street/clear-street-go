@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.5.0 (2026-05-08)
+
+Full Changelog: [v0.4.0...v0.5.0](https://github.com/clear-street/clear-street-go/compare/v0.4.0...v0.5.0)
+
+### Features
+
+* **api:** api update ([eef7624](https://github.com/clear-street/clear-street-go/commit/eef7624c5bbfca1d4f1b0bae2637d5c2c7d61ce0))
+* **api:** api update ([c3a2c7d](https://github.com/clear-street/clear-street-go/commit/c3a2c7d41959331e075a2c6a40a9ea1586c4859c))
+
+
+### Bug Fixes
+
+* **go:** avoid panic when http.DefaultTransport is wrapped ([83c385e](https://github.com/clear-street/clear-street-go/commit/83c385e74f094755c428289d147a17bb61bc2e6a))
+
+
+### Chores
+
+* redact api-key headers in debug logs ([1d7fe09](https://github.com/clear-street/clear-street-go/commit/1d7fe098f1702a9a21098e64615e5db1867f28d8))
+
 ## 0.4.0 (2026-05-07)
 
 Full Changelog: [v0.3.0...v0.4.0](https://github.com/clear-street/clear-street-go/compare/v0.3.0...v0.4.0)

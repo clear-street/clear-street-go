@@ -76,6 +76,24 @@ func (r *V1OmniAIMessageService) SubmitFeedback(ctx context.Context, messageID s
 	return res, err
 }
 
+type CreateFeedbackResponse struct {
+	CreatedAt  string `json:"created_at" api:"required"`
+	FeedbackID string `json:"feedback_id" api:"nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		CreatedAt   respjson.Field
+		FeedbackID  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r CreateFeedbackResponse) RawJSON() string { return r.JSON.raw }
+func (r *CreateFeedbackResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1OmniAIMessageGetMessageByIDResponse struct {
 	// Final immutable message.
 	Data Message `json:"data" api:"required"`

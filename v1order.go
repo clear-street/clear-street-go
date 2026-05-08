@@ -24,27 +24,27 @@ import (
 
 // Place, monitor, and manage trading orders.
 //
-// V1AccountOrderService contains methods and other services that help with
-// interacting with the clear-street API.
+// V1OrderService contains methods and other services that help with interacting
+// with the clear-street API.
 //
 // Note, unlike clients, this service does not read variables from the environment
 // automatically. You should not instantiate this service directly, and instead use
-// the [NewV1AccountOrderService] method instead.
-type V1AccountOrderService struct {
+// the [NewV1OrderService] method instead.
+type V1OrderService struct {
 	options []option.RequestOption
 }
 
-// NewV1AccountOrderService generates a new service that applies the given options
-// to each request. These options are applied after the parent client's options (if
-// there is one), and before any request-specific options.
-func NewV1AccountOrderService(opts ...option.RequestOption) (r V1AccountOrderService) {
-	r = V1AccountOrderService{}
+// NewV1OrderService generates a new service that applies the given options to each
+// request. These options are applied after the parent client's options (if there
+// is one), and before any request-specific options.
+func NewV1OrderService(opts ...option.RequestOption) (r V1OrderService) {
+	r = V1OrderService{}
 	r.options = opts
 	return
 }
 
 // Cancel all orders for an account
-func (r *V1AccountOrderService) CancelAllOpenOrders(ctx context.Context, accountID int64, body V1AccountOrderCancelAllOpenOrdersParams, opts ...option.RequestOption) (res *V1AccountOrderCancelAllOpenOrdersResponse, err error) {
+func (r *V1OrderService) CancelAllOpenOrders(ctx context.Context, accountID int64, body V1OrderCancelAllOpenOrdersParams, opts ...option.RequestOption) (res *V1OrderCancelAllOpenOrdersResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/orders", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, &res, opts...)
@@ -52,7 +52,7 @@ func (r *V1AccountOrderService) CancelAllOpenOrders(ctx context.Context, account
 }
 
 // Cancel a specific order
-func (r *V1AccountOrderService) CancelOpenOrder(ctx context.Context, orderID string, body V1AccountOrderCancelOpenOrderParams, opts ...option.RequestOption) (res *V1AccountOrderCancelOpenOrderResponse, err error) {
+func (r *V1OrderService) CancelOpenOrder(ctx context.Context, orderID string, body V1OrderCancelOpenOrderParams, opts ...option.RequestOption) (res *V1OrderCancelOpenOrderResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if orderID == "" {
 		err = errors.New("missing required order_id parameter")
@@ -64,7 +64,7 @@ func (r *V1AccountOrderService) CancelOpenOrder(ctx context.Context, orderID str
 }
 
 // Get Order By ID
-func (r *V1AccountOrderService) GetOrderByID(ctx context.Context, orderID string, query V1AccountOrderGetOrderByIDParams, opts ...option.RequestOption) (res *V1AccountOrderGetOrderByIDResponse, err error) {
+func (r *V1OrderService) GetOrderByID(ctx context.Context, orderID string, query V1OrderGetOrderByIDParams, opts ...option.RequestOption) (res *V1OrderGetOrderByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if orderID == "" {
 		err = errors.New("missing required order_id parameter")
@@ -76,7 +76,7 @@ func (r *V1AccountOrderService) GetOrderByID(ctx context.Context, orderID string
 }
 
 // List orders for an account with optional filtering
-func (r *V1AccountOrderService) GetOrders(ctx context.Context, accountID int64, query V1AccountOrderGetOrdersParams, opts ...option.RequestOption) (res *V1AccountOrderGetOrdersResponse, err error) {
+func (r *V1OrderService) GetOrders(ctx context.Context, accountID int64, query V1OrderGetOrdersParams, opts ...option.RequestOption) (res *V1OrderGetOrdersResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/orders", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
@@ -84,7 +84,7 @@ func (r *V1AccountOrderService) GetOrders(ctx context.Context, accountID int64, 
 }
 
 // Replace an order with new parameters
-func (r *V1AccountOrderService) ReplaceOrder(ctx context.Context, orderID string, params V1AccountOrderReplaceOrderParams, opts ...option.RequestOption) (res *V1AccountOrderReplaceOrderResponse, err error) {
+func (r *V1OrderService) ReplaceOrder(ctx context.Context, orderID string, params V1OrderReplaceOrderParams, opts ...option.RequestOption) (res *V1OrderReplaceOrderResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if orderID == "" {
 		err = errors.New("missing required order_id parameter")
@@ -96,7 +96,7 @@ func (r *V1AccountOrderService) ReplaceOrder(ctx context.Context, orderID string
 }
 
 // Submit new orders
-func (r *V1AccountOrderService) SubmitOrders(ctx context.Context, accountID int64, body V1AccountOrderSubmitOrdersParams, opts ...option.RequestOption) (res *V1AccountOrderSubmitOrdersResponse, err error) {
+func (r *V1OrderService) SubmitOrders(ctx context.Context, accountID int64, body V1OrderSubmitOrdersParams, opts ...option.RequestOption) (res *V1OrderSubmitOrdersResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/orders", accountID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
@@ -546,7 +546,7 @@ const (
 	TrailingOffsetTypeBps   TrailingOffsetType = "BPS"
 )
 
-type V1AccountOrderCancelAllOpenOrdersResponse struct {
+type V1OrderCancelAllOpenOrdersResponse struct {
 	Data OrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -558,12 +558,12 @@ type V1AccountOrderCancelAllOpenOrdersResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1AccountOrderCancelAllOpenOrdersResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1AccountOrderCancelAllOpenOrdersResponse) UnmarshalJSON(data []byte) error {
+func (r V1OrderCancelAllOpenOrdersResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OrderCancelAllOpenOrdersResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1AccountOrderCancelOpenOrderResponse struct {
+type V1OrderCancelOpenOrderResponse struct {
 	// A trading order with its current state and execution details.
 	//
 	// This is the unified API representation of an order across its lifecycle,
@@ -580,12 +580,12 @@ type V1AccountOrderCancelOpenOrderResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1AccountOrderCancelOpenOrderResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1AccountOrderCancelOpenOrderResponse) UnmarshalJSON(data []byte) error {
+func (r V1OrderCancelOpenOrderResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OrderCancelOpenOrderResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1AccountOrderGetOrderByIDResponse struct {
+type V1OrderGetOrderByIDResponse struct {
 	// A trading order with its current state and execution details.
 	//
 	// This is the unified API representation of an order across its lifecycle,
@@ -602,12 +602,12 @@ type V1AccountOrderGetOrderByIDResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1AccountOrderGetOrderByIDResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1AccountOrderGetOrderByIDResponse) UnmarshalJSON(data []byte) error {
+func (r V1OrderGetOrderByIDResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OrderGetOrderByIDResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1AccountOrderGetOrdersResponse struct {
+type V1OrderGetOrdersResponse struct {
 	Data OrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -619,12 +619,12 @@ type V1AccountOrderGetOrdersResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1AccountOrderGetOrdersResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1AccountOrderGetOrdersResponse) UnmarshalJSON(data []byte) error {
+func (r V1OrderGetOrdersResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OrderGetOrdersResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1AccountOrderReplaceOrderResponse struct {
+type V1OrderReplaceOrderResponse struct {
 	// A trading order with its current state and execution details.
 	//
 	// This is the unified API representation of an order across its lifecycle,
@@ -641,12 +641,12 @@ type V1AccountOrderReplaceOrderResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1AccountOrderReplaceOrderResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1AccountOrderReplaceOrderResponse) UnmarshalJSON(data []byte) error {
+func (r V1OrderReplaceOrderResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OrderReplaceOrderResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1AccountOrderSubmitOrdersResponse struct {
+type V1OrderSubmitOrdersResponse struct {
 	Data OrderList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -658,33 +658,33 @@ type V1AccountOrderSubmitOrdersResponse struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r V1AccountOrderSubmitOrdersResponse) RawJSON() string { return r.JSON.raw }
-func (r *V1AccountOrderSubmitOrdersResponse) UnmarshalJSON(data []byte) error {
+func (r V1OrderSubmitOrdersResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OrderSubmitOrdersResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1AccountOrderCancelAllOpenOrdersParams struct {
+type V1OrderCancelAllOpenOrdersParams struct {
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType V1AccountOrderCancelAllOpenOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
+	InstrumentType V1OrderCancelAllOpenOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Filter by order side (BUY or SELL)
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side V1AccountOrderCancelAllOpenOrdersParamsSide `query:"side,omitzero" json:"-"`
+	Side V1OrderCancelAllOpenOrdersParamsSide `query:"side,omitzero" json:"-"`
 	// Filter by order type (e.g., MARKET, LIMIT)
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
 	// "TRAILING_STOP_LIMIT", "OTHER".
-	Type V1AccountOrderCancelAllOpenOrdersParamsType `query:"type,omitzero" json:"-"`
+	Type V1OrderCancelAllOpenOrdersParamsType `query:"type,omitzero" json:"-"`
 	paramObj
 }
 
-// URLQuery serializes [V1AccountOrderCancelAllOpenOrdersParams]'s query parameters
-// as `url.Values`.
-func (r V1AccountOrderCancelAllOpenOrdersParams) URLQuery() (v url.Values, err error) {
+// URLQuery serializes [V1OrderCancelAllOpenOrdersParams]'s query parameters as
+// `url.Values`.
+func (r V1OrderCancelAllOpenOrdersParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -692,50 +692,50 @@ func (r V1AccountOrderCancelAllOpenOrdersParams) URLQuery() (v url.Values, err e
 }
 
 // Filter by instrument type (e.g., COMMON_STOCK, OPTION)
-type V1AccountOrderCancelAllOpenOrdersParamsInstrumentType string
+type V1OrderCancelAllOpenOrdersParamsInstrumentType string
 
 const (
-	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock    V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
-	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypePreferredStock V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "PREFERRED_STOCK"
-	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeOption         V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
-	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeCash           V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
-	V1AccountOrderCancelAllOpenOrdersParamsInstrumentTypeOther          V1AccountOrderCancelAllOpenOrdersParamsInstrumentType = "OTHER"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock    V1OrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypePreferredStock V1OrderCancelAllOpenOrdersParamsInstrumentType = "PREFERRED_STOCK"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOption         V1OrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCash           V1OrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOther          V1OrderCancelAllOpenOrdersParamsInstrumentType = "OTHER"
 )
 
 // Filter by order side (BUY or SELL)
-type V1AccountOrderCancelAllOpenOrdersParamsSide string
+type V1OrderCancelAllOpenOrdersParamsSide string
 
 const (
-	V1AccountOrderCancelAllOpenOrdersParamsSideBuy       V1AccountOrderCancelAllOpenOrdersParamsSide = "BUY"
-	V1AccountOrderCancelAllOpenOrdersParamsSideSell      V1AccountOrderCancelAllOpenOrdersParamsSide = "SELL"
-	V1AccountOrderCancelAllOpenOrdersParamsSideSellShort V1AccountOrderCancelAllOpenOrdersParamsSide = "SELL_SHORT"
-	V1AccountOrderCancelAllOpenOrdersParamsSideOther     V1AccountOrderCancelAllOpenOrdersParamsSide = "OTHER"
+	V1OrderCancelAllOpenOrdersParamsSideBuy       V1OrderCancelAllOpenOrdersParamsSide = "BUY"
+	V1OrderCancelAllOpenOrdersParamsSideSell      V1OrderCancelAllOpenOrdersParamsSide = "SELL"
+	V1OrderCancelAllOpenOrdersParamsSideSellShort V1OrderCancelAllOpenOrdersParamsSide = "SELL_SHORT"
+	V1OrderCancelAllOpenOrdersParamsSideOther     V1OrderCancelAllOpenOrdersParamsSide = "OTHER"
 )
 
 // Filter by order type (e.g., MARKET, LIMIT)
-type V1AccountOrderCancelAllOpenOrdersParamsType string
+type V1OrderCancelAllOpenOrdersParamsType string
 
 const (
-	V1AccountOrderCancelAllOpenOrdersParamsTypeMarket            V1AccountOrderCancelAllOpenOrdersParamsType = "MARKET"
-	V1AccountOrderCancelAllOpenOrdersParamsTypeLimit             V1AccountOrderCancelAllOpenOrdersParamsType = "LIMIT"
-	V1AccountOrderCancelAllOpenOrdersParamsTypeStop              V1AccountOrderCancelAllOpenOrdersParamsType = "STOP"
-	V1AccountOrderCancelAllOpenOrdersParamsTypeStopLimit         V1AccountOrderCancelAllOpenOrdersParamsType = "STOP_LIMIT"
-	V1AccountOrderCancelAllOpenOrdersParamsTypeTrailingStop      V1AccountOrderCancelAllOpenOrdersParamsType = "TRAILING_STOP"
-	V1AccountOrderCancelAllOpenOrdersParamsTypeTrailingStopLimit V1AccountOrderCancelAllOpenOrdersParamsType = "TRAILING_STOP_LIMIT"
-	V1AccountOrderCancelAllOpenOrdersParamsTypeOther             V1AccountOrderCancelAllOpenOrdersParamsType = "OTHER"
+	V1OrderCancelAllOpenOrdersParamsTypeMarket            V1OrderCancelAllOpenOrdersParamsType = "MARKET"
+	V1OrderCancelAllOpenOrdersParamsTypeLimit             V1OrderCancelAllOpenOrdersParamsType = "LIMIT"
+	V1OrderCancelAllOpenOrdersParamsTypeStop              V1OrderCancelAllOpenOrdersParamsType = "STOP"
+	V1OrderCancelAllOpenOrdersParamsTypeStopLimit         V1OrderCancelAllOpenOrdersParamsType = "STOP_LIMIT"
+	V1OrderCancelAllOpenOrdersParamsTypeTrailingStop      V1OrderCancelAllOpenOrdersParamsType = "TRAILING_STOP"
+	V1OrderCancelAllOpenOrdersParamsTypeTrailingStopLimit V1OrderCancelAllOpenOrdersParamsType = "TRAILING_STOP_LIMIT"
+	V1OrderCancelAllOpenOrdersParamsTypeOther             V1OrderCancelAllOpenOrdersParamsType = "OTHER"
 )
 
-type V1AccountOrderCancelOpenOrderParams struct {
+type V1OrderCancelOpenOrderParams struct {
 	AccountID int64 `path:"account_id" api:"required" json:"-"`
 	paramObj
 }
 
-type V1AccountOrderGetOrderByIDParams struct {
+type V1OrderGetOrderByIDParams struct {
 	AccountID int64 `path:"account_id" api:"required" json:"-"`
 	paramObj
 }
 
-type V1AccountOrderGetOrdersParams struct {
+type V1OrderGetOrdersParams struct {
 	// The start date and time for the query range, inclusive (ISO 8601 format)
 	From     param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
 	PageSize param.Opt[int64]     `query:"page_size,omitzero" json:"-"`
@@ -754,7 +754,7 @@ type V1AccountOrderGetOrdersParams struct {
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType V1AccountOrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
+	InstrumentType V1OrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Comma-separated order statuses to filter by
 	//
 	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
@@ -764,9 +764,8 @@ type V1AccountOrderGetOrdersParams struct {
 	paramObj
 }
 
-// URLQuery serializes [V1AccountOrderGetOrdersParams]'s query parameters as
-// `url.Values`.
-func (r V1AccountOrderGetOrdersParams) URLQuery() (v url.Values, err error) {
+// URLQuery serializes [V1OrderGetOrdersParams]'s query parameters as `url.Values`.
+func (r V1OrderGetOrdersParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
@@ -774,17 +773,17 @@ func (r V1AccountOrderGetOrdersParams) URLQuery() (v url.Values, err error) {
 }
 
 // Instrument type filter (e.g., COMMON_STOCK, OPTION)
-type V1AccountOrderGetOrdersParamsInstrumentType string
+type V1OrderGetOrdersParamsInstrumentType string
 
 const (
-	V1AccountOrderGetOrdersParamsInstrumentTypeCommonStock    V1AccountOrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
-	V1AccountOrderGetOrdersParamsInstrumentTypePreferredStock V1AccountOrderGetOrdersParamsInstrumentType = "PREFERRED_STOCK"
-	V1AccountOrderGetOrdersParamsInstrumentTypeOption         V1AccountOrderGetOrdersParamsInstrumentType = "OPTION"
-	V1AccountOrderGetOrdersParamsInstrumentTypeCash           V1AccountOrderGetOrdersParamsInstrumentType = "CASH"
-	V1AccountOrderGetOrdersParamsInstrumentTypeOther          V1AccountOrderGetOrdersParamsInstrumentType = "OTHER"
+	V1OrderGetOrdersParamsInstrumentTypeCommonStock    V1OrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
+	V1OrderGetOrdersParamsInstrumentTypePreferredStock V1OrderGetOrdersParamsInstrumentType = "PREFERRED_STOCK"
+	V1OrderGetOrdersParamsInstrumentTypeOption         V1OrderGetOrdersParamsInstrumentType = "OPTION"
+	V1OrderGetOrdersParamsInstrumentTypeCash           V1OrderGetOrdersParamsInstrumentType = "CASH"
+	V1OrderGetOrdersParamsInstrumentTypeOther          V1OrderGetOrdersParamsInstrumentType = "OTHER"
 )
 
-type V1AccountOrderReplaceOrderParams struct {
+type V1OrderReplaceOrderParams struct {
 	AccountID int64 `path:"account_id" api:"required" json:"-"`
 	// New limit price for the order
 	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
@@ -801,48 +800,48 @@ type V1AccountOrderReplaceOrderParams struct {
 	paramObj
 }
 
-func (r V1AccountOrderReplaceOrderParams) MarshalJSON() (data []byte, err error) {
-	type shadow V1AccountOrderReplaceOrderParams
+func (r V1OrderReplaceOrderParams) MarshalJSON() (data []byte, err error) {
+	type shadow V1OrderReplaceOrderParams
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *V1AccountOrderReplaceOrderParams) UnmarshalJSON(data []byte) error {
+func (r *V1OrderReplaceOrderParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1AccountOrderSubmitOrdersParams struct {
-	Orders []V1AccountOrderSubmitOrdersParamsOrderUnion
+type V1OrderSubmitOrdersParams struct {
+	Orders []V1OrderSubmitOrdersParamsOrderUnion
 	paramObj
 }
 
-func (r V1AccountOrderSubmitOrdersParams) MarshalJSON() (data []byte, err error) {
+func (r V1OrderSubmitOrdersParams) MarshalJSON() (data []byte, err error) {
 	return shimjson.Marshal(r.Orders)
 }
-func (r *V1AccountOrderSubmitOrdersParams) UnmarshalJSON(data []byte) error {
+func (r *V1OrderSubmitOrdersParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
-type V1AccountOrderSubmitOrdersParamsOrderUnion struct {
-	OfV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequest *V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest `json:",omitzero,inline"`
-	OfNewOrderRequest                                         *NewOrderRequestParam                                         `json:",omitzero,inline"`
+type V1OrderSubmitOrdersParamsOrderUnion struct {
+	OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest `json:",omitzero,inline"`
+	OfNewOrderRequest                                  *NewOrderRequestParam                                  `json:",omitzero,inline"`
 	paramUnion
 }
 
-func (u V1AccountOrderSubmitOrdersParamsOrderUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfV1AccountOrderSubmitOrderssOrderNewOrderMultilegRequest, u.OfNewOrderRequest)
+func (u V1OrderSubmitOrdersParamsOrderUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest, u.OfNewOrderRequest)
 }
-func (u *V1AccountOrderSubmitOrdersParamsOrderUnion) UnmarshalJSON(data []byte) error {
+func (u *V1OrderSubmitOrdersParamsOrderUnion) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
 }
 
 // Multileg strategy order request
 //
 // The properties Legs, OrderType, TimeInForce are required.
-type V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest struct {
+type V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest struct {
 	// Legs that compose the strategy.
-	Legs []V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg `json:"legs,omitzero" api:"required"`
+	Legs []V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg `json:"legs,omitzero" api:"required"`
 	// Type of order (currently MARKET or LIMIT for multileg strategy submission)
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
@@ -864,18 +863,18 @@ type V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest struct {
 	paramObj
 }
 
-func (r V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest) MarshalJSON() (data []byte, err error) {
-	type shadow V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest
+func (r V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest) MarshalJSON() (data []byte, err error) {
+	type shadow V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
+func (r *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // A single leg in a multileg strategy request.
 //
 // The properties InstrumentType, Ratio, Security, Side are required.
-type V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
+type V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
 	// Security type for the leg.
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
@@ -897,10 +896,10 @@ type V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
 	paramObj
 }
 
-func (r V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) MarshalJSON() (data []byte, err error) {
-	type shadow V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg
+func (r V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) MarshalJSON() (data []byte, err error) {
+	type shadow V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg
 	return param.MarshalObject(r, (*shadow)(&r))
 }
-func (r *V1AccountOrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) UnmarshalJSON(data []byte) error {
+func (r *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }

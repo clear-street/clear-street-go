@@ -20,7 +20,7 @@ import (
 	"github.com/clear-street/clear-street-go/shared"
 )
 
-// Retrieve details and lists of tradable instruments.
+// Retrieve core details and discovery endpoints for tradable instruments.
 //
 // V1InstrumentService contains methods and other services that help with
 // interacting with the clear-street API.
@@ -30,20 +30,6 @@ import (
 // the [NewV1InstrumentService] method instead.
 type V1InstrumentService struct {
 	options []option.RequestOption
-	// Retrieve details and lists of tradable instruments.
-	AnalystReporting V1InstrumentAnalystReportingService
-	// Retrieve details and lists of tradable instruments.
-	BalanceSheets V1InstrumentBalanceSheetService
-	// Retrieve details and lists of tradable instruments.
-	CashFlowStatements V1InstrumentCashFlowStatementService
-	// Retrieve details and lists of tradable instruments.
-	Events V1InstrumentEventService
-	// Retrieve details and lists of tradable instruments.
-	Fundamentals V1InstrumentFundamentalService
-	// Retrieve details and lists of tradable instruments.
-	IncomeStatements V1InstrumentIncomeStatementService
-	// Retrieve details and lists of tradable instruments.
-	Options V1InstrumentOptionService
 }
 
 // NewV1InstrumentService generates a new service that applies the given options to
@@ -52,13 +38,6 @@ type V1InstrumentService struct {
 func NewV1InstrumentService(opts ...option.RequestOption) (r V1InstrumentService) {
 	r = V1InstrumentService{}
 	r.options = opts
-	r.AnalystReporting = NewV1InstrumentAnalystReportingService(opts...)
-	r.BalanceSheets = NewV1InstrumentBalanceSheetService(opts...)
-	r.CashFlowStatements = NewV1InstrumentCashFlowStatementService(opts...)
-	r.Events = NewV1InstrumentEventService(opts...)
-	r.Fundamentals = NewV1InstrumentFundamentalService(opts...)
-	r.IncomeStatements = NewV1InstrumentIncomeStatementService(opts...)
-	r.Options = NewV1InstrumentOptionService(opts...)
 	return
 }
 
@@ -82,6 +61,17 @@ func (r *V1InstrumentService) GetInstruments(ctx context.Context, query V1Instru
 	return res, err
 }
 
+// List options contracts.
+//
+// Returns options contracts for a given underlier with options-specific metadata.
+// Exactly one underlier identifier must be provided.
+func (r *V1InstrumentService) GetOptionContracts(ctx context.Context, query V1InstrumentGetOptionContractsParams, opts ...option.RequestOption) (res *V1InstrumentGetOptionContractsResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "v1/instruments/options/contracts"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
 // Search instruments by symbol, alternate identifier, or company name.
 //
 // The `q` parameter is case-insensitive and supports ticker symbols, alternate
@@ -99,17 +89,6 @@ func (r *V1InstrumentService) SearchInstruments(ctx context.Context, query V1Ins
 	return res, err
 }
 
-// Analyst rating category
-type AnalystRating string
-
-const (
-	AnalystRatingStrongBuy  AnalystRating = "STRONG_BUY"
-	AnalystRatingBuy        AnalystRating = "BUY"
-	AnalystRatingHold       AnalystRating = "HOLD"
-	AnalystRatingSell       AnalystRating = "SELL"
-	AnalystRatingStrongSell AnalystRating = "STRONG_SELL"
-)
-
 // The type of options contract
 type ContractType string
 
@@ -124,16 +103,6 @@ type ExerciseStyle string
 const (
 	ExerciseStyleAmerican ExerciseStyle = "AMERICAN"
 	ExerciseStyleEuropean ExerciseStyle = "EUROPEAN"
-)
-
-// Fiscal period type for earnings reports
-type FiscalPeriodType string
-
-const (
-	FiscalPeriodTypeQuarterly FiscalPeriodType = "QUARTERLY"
-	FiscalPeriodTypeAnnual    FiscalPeriodType = "ANNUAL"
-	FiscalPeriodTypeTtm       FiscalPeriodType = "TTM"
-	FiscalPeriodTypeBiannual  FiscalPeriodType = "BIANNUAL"
 )
 
 // Represents a tradable financial instrument.
@@ -305,42 +274,6 @@ func (r *InstrumentCore) UnmarshalJSON(data []byte) error {
 
 type InstrumentCoreList []InstrumentCore
 
-// Represents instrument earnings data
-type InstrumentEarnings struct {
-	// The date when the earnings report was published
-	Date time.Time `json:"date" api:"required" format:"date"`
-	// The actual earnings per share (EPS) for the period
-	EpsActual string `json:"eps_actual" api:"nullable"`
-	// The estimated earnings per share (EPS) for the period
-	EpsEstimate string `json:"eps_estimate" api:"nullable"`
-	// The percentage difference between actual and estimated EPS
-	EpsSurprisePercent string `json:"eps_surprise_percent" api:"nullable"`
-	// The actual total revenue for the period
-	RevenueActual string `json:"revenue_actual" api:"nullable"`
-	// The estimated total revenue for the period
-	RevenueEstimate string `json:"revenue_estimate" api:"nullable"`
-	// The percentage difference between actual and estimated revenue
-	RevenueSurprisePercent string `json:"revenue_surprise_percent" api:"nullable"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Date                   respjson.Field
-		EpsActual              respjson.Field
-		EpsEstimate            respjson.Field
-		EpsSurprisePercent     respjson.Field
-		RevenueActual          respjson.Field
-		RevenueEstimate        respjson.Field
-		RevenueSurprisePercent respjson.Field
-		ExtraFields            map[string]respjson.Field
-		raw                    string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r InstrumentEarnings) RawJSON() string { return r.JSON.raw }
-func (r *InstrumentEarnings) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 // The listing type of an options contract
 type ListingType string
 
@@ -453,6 +386,23 @@ func (r *V1InstrumentGetInstrumentsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1InstrumentGetOptionContractsResponse struct {
+	Data OptionsContractList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1InstrumentGetOptionContractsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1InstrumentGetOptionContractsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1InstrumentSearchInstrumentsResponse struct {
 	Data InstrumentCoreList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -534,6 +484,33 @@ const (
 	V1InstrumentGetInstrumentsParamsInstrumentTypeCash           V1InstrumentGetInstrumentsParamsInstrumentType = "CASH"
 	V1InstrumentGetInstrumentsParamsInstrumentTypeOther          V1InstrumentGetInstrumentsParamsInstrumentType = "OTHER"
 )
+
+type V1InstrumentGetOptionContractsParams struct {
+	// Filter to contracts expiring on this date (YYYY-MM-DD)
+	Expiry   param.Opt[time.Time] `query:"expiry,omitzero" format:"date" json:"-"`
+	PageSize param.Opt[int64]     `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next page of results. Contains encoded pagination state
+	// (limit + offset). When provided, page_size is ignored.
+	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
+	// Underlier symbol (e.g., AAPL, SPX)
+	Underlier param.Opt[string] `query:"underlier,omitzero" json:"-"`
+	// OEMS instrument UUID or symbol of the underlying equity/index
+	UnderlyingInstrumentID param.Opt[InstrumentIDOrSymbol] `query:"underlying_instrument_id,omitzero" format:"uuid" json:"-"`
+	// Filter by contract type: CALL or PUT
+	//
+	// Any of "CALL", "PUT".
+	ContractType ContractType `query:"contract_type,omitzero" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1InstrumentGetOptionContractsParams]'s query parameters as
+// `url.Values`.
+func (r V1InstrumentGetOptionContractsParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
 
 type V1InstrumentSearchInstrumentsParams struct {
 	// Search term applied case-insensitively to ticker symbols, alternate identifiers

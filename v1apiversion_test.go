@@ -13,7 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestV1InstrumentFundamentalGetInstrumentFundamentals(t *testing.T) {
+func TestV1APIVersionGetVersion(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -26,7 +26,7 @@ func TestV1InstrumentFundamentalGetInstrumentFundamentals(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.Instruments.Fundamentals.GetInstrumentFundamentals(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.V1.APIVersion.GetVersion(context.TODO())
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {
