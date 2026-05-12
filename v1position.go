@@ -405,7 +405,9 @@ type V1PositionCancelPositionInstructionParams struct {
 }
 
 type V1PositionClosePositionParams struct {
-	AccountID    int64           `path:"account_id" api:"required" json:"-"`
+	AccountID int64 `path:"account_id" api:"required" json:"-"`
+	// Whether to cancel existing open orders for the position before submitting
+	// closing orders.
 	CancelOrders param.Opt[bool] `json:"cancel_orders,omitzero"`
 	paramObj
 }
@@ -419,6 +421,8 @@ func (r *V1PositionClosePositionParams) UnmarshalJSON(data []byte) error {
 }
 
 type V1PositionClosePositionsParams struct {
+	// Whether to cancel existing open orders for the position before submitting
+	// closing orders.
 	CancelOrders param.Opt[bool] `json:"cancel_orders,omitzero"`
 	paramObj
 }
@@ -447,9 +451,11 @@ func (r V1PositionGetPositionInstructionsParams) URLQuery() (v url.Values, err e
 }
 
 type V1PositionGetPositionsParams struct {
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`

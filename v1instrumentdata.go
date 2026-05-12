@@ -1222,9 +1222,11 @@ func (r V1InstrumentDataGetInstrumentAnalystConsensusParams) URLQuery() (v url.V
 type V1InstrumentDataGetInstrumentBalanceSheetStatementsParams struct {
 	// The start date for the query range, inclusive (YYYY-MM-DD).
 	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
-	PageSize param.Opt[int64]  `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// The end date for the query range, inclusive (YYYY-MM-DD).
 	ToDate param.Opt[string] `query:"to_date,omitzero" json:"-"`
@@ -1244,9 +1246,11 @@ func (r V1InstrumentDataGetInstrumentBalanceSheetStatementsParams) URLQuery() (v
 type V1InstrumentDataGetInstrumentCashFlowStatementsParams struct {
 	// The start date for the query range, inclusive (YYYY-MM-DD).
 	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
-	PageSize param.Opt[int64]  `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// The end date for the query range, inclusive (YYYY-MM-DD).
 	ToDate param.Opt[string] `query:"to_date,omitzero" json:"-"`
@@ -1282,9 +1286,11 @@ func (r V1InstrumentDataGetInstrumentEventsParams) URLQuery() (v url.Values, err
 type V1InstrumentDataGetInstrumentIncomeStatementsParams struct {
 	// The start date for the query range, inclusive (YYYY-MM-DD).
 	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
-	PageSize param.Opt[int64]  `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// The end date for the query range, inclusive (YYYY-MM-DD).
 	ToDate param.Opt[string] `query:"to_date,omitzero" json:"-"`

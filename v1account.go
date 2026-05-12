@@ -607,9 +607,11 @@ func (r V1AccountGetAccountBalancesParams) URLQuery() (v url.Values, err error) 
 }
 
 type V1AccountGetAccountsParams struct {
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	paramObj
 }
@@ -624,6 +626,7 @@ func (r V1AccountGetAccountsParams) URLQuery() (v url.Values, err error) {
 }
 
 type V1AccountGetPortfolioHistoryParams struct {
+	// Start date for the portfolio history range, in YYYY-MM-DD format.
 	StartDate time.Time `query:"start_date" api:"required" format:"date" json:"-"`
 	// Defaults to today in America/New_York when omitted.
 	EndDate param.Opt[time.Time] `query:"end_date,omitzero" format:"date" json:"-"`
