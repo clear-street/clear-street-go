@@ -447,10 +447,12 @@ type V1InstrumentGetInstrumentsParams struct {
 	// Filter by short prohibited status
 	IsShortProhibited param.Opt[bool] `query:"is_short_prohibited,omitzero" json:"-"`
 	// Filter by threshold security status
-	IsThresholdSecurity param.Opt[bool]  `query:"is_threshold_security,omitzero" json:"-"`
-	PageSize            param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	IsThresholdSecurity param.Opt[bool] `query:"is_threshold_security,omitzero" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
@@ -487,10 +489,12 @@ const (
 
 type V1InstrumentGetOptionContractsParams struct {
 	// Filter to contracts expiring on this date (YYYY-MM-DD)
-	Expiry   param.Opt[time.Time] `query:"expiry,omitzero" format:"date" json:"-"`
-	PageSize param.Opt[int64]     `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	Expiry param.Opt[time.Time] `query:"expiry,omitzero" format:"date" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Underlier symbol (e.g., AAPL, SPX)
 	Underlier param.Opt[string] `query:"underlier,omitzero" json:"-"`
@@ -527,10 +531,12 @@ type V1InstrumentSearchInstrumentsParams struct {
 	// Include inactive instruments. Default false.
 	IncludeInactive param.Opt[bool] `query:"include_inactive,omitzero" json:"-"`
 	// Include restricted instruments. Default true (penalized in ranking).
-	IncludeRestricted param.Opt[bool]  `query:"include_restricted,omitzero" json:"-"`
-	PageSize          param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	IncludeRestricted param.Opt[bool] `query:"include_restricted,omitzero" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	paramObj
 }

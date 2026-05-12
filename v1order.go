@@ -737,10 +737,12 @@ type V1OrderGetOrderByIDParams struct {
 
 type V1OrderGetOrdersParams struct {
 	// The start date and time for the query range, inclusive (ISO 8601 format)
-	From     param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
-	PageSize param.Opt[int64]     `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Filter by symbol
 	Symbol param.Opt[string] `query:"symbol,omitzero" json:"-"`

@@ -660,10 +660,12 @@ func init() {
 
 type V1OmniAIThreadGetMessagesParams struct {
 	// Account ID for the request
-	AccountID int64            `query:"account_id" api:"required" json:"-"`
-	PageSize  param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	paramObj
 }
@@ -709,10 +711,12 @@ func (r V1OmniAIThreadGetThreadResponseParams) URLQuery() (v url.Values, err err
 
 type V1OmniAIThreadGetThreadsParams struct {
 	// Account ID for the request
-	AccountID int64            `query:"account_id" api:"required" json:"-"`
-	PageSize  param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	paramObj
 }
