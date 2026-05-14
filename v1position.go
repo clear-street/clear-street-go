@@ -42,10 +42,10 @@ func NewV1PositionService(opts ...option.RequestOption) (r V1PositionService) {
 	return
 }
 
-// Cancel an outstanding exercise / DNE / CEA instruction by its server- assigned
-// `id`. Returns the updated instruction with status `CANCEL_REQUESTED`; the
-// terminal `CANCELLED` / `CANCEL_FAILED` state arrives asynchronously via
-// subsequent GETs.
+// Cancel an outstanding position instruction by its server-assigned `id`. Returns
+// the updated instruction with status `CANCEL_REQUESTED`. The terminal `CANCELLED`
+// or `CANCEL_FAILED` state arrives asynchronously and is observable via subsequent
+// GETs.
 func (r *V1PositionService) CancelPositionInstruction(ctx context.Context, instructionID string, body V1PositionCancelPositionInstructionParams, opts ...option.RequestOption) (res *V1PositionCancelPositionInstructionResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instructionID == "" {
@@ -81,8 +81,8 @@ func (r *V1PositionService) ClosePositions(ctx context.Context, accountID int64,
 	return res, err
 }
 
-// Returns the current lifecycle state of exercise / DNE / CEA instructions for the
-// account. Optionally filter by a specific instrument.
+// Returns the current lifecycle state of the account's position instructions.
+// Optionally filter by a specific contract.
 func (r *V1PositionService) GetPositionInstructions(ctx context.Context, accountID int64, query V1PositionGetPositionInstructionsParams, opts ...option.RequestOption) (res *V1PositionGetPositionInstructionsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/positions/instructions", accountID)
@@ -98,9 +98,10 @@ func (r *V1PositionService) GetPositions(ctx context.Context, accountID int64, q
 	return res, err
 }
 
-// Submit one or more option lifecycle instructions against the account. Each row
-// is routed to `oems-csc` independently; per-row rejections are surfaced on the
-// corresponding response entry without failing the batch.
+// Submit one or more position instructions (Exercise, Do-Not-Exercise, Contrary
+// Exercise Advice) against the account. Each row is processed independently; a
+// rejected row is returned with an error on the corresponding response entry
+// without failing the batch.
 func (r *V1PositionService) SubmitPositionInstructions(ctx context.Context, accountID int64, body V1PositionSubmitPositionInstructionsParams, opts ...option.RequestOption) (res *V1PositionSubmitPositionInstructionsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/positions/instructions", accountID)
@@ -184,43 +185,40 @@ func (r *Position) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// The API representation of a single CSC instruction, combining the caller's
-// request with the `oems-csc` lifecycle state.
+// A position instruction and its current lifecycle state.
 type PositionInstruction struct {
-	// Stable server-assigned id for the instruction (the engine instruction UUID).
-	// Used as the `{instruction_id}` path parameter on DELETE.
+	// Server-assigned id. Used as the path parameter on cancel.
 	ID string `json:"id" api:"required" format:"uuid"`
 	// Account the instruction belongs to.
 	AccountID int64 `json:"account_id" api:"required"`
-	// Caller-supplied instruction id (echoed from the submit request, or the
-	// server-generated fallback when the caller omitted one).
+	// Caller-supplied idempotency key echoed from the submit request; the
+	// server-assigned fallback when none was supplied.
 	InstructionID string `json:"instruction_id" api:"required"`
-	// The instruction type as understood by this API.
+	// The action this instruction requests.
 	//
 	// Any of "EXERCISE", "DO_NOT_EXERCISE", "CONTRARY_EXERCISE".
 	InstructionType PositionInstructionType `json:"instruction_type" api:"required"`
-	// OEMS instrument identifier the instruction is for.
+	// Identifier of the options contract this instruction acts on.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
-	// Quantity of contracts.
+	// Number of contracts included in the instruction.
 	Quantity string `json:"quantity" api:"required"`
 	// Current lifecycle status.
 	//
 	// Any of "SENT", "ACCEPTED", "REJECTED", "ENGINE_REJECTED", "CANCEL_REQUESTED",
 	// "CANCELLED", "CANCEL_FAILED", "UNKNOWN".
 	Status PositionInstructionStatus `json:"status" api:"required"`
-	// Trading symbol resolved from the instrument cache (OSI for options, since
-	// exercises are options-only). Empty if the instrument cannot be resolved (e.g.
-	// expired option). Display-only.
+	// Options symbol (OSI) for display.
 	Symbol string `json:"symbol" api:"required"`
-	// Quantity accepted by OCC. Populated after `ACCEPTED`.
+	// Number of contracts accepted by the clearing venue. Populated once the
+	// instruction reaches `ACCEPTED`.
 	AcceptedQuantity string `json:"accepted_quantity" api:"nullable"`
-	// Row creation timestamp surfaced from `oems-csc`.
+	// When the instruction was first accepted by the service.
 	CreatedAt time.Time `json:"created_at" api:"nullable" format:"date-time"`
-	// Inline error detail when a batch entry was rejected (omitted on success).
+	// Per-row error on a batch submission (omitted on success).
 	Error string `json:"error" api:"nullable"`
-	// Reason text populated on terminal reject / cancel-failed statuses.
+	// Explanation populated on terminal reject or cancel-failed statuses.
 	RejectionReason string `json:"rejection_reason" api:"nullable"`
-	// Last update timestamp surfaced from `oems-csc`.
+	// When the instruction's lifecycle state last changed.
 	UpdatedAt time.Time `json:"updated_at" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -250,11 +248,7 @@ func (r *PositionInstruction) UnmarshalJSON(data []byte) error {
 
 type PositionInstructionList []PositionInstruction
 
-// Public Active API lifecycle status for a position instruction.
-//
-// Maps 1:1 to the `oems-csc` wire enum while keeping the REST schema stable:
-// api-gw owns serialization, OpenAPI generation, and the `Unknown` fallback for
-// missing or unrecognized gRPC values.
+// Lifecycle status of a position instruction.
 type PositionInstructionStatus string
 
 const (
@@ -268,11 +262,7 @@ const (
 	PositionInstructionStatusUnknown         PositionInstructionStatus = "UNKNOWN"
 )
 
-// The instruction type a caller wants `oems-csc` to take against an options
-// position.
-//
-// Maps onto FIX `PosTransType` (tag 709) + `PosMaintAction` (tag 712) +
-// `ContraryInstructionIndicator` (tag 719) per `oems-csc`'s `classify_action`.
+// The action to take against an options position.
 type PositionInstructionType string
 
 const (
@@ -296,8 +286,7 @@ const (
 )
 
 type V1PositionCancelPositionInstructionResponse struct {
-	// The API representation of a single CSC instruction, combining the caller's
-	// request with the `oems-csc` lifecycle state.
+	// A position instruction and its current lifecycle state.
 	Data PositionInstruction `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -436,7 +425,7 @@ func (r *V1PositionClosePositionsParams) UnmarshalJSON(data []byte) error {
 }
 
 type V1PositionGetPositionInstructionsParams struct {
-	// Filter by OEMS instrument id or symbol (CMS / OSI).
+	// Limit results to a single contract. Accepts the instrument id or the OSI symbol.
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
@@ -513,25 +502,23 @@ func (r *V1PositionSubmitPositionInstructionsParams) UnmarshalJSON(data []byte) 
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// One exercise / DNE / CEA instruction requested by a client.
+// A position instruction to submit.
 //
-// Cancel is not an instruction type — use
-// `DELETE /accounts/{account_id}/positions/instructions/{instruction_id}`.
+// Use `DELETE /accounts/{account_id}/positions/instructions/{instruction_id}` to
+// cancel an outstanding instruction.
 //
 // The properties InstructionType, InstrumentID, Quantity are required.
 type V1PositionSubmitPositionInstructionsParamsInstruction struct {
-	// Instruction type.
+	// The action to take.
 	//
 	// Any of "EXERCISE", "DO_NOT_EXERCISE", "CONTRARY_EXERCISE".
 	InstructionType PositionInstructionType `json:"instruction_type,omitzero" api:"required"`
-	// OEMS instrument identifier. api-gw resolves this to `security_id` +
-	// `security_id_source` via the instrument cache before dispatching to `oems-csc`.
-	// Unknown ids return 404.
+	// Identifier of the options contract to act on. Unknown ids return 404.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
-	// Quantity of contracts to exercise / DNE / CEA.
+	// Number of contracts to include in the instruction.
 	Quantity string `json:"quantity" api:"required"`
-	// Caller-supplied instruction id. Echoed back on the response and used as the FIX
-	// `pos_req_id` (tag 710) for idempotency. If omitted the server generates a UUID.
+	// Caller-supplied idempotency key. Echoed on the response. The server generates a
+	// unique id when omitted.
 	InstructionID param.Opt[string] `json:"instruction_id,omitzero"`
 	paramObj
 }
