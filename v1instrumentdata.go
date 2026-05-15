@@ -705,6 +705,8 @@ type InstrumentEventEnvelope struct {
 	IpoEventData InstrumentEventIpoItem `json:"ipo_event_data" api:"nullable"`
 	// Instrument name associated with the event, when available.
 	Name string `json:"name" api:"nullable"`
+	// The currency used for reporting financial data.
+	ReportingCurrency string `json:"reporting_currency" api:"nullable"`
 	// Stock split payload when type is STOCK_SPLIT.
 	StockSplitEventData InstrumentSplitEvent `json:"stock_split_event_data" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -716,6 +718,7 @@ type InstrumentEventEnvelope struct {
 		InstrumentID        respjson.Field
 		IpoEventData        respjson.Field
 		Name                respjson.Field
+		ReportingCurrency   respjson.Field
 		StockSplitEventData respjson.Field
 		ExtraFields         map[string]respjson.Field
 		raw                 string
@@ -795,14 +798,17 @@ type InstrumentEventsData struct {
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Stock split events
 	Splits []InstrumentSplitEvent `json:"splits" api:"required"`
+	// The currency used for reporting financial data
+	ReportingCurrency string `json:"reporting_currency" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Dividends    respjson.Field
-		Earnings     respjson.Field
-		InstrumentID respjson.Field
-		Splits       respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
+		Dividends         respjson.Field
+		Earnings          respjson.Field
+		InstrumentID      respjson.Field
+		Splits            respjson.Field
+		ReportingCurrency respjson.Field
+		ExtraFields       map[string]respjson.Field
+		raw               string
 	} `json:"-"`
 }
 
@@ -841,26 +847,29 @@ type InstrumentFundamentals struct {
 	PreviousClose string `json:"previous_close" api:"nullable"`
 	// The price-to-earnings (P/E) ratio for the trailing twelve months (TTM)
 	PriceToEarnings string `json:"price_to_earnings" api:"nullable"`
+	// The currency used for reporting financial data
+	ReportingCurrency string `json:"reporting_currency" api:"nullable"`
 	// The business sector of the instrument's issuer
 	Sector string `json:"sector" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AverageVolume    respjson.Field
-		Beta             respjson.Field
-		Description      respjson.Field
-		DividendYield    respjson.Field
-		EarningsPerShare respjson.Field
-		FiftyTwoWeekHigh respjson.Field
-		FiftyTwoWeekLow  respjson.Field
-		Industry         respjson.Field
-		ListDate         respjson.Field
-		LogoURL          respjson.Field
-		MarketCap        respjson.Field
-		PreviousClose    respjson.Field
-		PriceToEarnings  respjson.Field
-		Sector           respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
+		AverageVolume     respjson.Field
+		Beta              respjson.Field
+		Description       respjson.Field
+		DividendYield     respjson.Field
+		EarningsPerShare  respjson.Field
+		FiftyTwoWeekHigh  respjson.Field
+		FiftyTwoWeekLow   respjson.Field
+		Industry          respjson.Field
+		ListDate          respjson.Field
+		LogoURL           respjson.Field
+		MarketCap         respjson.Field
+		PreviousClose     respjson.Field
+		PriceToEarnings   respjson.Field
+		ReportingCurrency respjson.Field
+		Sector            respjson.Field
+		ExtraFields       map[string]respjson.Field
+		raw               string
 	} `json:"-"`
 }
 
