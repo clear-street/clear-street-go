@@ -111,9 +111,6 @@ func (r *V1PositionService) GetPositions(ctx context.Context, accountID int64, q
 //     the underlying cause: `409` for duplicate `instruction_id`, `400` for
 //     validation failures such as DNE/CEA on a non-expiry day, `503` if the clearing
 //     service is unavailable. No `data` is returned.
-//
-// Pre-flight validation (unknown `instrument_id`, unencodable `quantity`)
-// short-circuits the whole batch with a `4xx` before any row is submitted.
 func (r *V1PositionService) SubmitPositionInstructions(ctx context.Context, accountID int64, body V1PositionSubmitPositionInstructionsParams, opts ...option.RequestOption) (res *V1PositionSubmitPositionInstructionsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/positions/instructions", accountID)
@@ -261,6 +258,22 @@ func (r *PositionInstruction) UnmarshalJSON(data []byte) error {
 type PositionInstructionList []PositionInstruction
 
 // Lifecycle status of a position instruction.
+//
+//   - `SENT`: accepted and forwarded to the clearing venue.
+//   - `ACCEPTED`: terminal — accepted by the clearing venue.
+//   - `REJECTED`: terminal rejection from the clearing venue; `rejection_reason`
+//     carries the venue-reported detail.
+//   - `ENGINE_REJECTED`: terminal rejection raised before the instruction reached
+//     the clearing venue; `rejection_reason` carries the detail. Typical causes:
+//     duplicate `instruction_id`, `DO_NOT_EXERCISE` / `CONTRARY_EXERCISE` submitted
+//     on a non-expiry day, insufficient position, or an instrument that does not
+//     resolve.
+//   - `CANCEL_REQUESTED`: cancel accepted; final cancel state pending.
+//   - `CANCELLED`: terminal — cancel completed.
+//   - `CANCEL_FAILED`: cancel could not be completed; operator attention required.
+//     `rejection_reason` carries the detail.
+//   - `UNKNOWN`: status could not be mapped from the upstream service. Not expected
+//     in practice; surfaces a service version skew.
 type PositionInstructionStatus string
 
 const (
