@@ -155,9 +155,12 @@ type MarketDataSnapshotList []MarketDataSnapshot
 type SnapshotLastTrade struct {
 	// Most recent last-sale eligible trade price.
 	Price string `json:"price" api:"required"`
+	// Share quantity of the most recent last-sale eligible trade.
+	Size int64 `json:"size" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Price       respjson.Field
+		Size        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
