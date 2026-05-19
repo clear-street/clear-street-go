@@ -194,21 +194,18 @@ func TestV1OrderSubmitOrders(t *testing.T) {
 			Orders: []clearstreet.V1OrderSubmitOrdersParamsOrderUnion{{
 				OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest: &clearstreet.V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest{
 					Legs: []clearstreet.V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg{{
-						InstrumentType: clearstreet.SecurityTypeOption,
 						Ratio:          "ratio",
 						Security:       "0193bb84-447a-706f-996f-097254663f02",
 						Side:           clearstreet.SideBuy,
 						ID:             clearstreet.String("1"),
 						PositionEffect: clearstreet.PositionEffectOpen,
 					}, {
-						InstrumentType: clearstreet.SecurityTypeOption,
 						Ratio:          "ratio",
 						Security:       "0193bb84-4db4-78ec-b4fd-cba8be61cf8a",
 						Side:           clearstreet.SideSell,
 						ID:             clearstreet.String("2"),
 						PositionEffect: clearstreet.PositionEffectOpen,
 					}, {
-						InstrumentType: clearstreet.SecurityTypeOption,
 						Ratio:          "ratio",
 						Security:       "0193bb84-5264-7f20-8fd3-35df82cd6ef0",
 						Side:           clearstreet.SideBuy,
