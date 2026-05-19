@@ -131,10 +131,6 @@ type InstrumentIDOrSymbol = string
 
 // Request to submit a new order (PlaceOrderRequest from spec)
 type NewOrderRequest struct {
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// Type of order
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
@@ -168,8 +164,7 @@ type NewOrderRequest struct {
 	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// Limit price (required for LIMIT and STOP_LIMIT orders)
 	LimitPrice string `json:"limit_price" api:"nullable"`
-	// Required when instrument_type is OPTION. Specifies whether the order opens or
-	// closes a position.
+	// Required for options. Specifies whether the order opens or closes a position.
 	//
 	// Any of "OPEN", "CLOSE".
 	PositionEffect PositionEffect `json:"position_effect"`
@@ -187,7 +182,6 @@ type NewOrderRequest struct {
 	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		InstrumentType     respjson.Field
 		OrderType          respjson.Field
 		Quantity           respjson.Field
 		Side               respjson.Field
@@ -225,13 +219,8 @@ func (r NewOrderRequest) ToParam() NewOrderRequestParam {
 
 // Request to submit a new order (PlaceOrderRequest from spec)
 //
-// The properties InstrumentType, OrderType, Quantity, Side, TimeInForce are
-// required.
+// The properties OrderType, Quantity, Side, TimeInForce are required.
 type NewOrderRequestParam struct {
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType SecurityType `json:"instrument_type,omitzero" api:"required"`
 	// Type of order
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
@@ -273,8 +262,7 @@ type NewOrderRequestParam struct {
 	TrailingOffset param.Opt[string] `json:"trailing_offset,omitzero"`
 	// OEMS instrument UUID
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `json:"instrument_id,omitzero" format:"uuid"`
-	// Required when instrument_type is OPTION. Specifies whether the order opens or
-	// closes a position.
+	// Required for options. Specifies whether the order opens or closes a position.
 	//
 	// Any of "OPEN", "CLOSE".
 	PositionEffect PositionEffect `json:"position_effect,omitzero"`
@@ -875,12 +863,8 @@ func (r *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest) UnmarshalJSON(da
 
 // A single leg in a multileg strategy request.
 //
-// The properties InstrumentType, Ratio, Security, Side are required.
+// The properties Ratio, Security, Side are required.
 type V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
-	// Security type for the leg.
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType SecurityType `json:"instrument_type,omitzero" api:"required"`
 	// Ratio for the leg.
 	Ratio string `json:"ratio" api:"required"`
 	// Trading symbol (e.g. "AAPL" or OSI symbol for options)
