@@ -115,6 +115,8 @@ type Instrument struct {
 	Currency string `json:"currency" api:"required"`
 	// Indicates if the instrument is classified as Easy-To-Borrow
 	EasyToBorrow bool `json:"easy_to_borrow" api:"required"`
+	// Indicates if the instrument supports fractional-quantity orders
+	IsFractionable bool `json:"is_fractionable" api:"required"`
 	// Indicates if the instrument is liquidation only and cannot be bought
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Indicates if the instrument is marginable
@@ -162,6 +164,7 @@ type Instrument struct {
 		CountryOfIssue      respjson.Field
 		Currency            respjson.Field
 		EasyToBorrow        respjson.Field
+		IsFractionable      respjson.Field
 		IsLiquidationOnly   respjson.Field
 		IsMarginable        respjson.Field
 		IsRestricted        respjson.Field
@@ -200,6 +203,8 @@ type InstrumentCore struct {
 	Currency string `json:"currency" api:"required"`
 	// Indicates if the instrument is classified as Easy-To-Borrow
 	EasyToBorrow bool `json:"easy_to_borrow" api:"required"`
+	// Indicates if the instrument supports fractional-quantity orders
+	IsFractionable bool `json:"is_fractionable" api:"required"`
 	// Indicates if the instrument is liquidation only and cannot be bought
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Indicates if the instrument is marginable
@@ -244,6 +249,7 @@ type InstrumentCore struct {
 		CountryOfIssue      respjson.Field
 		Currency            respjson.Field
 		EasyToBorrow        respjson.Field
+		IsFractionable      respjson.Field
 		IsLiquidationOnly   respjson.Field
 		IsMarginable        respjson.Field
 		IsRestricted        respjson.Field
