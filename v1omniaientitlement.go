@@ -23,7 +23,7 @@ import (
 // conversations, poll response objects for in-progress output, and read finalized
 // messages from thread history. Thread/message/response endpoints require an
 // explicit account_id. Entitlement endpoints are caller-scoped and use
-// trading_account_ids.
+// account_ids.
 //
 // V1OmniAIEntitlementService contains methods and other services that help with
 // interacting with the clear-street API.
@@ -243,9 +243,9 @@ func (r *V1OmniAIEntitlementGetEntitlementsResponse) UnmarshalJSON(data []byte) 
 }
 
 type V1OmniAIEntitlementNewEntitlementsParams struct {
-	AgreementID               string            `json:"agreement_id" api:"required"`
-	RequestedEntitlementCodes []EntitlementCode `json:"requested_entitlement_codes,omitzero" api:"required"`
-	TradingAccountIDs         []int64           `json:"trading_account_ids,omitzero" api:"required"`
+	AccountIDs       []int64           `json:"account_ids,omitzero" api:"required"`
+	AgreementID      string            `json:"agreement_id" api:"required"`
+	EntitlementCodes []EntitlementCode `json:"entitlement_codes,omitzero" api:"required"`
 	paramObj
 }
 

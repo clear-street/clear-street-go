@@ -66,11 +66,11 @@ func (r *BaseResponse) UnmarshalJSON(data []byte) error {
 type ResponseMetadata struct {
 	// A unique ID for this request, generated upon ingestion of the request.
 	RequestID string `json:"request_id" api:"required"`
-	// Base64URL-encoded pagination token containing limit and offset
+	// Base64URL-encoded pagination token
 	NextPageToken string `json:"next_page_token" api:"nullable" format:"byte"`
 	// Pagination. Included if this was a GET (list) response
 	PageNumber int64 `json:"page_number" api:"nullable"`
-	// Base64URL-encoded pagination token containing limit and offset
+	// Base64URL-encoded pagination token
 	PreviousPageToken string `json:"previous_page_token" api:"nullable" format:"byte"`
 	// Total number of items available (not just in this page).
 	TotalItems int64 `json:"total_items" api:"nullable"`

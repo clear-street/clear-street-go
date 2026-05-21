@@ -24,7 +24,7 @@ import (
 // conversations, poll response objects for in-progress output, and read finalized
 // messages from thread history. Thread/message/response endpoints require an
 // explicit account_id. Entitlement endpoints are caller-scoped and use
-// trading_account_ids.
+// account_ids.
 //
 // V1OmniAIThreadService contains methods and other services that help with
 // interacting with the clear-street API.
@@ -85,9 +85,10 @@ func (r *V1OmniAIThreadService) NewThread(ctx context.Context, body V1OmniAIThre
 
 // List finalized messages in a thread.
 //
-// Returns **finalized** messages in chronological order. Messages from in-progress
-// assistant turns are excluded — use `GET /omni-ai/threads/{thread_id}/response`
-// or `GET /omni-ai/responses/{response_id}` for live output.
+// Returns the latest page of **finalized** messages by default, with messages
+// within each page ordered chronologically. Messages from in-progress assistant
+// turns are excluded — use `GET /omni-ai/threads/{thread_id}/response` or
+// `GET /omni-ai/responses/{response_id}` for live output.
 //
 // If the last finalized message has role `USER`, an active response likely exists
 // and should be polled separately.
@@ -322,14 +323,11 @@ type MessageContentPartUnionPayload struct {
 	ActionButtons []ActionButton `json:"actionButtons"`
 	// This field is from variant [ChartPayload].
 	DataChart DataChart `json:"dataChart"`
-	// This field is from variant [ChartPayload].
-	SymbolChart SymbolChart `json:"symbolChart"`
-	JSON        struct {
+	JSON      struct {
 		OfContentPartCustomPayloadPayload respjson.Field
 		ChartID                           respjson.Field
 		ActionButtons                     respjson.Field
 		DataChart                         respjson.Field
-		SymbolChart                       respjson.Field
 		raw                               string
 	} `json:"-"`
 }

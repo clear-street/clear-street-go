@@ -23,7 +23,7 @@ import (
 // conversations, poll response objects for in-progress output, and read finalized
 // messages from thread history. Thread/message/response endpoints require an
 // explicit account_id. Entitlement endpoints are caller-scoped and use
-// trading_account_ids.
+// account_ids.
 //
 // V1OmniAIResponseService contains methods and other services that help with
 // interacting with the clear-street API.
@@ -252,14 +252,11 @@ type ResponseContentPartUnionPayload struct {
 	ActionButtons []ActionButton `json:"actionButtons"`
 	// This field is from variant [ChartPayload].
 	DataChart DataChart `json:"dataChart"`
-	// This field is from variant [ChartPayload].
-	SymbolChart SymbolChart `json:"symbolChart"`
-	JSON        struct {
+	JSON      struct {
 		OfContentPartCustomPayloadPayload respjson.Field
 		ChartID                           respjson.Field
 		ActionButtons                     respjson.Field
 		DataChart                         respjson.Field
-		SymbolChart                       respjson.Field
 		raw                               string
 	} `json:"-"`
 }
