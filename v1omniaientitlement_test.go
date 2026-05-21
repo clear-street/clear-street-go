@@ -27,9 +27,9 @@ func TestV1OmniAIEntitlementNewEntitlements(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.OmniAI.Entitlements.NewEntitlements(context.TODO(), clearstreet.V1OmniAIEntitlementNewEntitlementsParams{
-		AgreementID:               "01JZ0000000000000000000000",
-		RequestedEntitlementCodes: []clearstreet.EntitlementCode{clearstreet.EntitlementCodeOmniAccountData},
-		TradingAccountIDs:         []int64{100019, 100021},
+		AccountIDs:       []int64{100019, 100021},
+		AgreementID:      "01JZ0000000000000000000000",
+		EntitlementCodes: []clearstreet.EntitlementCode{clearstreet.EntitlementCodeOmniAccountData},
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

@@ -22,25 +22,25 @@ type V1OmniAIService struct {
 	// conversations, poll response objects for in-progress output, and read finalized
 	// messages from thread history. Thread/message/response endpoints require an
 	// explicit account_id. Entitlement endpoints are caller-scoped and use
-	// trading_account_ids.
+	// account_ids.
 	Entitlements V1OmniAIEntitlementService
 	// Thread-centric AI assistant for conversational trading. Create threads to start
 	// conversations, poll response objects for in-progress output, and read finalized
 	// messages from thread history. Thread/message/response endpoints require an
 	// explicit account_id. Entitlement endpoints are caller-scoped and use
-	// trading_account_ids.
+	// account_ids.
 	Messages V1OmniAIMessageService
 	// Thread-centric AI assistant for conversational trading. Create threads to start
 	// conversations, poll response objects for in-progress output, and read finalized
 	// messages from thread history. Thread/message/response endpoints require an
 	// explicit account_id. Entitlement endpoints are caller-scoped and use
-	// trading_account_ids.
+	// account_ids.
 	Responses V1OmniAIResponseService
 	// Thread-centric AI assistant for conversational trading. Create threads to start
 	// conversations, poll response objects for in-progress output, and read finalized
 	// messages from thread history. Thread/message/response endpoints require an
 	// explicit account_id. Entitlement endpoints are caller-scoped and use
-	// trading_account_ids.
+	// account_ids.
 	Threads V1OmniAIThreadService
 }
 
@@ -92,14 +92,11 @@ type ChartPayload struct {
 	ActionButtons []ActionButton `json:"actionButtons"`
 	// Explicit series-driven chart definition.
 	DataChart DataChart `json:"dataChart" api:"nullable"`
-	// Symbol-driven chart definition.
-	SymbolChart SymbolChart `json:"symbolChart" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ChartID       respjson.Field
 		ActionButtons respjson.Field
 		DataChart     respjson.Field
-		SymbolChart   respjson.Field
 		ExtraFields   map[string]respjson.Field
 		raw           string
 	} `json:"-"`
@@ -302,21 +299,21 @@ func (r *OpenChartAction) UnmarshalJSON(data []byte) error {
 
 // Action to open entitlement consent flow for one or more accounts.
 type OpenEntitlementConsentAction struct {
+	AccountIDs []int64 `json:"account_ids" api:"required"`
 	// Stable entitlement agreement family key.
 	//
 	// Any of "omni_account_data_access".
-	AgreementKey              EntitlementAgreementKey `json:"agreement_key" api:"required"`
-	Reason                    string                  `json:"reason" api:"required"`
-	RequestedEntitlementCodes []EntitlementCode       `json:"requested_entitlement_codes" api:"required"`
-	TradingAccountIDs         []int64                 `json:"trading_account_ids" api:"required"`
+	AgreementKey     EntitlementAgreementKey `json:"agreement_key" api:"required"`
+	EntitlementCodes []EntitlementCode       `json:"entitlement_codes" api:"required"`
+	Reason           string                  `json:"reason" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AgreementKey              respjson.Field
-		Reason                    respjson.Field
-		RequestedEntitlementCodes respjson.Field
-		TradingAccountIDs         respjson.Field
-		ExtraFields               map[string]respjson.Field
-		raw                       string
+		AccountIDs       respjson.Field
+		AgreementKey     respjson.Field
+		EntitlementCodes respjson.Field
+		Reason           respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
 	} `json:"-"`
 }
 
@@ -687,24 +684,5 @@ type SuggestedActionsPayload struct {
 // Returns the unmodified JSON received from the API
 func (r SuggestedActionsPayload) RawJSON() string { return r.JSON.raw }
 func (r *SuggestedActionsPayload) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Chart for a single symbol and timeframe.
-type SymbolChart struct {
-	Symbol    string `json:"symbol" api:"required"`
-	Timeframe string `json:"timeframe" api:"nullable"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Symbol      respjson.Field
-		Timeframe   respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r SymbolChart) RawJSON() string { return r.JSON.raw }
-func (r *SymbolChart) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
