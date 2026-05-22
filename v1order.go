@@ -63,6 +63,15 @@ func (r *V1OrderService) CancelOpenOrder(ctx context.Context, orderID string, bo
 	return res, err
 }
 
+// Retrieves filled and partially-filled execution reports for the specified
+// trading account, ordered by transaction time (nanosecond precision) descending.
+func (r *V1OrderService) GetExecutions(ctx context.Context, accountID int64, query V1OrderGetExecutionsParams, opts ...option.RequestOption) (res *V1OrderGetExecutionsResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := fmt.Sprintf("v1/accounts/%v/executions", accountID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
 // Get Order By ID
 func (r *V1OrderService) GetOrderByID(ctx context.Context, orderID string, query V1OrderGetOrderByIDParams, opts ...option.RequestOption) (res *V1OrderGetOrderByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -573,6 +582,23 @@ func (r *V1OrderCancelOpenOrderResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1OrderGetExecutionsResponse struct {
+	Data ExecutionList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1OrderGetExecutionsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OrderGetExecutionsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1OrderGetOrderByIDResponse struct {
 	// A trading order with its current state and execution details.
 	//
@@ -716,6 +742,32 @@ const (
 type V1OrderCancelOpenOrderParams struct {
 	AccountID int64 `path:"account_id" api:"required" json:"-"`
 	paramObj
+}
+
+type V1OrderGetExecutionsParams struct {
+	// The start date and time for the query range, inclusive (ISO 8601 format)
+	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
+	// Optional instrument to filter by. Accepts either a symbol (e.g. `AAPL`) or an
+	// OEMS instrument UUID.
+	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" format:"uuid" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
+	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
+	// The end date and time for the query range, inclusive (ISO 8601 format)
+	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1OrderGetExecutionsParams]'s query parameters as
+// `url.Values`.
+func (r V1OrderGetExecutionsParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
 }
 
 type V1OrderGetOrderByIDParams struct {

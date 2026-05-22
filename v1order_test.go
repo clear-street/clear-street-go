@@ -75,6 +75,39 @@ func TestV1OrderCancelOpenOrder(t *testing.T) {
 	}
 }
 
+func TestV1OrderGetExecutionsWithOptionalParams(t *testing.T) {
+	t.Skip("Mock server tests are disabled")
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.Orders.GetExecutions(
+		context.TODO(),
+		0,
+		clearstreet.V1OrderGetExecutionsParams{
+			From:         clearstreet.Time(time.Now()),
+			InstrumentID: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			PageSize:     clearstreet.Int(1),
+			PageToken:    clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+			To:           clearstreet.Time(time.Now()),
+		},
+	)
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
 func TestV1OrderGetOrderByID(t *testing.T) {
 	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
