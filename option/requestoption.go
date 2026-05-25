@@ -266,11 +266,11 @@ func WithEnvironmentProduction() RequestOption {
 	return requestconfig.WithDefaultBaseURL("https://api.clearstreet.com/")
 }
 
-// WithEnvironmentStaging returns a RequestOption that sets the current
-// environment to be the "staging" environment. An environment specifies which base URL
+// WithEnvironmentDev returns a RequestOption that sets the current
+// environment to be the "dev" environment. An environment specifies which base URL
 // to use by default.
-func WithEnvironmentStaging() RequestOption {
-	return requestconfig.WithDefaultBaseURL("https://oems-api-gw.dev-public.clst.co/")
+func WithEnvironmentDev() RequestOption {
+	return requestconfig.WithDefaultBaseURL("https://api-dev.clearstreet.com/")
 }
 
 // WithAPIKey returns a RequestOption that sets the client setting "api_key".
