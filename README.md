@@ -55,7 +55,7 @@ import (
 func main() {
 	client := clearstreet.NewClient(
 		option.WithAPIKey("My API Key"),
-		option.WithEnvironmentStaging(), // defaults to option.WithEnvironmentProduction()
+		option.WithEnvironmentDev(), // defaults to option.WithEnvironmentProduction()
 	)
 	response, err := client.V1.Accounts.GetAccounts(context.TODO(), clearstreet.V1AccountGetAccountsParams{})
 	if err != nil {
