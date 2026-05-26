@@ -121,6 +121,9 @@ type Instrument struct {
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Indicates if the instrument is marginable
 	IsMarginable bool `json:"is_marginable" api:"required"`
+	// Indicates if the instrument is a publicly traded partnership (PTP). PTP sales
+	// are subject to a 10% withholding tax for non-US tax residents.
+	IsPtp bool `json:"is_ptp" api:"required"`
 	// Indicates if the instrument is restricted from trading
 	IsRestricted bool `json:"is_restricted" api:"required"`
 	// Indicates if short selling is prohibited for the instrument
@@ -167,6 +170,7 @@ type Instrument struct {
 		IsFractionable      respjson.Field
 		IsLiquidationOnly   respjson.Field
 		IsMarginable        respjson.Field
+		IsPtp               respjson.Field
 		IsRestricted        respjson.Field
 		IsShortProhibited   respjson.Field
 		IsThresholdSecurity respjson.Field
@@ -209,6 +213,9 @@ type InstrumentCore struct {
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Indicates if the instrument is marginable
 	IsMarginable bool `json:"is_marginable" api:"required"`
+	// Indicates if the instrument is a publicly traded partnership (PTP). PTP sales
+	// are subject to a 10% withholding tax for non-US tax residents.
+	IsPtp bool `json:"is_ptp" api:"required"`
 	// Indicates if the instrument is restricted from trading
 	IsRestricted bool `json:"is_restricted" api:"required"`
 	// Indicates if short selling is prohibited for the instrument
@@ -252,6 +259,7 @@ type InstrumentCore struct {
 		IsFractionable      respjson.Field
 		IsLiquidationOnly   respjson.Field
 		IsMarginable        respjson.Field
+		IsPtp               respjson.Field
 		IsRestricted        respjson.Field
 		IsShortProhibited   respjson.Field
 		IsThresholdSecurity respjson.Field
@@ -448,6 +456,8 @@ type V1InstrumentGetInstrumentsParams struct {
 	IsLiquidationOnly param.Opt[bool] `query:"is_liquidation_only,omitzero" json:"-"`
 	// Filter by marginable status
 	IsMarginable param.Opt[bool] `query:"is_marginable,omitzero" json:"-"`
+	// Filter by publicly traded partnership (PTP) status
+	IsPtp param.Opt[bool] `query:"is_ptp,omitzero" json:"-"`
 	// Filter by restricted status
 	IsRestricted param.Opt[bool] `query:"is_restricted,omitzero" json:"-"`
 	// Filter by short prohibited status
@@ -536,6 +546,9 @@ type V1InstrumentSearchInstrumentsParams struct {
 	Currency param.Opt[string] `query:"currency,omitzero" json:"-"`
 	// Include inactive instruments. Default false.
 	IncludeInactive param.Opt[bool] `query:"include_inactive,omitzero" json:"-"`
+	// Include publicly traded partnership (PTP) instruments. Default true (penalized
+	// in ranking).
+	IncludePtp param.Opt[bool] `query:"include_ptp,omitzero" json:"-"`
 	// Include restricted instruments. Default true (penalized in ranking).
 	IncludeRestricted param.Opt[bool] `query:"include_restricted,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
