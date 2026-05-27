@@ -136,6 +136,49 @@ func (r *CancelOrderRequest) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Represents a single fill of an order for an account.
+type Execution struct {
+	// Unique identifier for this execution report.
+	ID string `json:"id" api:"required" format:"uuid"`
+	// OEMS instrument identifier.
+	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
+	// Identifier of the order this execution belongs to.
+	OrderID string `json:"order_id" api:"required" format:"uuid"`
+	// Fill price.
+	Price string `json:"price" api:"required"`
+	// Filled quantity.
+	Quantity string `json:"quantity" api:"required"`
+	// Side of the fill.
+	//
+	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	Side Side `json:"side" api:"required"`
+	// Trading symbol.
+	Symbol string `json:"symbol" api:"required"`
+	// Transaction timestamp in nanosecond precision (UTC).
+	TransactionTime time.Time `json:"transaction_time" api:"required" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID              respjson.Field
+		InstrumentID    respjson.Field
+		OrderID         respjson.Field
+		Price           respjson.Field
+		Quantity        respjson.Field
+		Side            respjson.Field
+		Symbol          respjson.Field
+		TransactionTime respjson.Field
+		ExtraFields     map[string]respjson.Field
+		raw             string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Execution) RawJSON() string { return r.JSON.raw }
+func (r *Execution) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ExecutionList []Execution
+
 type InstrumentIDOrSymbol = string
 
 // Request to submit a new order (PlaceOrderRequest from spec)
