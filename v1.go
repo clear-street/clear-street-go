@@ -19,8 +19,7 @@ type V1Service struct {
 	// Endpoints for API service metadata.
 	APIVersion V1APIVersionService
 	// Access clocks and financial calendars for market sessions and events.
-	Calendar   V1CalendarService
-	Executions V1ExecutionService
+	Calendar V1CalendarService
 	// Retrieve instrument analytics, market data, news, and related reference data.
 	InstrumentData V1InstrumentDataService
 	// Retrieve core details and discovery endpoints for tradable instruments.
@@ -45,7 +44,6 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 	r.Accounts = NewV1AccountService(opts...)
 	r.APIVersion = NewV1APIVersionService(opts...)
 	r.Calendar = NewV1CalendarService(opts...)
-	r.Executions = NewV1ExecutionService(opts...)
 	r.InstrumentData = NewV1InstrumentDataService(opts...)
 	r.Instruments = NewV1InstrumentService(opts...)
 	r.OmniAI = NewV1OmniAIService(opts...)
