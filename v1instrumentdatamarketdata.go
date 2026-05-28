@@ -121,6 +121,9 @@ type MarketDataSnapshot struct {
 	// Cumulative traded volume reported on the most recent trade, in shares for
 	// equities or contracts for options. Absent when no trade is available.
 	CumulativeVolume int64 `json:"cumulative_volume" api:"nullable"`
+	// Theoretical price and Greeks for option instruments. `None` for equities, and
+	// for options whose Greeks have not yet been observed
+	Greeks SnapshotGreeks `json:"greeks" api:"nullable"`
 	// Most recent quote if available.
 	LastQuote SnapshotQuote `json:"last_quote" api:"nullable"`
 	// Most recent last-sale trade if available.
@@ -134,6 +137,7 @@ type MarketDataSnapshot struct {
 		InstrumentID     respjson.Field
 		Symbol           respjson.Field
 		CumulativeVolume respjson.Field
+		Greeks           respjson.Field
 		LastQuote        respjson.Field
 		LastTrade        respjson.Field
 		Name             respjson.Field
@@ -150,6 +154,46 @@ func (r *MarketDataSnapshot) UnmarshalJSON(data []byte) error {
 }
 
 type MarketDataSnapshotList []MarketDataSnapshot
+
+// Theoretical price and Greeks for an options snapshot. All values are **per
+// share** as published by RENG; no contract multiplier is applied.
+type SnapshotGreeks struct {
+	// Delta: ∂V/∂S, range \[-1, 1\].
+	Delta string `json:"delta" api:"required"`
+	// Gamma: ∂²V/∂S².
+	Gamma string `json:"gamma" api:"required"`
+	// Implied volatility, annualized (`0.20` == 20%).
+	Iv string `json:"iv" api:"required"`
+	// Rho per 1.0 rate point.
+	Rho string `json:"rho" api:"required"`
+	// Theoretical option price in USD per share.
+	TheoPrice string `json:"theo_price" api:"required"`
+	// Theta per trading day.
+	Theta string `json:"theta" api:"required"`
+	// Event timestamp published by RENG.
+	Timestamp time.Time `json:"timestamp" api:"required" format:"date-time"`
+	// Vega per 1.0 vol point.
+	Vega string `json:"vega" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Delta       respjson.Field
+		Gamma       respjson.Field
+		Iv          respjson.Field
+		Rho         respjson.Field
+		TheoPrice   respjson.Field
+		Theta       respjson.Field
+		Timestamp   respjson.Field
+		Vega        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SnapshotGreeks) RawJSON() string { return r.JSON.raw }
+func (r *SnapshotGreeks) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Last-trade fields for a market data snapshot.
 type SnapshotLastTrade struct {
