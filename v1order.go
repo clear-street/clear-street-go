@@ -353,7 +353,7 @@ type Order struct {
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Type of security
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// Remaining unfilled quantity
 	LeavesQuantity string `json:"leaves_quantity" api:"required"`
@@ -725,7 +725,7 @@ type V1OrderCancelAllOpenOrdersParams struct {
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType V1OrderCancelAllOpenOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Filter by order side (BUY or SELL)
 	//
@@ -752,11 +752,9 @@ func (r V1OrderCancelAllOpenOrdersParams) URLQuery() (v url.Values, err error) {
 type V1OrderCancelAllOpenOrdersParamsInstrumentType string
 
 const (
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock    V1OrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypePreferredStock V1OrderCancelAllOpenOrdersParamsInstrumentType = "PREFERRED_STOCK"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOption         V1OrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCash           V1OrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOther          V1OrderCancelAllOpenOrdersParamsInstrumentType = "OTHER"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock V1OrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOption      V1OrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCash        V1OrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
 )
 
 // Filter by order side (BUY or SELL)
@@ -838,7 +836,7 @@ type V1OrderGetOrdersParams struct {
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType V1OrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Comma-separated order statuses to filter by
 	//
@@ -861,11 +859,9 @@ func (r V1OrderGetOrdersParams) URLQuery() (v url.Values, err error) {
 type V1OrderGetOrdersParamsInstrumentType string
 
 const (
-	V1OrderGetOrdersParamsInstrumentTypeCommonStock    V1OrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
-	V1OrderGetOrdersParamsInstrumentTypePreferredStock V1OrderGetOrdersParamsInstrumentType = "PREFERRED_STOCK"
-	V1OrderGetOrdersParamsInstrumentTypeOption         V1OrderGetOrdersParamsInstrumentType = "OPTION"
-	V1OrderGetOrdersParamsInstrumentTypeCash           V1OrderGetOrdersParamsInstrumentType = "CASH"
-	V1OrderGetOrdersParamsInstrumentTypeOther          V1OrderGetOrdersParamsInstrumentType = "OTHER"
+	V1OrderGetOrdersParamsInstrumentTypeCommonStock V1OrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
+	V1OrderGetOrdersParamsInstrumentTypeOption      V1OrderGetOrdersParamsInstrumentType = "OPTION"
+	V1OrderGetOrdersParamsInstrumentTypeCash        V1OrderGetOrdersParamsInstrumentType = "CASH"
 )
 
 type V1OrderReplaceOrderParams struct {

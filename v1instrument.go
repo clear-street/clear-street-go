@@ -140,7 +140,7 @@ type Instrument struct {
 	Adv string `json:"adv" api:"nullable"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// The percent of a long position's value you must post as margin
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
@@ -226,7 +226,7 @@ type InstrumentCore struct {
 	Adv string `json:"adv" api:"nullable"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// The percent of a long position's value you must post as margin
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
@@ -460,12 +460,6 @@ type V1InstrumentGetInstrumentsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
-	// Filter by instrument type. OPTION is not supported on this endpoint; use GET
-	// /instruments/options/contracts to list option contracts. If omitted, returns all
-	// supported instrument types except options.
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType V1InstrumentGetInstrumentsParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	paramObj
 }
 
@@ -477,19 +471,6 @@ func (r V1InstrumentGetInstrumentsParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
-
-// Filter by instrument type. OPTION is not supported on this endpoint; use GET
-// /instruments/options/contracts to list option contracts. If omitted, returns all
-// supported instrument types except options.
-type V1InstrumentGetInstrumentsParamsInstrumentType string
-
-const (
-	V1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock    V1InstrumentGetInstrumentsParamsInstrumentType = "COMMON_STOCK"
-	V1InstrumentGetInstrumentsParamsInstrumentTypePreferredStock V1InstrumentGetInstrumentsParamsInstrumentType = "PREFERRED_STOCK"
-	V1InstrumentGetInstrumentsParamsInstrumentTypeOption         V1InstrumentGetInstrumentsParamsInstrumentType = "OPTION"
-	V1InstrumentGetInstrumentsParamsInstrumentTypeCash           V1InstrumentGetInstrumentsParamsInstrumentType = "CASH"
-	V1InstrumentGetInstrumentsParamsInstrumentTypeOther          V1InstrumentGetInstrumentsParamsInstrumentType = "OTHER"
-)
 
 type V1InstrumentGetOptionContractsParams struct {
 	// Filter to contracts expiring on this date (YYYY-MM-DD)
