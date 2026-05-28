@@ -124,8 +124,6 @@ type Instrument struct {
 	// Indicates if the instrument is a publicly traded partnership (PTP). PTP sales
 	// are subject to a 10% withholding tax for non-US tax residents.
 	IsPtp bool `json:"is_ptp" api:"required"`
-	// Indicates if the instrument is restricted from trading
-	IsRestricted bool `json:"is_restricted" api:"required"`
 	// Indicates if short selling is prohibited for the instrument
 	IsShortProhibited bool `json:"is_short_prohibited" api:"required"`
 	// Indicates if the instrument is on the Regulation SHO Threshold Security List
@@ -167,7 +165,6 @@ type Instrument struct {
 		IsLiquidationOnly   respjson.Field
 		IsMarginable        respjson.Field
 		IsPtp               respjson.Field
-		IsRestricted        respjson.Field
 		IsShortProhibited   respjson.Field
 		IsThresholdSecurity respjson.Field
 		IsTradable          respjson.Field
@@ -210,8 +207,6 @@ type InstrumentCore struct {
 	// Indicates if the instrument is a publicly traded partnership (PTP). PTP sales
 	// are subject to a 10% withholding tax for non-US tax residents.
 	IsPtp bool `json:"is_ptp" api:"required"`
-	// Indicates if the instrument is restricted from trading
-	IsRestricted bool `json:"is_restricted" api:"required"`
 	// Indicates if short selling is prohibited for the instrument
 	IsShortProhibited bool `json:"is_short_prohibited" api:"required"`
 	// Indicates if the instrument is on the Regulation SHO Threshold Security List
@@ -250,7 +245,6 @@ type InstrumentCore struct {
 		IsLiquidationOnly   respjson.Field
 		IsMarginable        respjson.Field
 		IsPtp               respjson.Field
-		IsRestricted        respjson.Field
 		IsShortProhibited   respjson.Field
 		IsThresholdSecurity respjson.Field
 		IsTradable          respjson.Field
@@ -307,8 +301,6 @@ type OptionsContract struct {
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Whether the contract is marginable
 	IsMarginable bool `json:"is_marginable" api:"required"`
-	// Whether the contract is restricted from trading
-	IsRestricted bool `json:"is_restricted" api:"required"`
 	// Listing type
 	//
 	// Any of "STANDARD", "FLEX", "OTC".
@@ -333,7 +325,6 @@ type OptionsContract struct {
 		Expiry                 respjson.Field
 		IsLiquidationOnly      respjson.Field
 		IsMarginable           respjson.Field
-		IsRestricted           respjson.Field
 		ListingType            respjson.Field
 		Multiplier             respjson.Field
 		StrikePrice            respjson.Field
@@ -446,8 +437,6 @@ type V1InstrumentGetInstrumentsParams struct {
 	IsMarginable param.Opt[bool] `query:"is_marginable,omitzero" json:"-"`
 	// Filter by publicly traded partnership (PTP) status
 	IsPtp param.Opt[bool] `query:"is_ptp,omitzero" json:"-"`
-	// Filter by restricted status
-	IsRestricted param.Opt[bool] `query:"is_restricted,omitzero" json:"-"`
 	// Filter by short prohibited status
 	IsShortProhibited param.Opt[bool] `query:"is_short_prohibited,omitzero" json:"-"`
 	// Filter by threshold security status
@@ -518,8 +507,6 @@ type V1InstrumentSearchInstrumentsParams struct {
 	// Include publicly traded partnership (PTP) instruments. Default true (penalized
 	// in ranking).
 	IncludePtp param.Opt[bool] `query:"include_ptp,omitzero" json:"-"`
-	// Include restricted instruments. Default true (penalized in ranking).
-	IncludeRestricted param.Opt[bool] `query:"include_restricted,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
