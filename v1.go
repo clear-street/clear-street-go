@@ -58,9 +58,7 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 type SecurityType string
 
 const (
-	SecurityTypeCommonStock    SecurityType = "COMMON_STOCK"
-	SecurityTypePreferredStock SecurityType = "PREFERRED_STOCK"
-	SecurityTypeOption         SecurityType = "OPTION"
-	SecurityTypeCash           SecurityType = "CASH"
-	SecurityTypeOther          SecurityType = "OTHER"
+	SecurityTypeCommonStock SecurityType = "COMMON_STOCK"
+	SecurityTypeOption      SecurityType = "OPTION"
+	SecurityTypeCash        SecurityType = "CASH"
 )
