@@ -138,8 +138,6 @@ type Instrument struct {
 	Venue string `json:"venue" api:"required"`
 	// Average daily share volume from the security definition.
 	Adv string `json:"adv" api:"nullable"`
-	// The expiration date for options instruments
-	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
@@ -159,8 +157,6 @@ type Instrument struct {
 	PreviousClose string `json:"previous_close" api:"nullable"`
 	// The percent of a short position's value you must post as margin
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
-	// The strike price for options instruments
-	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                  respjson.Field
@@ -178,7 +174,6 @@ type Instrument struct {
 		Symbol              respjson.Field
 		Venue               respjson.Field
 		Adv                 respjson.Field
-		Expiry              respjson.Field
 		InstrumentType      respjson.Field
 		LongMarginRate      respjson.Field
 		Name                respjson.Field
@@ -186,7 +181,6 @@ type Instrument struct {
 		OptionsExpiryDates  respjson.Field
 		PreviousClose       respjson.Field
 		ShortMarginRate     respjson.Field
-		StrikePrice         respjson.Field
 		ExtraFields         map[string]respjson.Field
 		raw                 string
 	} `json:"-"`
@@ -230,8 +224,6 @@ type InstrumentCore struct {
 	Venue string `json:"venue" api:"required"`
 	// Average daily share volume from the security definition.
 	Adv string `json:"adv" api:"nullable"`
-	// The expiration date for options instruments
-	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
 	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
@@ -248,8 +240,6 @@ type InstrumentCore struct {
 	PreviousClose string `json:"previous_close" api:"nullable"`
 	// The percent of a short position's value you must post as margin
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
-	// The strike price for options instruments
-	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                  respjson.Field
@@ -267,14 +257,12 @@ type InstrumentCore struct {
 		Symbol              respjson.Field
 		Venue               respjson.Field
 		Adv                 respjson.Field
-		Expiry              respjson.Field
 		InstrumentType      respjson.Field
 		LongMarginRate      respjson.Field
 		Name                respjson.Field
 		NotionalAdv         respjson.Field
 		PreviousClose       respjson.Field
 		ShortMarginRate     respjson.Field
-		StrikePrice         respjson.Field
 		ExtraFields         map[string]respjson.Field
 		raw                 string
 	} `json:"-"`
