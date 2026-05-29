@@ -59,6 +59,7 @@ func TestV1InstrumentGetInstrumentsWithOptionalParams(t *testing.T) {
 	_, err := client.V1.Instruments.GetInstruments(context.TODO(), clearstreet.V1InstrumentGetInstrumentsParams{
 		EasyToBorrow:        clearstreet.Bool(true),
 		InstrumentIDs:       []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+		InstrumentType:      clearstreet.V1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock,
 		IsLiquidationOnly:   clearstreet.Bool(true),
 		IsMarginable:        clearstreet.Bool(true),
 		IsPtp:               clearstreet.Bool(true),

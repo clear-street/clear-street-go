@@ -136,6 +136,8 @@ type Instrument struct {
 	Venue string `json:"venue" api:"required"`
 	// Average daily share volume from the security definition.
 	Adv string `json:"adv" api:"nullable"`
+	// The expiration date for options instruments
+	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
 	// Any of "COMMON_STOCK", "OPTION", "CASH".
@@ -155,6 +157,8 @@ type Instrument struct {
 	PreviousClose string `json:"previous_close" api:"nullable"`
 	// The percent of a short position's value you must post as margin
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
+	// The strike price for options instruments
+	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                  respjson.Field
@@ -171,6 +175,7 @@ type Instrument struct {
 		Symbol              respjson.Field
 		Venue               respjson.Field
 		Adv                 respjson.Field
+		Expiry              respjson.Field
 		InstrumentType      respjson.Field
 		LongMarginRate      respjson.Field
 		Name                respjson.Field
@@ -178,6 +183,7 @@ type Instrument struct {
 		OptionsExpiryDates  respjson.Field
 		PreviousClose       respjson.Field
 		ShortMarginRate     respjson.Field
+		StrikePrice         respjson.Field
 		ExtraFields         map[string]respjson.Field
 		raw                 string
 	} `json:"-"`
@@ -219,6 +225,8 @@ type InstrumentCore struct {
 	Venue string `json:"venue" api:"required"`
 	// Average daily share volume from the security definition.
 	Adv string `json:"adv" api:"nullable"`
+	// The expiration date for options instruments
+	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
 	// Any of "COMMON_STOCK", "OPTION", "CASH".
@@ -235,6 +243,8 @@ type InstrumentCore struct {
 	PreviousClose string `json:"previous_close" api:"nullable"`
 	// The percent of a short position's value you must post as margin
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
+	// The strike price for options instruments
+	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                  respjson.Field
@@ -251,12 +261,14 @@ type InstrumentCore struct {
 		Symbol              respjson.Field
 		Venue               respjson.Field
 		Adv                 respjson.Field
+		Expiry              respjson.Field
 		InstrumentType      respjson.Field
 		LongMarginRate      respjson.Field
 		Name                respjson.Field
 		NotionalAdv         respjson.Field
 		PreviousClose       respjson.Field
 		ShortMarginRate     respjson.Field
+		StrikePrice         respjson.Field
 		ExtraFields         map[string]respjson.Field
 		raw                 string
 	} `json:"-"`
@@ -449,6 +461,10 @@ type V1InstrumentGetInstrumentsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	// Filter by instrument type (e.g. COMMON_STOCK, OPTION)
+	//
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
+	InstrumentType V1InstrumentGetInstrumentsParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	paramObj
 }
 
@@ -460,6 +476,15 @@ func (r V1InstrumentGetInstrumentsParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter by instrument type (e.g. COMMON_STOCK, OPTION)
+type V1InstrumentGetInstrumentsParamsInstrumentType string
+
+const (
+	V1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock V1InstrumentGetInstrumentsParamsInstrumentType = "COMMON_STOCK"
+	V1InstrumentGetInstrumentsParamsInstrumentTypeOption      V1InstrumentGetInstrumentsParamsInstrumentType = "OPTION"
+	V1InstrumentGetInstrumentsParamsInstrumentTypeCash        V1InstrumentGetInstrumentsParamsInstrumentType = "CASH"
+)
 
 type V1InstrumentGetOptionContractsParams struct {
 	// Filter to contracts expiring on this date (YYYY-MM-DD)
