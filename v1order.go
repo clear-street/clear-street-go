@@ -63,6 +63,15 @@ func (r *V1OrderService) CancelOpenOrder(ctx context.Context, orderID string, bo
 	return res, err
 }
 
+// Retrieves filled and partially-filled execution reports for the specified
+// trading account, ordered by transaction time (nanosecond precision) descending.
+func (r *V1OrderService) GetExecutions(ctx context.Context, accountID int64, query V1OrderGetExecutionsParams, opts ...option.RequestOption) (res *V1OrderGetExecutionsResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := fmt.Sprintf("v1/accounts/%v/executions", accountID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
 // Get Order By ID
 func (r *V1OrderService) GetOrderByID(ctx context.Context, orderID string, query V1OrderGetOrderByIDParams, opts ...option.RequestOption) (res *V1OrderGetOrderByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -127,14 +136,53 @@ func (r *CancelOrderRequest) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Represents a single fill of an order for an account.
+type Execution struct {
+	// Unique identifier for this execution report.
+	ID string `json:"id" api:"required" format:"uuid"`
+	// OEMS instrument identifier.
+	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
+	// Identifier of the order this execution belongs to.
+	OrderID string `json:"order_id" api:"required" format:"uuid"`
+	// Fill price.
+	Price string `json:"price" api:"required"`
+	// Filled quantity.
+	Quantity string `json:"quantity" api:"required"`
+	// Side of the fill.
+	//
+	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	Side Side `json:"side" api:"required"`
+	// Trading symbol.
+	Symbol string `json:"symbol" api:"required"`
+	// Transaction timestamp in nanosecond precision (UTC).
+	TransactionTime time.Time `json:"transaction_time" api:"required" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID              respjson.Field
+		InstrumentID    respjson.Field
+		OrderID         respjson.Field
+		Price           respjson.Field
+		Quantity        respjson.Field
+		Side            respjson.Field
+		Symbol          respjson.Field
+		TransactionTime respjson.Field
+		ExtraFields     map[string]respjson.Field
+		raw             string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Execution) RawJSON() string { return r.JSON.raw }
+func (r *Execution) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type ExecutionList []Execution
+
 type InstrumentIDOrSymbol = string
 
 // Request to submit a new order (PlaceOrderRequest from spec)
 type NewOrderRequest struct {
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// Type of order
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
@@ -168,8 +216,7 @@ type NewOrderRequest struct {
 	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// Limit price (required for LIMIT and STOP_LIMIT orders)
 	LimitPrice string `json:"limit_price" api:"nullable"`
-	// Required when instrument_type is OPTION. Specifies whether the order opens or
-	// closes a position.
+	// Required for options. Specifies whether the order opens or closes a position.
 	//
 	// Any of "OPEN", "CLOSE".
 	PositionEffect PositionEffect `json:"position_effect"`
@@ -187,7 +234,6 @@ type NewOrderRequest struct {
 	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		InstrumentType     respjson.Field
 		OrderType          respjson.Field
 		Quantity           respjson.Field
 		Side               respjson.Field
@@ -225,13 +271,8 @@ func (r NewOrderRequest) ToParam() NewOrderRequestParam {
 
 // Request to submit a new order (PlaceOrderRequest from spec)
 //
-// The properties InstrumentType, OrderType, Quantity, Side, TimeInForce are
-// required.
+// The properties OrderType, Quantity, Side, TimeInForce are required.
 type NewOrderRequestParam struct {
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType SecurityType `json:"instrument_type,omitzero" api:"required"`
 	// Type of order
 	//
 	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
@@ -273,8 +314,7 @@ type NewOrderRequestParam struct {
 	TrailingOffset param.Opt[string] `json:"trailing_offset,omitzero"`
 	// OEMS instrument UUID
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `json:"instrument_id,omitzero" format:"uuid"`
-	// Required when instrument_type is OPTION. Specifies whether the order opens or
-	// closes a position.
+	// Required for options. Specifies whether the order opens or closes a position.
 	//
 	// Any of "OPEN", "CLOSE".
 	PositionEffect PositionEffect `json:"position_effect,omitzero"`
@@ -313,7 +353,7 @@ type Order struct {
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Type of security
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// Remaining unfilled quantity
 	LeavesQuantity string `json:"leaves_quantity" api:"required"`
@@ -585,6 +625,23 @@ func (r *V1OrderCancelOpenOrderResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1OrderGetExecutionsResponse struct {
+	Data ExecutionList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1OrderGetExecutionsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OrderGetExecutionsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1OrderGetOrderByIDResponse struct {
 	// A trading order with its current state and execution details.
 	//
@@ -668,7 +725,7 @@ type V1OrderCancelAllOpenOrdersParams struct {
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType V1OrderCancelAllOpenOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Filter by order side (BUY or SELL)
 	//
@@ -686,7 +743,7 @@ type V1OrderCancelAllOpenOrdersParams struct {
 // `url.Values`.
 func (r V1OrderCancelAllOpenOrdersParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -695,11 +752,9 @@ func (r V1OrderCancelAllOpenOrdersParams) URLQuery() (v url.Values, err error) {
 type V1OrderCancelAllOpenOrdersParamsInstrumentType string
 
 const (
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock    V1OrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypePreferredStock V1OrderCancelAllOpenOrdersParamsInstrumentType = "PREFERRED_STOCK"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOption         V1OrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCash           V1OrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOther          V1OrderCancelAllOpenOrdersParamsInstrumentType = "OTHER"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock V1OrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOption      V1OrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCash        V1OrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
 )
 
 // Filter by order side (BUY or SELL)
@@ -730,6 +785,32 @@ type V1OrderCancelOpenOrderParams struct {
 	paramObj
 }
 
+type V1OrderGetExecutionsParams struct {
+	// The start date and time for the query range, inclusive (ISO 8601 format)
+	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
+	// Optional instrument to filter by. Accepts either a symbol (e.g. `AAPL`) or an
+	// OEMS instrument UUID.
+	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" format:"uuid" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
+	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
+	// The end date and time for the query range, inclusive (ISO 8601 format)
+	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1OrderGetExecutionsParams]'s query parameters as
+// `url.Values`.
+func (r V1OrderGetExecutionsParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
 type V1OrderGetOrderByIDParams struct {
 	AccountID int64 `path:"account_id" api:"required" json:"-"`
 	paramObj
@@ -737,23 +818,22 @@ type V1OrderGetOrderByIDParams struct {
 
 type V1OrderGetOrdersParams struct {
 	// The start date and time for the query range, inclusive (ISO 8601 format)
-	From     param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
-	PageSize param.Opt[int64]     `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Filter by symbol
 	Symbol param.Opt[string] `query:"symbol,omitzero" json:"-"`
 	// The end date and time for the query range, inclusive (ISO 8601 format)
 	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
-	// Comma-separated OEMS instrument UUIDs. Matches options orders whose resolved
-	// underlier is any of the given IDs.
-	UnderlyingInstrumentIDs param.Opt[string] `query:"underlying_instrument_ids,omitzero" json:"-"`
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType V1OrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Comma-separated order statuses to filter by
 	//
@@ -761,13 +841,16 @@ type V1OrderGetOrdersParams struct {
 	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
 	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
 	Status []string `query:"status,omitzero" json:"-"`
+	// Comma-separated OEMS instrument UUIDs. Matches options orders whose resolved
+	// underlier is any of the given IDs.
+	UnderlyingInstrumentIDs []string `query:"underlying_instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
 // URLQuery serializes [V1OrderGetOrdersParams]'s query parameters as `url.Values`.
 func (r V1OrderGetOrdersParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -776,11 +859,9 @@ func (r V1OrderGetOrdersParams) URLQuery() (v url.Values, err error) {
 type V1OrderGetOrdersParamsInstrumentType string
 
 const (
-	V1OrderGetOrdersParamsInstrumentTypeCommonStock    V1OrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
-	V1OrderGetOrdersParamsInstrumentTypePreferredStock V1OrderGetOrdersParamsInstrumentType = "PREFERRED_STOCK"
-	V1OrderGetOrdersParamsInstrumentTypeOption         V1OrderGetOrdersParamsInstrumentType = "OPTION"
-	V1OrderGetOrdersParamsInstrumentTypeCash           V1OrderGetOrdersParamsInstrumentType = "CASH"
-	V1OrderGetOrdersParamsInstrumentTypeOther          V1OrderGetOrdersParamsInstrumentType = "OTHER"
+	V1OrderGetOrdersParamsInstrumentTypeCommonStock V1OrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
+	V1OrderGetOrdersParamsInstrumentTypeOption      V1OrderGetOrdersParamsInstrumentType = "OPTION"
+	V1OrderGetOrdersParamsInstrumentTypeCash        V1OrderGetOrdersParamsInstrumentType = "CASH"
 )
 
 type V1OrderReplaceOrderParams struct {
@@ -873,12 +954,8 @@ func (r *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest) UnmarshalJSON(da
 
 // A single leg in a multileg strategy request.
 //
-// The properties InstrumentType, Ratio, Security, Side are required.
+// The properties Ratio, Security, Side are required.
 type V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
-	// Security type for the leg.
-	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
-	InstrumentType SecurityType `json:"instrument_type,omitzero" api:"required"`
 	// Ratio for the leg.
 	Ratio string `json:"ratio" api:"required"`
 	// Trading symbol (e.g. "AAPL" or OSI symbol for options)

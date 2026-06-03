@@ -23,7 +23,7 @@ import (
 // conversations, poll response objects for in-progress output, and read finalized
 // messages from thread history. Thread/message/response endpoints require an
 // explicit account_id. Entitlement endpoints are caller-scoped and use
-// trading_account_ids.
+// account_ids.
 //
 // V1OmniAIMessageService contains methods and other services that help with
 // interacting with the clear-street API.
@@ -139,7 +139,7 @@ type V1OmniAIMessageGetMessageByIDParams struct {
 // `url.Values`.
 func (r V1OmniAIMessageGetMessageByIDParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

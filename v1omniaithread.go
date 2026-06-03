@@ -24,7 +24,7 @@ import (
 // conversations, poll response objects for in-progress output, and read finalized
 // messages from thread history. Thread/message/response endpoints require an
 // explicit account_id. Entitlement endpoints are caller-scoped and use
-// trading_account_ids.
+// account_ids.
 //
 // V1OmniAIThreadService contains methods and other services that help with
 // interacting with the clear-street API.
@@ -85,9 +85,10 @@ func (r *V1OmniAIThreadService) NewThread(ctx context.Context, body V1OmniAIThre
 
 // List finalized messages in a thread.
 //
-// Returns **finalized** messages in chronological order. Messages from in-progress
-// assistant turns are excluded — use `GET /omni-ai/threads/{thread_id}/response`
-// or `GET /omni-ai/responses/{response_id}` for live output.
+// Returns the latest page of **finalized** messages by default, with messages
+// within each page ordered chronologically. Messages from in-progress assistant
+// turns are excluded — use `GET /omni-ai/threads/{thread_id}/response` or
+// `GET /omni-ai/responses/{response_id}` for live output.
 //
 // If the last finalized message has role `USER`, an active response likely exists
 // and should be polled separately.
@@ -248,18 +249,20 @@ func (r *MessageContent) UnmarshalJSON(data []byte) error {
 }
 
 // MessageContentPartUnion contains all possible properties and values from
-// [MessageContentPartObject], [MessageContentPartObject2],
-// [MessageContentPartObject3], [MessageContentPartObject4],
-// [MessageContentPartObject5].
+// [MessageContentPartContentPartText],
+// [MessageContentPartContentPartStructuredAction],
+// [MessageContentPartContentPartChart],
+// [MessageContentPartContentPartSuggestedActions],
+// [MessageContentPartContentPartCustom].
 //
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type MessageContentPartUnion struct {
-	// This field is from variant [MessageContentPartObject].
+	// This field is from variant [MessageContentPartContentPartText].
 	Text string `json:"text"`
 	Type string `json:"type"`
-	// This field is from variant [MessageContentPartObject2].
+	// This field is from variant [MessageContentPartContentPartStructuredAction].
 	Action StructuredActionUnion `json:"action"`
-	// This field is from variant [MessageContentPartObject2].
+	// This field is from variant [MessageContentPartContentPartStructuredAction].
 	ActionID string `json:"action_id"`
 	// This field is a union of [ChartPayload], [SuggestedActionsPayload], [any]
 	Payload MessageContentPartUnionPayload `json:"payload"`
@@ -273,27 +276,27 @@ type MessageContentPartUnion struct {
 	} `json:"-"`
 }
 
-func (u MessageContentPartUnion) AsMessageContentPartObject() (v MessageContentPartObject) {
+func (u MessageContentPartUnion) AsContentPartText() (v MessageContentPartContentPartText) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u MessageContentPartUnion) AsMessageContentPartObject2() (v MessageContentPartObject2) {
+func (u MessageContentPartUnion) AsContentPartStructuredAction() (v MessageContentPartContentPartStructuredAction) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u MessageContentPartUnion) AsMessageContentPartObject3() (v MessageContentPartObject3) {
+func (u MessageContentPartUnion) AsContentPartChart() (v MessageContentPartContentPartChart) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u MessageContentPartUnion) AsMessageContentPartObject4() (v MessageContentPartObject4) {
+func (u MessageContentPartUnion) AsContentPartSuggestedActions() (v MessageContentPartContentPartSuggestedActions) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u MessageContentPartUnion) AsMessageContentPartObject5() (v MessageContentPartObject5) {
+func (u MessageContentPartUnion) AsContentPartCustom() (v MessageContentPartContentPartCustom) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
@@ -322,14 +325,11 @@ type MessageContentPartUnionPayload struct {
 	ActionButtons []ActionButton `json:"actionButtons"`
 	// This field is from variant [ChartPayload].
 	DataChart DataChart `json:"dataChart"`
-	// This field is from variant [ChartPayload].
-	SymbolChart SymbolChart `json:"symbolChart"`
-	JSON        struct {
+	JSON      struct {
 		OfContentPartCustomPayloadPayload respjson.Field
 		ChartID                           respjson.Field
 		ActionButtons                     respjson.Field
 		DataChart                         respjson.Field
-		SymbolChart                       respjson.Field
 		raw                               string
 	} `json:"-"`
 }
@@ -339,7 +339,7 @@ func (r *MessageContentPartUnionPayload) UnmarshalJSON(data []byte) error {
 }
 
 // Text content part.
-type MessageContentPartObject struct {
+type MessageContentPartContentPartText struct {
 	// Any of "text".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -352,13 +352,13 @@ type MessageContentPartObject struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r MessageContentPartObject) RawJSON() string { return r.JSON.raw }
-func (r *MessageContentPartObject) UnmarshalJSON(data []byte) error {
+func (r MessageContentPartContentPartText) RawJSON() string { return r.JSON.raw }
+func (r *MessageContentPartContentPartText) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Structured action content part.
-type MessageContentPartObject2 struct {
+type MessageContentPartContentPartStructuredAction struct {
 	// Any of "structured_action".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -371,13 +371,13 @@ type MessageContentPartObject2 struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r MessageContentPartObject2) RawJSON() string { return r.JSON.raw }
-func (r *MessageContentPartObject2) UnmarshalJSON(data []byte) error {
+func (r MessageContentPartContentPartStructuredAction) RawJSON() string { return r.JSON.raw }
+func (r *MessageContentPartContentPartStructuredAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Chart payload content part.
-type MessageContentPartObject3 struct {
+type MessageContentPartContentPartChart struct {
 	// Any of "chart".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -390,13 +390,13 @@ type MessageContentPartObject3 struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r MessageContentPartObject3) RawJSON() string { return r.JSON.raw }
-func (r *MessageContentPartObject3) UnmarshalJSON(data []byte) error {
+func (r MessageContentPartContentPartChart) RawJSON() string { return r.JSON.raw }
+func (r *MessageContentPartContentPartChart) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Suggested actions payload content part.
-type MessageContentPartObject4 struct {
+type MessageContentPartContentPartSuggestedActions struct {
 	// Any of "suggested_actions".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -409,13 +409,13 @@ type MessageContentPartObject4 struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r MessageContentPartObject4) RawJSON() string { return r.JSON.raw }
-func (r *MessageContentPartObject4) UnmarshalJSON(data []byte) error {
+func (r MessageContentPartContentPartSuggestedActions) RawJSON() string { return r.JSON.raw }
+func (r *MessageContentPartContentPartSuggestedActions) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Escape-hatch custom payload content part.
-type MessageContentPartObject5 struct {
+type MessageContentPartContentPartCustom struct {
 	// Any of "custom".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -428,8 +428,8 @@ type MessageContentPartObject5 struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r MessageContentPartObject5) RawJSON() string { return r.JSON.raw }
-func (r *MessageContentPartObject5) UnmarshalJSON(data []byte) error {
+func (r MessageContentPartContentPartCustom) RawJSON() string { return r.JSON.raw }
+func (r *MessageContentPartContentPartCustom) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -660,10 +660,12 @@ func init() {
 
 type V1OmniAIThreadGetMessagesParams struct {
 	// Account ID for the request
-	AccountID int64            `query:"account_id" api:"required" json:"-"`
-	PageSize  param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	paramObj
 }
@@ -672,7 +674,7 @@ type V1OmniAIThreadGetMessagesParams struct {
 // `url.Values`.
 func (r V1OmniAIThreadGetMessagesParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -687,7 +689,7 @@ type V1OmniAIThreadGetThreadByIDParams struct {
 // `url.Values`.
 func (r V1OmniAIThreadGetThreadByIDParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -702,17 +704,19 @@ type V1OmniAIThreadGetThreadResponseParams struct {
 // as `url.Values`.
 func (r V1OmniAIThreadGetThreadResponseParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
 type V1OmniAIThreadGetThreadsParams struct {
 	// Account ID for the request
-	AccountID int64            `query:"account_id" api:"required" json:"-"`
-	PageSize  param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	paramObj
 }
@@ -721,7 +725,7 @@ type V1OmniAIThreadGetThreadsParams struct {
 // `url.Values`.
 func (r V1OmniAIThreadGetThreadsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

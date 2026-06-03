@@ -23,7 +23,7 @@ import (
 // conversations, poll response objects for in-progress output, and read finalized
 // messages from thread history. Thread/message/response endpoints require an
 // explicit account_id. Entitlement endpoints are caller-scoped and use
-// trading_account_ids.
+// account_ids.
 //
 // V1OmniAIEntitlementService contains methods and other services that help with
 // interacting with the clear-street API.
@@ -98,13 +98,6 @@ func (r *DeleteEntitlementResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Stable entitlement agreement family key.
-type EntitlementAgreementKey string
-
-const (
-	EntitlementAgreementKeyOmniAccountDataAccess EntitlementAgreementKey = "omni_account_data_access"
-)
-
 type EntitlementAgreementResource struct {
 	AgreementID string `json:"agreement_id" api:"required"`
 	// Stable entitlement agreement family key.
@@ -137,13 +130,6 @@ func (r *EntitlementAgreementResource) UnmarshalJSON(data []byte) error {
 }
 
 type EntitlementAgreementResourceList []EntitlementAgreementResource
-
-// Stable entitlement code granted by an agreement.
-type EntitlementCode string
-
-const (
-	EntitlementCodeOmniAccountData EntitlementCode = "omni.account_data"
-)
 
 type EntitlementResource struct {
 	AgreementID string `json:"agreement_id" api:"required"`
@@ -243,9 +229,9 @@ func (r *V1OmniAIEntitlementGetEntitlementsResponse) UnmarshalJSON(data []byte) 
 }
 
 type V1OmniAIEntitlementNewEntitlementsParams struct {
-	AgreementID               string            `json:"agreement_id" api:"required"`
-	RequestedEntitlementCodes []EntitlementCode `json:"requested_entitlement_codes,omitzero" api:"required"`
-	TradingAccountIDs         []int64           `json:"trading_account_ids,omitzero" api:"required"`
+	AccountIDs       []int64           `json:"account_ids,omitzero" api:"required"`
+	AgreementID      string            `json:"agreement_id" api:"required"`
+	EntitlementCodes []EntitlementCode `json:"entitlement_codes,omitzero" api:"required"`
 	paramObj
 }
 
@@ -266,7 +252,7 @@ type V1OmniAIEntitlementGetEntitlementsParams struct {
 // parameters as `url.Values`.
 func (r V1OmniAIEntitlementGetEntitlementsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

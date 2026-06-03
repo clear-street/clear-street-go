@@ -62,7 +62,7 @@ func TestV1InstrumentGetInstrumentsWithOptionalParams(t *testing.T) {
 		InstrumentType:      clearstreet.V1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock,
 		IsLiquidationOnly:   clearstreet.Bool(true),
 		IsMarginable:        clearstreet.Bool(true),
-		IsRestricted:        clearstreet.Bool(true),
+		IsPtp:               clearstreet.Bool(true),
 		IsShortProhibited:   clearstreet.Bool(true),
 		IsThresholdSecurity: clearstreet.Bool(true),
 		PageSize:            clearstreet.Int(1),
@@ -121,14 +121,14 @@ func TestV1InstrumentSearchInstrumentsWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.Instruments.SearchInstruments(context.TODO(), clearstreet.V1InstrumentSearchInstrumentsParams{
-		Q:                 "q",
-		AssetClass:        clearstreet.String("asset_class"),
-		Country:           clearstreet.String("country"),
-		Currency:          clearstreet.String("currency"),
-		IncludeInactive:   clearstreet.Bool(true),
-		IncludeRestricted: clearstreet.Bool(true),
-		PageSize:          clearstreet.Int(1),
-		PageToken:         clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+		Q:               "q",
+		AssetClass:      clearstreet.String("asset_class"),
+		Country:         clearstreet.String("country"),
+		Currency:        clearstreet.String("currency"),
+		IncludeInactive: clearstreet.Bool(true),
+		IncludePtp:      clearstreet.Bool(true),
+		PageSize:        clearstreet.Int(1),
+		PageToken:       clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

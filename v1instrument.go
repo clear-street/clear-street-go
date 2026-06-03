@@ -115,12 +115,15 @@ type Instrument struct {
 	Currency string `json:"currency" api:"required"`
 	// Indicates if the instrument is classified as Easy-To-Borrow
 	EasyToBorrow bool `json:"easy_to_borrow" api:"required"`
+	// Indicates if the instrument supports fractional-quantity orders
+	IsFractionable bool `json:"is_fractionable" api:"required"`
 	// Indicates if the instrument is liquidation only and cannot be bought
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Indicates if the instrument is marginable
 	IsMarginable bool `json:"is_marginable" api:"required"`
-	// Indicates if the instrument is restricted from trading
-	IsRestricted bool `json:"is_restricted" api:"required"`
+	// Indicates if the instrument is a publicly traded partnership (PTP). PTP sales
+	// are subject to a 10% withholding tax for non-US tax residents.
+	IsPtp bool `json:"is_ptp" api:"required"`
 	// Indicates if short selling is prohibited for the instrument
 	IsShortProhibited bool `json:"is_short_prohibited" api:"required"`
 	// Indicates if the instrument is on the Regulation SHO Threshold Security List
@@ -137,7 +140,7 @@ type Instrument struct {
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// The percent of a long position's value you must post as margin
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
@@ -162,9 +165,10 @@ type Instrument struct {
 		CountryOfIssue      respjson.Field
 		Currency            respjson.Field
 		EasyToBorrow        respjson.Field
+		IsFractionable      respjson.Field
 		IsLiquidationOnly   respjson.Field
 		IsMarginable        respjson.Field
-		IsRestricted        respjson.Field
+		IsPtp               respjson.Field
 		IsShortProhibited   respjson.Field
 		IsThresholdSecurity respjson.Field
 		IsTradable          respjson.Field
@@ -200,12 +204,15 @@ type InstrumentCore struct {
 	Currency string `json:"currency" api:"required"`
 	// Indicates if the instrument is classified as Easy-To-Borrow
 	EasyToBorrow bool `json:"easy_to_borrow" api:"required"`
+	// Indicates if the instrument supports fractional-quantity orders
+	IsFractionable bool `json:"is_fractionable" api:"required"`
 	// Indicates if the instrument is liquidation only and cannot be bought
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Indicates if the instrument is marginable
 	IsMarginable bool `json:"is_marginable" api:"required"`
-	// Indicates if the instrument is restricted from trading
-	IsRestricted bool `json:"is_restricted" api:"required"`
+	// Indicates if the instrument is a publicly traded partnership (PTP). PTP sales
+	// are subject to a 10% withholding tax for non-US tax residents.
+	IsPtp bool `json:"is_ptp" api:"required"`
 	// Indicates if short selling is prohibited for the instrument
 	IsShortProhibited bool `json:"is_short_prohibited" api:"required"`
 	// Indicates if the instrument is on the Regulation SHO Threshold Security List
@@ -222,7 +229,7 @@ type InstrumentCore struct {
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// The percent of a long position's value you must post as margin
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
@@ -244,9 +251,10 @@ type InstrumentCore struct {
 		CountryOfIssue      respjson.Field
 		Currency            respjson.Field
 		EasyToBorrow        respjson.Field
+		IsFractionable      respjson.Field
 		IsLiquidationOnly   respjson.Field
 		IsMarginable        respjson.Field
-		IsRestricted        respjson.Field
+		IsPtp               respjson.Field
 		IsShortProhibited   respjson.Field
 		IsThresholdSecurity respjson.Field
 		IsTradable          respjson.Field
@@ -305,8 +313,6 @@ type OptionsContract struct {
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Whether the contract is marginable
 	IsMarginable bool `json:"is_marginable" api:"required"`
-	// Whether the contract is restricted from trading
-	IsRestricted bool `json:"is_restricted" api:"required"`
 	// Listing type
 	//
 	// Any of "STANDARD", "FLEX", "OTC".
@@ -331,7 +337,6 @@ type OptionsContract struct {
 		Expiry                 respjson.Field
 		IsLiquidationOnly      respjson.Field
 		IsMarginable           respjson.Field
-		IsRestricted           respjson.Field
 		ListingType            respjson.Field
 		Multiplier             respjson.Field
 		StrikePrice            respjson.Field
@@ -430,7 +435,7 @@ type V1InstrumentGetInstrumentByIDParams struct {
 // `url.Values`.
 func (r V1InstrumentGetInstrumentByIDParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -442,23 +447,23 @@ type V1InstrumentGetInstrumentsParams struct {
 	IsLiquidationOnly param.Opt[bool] `query:"is_liquidation_only,omitzero" json:"-"`
 	// Filter by marginable status
 	IsMarginable param.Opt[bool] `query:"is_marginable,omitzero" json:"-"`
-	// Filter by restricted status
-	IsRestricted param.Opt[bool] `query:"is_restricted,omitzero" json:"-"`
+	// Filter by publicly traded partnership (PTP) status
+	IsPtp param.Opt[bool] `query:"is_ptp,omitzero" json:"-"`
 	// Filter by short prohibited status
 	IsShortProhibited param.Opt[bool] `query:"is_short_prohibited,omitzero" json:"-"`
 	// Filter by threshold security status
-	IsThresholdSecurity param.Opt[bool]  `query:"is_threshold_security,omitzero" json:"-"`
-	PageSize            param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	IsThresholdSecurity param.Opt[bool] `query:"is_threshold_security,omitzero" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
-	// Filter by instrument type. OPTION is not supported on this endpoint; use GET
-	// /instruments/options/contracts to list option contracts. If omitted, returns all
-	// supported instrument types except options.
+	// Filter by instrument type (e.g. COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "PREFERRED_STOCK", "OPTION", "CASH", "OTHER".
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType V1InstrumentGetInstrumentsParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	paramObj
 }
@@ -467,30 +472,28 @@ type V1InstrumentGetInstrumentsParams struct {
 // `url.Values`.
 func (r V1InstrumentGetInstrumentsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
 
-// Filter by instrument type. OPTION is not supported on this endpoint; use GET
-// /instruments/options/contracts to list option contracts. If omitted, returns all
-// supported instrument types except options.
+// Filter by instrument type (e.g. COMMON_STOCK, OPTION)
 type V1InstrumentGetInstrumentsParamsInstrumentType string
 
 const (
-	V1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock    V1InstrumentGetInstrumentsParamsInstrumentType = "COMMON_STOCK"
-	V1InstrumentGetInstrumentsParamsInstrumentTypePreferredStock V1InstrumentGetInstrumentsParamsInstrumentType = "PREFERRED_STOCK"
-	V1InstrumentGetInstrumentsParamsInstrumentTypeOption         V1InstrumentGetInstrumentsParamsInstrumentType = "OPTION"
-	V1InstrumentGetInstrumentsParamsInstrumentTypeCash           V1InstrumentGetInstrumentsParamsInstrumentType = "CASH"
-	V1InstrumentGetInstrumentsParamsInstrumentTypeOther          V1InstrumentGetInstrumentsParamsInstrumentType = "OTHER"
+	V1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock V1InstrumentGetInstrumentsParamsInstrumentType = "COMMON_STOCK"
+	V1InstrumentGetInstrumentsParamsInstrumentTypeOption      V1InstrumentGetInstrumentsParamsInstrumentType = "OPTION"
+	V1InstrumentGetInstrumentsParamsInstrumentTypeCash        V1InstrumentGetInstrumentsParamsInstrumentType = "CASH"
 )
 
 type V1InstrumentGetOptionContractsParams struct {
 	// Filter to contracts expiring on this date (YYYY-MM-DD)
-	Expiry   param.Opt[time.Time] `query:"expiry,omitzero" format:"date" json:"-"`
-	PageSize param.Opt[int64]     `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	Expiry param.Opt[time.Time] `query:"expiry,omitzero" format:"date" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Underlier symbol (e.g., AAPL, SPX)
 	Underlier param.Opt[string] `query:"underlier,omitzero" json:"-"`
@@ -507,7 +510,7 @@ type V1InstrumentGetOptionContractsParams struct {
 // `url.Values`.
 func (r V1InstrumentGetOptionContractsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -526,11 +529,14 @@ type V1InstrumentSearchInstrumentsParams struct {
 	Currency param.Opt[string] `query:"currency,omitzero" json:"-"`
 	// Include inactive instruments. Default false.
 	IncludeInactive param.Opt[bool] `query:"include_inactive,omitzero" json:"-"`
-	// Include restricted instruments. Default true (penalized in ranking).
-	IncludeRestricted param.Opt[bool]  `query:"include_restricted,omitzero" json:"-"`
-	PageSize          param.Opt[int64] `query:"page_size,omitzero" json:"-"`
-	// Token for retrieving the next page of results. Contains encoded pagination state
-	// (limit + offset). When provided, page_size is ignored.
+	// Include publicly traded partnership (PTP) instruments. Default true (penalized
+	// in ranking).
+	IncludePtp param.Opt[bool] `query:"include_ptp,omitzero" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	paramObj
 }
@@ -539,7 +545,7 @@ type V1InstrumentSearchInstrumentsParams struct {
 // `url.Values`.
 func (r V1InstrumentSearchInstrumentsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
