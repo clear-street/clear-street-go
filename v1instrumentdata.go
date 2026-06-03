@@ -1206,7 +1206,7 @@ type V1InstrumentDataGetAllInstrumentEventsParams struct {
 // parameters as `url.Values`.
 func (r V1InstrumentDataGetAllInstrumentEventsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -1223,7 +1223,7 @@ type V1InstrumentDataGetInstrumentAnalystConsensusParams struct {
 // query parameters as `url.Values`.
 func (r V1InstrumentDataGetInstrumentAnalystConsensusParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -1247,7 +1247,7 @@ type V1InstrumentDataGetInstrumentBalanceSheetStatementsParams struct {
 // as `url.Values`.
 func (r V1InstrumentDataGetInstrumentBalanceSheetStatementsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -1270,7 +1270,7 @@ type V1InstrumentDataGetInstrumentCashFlowStatementsParams struct {
 // query parameters as `url.Values`.
 func (r V1InstrumentDataGetInstrumentCashFlowStatementsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -1287,7 +1287,7 @@ type V1InstrumentDataGetInstrumentEventsParams struct {
 // parameters as `url.Values`.
 func (r V1InstrumentDataGetInstrumentEventsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -1310,7 +1310,7 @@ type V1InstrumentDataGetInstrumentIncomeStatementsParams struct {
 // query parameters as `url.Values`.
 func (r V1InstrumentDataGetInstrumentIncomeStatementsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

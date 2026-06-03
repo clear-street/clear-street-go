@@ -170,20 +170,22 @@ func (r *ResponseContent) UnmarshalJSON(data []byte) error {
 }
 
 // ResponseContentPartUnion contains all possible properties and values from
-// [ResponseContentPartObject], [ResponseContentPartObject2],
-// [ResponseContentPartObject3], [ResponseContentPartObject4],
-// [ResponseContentPartObject5], [ResponseContentPartObject6].
+// [ResponseContentPartContentPartText], [ResponseContentPartContentPartThinking],
+// [ResponseContentPartContentPartStructuredAction],
+// [ResponseContentPartContentPartChart],
+// [ResponseContentPartContentPartSuggestedActions],
+// [ResponseContentPartContentPartCustom].
 //
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type ResponseContentPartUnion struct {
-	// This field is from variant [ResponseContentPartObject].
+	// This field is from variant [ResponseContentPartContentPartText].
 	Text string `json:"text"`
 	Type string `json:"type"`
-	// This field is from variant [ResponseContentPartObject2].
+	// This field is from variant [ResponseContentPartContentPartThinking].
 	Thoughts []string `json:"thoughts"`
-	// This field is from variant [ResponseContentPartObject3].
+	// This field is from variant [ResponseContentPartContentPartStructuredAction].
 	Action StructuredActionUnion `json:"action"`
-	// This field is from variant [ResponseContentPartObject3].
+	// This field is from variant [ResponseContentPartContentPartStructuredAction].
 	ActionID string `json:"action_id"`
 	// This field is a union of [ChartPayload], [SuggestedActionsPayload], [any]
 	Payload ResponseContentPartUnionPayload `json:"payload"`
@@ -198,32 +200,32 @@ type ResponseContentPartUnion struct {
 	} `json:"-"`
 }
 
-func (u ResponseContentPartUnion) AsResponseContentPartObject() (v ResponseContentPartObject) {
+func (u ResponseContentPartUnion) AsContentPartText() (v ResponseContentPartContentPartText) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u ResponseContentPartUnion) AsResponseContentPartObject2() (v ResponseContentPartObject2) {
+func (u ResponseContentPartUnion) AsContentPartThinking() (v ResponseContentPartContentPartThinking) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u ResponseContentPartUnion) AsResponseContentPartObject3() (v ResponseContentPartObject3) {
+func (u ResponseContentPartUnion) AsContentPartStructuredAction() (v ResponseContentPartContentPartStructuredAction) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u ResponseContentPartUnion) AsResponseContentPartObject4() (v ResponseContentPartObject4) {
+func (u ResponseContentPartUnion) AsContentPartChart() (v ResponseContentPartContentPartChart) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u ResponseContentPartUnion) AsResponseContentPartObject5() (v ResponseContentPartObject5) {
+func (u ResponseContentPartUnion) AsContentPartSuggestedActions() (v ResponseContentPartContentPartSuggestedActions) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
 
-func (u ResponseContentPartUnion) AsResponseContentPartObject6() (v ResponseContentPartObject6) {
+func (u ResponseContentPartUnion) AsContentPartCustom() (v ResponseContentPartContentPartCustom) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
@@ -266,7 +268,7 @@ func (r *ResponseContentPartUnionPayload) UnmarshalJSON(data []byte) error {
 }
 
 // Text content part.
-type ResponseContentPartObject struct {
+type ResponseContentPartContentPartText struct {
 	// Any of "text".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -279,13 +281,13 @@ type ResponseContentPartObject struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject) UnmarshalJSON(data []byte) error {
+func (r ResponseContentPartContentPartText) RawJSON() string { return r.JSON.raw }
+func (r *ResponseContentPartContentPartText) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Thinking content part shown on dynamic response polling.
-type ResponseContentPartObject2 struct {
+type ResponseContentPartContentPartThinking struct {
 	// Any of "thinking".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -298,13 +300,13 @@ type ResponseContentPartObject2 struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject2) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject2) UnmarshalJSON(data []byte) error {
+func (r ResponseContentPartContentPartThinking) RawJSON() string { return r.JSON.raw }
+func (r *ResponseContentPartContentPartThinking) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Structured action content part.
-type ResponseContentPartObject3 struct {
+type ResponseContentPartContentPartStructuredAction struct {
 	// Any of "structured_action".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -317,13 +319,13 @@ type ResponseContentPartObject3 struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject3) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject3) UnmarshalJSON(data []byte) error {
+func (r ResponseContentPartContentPartStructuredAction) RawJSON() string { return r.JSON.raw }
+func (r *ResponseContentPartContentPartStructuredAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Chart payload content part.
-type ResponseContentPartObject4 struct {
+type ResponseContentPartContentPartChart struct {
 	// Any of "chart".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -336,13 +338,13 @@ type ResponseContentPartObject4 struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject4) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject4) UnmarshalJSON(data []byte) error {
+func (r ResponseContentPartContentPartChart) RawJSON() string { return r.JSON.raw }
+func (r *ResponseContentPartContentPartChart) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Suggested actions payload content part.
-type ResponseContentPartObject5 struct {
+type ResponseContentPartContentPartSuggestedActions struct {
 	// Any of "suggested_actions".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -355,13 +357,13 @@ type ResponseContentPartObject5 struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject5) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject5) UnmarshalJSON(data []byte) error {
+func (r ResponseContentPartContentPartSuggestedActions) RawJSON() string { return r.JSON.raw }
+func (r *ResponseContentPartContentPartSuggestedActions) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
 // Escape-hatch custom payload content part.
-type ResponseContentPartObject6 struct {
+type ResponseContentPartContentPartCustom struct {
 	// Any of "custom".
 	Type string `json:"type" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -374,8 +376,8 @@ type ResponseContentPartObject6 struct {
 }
 
 // Returns the unmodified JSON received from the API
-func (r ResponseContentPartObject6) RawJSON() string { return r.JSON.raw }
-func (r *ResponseContentPartObject6) UnmarshalJSON(data []byte) error {
+func (r ResponseContentPartContentPartCustom) RawJSON() string { return r.JSON.raw }
+func (r *ResponseContentPartContentPartCustom) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -435,7 +437,7 @@ type V1OmniAIResponseCancelResponseParams struct {
 // `url.Values`.
 func (r V1OmniAIResponseCancelResponseParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -450,7 +452,7 @@ type V1OmniAIResponseGetResponseByIDParams struct {
 // as `url.Values`.
 func (r V1OmniAIResponseGetResponseByIDParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

@@ -162,7 +162,7 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 			Status:                  []string{"PENDING_NEW"},
 			Symbol:                  clearstreet.String("symbol"),
 			To:                      clearstreet.Time(time.Now()),
-			UnderlyingInstrumentIDs: clearstreet.String("underlying_instrument_ids"),
+			UnderlyingInstrumentIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 		},
 	)
 	if err != nil {

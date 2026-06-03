@@ -243,9 +243,39 @@ func (r *V1WatchlistNewWatchlistResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-type V1WatchlistDeleteWatchlistResponse = any
+type V1WatchlistDeleteWatchlistResponse struct {
+	Data any `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
 
-type V1WatchlistDeleteWatchlistItemResponse = any
+// Returns the unmodified JSON received from the API
+func (r V1WatchlistDeleteWatchlistResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1WatchlistDeleteWatchlistResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1WatchlistDeleteWatchlistItemResponse struct {
+	Data any `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1WatchlistDeleteWatchlistItemResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1WatchlistDeleteWatchlistItemResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type V1WatchlistGetWatchlistByIDResponse struct {
 	// Detailed watchlist with all items
@@ -329,7 +359,7 @@ type V1WatchlistGetWatchlistsParams struct {
 // `url.Values`.
 func (r V1WatchlistGetWatchlistsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

@@ -273,7 +273,7 @@ type V1CalendarGetMarketHoursCalendarParams struct {
 // as `url.Values`.
 func (r V1CalendarGetMarketHoursCalendarParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

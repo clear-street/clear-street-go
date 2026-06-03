@@ -459,7 +459,7 @@ type V1PositionGetPositionInstructionsParams struct {
 // as `url.Values`.
 func (r V1PositionGetPositionInstructionsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -489,7 +489,7 @@ type V1PositionGetPositionsParams struct {
 // `url.Values`.
 func (r V1PositionGetPositionsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

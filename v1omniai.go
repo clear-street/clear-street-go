@@ -273,6 +273,20 @@ func (r *DataChart) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Stable entitlement agreement family key.
+type EntitlementAgreementKey string
+
+const (
+	EntitlementAgreementKeyOmniAccountDataAccess EntitlementAgreementKey = "omni_account_data_access"
+)
+
+// Stable entitlement code granted by an agreement.
+type EntitlementCode string
+
+const (
+	EntitlementCodeOmniAccountData EntitlementCode = "omni.account_data"
+)
+
 // Action to open a chart for a symbol.
 type OpenChartAction struct {
 	// Trading symbol to chart
