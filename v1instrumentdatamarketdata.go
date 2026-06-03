@@ -314,7 +314,7 @@ type V1InstrumentDataMarketDataGetDailySummariesParams struct {
 // parameters as `url.Values`.
 func (r V1InstrumentDataMarketDataGetDailySummariesParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -329,7 +329,7 @@ type V1InstrumentDataMarketDataGetSnapshotsParams struct {
 // parameters as `url.Values`.
 func (r V1InstrumentDataMarketDataGetSnapshotsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

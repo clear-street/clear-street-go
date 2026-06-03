@@ -139,7 +139,7 @@ type V1OmniAIMessageGetMessageByIDParams struct {
 // `url.Values`.
 func (r V1OmniAIMessageGetMessageByIDParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

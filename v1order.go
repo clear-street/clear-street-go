@@ -743,7 +743,7 @@ type V1OrderCancelAllOpenOrdersParams struct {
 // `url.Values`.
 func (r V1OrderCancelAllOpenOrdersParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -806,7 +806,7 @@ type V1OrderGetExecutionsParams struct {
 // `url.Values`.
 func (r V1OrderGetExecutionsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
@@ -829,9 +829,6 @@ type V1OrderGetOrdersParams struct {
 	Symbol param.Opt[string] `query:"symbol,omitzero" json:"-"`
 	// The end date and time for the query range, inclusive (ISO 8601 format)
 	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
-	// Comma-separated OEMS instrument UUIDs. Matches options orders whose resolved
-	// underlier is any of the given IDs.
-	UnderlyingInstrumentIDs param.Opt[string] `query:"underlying_instrument_ids,omitzero" json:"-"`
 	// Comma-separated OEMS instrument UUIDs
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
@@ -844,13 +841,16 @@ type V1OrderGetOrdersParams struct {
 	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
 	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
 	Status []string `query:"status,omitzero" json:"-"`
+	// Comma-separated OEMS instrument UUIDs. Matches options orders whose resolved
+	// underlier is any of the given IDs.
+	UnderlyingInstrumentIDs []string `query:"underlying_instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
 // URLQuery serializes [V1OrderGetOrdersParams]'s query parameters as `url.Values`.
 func (r V1OrderGetOrdersParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }

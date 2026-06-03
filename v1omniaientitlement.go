@@ -98,13 +98,6 @@ func (r *DeleteEntitlementResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Stable entitlement agreement family key.
-type EntitlementAgreementKey string
-
-const (
-	EntitlementAgreementKeyOmniAccountDataAccess EntitlementAgreementKey = "omni_account_data_access"
-)
-
 type EntitlementAgreementResource struct {
 	AgreementID string `json:"agreement_id" api:"required"`
 	// Stable entitlement agreement family key.
@@ -137,13 +130,6 @@ func (r *EntitlementAgreementResource) UnmarshalJSON(data []byte) error {
 }
 
 type EntitlementAgreementResourceList []EntitlementAgreementResource
-
-// Stable entitlement code granted by an agreement.
-type EntitlementCode string
-
-const (
-	EntitlementCodeOmniAccountData EntitlementCode = "omni.account_data"
-)
 
 type EntitlementResource struct {
 	AgreementID string `json:"agreement_id" api:"required"`
@@ -266,7 +252,7 @@ type V1OmniAIEntitlementGetEntitlementsParams struct {
 // parameters as `url.Values`.
 func (r V1OmniAIEntitlementGetEntitlementsParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
-		ArrayFormat:  apiquery.ArrayQueryFormatIndices,
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
