@@ -81,7 +81,9 @@ func (r *V1InstrumentService) GetOptionContracts(ctx context.Context, query V1In
 // marginability, easy-to-borrow status, and OTC, restricted, and liquidation-only
 // penalties. Defaults to the `EQUITY` asset class (common stocks, preferred
 // shares, ADRs, ETFs, and exchange-traded mutual funds). Pass `asset_class=OPTION`
-// to search option contracts by symbol or alternate identifier.
+// to search option contracts: by full OSI symbol, by an OSI prefix (root +
+// `YYMMDD` expiry, e.g. `AAPL 261217`), or by a root-scoped phrase such as
+// `AAPL Dec 250 call`.
 func (r *V1InstrumentService) SearchInstruments(ctx context.Context, query V1InstrumentSearchInstrumentsParams, opts ...option.RequestOption) (res *V1InstrumentSearchInstrumentsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/instruments/search"
