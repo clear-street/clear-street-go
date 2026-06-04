@@ -220,6 +220,8 @@ type AccountBalancesSod struct {
 	// Timestamp for the start-of-day values.
 	Asof time.Time `json:"asof" api:"nullable" format:"date"`
 	// Start-of-day day-trade buying power.
+	//
+	// Deprecated: deprecated
 	DayTradeBuyingPower string `json:"day_trade_buying_power" api:"nullable"`
 	// Start-of-day maintenance margin excess.
 	MaintenanceMarginExcess string `json:"maintenance_margin_excess" api:"nullable"`
@@ -296,6 +298,8 @@ const (
 
 type MarginDetails struct {
 	// The number of day trades executed over the 5 most recent trading days.
+	//
+	// Deprecated: deprecated
 	DayTradeCount int64 `json:"day_trade_count" api:"required"`
 	// Initial margin excess for trade-date balances.
 	InitialMarginExcess string `json:"initial_margin_excess" api:"required"`
@@ -306,8 +310,12 @@ type MarginDetails struct {
 	// Maintenance margin requirement for trade-date balances.
 	MaintenanceMarginRequirement string `json:"maintenance_margin_requirement" api:"required"`
 	// `true` if the account is currently flagged as a PDT, otherwise `false`.
+	//
+	// Deprecated: deprecated
 	PatternDayTrader bool `json:"pattern_day_trader" api:"required"`
 	// The amount of day-trade buying power used during the current trading day.
+	//
+	// Deprecated: deprecated
 	DayTradeBuyingPowerUsage string `json:"day_trade_buying_power_usage" api:"nullable"`
 	// Optional top margin contributors, returned only when explicitly requested.
 	TopContributors []MarginTopContributor `json:"top_contributors"`
