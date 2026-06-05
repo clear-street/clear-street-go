@@ -366,6 +366,8 @@ func (r *MarginDetailsUsage) UnmarshalJSON(data []byte) error {
 type MarginTopContributor struct {
 	// Day-trade buying power consumed by fills against this underlying on the current
 	// trade date. Populated only for pattern day trader accounts.
+	//
+	// Deprecated: deprecated
 	DayTradeBuyingPowerUsage string `json:"day_trade_buying_power_usage" api:"required"`
 	// Initial margin requirement attributable to this underlying.
 	InitialMarginRequirement string `json:"initial_margin_requirement" api:"required"`
