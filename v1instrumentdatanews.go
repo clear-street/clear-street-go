@@ -50,11 +50,11 @@ func (r *V1InstrumentDataNewsService) GetNews(ctx context.Context, query V1Instr
 
 // Instrument associated with a news item.
 type NewsInstrument struct {
-	// OEMS instrument UUID.
+	// Instrument identifier.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
-	// Instrument name/description, if available from instrument cache enrichment.
+	// Instrument name/description, if available.
 	Name string `json:"name" api:"nullable"`
-	// Trading symbol, if available from instrument cache enrichment.
+	// Trading symbol, if available.
 	Symbol string `json:"symbol" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -162,7 +162,7 @@ type V1InstrumentDataNewsGetNewsParams struct {
 	SearchQuery param.Opt[string] `query:"search_query,omitzero" json:"-"`
 	// Inclusive end timestamp. Accepts `YYYY-MM-DD` or RFC3339 datetime.
 	To param.Opt[string] `query:"to,omitzero" json:"-"`
-	// Comma-delimited OEMS instrument UUIDs to filter by.
+	// Comma-delimited instrument identifiers to filter by.
 	InstrumentIDs []string `query:"instrument_ids,omitzero" json:"-"`
 	// Filter by news type.
 	//

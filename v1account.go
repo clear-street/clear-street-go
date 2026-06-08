@@ -628,7 +628,7 @@ func (r *V1AccountPatchAccountByIDResponse) UnmarshalJSON(data []byte) error {
 }
 
 type V1AccountGetAccountBalancesParams struct {
-	// Limit the number of top margin contributors returned by the engine.
+	// Limit the number of top margin contributors returned.
 	TopMarginContributorsLimit param.Opt[int64] `query:"top_margin_contributors_limit,omitzero" json:"-"`
 	paramObj
 }
