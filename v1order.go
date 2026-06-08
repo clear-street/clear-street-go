@@ -140,7 +140,7 @@ func (r *CancelOrderRequest) UnmarshalJSON(data []byte) error {
 type Execution struct {
 	// Unique identifier for this execution report.
 	ID string `json:"id" api:"required" format:"uuid"`
-	// OEMS instrument identifier.
+	// Unique instrument identifier.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Identifier of the order this execution belongs to.
 	OrderID string `json:"order_id" api:"required" format:"uuid"`
@@ -210,7 +210,7 @@ type NewOrderRequest struct {
 	// Allow trading outside regular trading hours. Some brokers disallow options
 	// outside RTH.
 	ExtendedHours bool `json:"extended_hours" api:"nullable"`
-	// OEMS instrument UUID
+	// Instrument identifier
 	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"nullable" format:"uuid"`
 	// Limit offset for trailing stop-limit orders (signed)
 	LimitOffset string `json:"limit_offset" api:"nullable"`
@@ -312,7 +312,7 @@ type NewOrderRequestParam struct {
 	Symbol param.Opt[string] `json:"symbol,omitzero"`
 	// Trailing offset amount (required for trailing orders)
 	TrailingOffset param.Opt[string] `json:"trailing_offset,omitzero"`
-	// OEMS instrument UUID
+	// Instrument identifier
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `json:"instrument_id,omitzero" format:"uuid"`
 	// Required for options. Specifies whether the order opens or closes a position.
 	//
@@ -343,13 +343,13 @@ type Order struct {
 	ID string `json:"id" api:"required"`
 	// Account placing the order
 	AccountID int64 `json:"account_id" api:"required"`
-	// Client-provided identifier echoed back (FIX tag 11).
+	// Client-provided identifier echoed back.
 	ClientOrderID string `json:"client_order_id" api:"required"`
 	// Timestamp when order was created (UTC)
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Cumulative filled quantity
 	FilledQuantity string `json:"filled_quantity" api:"required"`
-	// OEMS instrument UUID for the traded instrument.
+	// Instrument identifier for the traded instrument.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Type of security
 	//
@@ -422,9 +422,9 @@ type Order struct {
 	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
 	// Trailing watermark timestamp for trailing orders
 	TrailingWatermarkTs time.Time `json:"trailing_watermark_ts" api:"nullable" format:"date-time"`
-	// OEMS instrument ID of the option's underlying instrument. Populated only for
-	// OPTIONS orders; `null` for non-options and for options whose underlier cannot be
-	// resolved from the instrument cache.
+	// Instrument ID of the option's underlying instrument. Populated only for options
+	// orders; `null` for non-options and for options whose underlier cannot be
+	// resolved.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -721,7 +721,7 @@ func (r *V1OrderSubmitOrdersResponse) UnmarshalJSON(data []byte) error {
 }
 
 type V1OrderCancelAllOpenOrdersParams struct {
-	// Comma-separated OEMS instrument UUIDs
+	// Comma-separated instrument identifiers
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
 	//
@@ -789,7 +789,7 @@ type V1OrderGetExecutionsParams struct {
 	// The start date and time for the query range, inclusive (ISO 8601 format)
 	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
 	// Optional instrument to filter by. Accepts either a symbol (e.g. `AAPL`) or an
-	// OEMS instrument UUID.
+	// instrument identifier.
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" format:"uuid" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
@@ -829,7 +829,7 @@ type V1OrderGetOrdersParams struct {
 	Symbol param.Opt[string] `query:"symbol,omitzero" json:"-"`
 	// The end date and time for the query range, inclusive (ISO 8601 format)
 	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
-	// Comma-separated OEMS instrument UUIDs
+	// Comma-separated instrument identifiers
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
@@ -841,7 +841,7 @@ type V1OrderGetOrdersParams struct {
 	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
 	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
 	Status []string `query:"status,omitzero" json:"-"`
-	// Comma-separated OEMS instrument UUIDs. Matches options orders whose resolved
+	// Comma-separated instrument identifiers. Matches options orders whose resolved
 	// underlier is any of the given IDs.
 	UnderlyingInstrumentIDs []string `query:"underlying_instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj

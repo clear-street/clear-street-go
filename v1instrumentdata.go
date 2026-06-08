@@ -698,8 +698,7 @@ type InstrumentEventEnvelope struct {
 	DividendEventData InstrumentDividendEvent `json:"dividend_event_data" api:"nullable"`
 	// Earnings payload when type is EARNINGS.
 	EarningsEventData InstrumentEarnings `json:"earnings_event_data" api:"nullable"`
-	// OEMS instrument identifier, when the instrument is found in the instrument
-	// cache.
+	// Instrument identifier, when available.
 	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
 	// IPO payload when type is IPO.
 	IpoEventData InstrumentEventIpoItem `json:"ipo_event_data" api:"nullable"`
@@ -794,7 +793,7 @@ type InstrumentEventsData struct {
 	Dividends []InstrumentDividendEvent `json:"dividends" api:"required"`
 	// Earnings announcement events
 	Earnings []InstrumentEarnings `json:"earnings" api:"required"`
-	// OEMS instrument UUID from the request
+	// Instrument identifier
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Stock split events
 	Splits []InstrumentSplitEvent `json:"splits" api:"required"`
@@ -1196,7 +1195,7 @@ type V1InstrumentDataGetAllInstrumentEventsParams struct {
 	// Filter by event type(s). Comma-delimited list. Example:
 	// `event_types=EARNINGS,IPO`.
 	EventTypes []AllEventsEventType `query:"event_types,omitzero" json:"-"`
-	// Filter by OEMS instrument ID(s). Comma-delimited list of UUIDs. Example:
+	// Filter by instrument ID(s). Comma-delimited list of UUIDs. Example:
 	// `instrument_ids=550e8400-e29b-41d4-a716-446655440000`.
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj

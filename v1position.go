@@ -126,7 +126,7 @@ type Position struct {
 	AccountID int64 `json:"account_id" api:"required"`
 	// The quantity of a position that is free to be operated on.
 	AvailableQuantity string `json:"available_quantity" api:"required"`
-	// OEMS instrument UUID
+	// Unique instrument identifier
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Type of security
 	//
@@ -157,7 +157,7 @@ type Position struct {
 	DailyUnrealizedPnlPct string `json:"daily_unrealized_pnl_pct" api:"nullable"`
 	// The current market price of the instrument
 	InstrumentPrice string `json:"instrument_price" api:"nullable"`
-	// OEMS instrument identifier of the underlying instrument, if resolvable
+	// Identifier of the underlying instrument, when available
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// The total unrealized profit or loss for this position based on current market
 	// value
@@ -261,21 +261,19 @@ type PositionInstructionList []PositionInstruction
 
 // Lifecycle status of a position instruction.
 //
-//   - `SENT`: accepted and forwarded to the clearing venue.
+//   - `SENT`: accepted and submitted to the clearing venue.
 //   - `ACCEPTED`: terminal — accepted by the clearing venue.
 //   - `REJECTED`: terminal rejection from the clearing venue; `rejection_reason`
 //     carries the venue-reported detail.
-//   - `ENGINE_REJECTED`: terminal rejection raised before the instruction reached
-//     the clearing venue; `rejection_reason` carries the detail. Typical causes:
-//     duplicate `instruction_id`, `DO_NOT_EXERCISE` / `CONTRARY_EXERCISE` submitted
-//     on a non-expiry day, insufficient position, or an instrument that does not
-//     resolve.
+//   - `ENGINE_REJECTED`: terminal rejection from validation; `rejection_reason`
+//     carries the detail. Typical causes: duplicate `instruction_id`,
+//     `DO_NOT_EXERCISE` / `CONTRARY_EXERCISE` submitted on a non-expiry day,
+//     insufficient position, or an invalid instrument.
 //   - `CANCEL_REQUESTED`: cancel accepted; final cancel state pending.
 //   - `CANCELLED`: terminal — cancel completed.
 //   - `CANCEL_FAILED`: cancel could not be completed; operator attention required.
 //     `rejection_reason` carries the detail.
-//   - `UNKNOWN`: status could not be mapped from the upstream service. Not expected
-//     in practice; surfaces a service version skew.
+//   - `UNKNOWN`: status could not be determined.
 type PositionInstructionStatus string
 
 const (
@@ -473,7 +471,7 @@ type V1PositionGetPositionsParams struct {
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
-	// Comma-separated OEMS instrument UUIDs
+	// Comma-separated instrument identifiers
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Field to sort by
 	//

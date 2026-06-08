@@ -38,18 +38,13 @@ func NewV1InstrumentDataMarketDataService(opts ...option.RequestOption) (r V1Ins
 	return
 }
 
-// Returns the most recent OHLV and current price for the requested OEMS
-// instruments. Backed by the in-memory Polygon snapshot cache.
+// Returns the most recent open, high, low, volume (OHLV) and current price for the
+// requested instruments.
 //
 // Response contract: every request returns one row per **unique** `instrument_id`,
 // in first-seen request order. Unresolvable IDs come back with `symbol = null` and
-// every market-data field `null`; resolvable IDs with no cache entry come back
+// every market-data field `null`; resolvable IDs with no available data come back
 // with `symbol` populated but market-data fields `null`.
-//
-// **Note (temporary):** ID resolution currently goes through the supplemental
-// screener (OEMS instrument_id → FMP fmp_symbol → metadata_id → realtime cache).
-// Removed when the market-data service serves daily aggregates directly, or when
-// Polygon symbology is loaded into the instrument cache.
 func (r *V1InstrumentDataMarketDataService) GetDailySummaries(ctx context.Context, query V1InstrumentDataMarketDataGetDailySummariesParams, opts ...option.RequestOption) (res *V1InstrumentDataMarketDataGetDailySummariesResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/market-data/daily-summary"
@@ -76,7 +71,7 @@ func (r *V1InstrumentDataMarketDataService) GetSnapshots(ctx context.Context, qu
 //   - `trade_date` reflects the session the OHLV represents (today during trading
 //     hours, the last trading date during weekends/holidays).
 type DailySummary struct {
-	// OEMS instrument identifier. Always populated; echoes the request ID.
+	// Unique instrument identifier. Always populated; echoes the request ID.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Session high.
 	High string `json:"high" api:"nullable"`
@@ -114,7 +109,7 @@ type DailySummaryList []DailySummary
 
 // Market data snapshot for a single security.
 type MarketDataSnapshot struct {
-	// OEMS instrument identifier.
+	// Unique instrument identifier.
 	InstrumentID string `json:"instrument_id" api:"required"`
 	// Display symbol for the security.
 	Symbol string `json:"symbol" api:"required"`
@@ -156,7 +151,7 @@ func (r *MarketDataSnapshot) UnmarshalJSON(data []byte) error {
 type MarketDataSnapshotList []MarketDataSnapshot
 
 // Theoretical price and Greeks for an options snapshot. All values are **per
-// share** as published by RENG; no contract multiplier is applied.
+// share**; no contract multiplier is applied.
 type SnapshotGreeks struct {
 	// Delta: ∂V/∂S, range \[-1, 1\].
 	Delta string `json:"delta" api:"required"`
@@ -170,7 +165,7 @@ type SnapshotGreeks struct {
 	TheoPrice string `json:"theo_price" api:"required"`
 	// Theta per trading day.
 	Theta string `json:"theta" api:"required"`
-	// Event timestamp published by RENG.
+	// Timestamp when the Greeks were calculated.
 	Timestamp time.Time `json:"timestamp" api:"required" format:"date-time"`
 	// Vega per 1.0 vol point.
 	Vega string `json:"vega" api:"required"`
@@ -305,7 +300,7 @@ func (r *V1InstrumentDataMarketDataGetSnapshotsResponse) UnmarshalJSON(data []by
 }
 
 type V1InstrumentDataMarketDataGetDailySummariesParams struct {
-	// Comma-separated OEMS instrument UUIDs (required, 1..=100)
+	// Comma-separated instrument identifiers (required, 1..=100)
 	InstrumentIDs string `query:"instrument_ids" api:"required" json:"-"`
 	paramObj
 }
@@ -320,7 +315,7 @@ func (r V1InstrumentDataMarketDataGetDailySummariesParams) URLQuery() (v url.Val
 }
 
 type V1InstrumentDataMarketDataGetSnapshotsParams struct {
-	// Comma-separated OEMS instrument UUIDs.
+	// Comma-separated instrument identifiers.
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

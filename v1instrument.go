@@ -75,11 +75,9 @@ func (r *V1InstrumentService) GetOptionContracts(ctx context.Context, query V1In
 // Search instruments by symbol, alternate identifier, or company name.
 //
 // The `q` parameter is case-insensitive and supports ticker symbols, alternate
-// identifiers such as CUSIP, ISIN, OPRA root, and CMS identifiers, and company
-// names for non-option instruments. Results are ranked by match quality plus
-// instrument quality signals including log-scaled ADV, listing status,
-// marginability, easy-to-borrow status, and OTC, restricted, and liquidation-only
-// penalties. Defaults to the `EQUITY` asset class (common stocks, preferred
+// identifiers such as CUSIP, ISIN, and OPRA root, and company names for non-option
+// instruments. Results are ranked by match quality plus instrument quality signals
+// and relevance. Defaults to the `EQUITY` asset class (common stocks, preferred
 // shares, ADRs, ETFs, and exchange-traded mutual funds). Pass `asset_class=OPTION`
 // to search option contracts: by full OSI symbol, by an OSI prefix (root +
 // `YYMMDD` expiry, e.g. `AAPL 261217`), or by a root-scoped phrase such as
@@ -109,7 +107,7 @@ const (
 
 // Represents a tradable financial instrument.
 type Instrument struct {
-	// Unique OEMS instrument identifier (UUID)
+	// Unique instrument identifier (UUID)
 	ID string `json:"id" api:"required" format:"uuid"`
 	// The ISO country code of the instrument's issue
 	CountryOfIssue string `json:"country_of_issue" api:"required"`
@@ -148,9 +146,7 @@ type Instrument struct {
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
 	// The full name of the instrument or its issuer
 	Name string `json:"name" api:"nullable"`
-	// Notional ADV (`adv × previous_close`). The primary liquidity signal used by
-	// `/instruments/search` ranking. Computed at response time so it stays consistent
-	// with whatever `adv` and `previous_close` show.
+	// Notional average daily volume (ADV multiplied by previous close price).
 	NotionalAdv string `json:"notional_adv" api:"nullable"`
 	// Available options expiration dates for this instrument. Present only when
 	// `include_options_expiry_dates=true` in the request.
@@ -198,7 +194,7 @@ func (r *Instrument) UnmarshalJSON(data []byte) error {
 }
 
 type InstrumentCore struct {
-	// Unique OEMS instrument identifier (UUID)
+	// Unique instrument identifier (UUID)
 	ID string `json:"id" api:"required" format:"uuid"`
 	// The ISO country code of the instrument's issue
 	CountryOfIssue string `json:"country_of_issue" api:"required"`
@@ -237,9 +233,7 @@ type InstrumentCore struct {
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
 	// The full name of the instrument or its issuer
 	Name string `json:"name" api:"nullable"`
-	// Notional ADV (`adv × previous_close`). The primary liquidity signal used by
-	// `/instruments/search` ranking. Computed at response time so it stays consistent
-	// with whatever `adv` and `previous_close` show.
+	// Notional average daily volume (ADV multiplied by previous close price).
 	NotionalAdv string `json:"notional_adv" api:"nullable"`
 	// Last close price from the security definition.
 	PreviousClose string `json:"previous_close" api:"nullable"`
@@ -295,7 +289,7 @@ const (
 
 // An options contract with options-specific metadata
 type OptionsContract struct {
-	// OEMS instrument identifier
+	// Instrument identifier
 	ID string `json:"id" api:"required" format:"uuid"`
 	// Whether this is a CALL or PUT
 	//
@@ -327,7 +321,7 @@ type OptionsContract struct {
 	Symbol string `json:"symbol" api:"required"`
 	// Open interest (number of outstanding contracts), if available
 	OpenInterest int64 `json:"open_interest" api:"nullable"`
-	// OEMS instrument ID of the underlying instrument, if resolvable
+	// Instrument ID of the underlying instrument, when available
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -461,7 +455,7 @@ type V1InstrumentGetInstrumentsParams struct {
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
-	// Comma-separated OEMS instrument UUIDs
+	// Comma-separated instrument identifiers
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g. COMMON_STOCK, OPTION)
 	//
@@ -499,7 +493,7 @@ type V1InstrumentGetOptionContractsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Underlier symbol (e.g., AAPL, SPX)
 	Underlier param.Opt[string] `query:"underlier,omitzero" json:"-"`
-	// OEMS instrument UUID or symbol of the underlying equity/index
+	// Instrument identifier or symbol of the underlying equity/index
 	UnderlyingInstrumentID param.Opt[InstrumentIDOrSymbol] `query:"underlying_instrument_id,omitzero" format:"uuid" json:"-"`
 	// Filter by contract type: CALL or PUT
 	//
@@ -519,8 +513,8 @@ func (r V1InstrumentGetOptionContractsParams) URLQuery() (v url.Values, err erro
 
 type V1InstrumentSearchInstrumentsParams struct {
 	// Search term applied case-insensitively to ticker symbols, alternate identifiers
-	// (CUSIP, ISIN, OPRA root, CMS), and company names for non-option instruments.
-	// Option searches match symbols and alternate identifiers.
+	// (CUSIP, ISIN, OPRA root), and company names for non-option instruments. Option
+	// searches match symbols and alternate identifiers.
 	Q string `query:"q" api:"required" json:"-"`
 	// Comma-separated asset classes (EQUITY|OPTION|WARRANT|BOND|FX|OTHER). Defaults to
 	// EQUITY.
