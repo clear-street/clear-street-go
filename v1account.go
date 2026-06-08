@@ -305,10 +305,14 @@ type MarginDetails struct {
 	InitialMarginExcess string `json:"initial_margin_excess" api:"required"`
 	// Initial margin requirement for trade-date balances.
 	InitialMarginRequirement string `json:"initial_margin_requirement" api:"required"`
+	// Intraday session margin calculation details.
+	IntradayDetails MarginSessionDetails `json:"intraday_details" api:"required"`
 	// Maintenance margin excess for trade-date balances.
 	MaintenanceMarginExcess string `json:"maintenance_margin_excess" api:"required"`
 	// Maintenance margin requirement for trade-date balances.
 	MaintenanceMarginRequirement string `json:"maintenance_margin_requirement" api:"required"`
+	// Overnight session margin calculation details.
+	OvernightDetails MarginSessionDetails `json:"overnight_details" api:"required"`
 	// `true` if the account is currently flagged as a PDT, otherwise `false`.
 	//
 	// Deprecated: deprecated
@@ -326,8 +330,10 @@ type MarginDetails struct {
 		DayTradeCount                respjson.Field
 		InitialMarginExcess          respjson.Field
 		InitialMarginRequirement     respjson.Field
+		IntradayDetails              respjson.Field
 		MaintenanceMarginExcess      respjson.Field
 		MaintenanceMarginRequirement respjson.Field
+		OvernightDetails             respjson.Field
 		PatternDayTrader             respjson.Field
 		DayTradeBuyingPowerUsage     respjson.Field
 		TopContributors              respjson.Field
@@ -360,6 +366,26 @@ type MarginDetailsUsage struct {
 // Returns the unmodified JSON received from the API
 func (r MarginDetailsUsage) RawJSON() string { return r.JSON.raw }
 func (r *MarginDetailsUsage) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type MarginSessionDetails struct {
+	// Maximum buying power available in the account during the session.
+	BuyingPower string `json:"buying_power" api:"required"`
+	// Effective multiplier for margin calculations during the session.
+	Multiplier string `json:"multiplier" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		BuyingPower respjson.Field
+		Multiplier  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r MarginSessionDetails) RawJSON() string { return r.JSON.raw }
+func (r *MarginSessionDetails) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
