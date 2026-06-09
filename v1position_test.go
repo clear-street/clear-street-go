@@ -14,7 +14,6 @@ import (
 )
 
 func TestV1PositionCancelPositionInstruction(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -43,7 +42,6 @@ func TestV1PositionCancelPositionInstruction(t *testing.T) {
 }
 
 func TestV1PositionClosePositionWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -73,7 +71,6 @@ func TestV1PositionClosePositionWithOptionalParams(t *testing.T) {
 }
 
 func TestV1PositionClosePositionsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -102,7 +99,6 @@ func TestV1PositionClosePositionsWithOptionalParams(t *testing.T) {
 }
 
 func TestV1PositionGetPositionInstructionsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -131,7 +127,6 @@ func TestV1PositionGetPositionInstructionsWithOptionalParams(t *testing.T) {
 }
 
 func TestV1PositionGetPositionsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -164,7 +159,6 @@ func TestV1PositionGetPositionsWithOptionalParams(t *testing.T) {
 }
 
 func TestV1PositionSubmitPositionInstructions(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL

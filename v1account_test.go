@@ -15,7 +15,6 @@ import (
 )
 
 func TestV1AccountGetAccountBalancesWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -44,7 +43,6 @@ func TestV1AccountGetAccountBalancesWithOptionalParams(t *testing.T) {
 }
 
 func TestV1AccountGetAccountByID(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -67,7 +65,6 @@ func TestV1AccountGetAccountByID(t *testing.T) {
 }
 
 func TestV1AccountGetAccountsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -93,7 +90,6 @@ func TestV1AccountGetAccountsWithOptionalParams(t *testing.T) {
 }
 
 func TestV1AccountGetPortfolioHistoryWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -123,7 +119,6 @@ func TestV1AccountGetPortfolioHistoryWithOptionalParams(t *testing.T) {
 }
 
 func TestV1AccountPatchAccountByIDWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
