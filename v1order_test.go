@@ -15,7 +15,6 @@ import (
 )
 
 func TestV1OrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -47,7 +46,6 @@ func TestV1OrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
 }
 
 func TestV1OrderCancelOpenOrder(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -76,7 +74,6 @@ func TestV1OrderCancelOpenOrder(t *testing.T) {
 }
 
 func TestV1OrderGetExecutionsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -109,7 +106,6 @@ func TestV1OrderGetExecutionsWithOptionalParams(t *testing.T) {
 }
 
 func TestV1OrderGetOrderByID(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -138,7 +134,6 @@ func TestV1OrderGetOrderByID(t *testing.T) {
 }
 
 func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -175,7 +170,6 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 }
 
 func TestV1OrderReplaceOrderWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -208,7 +202,6 @@ func TestV1OrderReplaceOrderWithOptionalParams(t *testing.T) {
 }
 
 func TestV1OrderSubmitOrders(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL

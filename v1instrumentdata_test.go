@@ -15,7 +15,6 @@ import (
 )
 
 func TestV1InstrumentDataGetAllInstrumentEventsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -43,7 +42,6 @@ func TestV1InstrumentDataGetAllInstrumentEventsWithOptionalParams(t *testing.T) 
 }
 
 func TestV1InstrumentDataGetInstrumentAnalystConsensusWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -73,7 +71,6 @@ func TestV1InstrumentDataGetInstrumentAnalystConsensusWithOptionalParams(t *test
 }
 
 func TestV1InstrumentDataGetInstrumentBalanceSheetStatementsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -105,7 +102,6 @@ func TestV1InstrumentDataGetInstrumentBalanceSheetStatementsWithOptionalParams(t
 }
 
 func TestV1InstrumentDataGetInstrumentCashFlowStatementsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -137,7 +133,6 @@ func TestV1InstrumentDataGetInstrumentCashFlowStatementsWithOptionalParams(t *te
 }
 
 func TestV1InstrumentDataGetInstrumentEventsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -167,7 +162,6 @@ func TestV1InstrumentDataGetInstrumentEventsWithOptionalParams(t *testing.T) {
 }
 
 func TestV1InstrumentDataGetInstrumentFundamentals(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -190,7 +184,6 @@ func TestV1InstrumentDataGetInstrumentFundamentals(t *testing.T) {
 }
 
 func TestV1InstrumentDataGetInstrumentIncomeStatementsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL

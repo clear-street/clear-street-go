@@ -14,7 +14,7 @@ import (
 )
 
 func TestV1WebsocketWebsocketHandler(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
+	t.Skip("websocket upgrade endpoint is currently not modeled correctly for stainless")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
