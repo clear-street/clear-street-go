@@ -83,6 +83,12 @@ func (r *V1PositionService) ClosePositions(ctx context.Context, accountID int64,
 
 // Returns the current lifecycle state of the account's position instructions.
 // Optionally filter by a specific contract.
+//
+// Note: instructions that fail pre-acceptance validation on `POST` — duplicates,
+// `DO_NOT_EXERCISE` / `CONTRARY_EXERCISE` on a non-expiry day, insufficient
+// position, or an unresolvable instrument — are rejected (with `status = REJECTED`
+// and a `rejection_reason`) without being persisted, so they surface only in the
+// `POST` response and never appear in this list.
 func (r *V1PositionService) GetPositionInstructions(ctx context.Context, accountID int64, query V1PositionGetPositionInstructionsParams, opts ...option.RequestOption) (res *V1PositionGetPositionInstructionsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/positions/instructions", accountID)
@@ -105,14 +111,14 @@ func (r *V1PositionService) GetPositions(ctx context.Context, accountID int64, q
 //
 //   - **All rows accepted** → `200 OK`. Every row is in `data` with `status = SENT`.
 //   - **Partial success** → `207 Multi-Status`. `data` contains every row; rejected
-//     rows carry `status = ENGINE_REJECTED` (or `REJECTED`) and `rejection_reason`.
-//     The top-level `error` summarizes the batch failure.
+//     rows carry `status = REJECTED` and `rejection_reason`. The top-level `error`
+//     summarizes the batch failure.
 //   - **All rows rejected** → `4xx`/`5xx`. The HTTP status reflects the aggregate
 //     cause: `409` when every row was a duplicate, `400` for validation failures
 //     like DNE/CEA on a non-expiry day, `503` if the clearing service is
-//     unavailable. `data` still contains every row carrying
-//     `status = ENGINE_REJECTED` and `rejection_reason` so callers can attribute
-//     failures by `instruction_id`; the top-level `error` summarizes the batch.
+//     unavailable. `data` still contains every row carrying `status = REJECTED` and
+//     `rejection_reason` so callers can attribute failures by `instruction_id`; the
+//     top-level `error` summarizes the batch.
 func (r *V1PositionService) SubmitPositionInstructions(ctx context.Context, accountID int64, body V1PositionSubmitPositionInstructionsParams, opts ...option.RequestOption) (res *V1PositionSubmitPositionInstructionsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/positions/instructions", accountID)
@@ -215,8 +221,8 @@ type PositionInstruction struct {
 	Quantity string `json:"quantity" api:"required"`
 	// Current lifecycle status.
 	//
-	// Any of "SENT", "ACCEPTED", "REJECTED", "ENGINE_REJECTED", "CANCEL_REQUESTED",
-	// "CANCELLED", "CANCEL_FAILED", "UNKNOWN".
+	// Any of "SENT", "ACCEPTED", "REJECTED", "CANCEL_REQUESTED", "CANCELLED",
+	// "CANCEL_FAILED", "UNKNOWN".
 	Status PositionInstructionStatus `json:"status" api:"required"`
 	// Options symbol (OSI) for display.
 	Symbol string `json:"symbol" api:"required"`
@@ -226,9 +232,9 @@ type PositionInstruction struct {
 	// When the instruction was first accepted by the service.
 	CreatedAt time.Time `json:"created_at" api:"nullable" format:"date-time"`
 	// Human-readable explanation populated on any non-success terminal status —
-	// `REJECTED`, `ENGINE_REJECTED`, or `CANCEL_FAILED`. On a `207 Multi-Status` batch
-	// submit the top-level `error` field summarizes the batch; per-row detail
-	// continues to live here.
+	// `REJECTED` or `CANCEL_FAILED`. On a `207 Multi-Status` batch submit the
+	// top-level `error` field summarizes the batch; per-row detail continues to live
+	// here.
 	RejectionReason string `json:"rejection_reason" api:"nullable"`
 	// When the instruction's lifecycle state last changed.
 	UpdatedAt time.Time `json:"updated_at" api:"nullable" format:"date-time"`
@@ -263,12 +269,11 @@ type PositionInstructionList []PositionInstruction
 //
 //   - `SENT`: accepted and submitted to the clearing venue.
 //   - `ACCEPTED`: terminal — accepted by the clearing venue.
-//   - `REJECTED`: terminal rejection from the clearing venue; `rejection_reason`
-//     carries the venue-reported detail.
-//   - `ENGINE_REJECTED`: terminal rejection from validation; `rejection_reason`
-//     carries the detail. Typical causes: duplicate `instruction_id`,
-//     `DO_NOT_EXERCISE` / `CONTRARY_EXERCISE` submitted on a non-expiry day,
-//     insufficient position, or an invalid instrument.
+//   - `REJECTED`: terminal rejection; `rejection_reason` carries the detail. Covers
+//     both venue-reported rejections and rejections raised before the instruction
+//     reached the clearing venue (e.g. duplicate `instruction_id`, `DO_NOT_EXERCISE`
+//     / `CONTRARY_EXERCISE` submitted on a non-expiry day, insufficient position, or
+//     an instrument that does not resolve).
 //   - `CANCEL_REQUESTED`: cancel accepted; final cancel state pending.
 //   - `CANCELLED`: terminal — cancel completed.
 //   - `CANCEL_FAILED`: cancel could not be completed; operator attention required.
@@ -280,7 +285,6 @@ const (
 	PositionInstructionStatusSent            PositionInstructionStatus = "SENT"
 	PositionInstructionStatusAccepted        PositionInstructionStatus = "ACCEPTED"
 	PositionInstructionStatusRejected        PositionInstructionStatus = "REJECTED"
-	PositionInstructionStatusEngineRejected  PositionInstructionStatus = "ENGINE_REJECTED"
 	PositionInstructionStatusCancelRequested PositionInstructionStatus = "CANCEL_REQUESTED"
 	PositionInstructionStatusCancelled       PositionInstructionStatus = "CANCELLED"
 	PositionInstructionStatusCancelFailed    PositionInstructionStatus = "CANCEL_FAILED"
