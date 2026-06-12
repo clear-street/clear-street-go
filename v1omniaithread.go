@@ -208,7 +208,7 @@ type Message struct {
 	Role     MessageRole `json:"role" api:"required"`
 	Seq      int64       `json:"seq" api:"required"`
 	ThreadID string      `json:"thread_id" api:"required" format:"uuid"`
-	// Shared sanitized error payload.
+	// When a null/undefined value is observed, it indicates it does not apply.
 	Error ErrorStatus `json:"error" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {

@@ -77,7 +77,9 @@ func (r *V1OmniAIMessageService) SubmitFeedback(ctx context.Context, messageID s
 }
 
 type CreateFeedbackResponse struct {
-	CreatedAt  string `json:"created_at" api:"required"`
+	CreatedAt string `json:"created_at" api:"required"`
+	// When a null/undefined value is observed, it indicates that there is no available
+	// data.
 	FeedbackID string `json:"feedback_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {

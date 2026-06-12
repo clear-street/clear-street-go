@@ -148,28 +148,39 @@ type Position struct {
 	Quantity string `json:"quantity" api:"required"`
 	// The trading symbol for the instrument
 	Symbol string `json:"symbol" api:"required"`
-	// The average price paid per share or contract for this position
+	// The average price paid per share or contract for this position When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	AvgPrice string `json:"avg_price" api:"nullable"`
-	// The closing price used to value the position for the last trading day
+	// The closing price used to value the position for the last trading day When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	ClosingPrice string `json:"closing_price" api:"nullable"`
-	// The market date associated with `closing_price`
+	// The market date associated with `closing_price` When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	ClosingPriceDate time.Time `json:"closing_price_date" api:"nullable" format:"date"`
-	// The total cost basis for this position
+	// The total cost basis for this position When a null/undefined value is observed,
+	// it indicates that there is no available data.
 	CostBasis string `json:"cost_basis" api:"nullable"`
 	// The unrealized profit or loss for this position relative to the previous close
+	// When a null/undefined value is observed, it indicates that there is no available
+	// data.
 	DailyUnrealizedPnl string `json:"daily_unrealized_pnl" api:"nullable"`
 	// The unrealized profit/loss for the position for the current day, expressed as a
-	// percentage of the baseline value (range: 0-100).
+	// percentage of the baseline value (range: 0-100). When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	DailyUnrealizedPnlPct string `json:"daily_unrealized_pnl_pct" api:"nullable"`
-	// The current market price of the instrument
+	// The current market price of the instrument When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	InstrumentPrice string `json:"instrument_price" api:"nullable"`
-	// Identifier of the underlying instrument, when available
+	// Identifier of the underlying instrument, when available When a null/undefined
+	// value is observed, it indicates it does not apply.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// The total unrealized profit or loss for this position based on current market
-	// value
+	// value When a null/undefined value is observed, it indicates that there is no
+	// available data.
 	UnrealizedPnl string `json:"unrealized_pnl" api:"nullable"`
 	// The unrealized profit/loss for the position, expressed as a percentage of the
-	// position's cost basis (range: 0-100).
+	// position's cost basis (range: 0-100). When a null/undefined value is observed,
+	// it indicates that there is no available data.
 	UnrealizedPnlPct string `json:"unrealized_pnl_pct" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -227,16 +238,19 @@ type PositionInstruction struct {
 	// Options symbol (OSI) for display.
 	Symbol string `json:"symbol" api:"required"`
 	// Number of contracts accepted by the clearing venue. Populated once the
-	// instruction reaches `ACCEPTED`.
+	// instruction reaches `ACCEPTED`. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	AcceptedQuantity string `json:"accepted_quantity" api:"nullable"`
-	// When the instruction was first accepted by the service.
+	// When the instruction was first accepted by the service. When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	CreatedAt time.Time `json:"created_at" api:"nullable" format:"date-time"`
 	// Human-readable explanation populated on any non-success terminal status —
 	// `REJECTED` or `CANCEL_FAILED`. On a `207 Multi-Status` batch submit the
 	// top-level `error` field summarizes the batch; per-row detail continues to live
-	// here.
+	// here. When a null/undefined value is observed, it indicates it does not apply.
 	RejectionReason string `json:"rejection_reason" api:"nullable"`
-	// When the instruction's lifecycle state last changed.
+	// When the instruction's lifecycle state last changed. When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	UpdatedAt time.Time `json:"updated_at" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {

@@ -73,17 +73,23 @@ func (r *V1InstrumentDataMarketDataService) GetSnapshots(ctx context.Context, qu
 type DailySummary struct {
 	// Unique instrument identifier. Always populated; echoes the request ID.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
-	// Session high.
+	// Session high. When a null/undefined value is observed, it indicates that there
+	// is no available data.
 	High string `json:"high" api:"nullable"`
-	// Session low.
+	// Session low. When a null/undefined value is observed, it indicates that there is
+	// no available data.
 	Low string `json:"low" api:"nullable"`
-	// Opening price for the session.
+	// Opening price for the session. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	Open string `json:"open" api:"nullable"`
-	// Display symbol for the security. `None` for unresolvable IDs.
+	// Display symbol for the security. `None` for unresolvable IDs. When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	Symbol string `json:"symbol" api:"nullable"`
-	// Session date the OHLV represents, US/Eastern.
+	// Session date the OHLV represents, US/Eastern. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	TradeDate time.Time `json:"trade_date" api:"nullable" format:"date"`
-	// Session cumulative trading volume.
+	// Session cumulative trading volume. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	Volume int64 `json:"volume" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -114,18 +120,25 @@ type MarketDataSnapshot struct {
 	// Display symbol for the security.
 	Symbol string `json:"symbol" api:"required"`
 	// Cumulative traded volume reported on the most recent trade, in shares for
-	// equities or contracts for options. Absent when no trade is available.
+	// equities or contracts for options. Absent when no trade is available. When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	CumulativeVolume int64 `json:"cumulative_volume" api:"nullable"`
 	// Theoretical price and Greeks for option instruments. `None` for equities, and
-	// for options whose Greeks have not yet been observed
+	// for options whose Greeks have not yet been observed When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	Greeks SnapshotGreeks `json:"greeks" api:"nullable"`
-	// Most recent quote if available.
+	// Most recent quote if available. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	LastQuote SnapshotQuote `json:"last_quote" api:"nullable"`
-	// Most recent last-sale trade if available.
+	// Most recent last-sale trade if available. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	LastTrade SnapshotLastTrade `json:"last_trade" api:"nullable"`
-	// Security name if available.
+	// Security name if available. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// Session metrics computed from previous close and last trade, if available.
+	// Session metrics computed from previous close and last trade, if available. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
 	Session SnapshotSession `json:"session" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -219,9 +232,11 @@ type SnapshotQuote struct {
 	Bid string `json:"bid" api:"required"`
 	// Midpoint of bid and ask.
 	Midpoint string `json:"midpoint" api:"required"`
-	// Size at the best ask, in shares.
+	// Size at the best ask, in shares. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	AskSize int64 `json:"ask_size" api:"nullable"`
-	// Size at the best bid, in shares.
+	// Size at the best bid, in shares. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	BidSize int64 `json:"bid_size" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {

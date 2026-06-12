@@ -386,45 +386,60 @@ type Order struct {
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// MIC code of the venue where the order is routed
 	Venue string `json:"venue" api:"required"`
-	// Average fill price across all executions
+	// Average fill price across all executions When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	AverageFillPrice string `json:"average_fill_price" api:"nullable"`
 	// Contains execution, rejection or cancellation details, if any
 	Details []string `json:"details"`
 	// Timestamp when the order will expire (UTC). Present when time_in_force is
-	// GOOD_TILL_DATE.
+	// GOOD_TILL_DATE. When a null/undefined value is observed, it indicates it does
+	// not apply.
 	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
 	// Whether the order is eligible for extended-hours trading.
 	ExtendedHours bool `json:"extended_hours" api:"nullable"`
-	// Limit offset for trailing stop-limit orders (signed)
+	// Limit offset for trailing stop-limit orders (signed) When a null/undefined value
+	// is observed, it indicates it does not apply.
 	LimitOffset string `json:"limit_offset" api:"nullable"`
-	// Limit price (for LIMIT and STOP_LIMIT orders)
+	// Limit price (for LIMIT and STOP_LIMIT orders) When a null/undefined value is
+	// observed, it indicates it does not apply.
 	LimitPrice string `json:"limit_price" api:"nullable"`
 	// Parent order queue state, present when the order is awaiting release or
-	// released.
+	// released. When a null/undefined value is observed, it indicates it does not
+	// apply.
 	//
 	// Any of "AWAITING_RELEASE", "RELEASED".
 	QueueState QueueState `json:"queue_state" api:"nullable"`
-	// Scheduled release time for orders awaiting release.
+	// Scheduled release time for orders awaiting release. When a null/undefined value
+	// is observed, it indicates it does not apply.
 	ReleasesAt time.Time `json:"releases_at" api:"nullable" format:"date-time"`
-	// Stop price (for STOP and STOP_LIMIT orders)
+	// Stop price (for STOP and STOP_LIMIT orders) When a null/undefined value is
+	// observed, it indicates it does not apply.
 	StopPrice string `json:"stop_price" api:"nullable"`
-	// Current trailing limit price computed by the trailing strategy
+	// Current trailing limit price computed by the trailing strategy When a
+	// null/undefined value is observed, it indicates it does not apply.
 	TrailingLimitPx string `json:"trailing_limit_px" api:"nullable"`
-	// Trailing offset amount for trailing orders
+	// Trailing offset amount for trailing orders When a null/undefined value is
+	// observed, it indicates it does not apply.
 	TrailingOffset string `json:"trailing_offset" api:"nullable"`
-	// Trailing offset type for trailing orders
+	// Trailing offset type for trailing orders When a null/undefined value is
+	// observed, it indicates it does not apply.
 	//
 	// Any of "PRICE", "BPS".
 	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
-	// Current trailing stop price computed by the trailing strategy
+	// Current trailing stop price computed by the trailing strategy When a
+	// null/undefined value is observed, it indicates it does not apply.
 	TrailingStopPx string `json:"trailing_stop_px" api:"nullable"`
-	// Trailing watermark price for trailing orders
+	// Trailing watermark price for trailing orders When a null/undefined value is
+	// observed, it indicates it does not apply.
 	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
-	// Trailing watermark timestamp for trailing orders
+	// Trailing watermark timestamp for trailing orders When a null/undefined value is
+	// observed, it indicates it does not apply.
 	TrailingWatermarkTs time.Time `json:"trailing_watermark_ts" api:"nullable" format:"date-time"`
 	// Instrument ID of the option's underlying instrument. Populated only for options
-	// orders; `null` for non-options and for options whose underlier cannot be
-	// resolved.
+	// orders. A `null` means one of two things: the order is not an option, so the
+	// field does not apply; or the order is an option whose underlier has not yet been
+	// resolved. When a null/undefined value is observed, it indicates it does not
+	// apply.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
