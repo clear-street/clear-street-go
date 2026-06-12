@@ -107,7 +107,8 @@ type Account struct {
 	//
 	// Any of "CUSTOMER", "OTHER".
 	Type AccountType `json:"type" api:"required"`
-	// The date the account was closed, if applicable
+	// The date the account was closed, if applicable When a null/undefined value is
+	// observed, it indicates it does not apply.
 	CloseDate time.Time `json:"close_date" api:"nullable" format:"date"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -170,11 +171,14 @@ type AccountBalances struct {
 	UnsettledDebits string `json:"unsettled_debits" api:"required"`
 	// The amount of cash currently available to withdraw.
 	WithdrawableCash string `json:"withdrawable_cash" api:"required"`
-	// Margin-account-only details.
+	// Margin-account-only details. When a null/undefined value is observed, it
+	// indicates it does not apply.
 	MarginDetails MarginDetails `json:"margin_details" api:"nullable"`
-	// Applied multiplier for margin calculations.
+	// Applied multiplier for margin calculations. When a null/undefined value is
+	// observed, it indicates it does not apply.
 	Multiplier string `json:"multiplier" api:"nullable"`
-	// The total market value of all short positions.
+	// The total market value of all short positions. When null/undefined, the value
+	// should be assumed to be zero. The field is omitted to simplify the response.
 	ShortMarketValue string `json:"short_market_value" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -217,17 +221,22 @@ type AccountBalancesSod struct {
 	LongMarketValue string `json:"long_market_value" api:"required"`
 	// Start-of-day short market value.
 	ShortMarketValue string `json:"short_market_value" api:"required"`
-	// Timestamp for the start-of-day values.
+	// Timestamp for the start-of-day values. When a null/undefined value is observed,
+	// it indicates that there is no available data.
 	Asof time.Time `json:"asof" api:"nullable" format:"date"`
-	// Start-of-day day-trade buying power.
+	// Start-of-day day-trade buying power. When a null/undefined value is observed, it
+	// indicates it does not apply.
 	//
 	// Deprecated: deprecated
 	DayTradeBuyingPower string `json:"day_trade_buying_power" api:"nullable"`
-	// Start-of-day maintenance margin excess.
+	// Start-of-day maintenance margin excess. When a null/undefined value is observed,
+	// it indicates it does not apply.
 	MaintenanceMarginExcess string `json:"maintenance_margin_excess" api:"nullable"`
-	// Start-of-day maintenance margin requirement.
+	// Start-of-day maintenance margin requirement. When a null/undefined value is
+	// observed, it indicates it does not apply.
 	MaintenanceMarginRequirement string `json:"maintenance_margin_requirement" api:"nullable"`
-	// Start-of-day trade cash.
+	// Start-of-day trade cash. When a null/undefined value is observed, it indicates
+	// it does not apply.
 	TradeCash string `json:"trade_cash" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -254,7 +263,8 @@ func (r *AccountBalancesSod) UnmarshalJSON(data []byte) error {
 type AccountList []Account
 
 type AccountSettings struct {
-	// Risk settings for the account
+	// Risk settings for the account When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	Risk RiskSettings `json:"risk" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -317,13 +327,16 @@ type MarginDetails struct {
 	//
 	// Deprecated: deprecated
 	PatternDayTrader bool `json:"pattern_day_trader" api:"required"`
-	// The amount of day-trade buying power used during the current trading day.
+	// The amount of day-trade buying power used during the current trading day. When
+	// null/undefined, the value should be assumed to be zero. The field is omitted to
+	// simplify the response.
 	//
 	// Deprecated: deprecated
 	DayTradeBuyingPowerUsage string `json:"day_trade_buying_power_usage" api:"nullable"`
 	// Optional top margin contributors, returned only when explicitly requested.
 	TopContributors []MarginTopContributor `json:"top_contributors"`
-	// Current usage totals.
+	// Current usage totals. When a null/undefined value is observed, it indicates that
+	// there is no available data.
 	Usage MarginDetailsUsage `json:"usage" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -500,7 +513,8 @@ func (r *PortfolioHistorySegment) UnmarshalJSON(data []byte) error {
 
 // Risk settings for an account
 type RiskSettings struct {
-	// The maximum notional value available to the account
+	// The maximum notional value available to the account When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	MaxNotional string `json:"max_notional" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -527,7 +541,8 @@ func (r RiskSettings) ToParam() RiskSettingsParam {
 
 // Risk settings for an account
 type RiskSettingsParam struct {
-	// The maximum notional value available to the account
+	// The maximum notional value available to the account When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	MaxNotional param.Opt[string] `json:"max_notional,omitzero"`
 	paramObj
 }

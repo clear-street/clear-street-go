@@ -186,9 +186,11 @@ type WatchlistItemEntry struct {
 	ID string `json:"id" api:"required" format:"uuid"`
 	// When the item was added
 	AddedAt time.Time `json:"added_at" api:"required" format:"date-time"`
-	// Price when the item was added
+	// Price when the item was added When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	AddedPrice string `json:"added_price" api:"nullable"`
-	// Instrument details
+	// Instrument details When a null/undefined value is observed, it indicates that
+	// there is no available data.
 	Instrument Instrument `json:"instrument" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {

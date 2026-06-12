@@ -101,7 +101,8 @@ func (r *CancelResponsePayload) UnmarshalJSON(data []byte) error {
 type ErrorStatus struct {
 	Code    string `json:"code" api:"required"`
 	Message string `json:"message" api:"required"`
-	Details any    `json:"details" api:"nullable"`
+	// When a null/undefined value is observed, it indicates it does not apply.
+	Details any `json:"details" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Code        respjson.Field
@@ -127,11 +128,13 @@ type Response struct {
 	Status        ResponseStatus `json:"status" api:"required"`
 	ThreadID      string         `json:"thread_id" api:"required" format:"uuid"`
 	UserMessageID string         `json:"user_message_id" api:"required" format:"uuid"`
-	// Dynamic response content container. May include thinking parts.
+	// When a null/undefined value is observed, it indicates that there is no available
+	// data.
 	Content ResponseContent `json:"content" api:"nullable"`
-	// Shared sanitized error payload.
-	Error           ErrorStatus `json:"error" api:"nullable"`
-	OutputMessageID string      `json:"output_message_id" api:"nullable" format:"uuid"`
+	// When a null/undefined value is observed, it indicates it does not apply.
+	Error ErrorStatus `json:"error" api:"nullable"`
+	// When a null/undefined value is observed, it indicates it does not apply.
+	OutputMessageID string `json:"output_message_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID              respjson.Field

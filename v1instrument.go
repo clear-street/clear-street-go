@@ -134,28 +134,38 @@ type Instrument struct {
 	Symbol string `json:"symbol" api:"required"`
 	// The MIC code of the primary listing venue
 	Venue string `json:"venue" api:"required"`
-	// Average daily share volume from the security definition.
+	// Average daily share volume from the security definition. When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	Adv string `json:"adv" api:"nullable"`
-	// The expiration date for options instruments
+	// The expiration date for options instruments When a null/undefined value is
+	// observed, it indicates it does not apply.
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
-	// The type of security (e.g., Common Stock, ETF)
+	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	//
 	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
-	// The percent of a long position's value you must post as margin
+	// The percent of a long position's value you must post as margin When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
-	// The full name of the instrument or its issuer
+	// The full name of the instrument or its issuer When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// Notional average daily volume (ADV multiplied by previous close price).
+	// Notional average daily volume (ADV multiplied by previous close price). When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	NotionalAdv string `json:"notional_adv" api:"nullable"`
 	// Available options expiration dates for this instrument. Present only when
-	// `include_options_expiry_dates=true` in the request.
+	// `include_options_expiry_dates=true` in the request. When a null/undefined value
+	// is observed, it indicates it does not apply.
 	OptionsExpiryDates []time.Time `json:"options_expiry_dates" api:"nullable" format:"date"`
-	// Last close price from the security definition.
+	// Last close price from the security definition. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	PreviousClose string `json:"previous_close" api:"nullable"`
-	// The percent of a short position's value you must post as margin
+	// The percent of a short position's value you must post as margin When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
-	// The strike price for options instruments
+	// The strike price for options instruments When a null/undefined value is
+	// observed, it indicates it does not apply.
 	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -221,25 +231,34 @@ type InstrumentCore struct {
 	Symbol string `json:"symbol" api:"required"`
 	// The MIC code of the primary listing venue
 	Venue string `json:"venue" api:"required"`
-	// Average daily share volume from the security definition.
+	// Average daily share volume from the security definition. When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	Adv string `json:"adv" api:"nullable"`
-	// The expiration date for options instruments
+	// The expiration date for options instruments When a null/undefined value is
+	// observed, it indicates it does not apply.
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
-	// The type of security (e.g., Common Stock, ETF)
+	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	//
 	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
-	// The percent of a long position's value you must post as margin
+	// The percent of a long position's value you must post as margin When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
-	// The full name of the instrument or its issuer
+	// The full name of the instrument or its issuer When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// Notional average daily volume (ADV multiplied by previous close price).
+	// Notional average daily volume (ADV multiplied by previous close price). When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	NotionalAdv string `json:"notional_adv" api:"nullable"`
-	// Last close price from the security definition.
+	// Last close price from the security definition. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	PreviousClose string `json:"previous_close" api:"nullable"`
-	// The percent of a short position's value you must post as margin
+	// The percent of a short position's value you must post as margin When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
-	// The strike price for options instruments
+	// The strike price for options instruments When a null/undefined value is
+	// observed, it indicates it does not apply.
 	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -319,9 +338,11 @@ type OptionsContract struct {
 	StrikePrice string `json:"strike_price" api:"required"`
 	// OSI symbol (e.g. "AAPL 251219C00150000")
 	Symbol string `json:"symbol" api:"required"`
-	// Open interest (number of outstanding contracts), if available
+	// Open interest (number of outstanding contracts), if available When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	OpenInterest int64 `json:"open_interest" api:"nullable"`
-	// Instrument ID of the underlying instrument, when available
+	// Instrument ID of the underlying instrument, when available When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
