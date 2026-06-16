@@ -141,6 +141,10 @@ type AccountBalances struct {
 	BuyingPower string `json:"buying_power" api:"required"`
 	// Currency identifier for all monetary values.
 	Currency string `json:"currency" api:"required"`
+	// Difference between current equity and start-of-day equity.
+	DailyChange string `json:"daily_change" api:"required"`
+	// Total profit or loss since start of day.
+	DailyPnl string `json:"daily_pnl" api:"required"`
 	// Realized profit or loss since start of day.
 	DailyRealizedPnl string `json:"daily_realized_pnl" api:"required"`
 	// Total profit or loss since start of day.
@@ -165,6 +169,8 @@ type AccountBalances struct {
 	Sod AccountBalancesSod `json:"sod" api:"required"`
 	// Trade-date effective cash.
 	TradeCash string `json:"trade_cash" api:"required"`
+	// Total unrealized profit or loss across all open positions.
+	UnrealizedPnl string `json:"unrealized_pnl" api:"required"`
 	// Trade-date unsettled cash credits.
 	UnsettledCredits string `json:"unsettled_credits" api:"required"`
 	// Trade-date unsettled cash debits.
@@ -185,6 +191,8 @@ type AccountBalances struct {
 		AccountID           respjson.Field
 		BuyingPower         respjson.Field
 		Currency            respjson.Field
+		DailyChange         respjson.Field
+		DailyPnl            respjson.Field
 		DailyRealizedPnl    respjson.Field
 		DailyTotalPnl       respjson.Field
 		DailyUnrealizedPnl  respjson.Field
@@ -195,6 +203,7 @@ type AccountBalances struct {
 		SettledCash         respjson.Field
 		Sod                 respjson.Field
 		TradeCash           respjson.Field
+		UnrealizedPnl       respjson.Field
 		UnsettledCredits    respjson.Field
 		UnsettledDebits     respjson.Field
 		WithdrawableCash    respjson.Field

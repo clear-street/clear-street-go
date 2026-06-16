@@ -160,6 +160,9 @@ type Position struct {
 	// The total cost basis for this position When a null/undefined value is observed,
 	// it indicates that there is no available data.
 	CostBasis string `json:"cost_basis" api:"nullable"`
+	// The realized profit or loss for this position for the current day When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	DailyRealizedPnl string `json:"daily_realized_pnl" api:"nullable"`
 	// The unrealized profit or loss for this position relative to the previous close
 	// When a null/undefined value is observed, it indicates that there is no available
 	// data.
@@ -196,6 +199,7 @@ type Position struct {
 		ClosingPrice           respjson.Field
 		ClosingPriceDate       respjson.Field
 		CostBasis              respjson.Field
+		DailyRealizedPnl       respjson.Field
 		DailyUnrealizedPnl     respjson.Field
 		DailyUnrealizedPnlPct  respjson.Field
 		InstrumentPrice        respjson.Field
@@ -494,7 +498,7 @@ type V1PositionGetPositionsParams struct {
 	// Field to sort by
 	//
 	// Any of "SYMBOL", "INSTRUMENT_TYPE", "QUANTITY", "MARKET_VALUE", "POSITION_TYPE",
-	// "UNREALIZED_PNL", "DAILY_UNREALIZED_PNL".
+	// "UNREALIZED_PNL", "DAILY_UNREALIZED_PNL", "DAILY_REALIZED_PNL".
 	SortBy V1PositionGetPositionsParamsSortBy `query:"sort_by,omitzero" json:"-"`
 	// Sort direction
 	//
@@ -523,6 +527,7 @@ const (
 	V1PositionGetPositionsParamsSortByPositionType       V1PositionGetPositionsParamsSortBy = "POSITION_TYPE"
 	V1PositionGetPositionsParamsSortByUnrealizedPnl      V1PositionGetPositionsParamsSortBy = "UNREALIZED_PNL"
 	V1PositionGetPositionsParamsSortByDailyUnrealizedPnl V1PositionGetPositionsParamsSortBy = "DAILY_UNREALIZED_PNL"
+	V1PositionGetPositionsParamsSortByDailyRealizedPnl   V1PositionGetPositionsParamsSortBy = "DAILY_REALIZED_PNL"
 )
 
 // Sort direction
