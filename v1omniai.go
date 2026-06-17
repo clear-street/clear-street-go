@@ -348,6 +348,10 @@ type OpenScreenerAction struct {
 	Filters []ScreenerFilter `json:"filters" api:"required"`
 	// Optional field/column selection for screener results. When a null/undefined
 	// value is observed, it indicates it does not apply.
+	Columns []string `json:"columns" api:"nullable"`
+	// Deprecated: use `columns` instead. Mirrors `columns`.
+	//
+	// Deprecated: deprecated
 	FieldFilter []string `json:"field_filter" api:"nullable"`
 	// Optional page size. When a null/undefined value is observed, it indicates it
 	// does not apply.
@@ -361,6 +365,7 @@ type OpenScreenerAction struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Filters       respjson.Field
+		Columns       respjson.Field
 		FieldFilter   respjson.Field
 		PageSize      respjson.Field
 		SortBy        respjson.Field
@@ -525,30 +530,6 @@ type PromptButtonAction struct {
 // Returns the unmodified JSON received from the API
 func (r PromptButtonAction) RawJSON() string { return r.JSON.raw }
 func (r *PromptButtonAction) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// A single filter criterion for the screener.
-type ScreenerFilter struct {
-	// Field to filter on (e.g., "market_cap", "sector", "price")
-	Field string `json:"field" api:"required"`
-	// Comparison operator (e.g., "eq", "gte", "lte", "in")
-	Operator string `json:"operator" api:"required"`
-	// Filter value
-	Value any `json:"value" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Field       respjson.Field
-		Operator    respjson.Field
-		Value       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r ScreenerFilter) RawJSON() string { return r.JSON.raw }
-func (r *ScreenerFilter) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
