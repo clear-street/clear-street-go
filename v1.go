@@ -29,6 +29,8 @@ type V1Service struct {
 	Orders V1OrderService
 	// View positions and manage position instructions.
 	Positions V1PositionService
+	// Search instruments and manage saved screeners.
+	Screener V1ScreenerService
 	// Create and manage watchlists.
 	Watchlist V1WatchlistService
 }
@@ -47,6 +49,7 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 	r.OmniAI = NewV1OmniAIService(opts...)
 	r.Orders = NewV1OrderService(opts...)
 	r.Positions = NewV1PositionService(opts...)
+	r.Screener = NewV1ScreenerService(opts...)
 	r.Watchlist = NewV1WatchlistService(opts...)
 	return
 }
@@ -58,4 +61,12 @@ const (
 	SecurityTypeCommonStock SecurityType = "COMMON_STOCK"
 	SecurityTypeOption      SecurityType = "OPTION"
 	SecurityTypeCash        SecurityType = "CASH"
+)
+
+// Sort direction sorted results
+type SortDirection string
+
+const (
+	SortDirectionAsc  SortDirection = "ASC"
+	SortDirectionDesc SortDirection = "DESC"
 )
