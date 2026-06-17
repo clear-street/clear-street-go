@@ -137,8 +137,10 @@ type Instrument struct {
 	// Average daily share volume from the security definition. When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	Adv string `json:"adv" api:"nullable"`
-	// The expiration date for options instruments When a null/undefined value is
-	// observed, it indicates it does not apply.
+	// Deprecated. Always null. When a null/undefined value is observed, it indicates
+	// it does not apply.
+	//
+	// Deprecated: deprecated
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
 	// observed, it indicates that there is no available data.
@@ -164,8 +166,10 @@ type Instrument struct {
 	// The percent of a short position's value you must post as margin When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
-	// The strike price for options instruments When a null/undefined value is
-	// observed, it indicates it does not apply.
+	// Deprecated. Always null. When a null/undefined value is observed, it indicates
+	// it does not apply.
+	//
+	// Deprecated: deprecated
 	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -234,8 +238,10 @@ type InstrumentCore struct {
 	// Average daily share volume from the security definition. When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	Adv string `json:"adv" api:"nullable"`
-	// The expiration date for options instruments When a null/undefined value is
-	// observed, it indicates it does not apply.
+	// Deprecated. Always null. When a null/undefined value is observed, it indicates
+	// it does not apply.
+	//
+	// Deprecated: deprecated
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
 	// observed, it indicates that there is no available data.
@@ -257,8 +263,10 @@ type InstrumentCore struct {
 	// The percent of a short position's value you must post as margin When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
-	// The strike price for options instruments When a null/undefined value is
-	// observed, it indicates it does not apply.
+	// Deprecated. Always null. When a null/undefined value is observed, it indicates
+	// it does not apply.
+	//
+	// Deprecated: deprecated
 	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -476,7 +484,8 @@ type V1InstrumentGetInstrumentsParams struct {
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
-	// Comma-separated instrument identifiers
+	// Comma-separated instrument identifiers: unique identifiers or symbols (symbol
+	// for equities, OSI for options)
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g. COMMON_STOCK, OPTION)
 	//
