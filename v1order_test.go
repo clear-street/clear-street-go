@@ -152,6 +152,7 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 			From:                    clearstreet.Time(time.Now()),
 			InstrumentIDs:           []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 			InstrumentType:          clearstreet.V1OrderGetOrdersParamsInstrumentTypeCommonStock,
+			OrderIDs:                []string{"string"},
 			PageSize:                clearstreet.Int(1),
 			PageToken:               clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 			Status:                  []string{"PENDING_NEW"},

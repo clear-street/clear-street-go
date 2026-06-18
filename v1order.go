@@ -850,6 +850,9 @@ type V1OrderGetOrdersParams struct {
 	//
 	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType V1OrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
+	// Comma-separated order IDs to filter by. When provided, only orders whose order
+	// ID is in this set are returned.
+	OrderIDs []string `query:"order_ids,omitzero" json:"-"`
 	// Comma-separated order statuses to filter by
 	//
 	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
