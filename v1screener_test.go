@@ -46,7 +46,7 @@ func TestV1ScreenerNewScreenerWithOptionalParams(t *testing.T) {
 				ValueType: clearstreet.FieldTypeDecimal,
 			},
 			Op: clearstreet.FilterOpSpecParam{
-				Name: clearstreet.FilterOperatorLessThan,
+				Name: clearstreet.FilterOperatorGreaterOrEqual,
 				Args: []clearstreet.OperatorArg{clearstreet.OperatorArgLeftInclusive},
 			},
 			Right: []clearstreet.FilterValueParam{{
@@ -190,7 +190,7 @@ func TestV1ScreenerReplaceScreenerWithOptionalParams(t *testing.T) {
 					ValueType: clearstreet.FieldTypeDecimal,
 				},
 				Op: clearstreet.FilterOpSpecParam{
-					Name: clearstreet.FilterOperatorLessThan,
+					Name: clearstreet.FilterOperatorGreaterOrEqual,
 					Args: []clearstreet.OperatorArg{clearstreet.OperatorArgLeftInclusive},
 				},
 				Right: []clearstreet.FilterValueParam{{
@@ -276,7 +276,7 @@ func TestV1ScreenerSearchScreenerWithOptionalParams(t *testing.T) {
 				ValueType: clearstreet.FieldTypeDecimal,
 			},
 			Op: clearstreet.FilterOpSpecParam{
-				Name: clearstreet.FilterOperatorLessThan,
+				Name: clearstreet.FilterOperatorGreaterOrEqual,
 				Args: []clearstreet.OperatorArg{clearstreet.OperatorArgLeftInclusive},
 			},
 			Right: []clearstreet.FilterValueParam{{
