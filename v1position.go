@@ -472,7 +472,8 @@ func (r *V1PositionClosePositionsParams) UnmarshalJSON(data []byte) error {
 }
 
 type V1PositionGetPositionInstructionsParams struct {
-	// Limit results to a single contract. Accepts the instrument id or the OSI symbol.
+	// Limit results to a single contract. Instrument ID (UUID) or symbol (equity
+	// ticker or OSI option symbol).
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

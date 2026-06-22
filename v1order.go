@@ -222,8 +222,8 @@ type NewOrderRequest struct {
 	PositionEffect PositionEffect `json:"position_effect"`
 	// Stop price (required for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price" api:"nullable"`
-	// Trading symbol. For equities, use the ticker symbol (e.g., "AAPL"). For options,
-	// use the OSI symbol (e.g., "AAPL 250117C00190000"). Either `symbol` or
+	// Trading symbol. For equities, use the ticker symbol (e.g., "TSLA"). For options,
+	// use the OSI symbol (e.g., "TSLA 250117C00190000"). Either `symbol` or
 	// `instrument_id` must be provided.
 	Symbol string `json:"symbol" api:"nullable"`
 	// Trailing offset amount (required for trailing orders)
@@ -306,8 +306,8 @@ type NewOrderRequestParam struct {
 	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
 	// Stop price (required for STOP and STOP_LIMIT orders)
 	StopPrice param.Opt[string] `json:"stop_price,omitzero"`
-	// Trading symbol. For equities, use the ticker symbol (e.g., "AAPL"). For options,
-	// use the OSI symbol (e.g., "AAPL 250117C00190000"). Either `symbol` or
+	// Trading symbol. For equities, use the ticker symbol (e.g., "TSLA"). For options,
+	// use the OSI symbol (e.g., "TSLA 250117C00190000"). Either `symbol` or
 	// `instrument_id` must be provided.
 	Symbol param.Opt[string] `json:"symbol,omitzero"`
 	// Trailing offset amount (required for trailing orders)
