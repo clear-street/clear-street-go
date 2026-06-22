@@ -57,7 +57,13 @@ func (r *V1AccountService) GetAccountByID(ctx context.Context, accountID int64, 
 	return res, err
 }
 
-// List accounts the authenticated user has permission to access
+// List accounts the authenticated user has permission to access.
+//
+// Results can be narrowed with the optional `account_id` and `account_name`
+// filters. `account_id` is a lexicographic prefix match on the decimal account id
+// (e.g. `100` matches `100345` and `100567`); `account_name` is a case-insensitive
+// substring match on the account's full name. When both are supplied an account
+// must match both. When neither is supplied every accessible account is returned.
 func (r *V1AccountService) GetAccounts(ctx context.Context, query V1AccountGetAccountsParams, opts ...option.RequestOption) (res *V1AccountGetAccountsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/accounts"
@@ -667,6 +673,12 @@ func (r V1AccountGetAccountBalancesParams) URLQuery() (v url.Values, err error) 
 }
 
 type V1AccountGetAccountsParams struct {
+	// Filter to accounts whose id starts with this value (lexicographic prefix match
+	// on the decimal id, e.g. `100` matches `100345`).
+	AccountID param.Opt[string] `query:"account_id,omitzero" json:"-"`
+	// Filter to accounts whose full name contains this value (case-insensitive
+	// substring match).
+	AccountName param.Opt[string] `query:"account_name,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`

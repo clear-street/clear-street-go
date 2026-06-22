@@ -77,8 +77,10 @@ func TestV1AccountGetAccountsWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.Accounts.GetAccounts(context.TODO(), clearstreet.V1AccountGetAccountsParams{
-		PageSize:  clearstreet.Int(1),
-		PageToken: clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+		AccountID:   clearstreet.String("account_id"),
+		AccountName: clearstreet.String("account_name"),
+		PageSize:    clearstreet.Int(1),
+		PageToken:   clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 	})
 	if err != nil {
 		var apierr *clearstreet.Error
