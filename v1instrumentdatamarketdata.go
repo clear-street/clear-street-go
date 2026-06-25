@@ -226,25 +226,28 @@ func (r *SnapshotLastTrade) UnmarshalJSON(data []byte) error {
 
 // L1 quote fields for a market data snapshot.
 type SnapshotQuote struct {
-	// Current best ask.
-	Ask string `json:"ask" api:"required"`
-	// Current best bid.
-	Bid string `json:"bid" api:"required"`
-	// Midpoint of bid and ask.
-	Midpoint string `json:"midpoint" api:"required"`
+	// Current best ask. Absent when no ask is available (one-sided quote). When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	Ask string `json:"ask" api:"nullable"`
 	// Size at the best ask, in shares. When a null/undefined value is observed, it
 	// indicates that there is no available data.
 	AskSize int64 `json:"ask_size" api:"nullable"`
+	// Current best bid. Absent when no bid is available (one-sided quote). When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	Bid string `json:"bid" api:"nullable"`
 	// Size at the best bid, in shares. When a null/undefined value is observed, it
 	// indicates that there is no available data.
 	BidSize int64 `json:"bid_size" api:"nullable"`
+	// Midpoint of bid and ask. Absent when either side is missing. When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	Midpoint string `json:"midpoint" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Ask         respjson.Field
-		Bid         respjson.Field
-		Midpoint    respjson.Field
 		AskSize     respjson.Field
+		Bid         respjson.Field
 		BidSize     respjson.Field
+		Midpoint    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
