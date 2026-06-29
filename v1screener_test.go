@@ -32,12 +32,6 @@ func TestV1ScreenerNewScreenerWithOptionalParams(t *testing.T) {
 			Period:    clearstreet.FieldPeriodQuarter,
 			ValueType: clearstreet.FieldTypeDecimal,
 		}},
-		FieldFilter: []clearstreet.FieldRefParam{{
-			Name:      "market_cap",
-			Lookback:  clearstreet.FieldLookbackOneDay,
-			Period:    clearstreet.FieldPeriodQuarter,
-			ValueType: clearstreet.FieldTypeDecimal,
-		}},
 		Filters: []clearstreet.SearchFilterParam{{
 			Left: clearstreet.FieldRefParam{
 				Name:      "market_cap",
@@ -176,12 +170,6 @@ func TestV1ScreenerReplaceScreenerWithOptionalParams(t *testing.T) {
 				Period:    clearstreet.FieldPeriodQuarter,
 				ValueType: clearstreet.FieldTypeDecimal,
 			}},
-			FieldFilter: []clearstreet.FieldRefParam{{
-				Name:      "market_cap",
-				Lookback:  clearstreet.FieldLookbackOneDay,
-				Period:    clearstreet.FieldPeriodQuarter,
-				ValueType: clearstreet.FieldTypeDecimal,
-			}},
 			Filters: []clearstreet.SearchFilterParam{{
 				Left: clearstreet.FieldRefParam{
 					Name:      "market_cap",
@@ -258,12 +246,6 @@ func TestV1ScreenerSearchScreenerWithOptionalParams(t *testing.T) {
 			ValueType: clearstreet.FieldTypeDecimal,
 		}, {
 			Name:      "volume",
-			Lookback:  clearstreet.FieldLookbackOneDay,
-			Period:    clearstreet.FieldPeriodQuarter,
-			ValueType: clearstreet.FieldTypeDecimal,
-		}},
-		FieldFilter: []clearstreet.FieldRefParam{{
-			Name:      "market_cap",
 			Lookback:  clearstreet.FieldLookbackOneDay,
 			Period:    clearstreet.FieldPeriodQuarter,
 			ValueType: clearstreet.FieldTypeDecimal,
