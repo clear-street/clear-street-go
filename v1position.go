@@ -142,7 +142,7 @@ type Position struct {
 	MarketValue string `json:"market_value" api:"required"`
 	// The type of position
 	//
-	// Any of "LONG", "SHORT", "LONG_CALL", "SHORT_CALL", "LONG_PUT", "SHORT_PUT".
+	// Any of "LONG", "SHORT".
 	PositionType PositionType `json:"position_type" api:"required"`
 	// The number of shares or contracts. Can be positive (long) or negative (short)
 	Quantity string `json:"quantity" api:"required"`
@@ -324,12 +324,8 @@ type PositionList []Position
 type PositionType string
 
 const (
-	PositionTypeLong      PositionType = "LONG"
-	PositionTypeShort     PositionType = "SHORT"
-	PositionTypeLongCall  PositionType = "LONG_CALL"
-	PositionTypeShortCall PositionType = "SHORT_CALL"
-	PositionTypeLongPut   PositionType = "LONG_PUT"
-	PositionTypeShortPut  PositionType = "SHORT_PUT"
+	PositionTypeLong  PositionType = "LONG"
+	PositionTypeShort PositionType = "SHORT"
 )
 
 type V1PositionCancelPositionInstructionResponse struct {
