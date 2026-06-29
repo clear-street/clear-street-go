@@ -349,10 +349,6 @@ type OpenScreenerAction struct {
 	// Optional field/column selection for screener results. When a null/undefined
 	// value is observed, it indicates it does not apply.
 	Columns []string `json:"columns" api:"nullable"`
-	// Deprecated: use `columns` instead. Mirrors `columns`.
-	//
-	// Deprecated: deprecated
-	FieldFilter []string `json:"field_filter" api:"nullable"`
 	// Optional page size. When a null/undefined value is observed, it indicates it
 	// does not apply.
 	PageSize int64 `json:"page_size" api:"nullable"`
@@ -366,7 +362,6 @@ type OpenScreenerAction struct {
 	JSON struct {
 		Filters       respjson.Field
 		Columns       respjson.Field
-		FieldFilter   respjson.Field
 		PageSize      respjson.Field
 		SortBy        respjson.Field
 		SortDirection respjson.Field

@@ -596,11 +596,7 @@ type ScreenerEntry struct {
 	UpdatedAt time.Time      `json:"updated_at" api:"required" format:"date-time"`
 	// Field references included when running this screener.
 	Columns []FieldRef `json:"columns" api:"nullable"`
-	// Deprecated: use `columns` instead. Mirrors `columns`.
-	//
-	// Deprecated: deprecated
-	FieldFilter []FieldRef `json:"field_filter" api:"nullable"`
-	Sorts       []SortSpec `json:"sorts" api:"nullable"`
+	Sorts   []SortSpec `json:"sorts" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field
@@ -609,7 +605,6 @@ type ScreenerEntry struct {
 		Name        respjson.Field
 		UpdatedAt   respjson.Field
 		Columns     respjson.Field
-		FieldFilter respjson.Field
 		Sorts       respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -935,8 +930,6 @@ type V1ScreenerNewScreenerParams struct {
 	Name param.Opt[string] `json:"name,omitzero"`
 	// Structured field references to include when running this screener
 	Columns []FieldRefParam `json:"columns,omitzero"`
-	// Deprecated: use `columns` instead. Ignored when `columns` is provided.
-	FieldFilter []FieldRefParam `json:"field_filter,omitzero"`
 	// Structured search filter criteria
 	Filters []SearchFilterParam `json:"filters,omitzero"`
 	// Multi-field sort specifications
@@ -957,8 +950,6 @@ type V1ScreenerReplaceScreenerParams struct {
 	Name param.Opt[string] `json:"name,omitzero"`
 	// Structured field references to include when running this screener
 	Columns []FieldRefParam `json:"columns,omitzero"`
-	// Deprecated: use `columns` instead. Ignored when `columns` is provided.
-	FieldFilter []FieldRefParam `json:"field_filter,omitzero"`
 	// Structured search filter criteria
 	Filters []SearchFilterParam `json:"filters,omitzero"`
 	// Multi-field sort specifications
@@ -985,8 +976,6 @@ type V1ScreenerSearchScreenerParams struct {
 	SortCaseSensitive param.Opt[bool] `json:"sort_case_sensitive,omitzero"`
 	// Subset of fields to include in the response.
 	Columns []FieldRefParam `json:"columns,omitzero"`
-	// Deprecated: use `columns` instead. Ignored when `columns` is provided.
-	FieldFilter []FieldRefParam `json:"field_filter,omitzero"`
 	// Filter conditions to apply.
 	Filters []SearchFilterParam `json:"filters,omitzero"`
 	// Multi-field sort specifications.
