@@ -908,7 +908,7 @@ func (r *V1OrderReplaceOrderParams) UnmarshalJSON(data []byte) error {
 }
 
 type V1OrderSubmitOrdersParams struct {
-	Orders []V1OrderSubmitOrdersParamsOrderUnion
+	Orders []NewOrderRequestParam
 	paramObj
 }
 
@@ -916,85 +916,5 @@ func (r V1OrderSubmitOrdersParams) MarshalJSON() (data []byte, err error) {
 	return shimjson.Marshal(r.Orders)
 }
 func (r *V1OrderSubmitOrdersParams) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type V1OrderSubmitOrdersParamsOrderUnion struct {
-	OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest `json:",omitzero,inline"`
-	OfNewOrderRequest                                  *NewOrderRequestParam                                  `json:",omitzero,inline"`
-	paramUnion
-}
-
-func (u V1OrderSubmitOrdersParamsOrderUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest, u.OfNewOrderRequest)
-}
-func (u *V1OrderSubmitOrdersParamsOrderUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, u)
-}
-
-// Multileg strategy order request
-//
-// The properties Legs, OrderType, TimeInForce are required.
-type V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest struct {
-	// Legs that compose the strategy.
-	Legs []V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg `json:"legs,omitzero" api:"required"`
-	// Type of order (currently MARKET or LIMIT for multileg strategy submission)
-	//
-	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
-	// "TRAILING_STOP_LIMIT".
-	OrderType RequestOrderType `json:"order_type,omitzero" api:"required"`
-	// Time in force
-	//
-	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
-	TimeInForce RequestTimeInForce `json:"time_in_force,omitzero" api:"required"`
-	// Optional client-provided unique ID (idempotency). Required to be unique per
-	// account.
-	ID param.Opt[string] `json:"id,omitzero"`
-	// Strategy price, required for LIMIT orders.
-	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
-	// Optional strategy-level quantity. Multiplies leg quantities. Defaults to 1.
-	Quantity param.Opt[string] `json:"quantity,omitzero"`
-	paramObj
-}
-
-func (r V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest) MarshalJSON() (data []byte, err error) {
-	type shadow V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// A single leg in a multileg strategy request.
-//
-// The properties Ratio, Security, Side are required.
-type V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
-	// Ratio for the leg.
-	Ratio string `json:"ratio" api:"required"`
-	// Trading symbol (e.g. "AAPL" or OSI symbol for options)
-	Security string `json:"security" api:"required"`
-	// Leg side.
-	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side Side `json:"side,omitzero" api:"required"`
-	// Optional leg reference identifier.
-	ID param.Opt[string] `json:"id,omitzero"`
-	// Optional leg position effect.
-	//
-	// Any of "OPEN", "CLOSE".
-	PositionEffect PositionEffect `json:"position_effect,omitzero"`
-	paramObj
-}
-
-func (r V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) MarshalJSON() (data []byte, err error) {
-	type shadow V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
