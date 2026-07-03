@@ -803,9 +803,6 @@ type V1OrderCancelOpenOrderParams struct {
 type V1OrderGetExecutionsParams struct {
 	// The start date and time for the query range, inclusive (ISO 8601 format)
 	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
-	// Optional instrument to filter by. Accepts either a symbol (e.g. `AAPL`) or an
-	// instrument identifier.
-	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" format:"uuid" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
@@ -814,6 +811,10 @@ type V1OrderGetExecutionsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// The end date and time for the query range, inclusive (ISO 8601 format)
 	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
+	// Comma-separated instrument identifiers (UUIDs) or symbols (e.g. `AAPL`) to
+	// filter by. When provided, only executions for any of the listed instruments are
+	// returned.
+	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
