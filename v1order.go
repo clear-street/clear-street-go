@@ -216,10 +216,6 @@ type NewOrderRequest struct {
 	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// Limit price (required for LIMIT and STOP_LIMIT orders)
 	LimitPrice string `json:"limit_price" api:"nullable"`
-	// Required for options. Specifies whether the order opens or closes a position.
-	//
-	// Any of "OPEN", "CLOSE".
-	PositionEffect PositionEffect `json:"position_effect"`
 	// Stop price (required for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price" api:"nullable"`
 	// Trading symbol. For equities, use the ticker symbol (e.g., "TSLA"). For options,
@@ -244,7 +240,6 @@ type NewOrderRequest struct {
 		InstrumentID       respjson.Field
 		LimitOffset        respjson.Field
 		LimitPrice         respjson.Field
-		PositionEffect     respjson.Field
 		StopPrice          respjson.Field
 		Symbol             respjson.Field
 		TrailingOffset     respjson.Field
@@ -314,10 +309,6 @@ type NewOrderRequestParam struct {
 	TrailingOffset param.Opt[string] `json:"trailing_offset,omitzero"`
 	// Instrument identifier
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `json:"instrument_id,omitzero" format:"uuid"`
-	// Required for options. Specifies whether the order opens or closes a position.
-	//
-	// Any of "OPEN", "CLOSE".
-	PositionEffect PositionEffect `json:"position_effect,omitzero"`
 	// Trailing offset type (PRICE or PERCENT_BPS)
 	//
 	// Any of "PRICE", "BPS".
@@ -520,14 +511,6 @@ const (
 	OrderTypeTrailingStop      OrderType = "TRAILING_STOP"
 	OrderTypeTrailingStopLimit OrderType = "TRAILING_STOP_LIMIT"
 	OrderTypeOther             OrderType = "OTHER"
-)
-
-// Position effect for options orders
-type PositionEffect string
-
-const (
-	PositionEffectOpen  PositionEffect = "OPEN"
-	PositionEffectClose PositionEffect = "CLOSE"
 )
 
 // Parent order queue or hold state.
