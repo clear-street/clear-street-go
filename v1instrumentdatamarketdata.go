@@ -63,13 +63,16 @@ func (r *V1InstrumentDataMarketDataService) GetSnapshots(ctx context.Context, qu
 // Daily aggregate (OHLV) summary for a single instrument.
 //
 // Returned by `GET /market-data/daily-summary`. Every field except `instrument_id`
-// is `Option`:
+// and `not_applicable` is `Option`:
 //
 //   - Unresolvable `instrument_id` → all other fields `None` (including `symbol`).
 //   - Resolvable `instrument_id` with no realtime cache entry → `symbol` populated,
 //     OHLV/`trade_date` `None`.
 //   - `trade_date` reflects the session the OHLV represents (today during trading
 //     hours, the last trading date during weekends/holidays).
+//   - `not_applicable` is a non-optional `bool`, always serialized: `true` for
+//     instrument types with no daily summary by definition (e.g. an index, whose
+//     OHLV/`trade_date` are `None`), `false` otherwise.
 type DailySummary struct {
 	// Unique instrument identifier. Always populated; echoes the request ID.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
@@ -79,6 +82,10 @@ type DailySummary struct {
 	// Session low. When a null/undefined value is observed, it indicates that there is
 	// no available data.
 	Low string `json:"low" api:"nullable"`
+	// `true` when the instrument type has no daily summary by definition (e.g. an
+	// index). Distinguishes an intentional N/A from OHLV that is merely not loaded
+	// yet. `false` for instruments that can have a summary.
+	NotApplicable bool `json:"not_applicable"`
 	// Opening price for the session. When a null/undefined value is observed, it
 	// indicates that there is no available data.
 	Open string `json:"open" api:"nullable"`
@@ -93,15 +100,16 @@ type DailySummary struct {
 	Volume int64 `json:"volume" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		InstrumentID respjson.Field
-		High         respjson.Field
-		Low          respjson.Field
-		Open         respjson.Field
-		Symbol       respjson.Field
-		TradeDate    respjson.Field
-		Volume       respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
+		InstrumentID  respjson.Field
+		High          respjson.Field
+		Low           respjson.Field
+		NotApplicable respjson.Field
+		Open          respjson.Field
+		Symbol        respjson.Field
+		TradeDate     respjson.Field
+		Volume        respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
 	} `json:"-"`
 }
 
@@ -204,10 +212,16 @@ func (r *SnapshotGreeks) UnmarshalJSON(data []byte) error {
 }
 
 // Last-trade fields for a market data snapshot.
+//
+// For index instruments this carries the current index _level_ — a computed value,
+// not a trade: `price` is the level and `size` is always `0` (no contract changes
+// hands).
 type SnapshotLastTrade struct {
-	// Most recent last-sale eligible trade price.
+	// Most recent last-sale eligible trade price. For index instruments, the current
+	// index level.
 	Price string `json:"price" api:"required"`
-	// Share quantity of the most recent last-sale eligible trade.
+	// Share quantity of the most recent last-sale eligible trade. Always `0` for index
+	// instruments, whose level is computed rather than traded.
 	Size int64 `json:"size" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
