@@ -15,7 +15,6 @@ import (
 )
 
 func TestV1AccountGetAccountBalancesWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -44,7 +43,6 @@ func TestV1AccountGetAccountBalancesWithOptionalParams(t *testing.T) {
 }
 
 func TestV1AccountGetAccountByID(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -67,7 +65,6 @@ func TestV1AccountGetAccountByID(t *testing.T) {
 }
 
 func TestV1AccountGetAccountsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -80,8 +77,10 @@ func TestV1AccountGetAccountsWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.Accounts.GetAccounts(context.TODO(), clearstreet.V1AccountGetAccountsParams{
-		PageSize:  clearstreet.Int(1),
-		PageToken: clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+		AccountID:   clearstreet.String("account_id"),
+		AccountName: clearstreet.String("account_name"),
+		PageSize:    clearstreet.Int(1),
+		PageToken:   clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 	})
 	if err != nil {
 		var apierr *clearstreet.Error
@@ -93,7 +92,6 @@ func TestV1AccountGetAccountsWithOptionalParams(t *testing.T) {
 }
 
 func TestV1AccountGetPortfolioHistoryWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -123,7 +121,6 @@ func TestV1AccountGetPortfolioHistoryWithOptionalParams(t *testing.T) {
 }
 
 func TestV1AccountPatchAccountByIDWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL

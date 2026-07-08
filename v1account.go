@@ -57,7 +57,13 @@ func (r *V1AccountService) GetAccountByID(ctx context.Context, accountID int64, 
 	return res, err
 }
 
-// List accounts the authenticated user has permission to access
+// List accounts the authenticated user has permission to access.
+//
+// Results can be narrowed with the optional `account_id` and `account_name`
+// filters. `account_id` is a lexicographic prefix match on the decimal account id
+// (e.g. `100` matches `100345` and `100567`); `account_name` is a case-insensitive
+// substring match on the account's full name. When both are supplied an account
+// must match both. When neither is supplied every accessible account is returned.
 func (r *V1AccountService) GetAccounts(ctx context.Context, query V1AccountGetAccountsParams, opts ...option.RequestOption) (res *V1AccountGetAccountsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/accounts"
@@ -107,7 +113,8 @@ type Account struct {
 	//
 	// Any of "CUSTOMER", "OTHER".
 	Type AccountType `json:"type" api:"required"`
-	// The date the account was closed, if applicable
+	// The date the account was closed, if applicable When a null/undefined value is
+	// observed, it indicates it does not apply.
 	CloseDate time.Time `json:"close_date" api:"nullable" format:"date"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -140,6 +147,10 @@ type AccountBalances struct {
 	BuyingPower string `json:"buying_power" api:"required"`
 	// Currency identifier for all monetary values.
 	Currency string `json:"currency" api:"required"`
+	// Difference between current equity and start-of-day equity.
+	DailyChange string `json:"daily_change" api:"required"`
+	// Total profit or loss since start of day.
+	DailyPnl string `json:"daily_pnl" api:"required"`
 	// Realized profit or loss since start of day.
 	DailyRealizedPnl string `json:"daily_realized_pnl" api:"required"`
 	// Total profit or loss since start of day.
@@ -164,23 +175,30 @@ type AccountBalances struct {
 	Sod AccountBalancesSod `json:"sod" api:"required"`
 	// Trade-date effective cash.
 	TradeCash string `json:"trade_cash" api:"required"`
+	// Total unrealized profit or loss across all open positions.
+	UnrealizedPnl string `json:"unrealized_pnl" api:"required"`
 	// Trade-date unsettled cash credits.
 	UnsettledCredits string `json:"unsettled_credits" api:"required"`
 	// Trade-date unsettled cash debits.
 	UnsettledDebits string `json:"unsettled_debits" api:"required"`
 	// The amount of cash currently available to withdraw.
 	WithdrawableCash string `json:"withdrawable_cash" api:"required"`
-	// Margin-account-only details.
+	// Margin-account-only details. When a null/undefined value is observed, it
+	// indicates it does not apply.
 	MarginDetails MarginDetails `json:"margin_details" api:"nullable"`
-	// Applied multiplier for margin calculations.
+	// Applied multiplier for margin calculations. When a null/undefined value is
+	// observed, it indicates it does not apply.
 	Multiplier string `json:"multiplier" api:"nullable"`
-	// The total market value of all short positions.
+	// The total market value of all short positions. When null/undefined, the value
+	// should be assumed to be zero. The field is omitted to simplify the response.
 	ShortMarketValue string `json:"short_market_value" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AccountID           respjson.Field
 		BuyingPower         respjson.Field
 		Currency            respjson.Field
+		DailyChange         respjson.Field
+		DailyPnl            respjson.Field
 		DailyRealizedPnl    respjson.Field
 		DailyTotalPnl       respjson.Field
 		DailyUnrealizedPnl  respjson.Field
@@ -191,6 +209,7 @@ type AccountBalances struct {
 		SettledCash         respjson.Field
 		Sod                 respjson.Field
 		TradeCash           respjson.Field
+		UnrealizedPnl       respjson.Field
 		UnsettledCredits    respjson.Field
 		UnsettledDebits     respjson.Field
 		WithdrawableCash    respjson.Field
@@ -217,15 +236,22 @@ type AccountBalancesSod struct {
 	LongMarketValue string `json:"long_market_value" api:"required"`
 	// Start-of-day short market value.
 	ShortMarketValue string `json:"short_market_value" api:"required"`
-	// Timestamp for the start-of-day values.
+	// Timestamp for the start-of-day values. When a null/undefined value is observed,
+	// it indicates that there is no available data.
 	Asof time.Time `json:"asof" api:"nullable" format:"date"`
-	// Start-of-day day-trade buying power.
+	// Start-of-day day-trade buying power. When a null/undefined value is observed, it
+	// indicates it does not apply.
+	//
+	// Deprecated: deprecated
 	DayTradeBuyingPower string `json:"day_trade_buying_power" api:"nullable"`
-	// Start-of-day maintenance margin excess.
+	// Start-of-day maintenance margin excess. When a null/undefined value is observed,
+	// it indicates it does not apply.
 	MaintenanceMarginExcess string `json:"maintenance_margin_excess" api:"nullable"`
-	// Start-of-day maintenance margin requirement.
+	// Start-of-day maintenance margin requirement. When a null/undefined value is
+	// observed, it indicates it does not apply.
 	MaintenanceMarginRequirement string `json:"maintenance_margin_requirement" api:"nullable"`
-	// Start-of-day trade cash.
+	// Start-of-day trade cash. When a null/undefined value is observed, it indicates
+	// it does not apply.
 	TradeCash string `json:"trade_cash" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -252,7 +278,8 @@ func (r *AccountBalancesSod) UnmarshalJSON(data []byte) error {
 type AccountList []Account
 
 type AccountSettings struct {
-	// Risk settings for the account
+	// Risk settings for the account When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	Risk RiskSettings `json:"risk" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -296,30 +323,45 @@ const (
 
 type MarginDetails struct {
 	// The number of day trades executed over the 5 most recent trading days.
+	//
+	// Deprecated: deprecated
 	DayTradeCount int64 `json:"day_trade_count" api:"required"`
 	// Initial margin excess for trade-date balances.
 	InitialMarginExcess string `json:"initial_margin_excess" api:"required"`
 	// Initial margin requirement for trade-date balances.
 	InitialMarginRequirement string `json:"initial_margin_requirement" api:"required"`
+	// Intraday session margin calculation details.
+	IntradayDetails MarginSessionDetails `json:"intraday_details" api:"required"`
 	// Maintenance margin excess for trade-date balances.
 	MaintenanceMarginExcess string `json:"maintenance_margin_excess" api:"required"`
 	// Maintenance margin requirement for trade-date balances.
 	MaintenanceMarginRequirement string `json:"maintenance_margin_requirement" api:"required"`
+	// Overnight session margin calculation details.
+	OvernightDetails MarginSessionDetails `json:"overnight_details" api:"required"`
 	// `true` if the account is currently flagged as a PDT, otherwise `false`.
+	//
+	// Deprecated: deprecated
 	PatternDayTrader bool `json:"pattern_day_trader" api:"required"`
-	// The amount of day-trade buying power used during the current trading day.
+	// The amount of day-trade buying power used during the current trading day. When
+	// null/undefined, the value should be assumed to be zero. The field is omitted to
+	// simplify the response.
+	//
+	// Deprecated: deprecated
 	DayTradeBuyingPowerUsage string `json:"day_trade_buying_power_usage" api:"nullable"`
 	// Optional top margin contributors, returned only when explicitly requested.
 	TopContributors []MarginTopContributor `json:"top_contributors"`
-	// Current usage totals.
+	// Current usage totals. When a null/undefined value is observed, it indicates that
+	// there is no available data.
 	Usage MarginDetailsUsage `json:"usage" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		DayTradeCount                respjson.Field
 		InitialMarginExcess          respjson.Field
 		InitialMarginRequirement     respjson.Field
+		IntradayDetails              respjson.Field
 		MaintenanceMarginExcess      respjson.Field
 		MaintenanceMarginRequirement respjson.Field
+		OvernightDetails             respjson.Field
 		PatternDayTrader             respjson.Field
 		DayTradeBuyingPowerUsage     respjson.Field
 		TopContributors              respjson.Field
@@ -355,9 +397,31 @@ func (r *MarginDetailsUsage) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type MarginSessionDetails struct {
+	// Maximum buying power available in the account during the session.
+	BuyingPower string `json:"buying_power" api:"required"`
+	// Effective multiplier for margin calculations during the session.
+	Multiplier string `json:"multiplier" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		BuyingPower respjson.Field
+		Multiplier  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r MarginSessionDetails) RawJSON() string { return r.JSON.raw }
+func (r *MarginSessionDetails) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type MarginTopContributor struct {
 	// Day-trade buying power consumed by fills against this underlying on the current
 	// trade date. Populated only for pattern day trader accounts.
+	//
+	// Deprecated: deprecated
 	DayTradeBuyingPowerUsage string `json:"day_trade_buying_power_usage" api:"required"`
 	// Initial margin requirement attributable to this underlying.
 	InitialMarginRequirement string `json:"initial_margin_requirement" api:"required"`
@@ -464,7 +528,8 @@ func (r *PortfolioHistorySegment) UnmarshalJSON(data []byte) error {
 
 // Risk settings for an account
 type RiskSettings struct {
-	// The maximum notional value available to the account
+	// The maximum notional value available to the account When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	MaxNotional string `json:"max_notional" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -491,7 +556,8 @@ func (r RiskSettings) ToParam() RiskSettingsParam {
 
 // Risk settings for an account
 type RiskSettingsParam struct {
-	// The maximum notional value available to the account
+	// The maximum notional value available to the account When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	MaxNotional param.Opt[string] `json:"max_notional,omitzero"`
 	paramObj
 }
@@ -592,7 +658,7 @@ func (r *V1AccountPatchAccountByIDResponse) UnmarshalJSON(data []byte) error {
 }
 
 type V1AccountGetAccountBalancesParams struct {
-	// Limit the number of top margin contributors returned by the engine.
+	// Limit the number of top margin contributors returned.
 	TopMarginContributorsLimit param.Opt[int64] `query:"top_margin_contributors_limit,omitzero" json:"-"`
 	paramObj
 }
@@ -607,6 +673,12 @@ func (r V1AccountGetAccountBalancesParams) URLQuery() (v url.Values, err error) 
 }
 
 type V1AccountGetAccountsParams struct {
+	// Filter to accounts whose id starts with this value (lexicographic prefix match
+	// on the decimal id, e.g. `100` matches `100345`).
+	AccountID param.Opt[string] `query:"account_id,omitzero" json:"-"`
+	// Filter to accounts whose full name contains this value (case-insensitive
+	// substring match).
+	AccountName param.Opt[string] `query:"account_name,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`

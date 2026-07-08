@@ -38,18 +38,13 @@ func NewV1InstrumentDataMarketDataService(opts ...option.RequestOption) (r V1Ins
 	return
 }
 
-// Returns the most recent OHLV and current price for the requested OEMS
-// instruments. Backed by the in-memory Polygon snapshot cache.
+// Returns the most recent open, high, low, volume (OHLV) and current price for the
+// requested instruments.
 //
 // Response contract: every request returns one row per **unique** `instrument_id`,
 // in first-seen request order. Unresolvable IDs come back with `symbol = null` and
-// every market-data field `null`; resolvable IDs with no cache entry come back
+// every market-data field `null`; resolvable IDs with no available data come back
 // with `symbol` populated but market-data fields `null`.
-//
-// **Note (temporary):** ID resolution currently goes through the supplemental
-// screener (OEMS instrument_id → FMP fmp_symbol → metadata_id → realtime cache).
-// Removed when the market-data service serves daily aggregates directly, or when
-// Polygon symbology is loaded into the instrument cache.
 func (r *V1InstrumentDataMarketDataService) GetDailySummaries(ctx context.Context, query V1InstrumentDataMarketDataGetDailySummariesParams, opts ...option.RequestOption) (res *V1InstrumentDataMarketDataGetDailySummariesResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/market-data/daily-summary"
@@ -68,39 +63,53 @@ func (r *V1InstrumentDataMarketDataService) GetSnapshots(ctx context.Context, qu
 // Daily aggregate (OHLV) summary for a single instrument.
 //
 // Returned by `GET /market-data/daily-summary`. Every field except `instrument_id`
-// is `Option`:
+// and `not_applicable` is `Option`:
 //
 //   - Unresolvable `instrument_id` → all other fields `None` (including `symbol`).
 //   - Resolvable `instrument_id` with no realtime cache entry → `symbol` populated,
 //     OHLV/`trade_date` `None`.
 //   - `trade_date` reflects the session the OHLV represents (today during trading
 //     hours, the last trading date during weekends/holidays).
+//   - `not_applicable` is a non-optional `bool`, always serialized: `true` for
+//     instrument types with no daily summary by definition (e.g. an index, whose
+//     OHLV/`trade_date` are `None`), `false` otherwise.
 type DailySummary struct {
-	// OEMS instrument identifier. Always populated; echoes the request ID.
+	// Unique instrument identifier. Always populated; echoes the request ID.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
-	// Session high.
+	// Session high. When a null/undefined value is observed, it indicates that there
+	// is no available data.
 	High string `json:"high" api:"nullable"`
-	// Session low.
+	// Session low. When a null/undefined value is observed, it indicates that there is
+	// no available data.
 	Low string `json:"low" api:"nullable"`
-	// Opening price for the session.
+	// `true` when the instrument type has no daily summary by definition (e.g. an
+	// index). Distinguishes an intentional N/A from OHLV that is merely not loaded
+	// yet. `false` for instruments that can have a summary.
+	NotApplicable bool `json:"not_applicable"`
+	// Opening price for the session. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	Open string `json:"open" api:"nullable"`
-	// Display symbol for the security. `None` for unresolvable IDs.
+	// Display symbol for the security. `None` for unresolvable IDs. When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	Symbol string `json:"symbol" api:"nullable"`
-	// Session date the OHLV represents, US/Eastern.
+	// Session date the OHLV represents, US/Eastern. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	TradeDate time.Time `json:"trade_date" api:"nullable" format:"date"`
-	// Session cumulative trading volume.
+	// Session cumulative trading volume. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	Volume int64 `json:"volume" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		InstrumentID respjson.Field
-		High         respjson.Field
-		Low          respjson.Field
-		Open         respjson.Field
-		Symbol       respjson.Field
-		TradeDate    respjson.Field
-		Volume       respjson.Field
-		ExtraFields  map[string]respjson.Field
-		raw          string
+		InstrumentID  respjson.Field
+		High          respjson.Field
+		Low           respjson.Field
+		NotApplicable respjson.Field
+		Open          respjson.Field
+		Symbol        respjson.Field
+		TradeDate     respjson.Field
+		Volume        respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
 	} `json:"-"`
 }
 
@@ -114,23 +123,30 @@ type DailySummaryList []DailySummary
 
 // Market data snapshot for a single security.
 type MarketDataSnapshot struct {
-	// OEMS instrument identifier.
+	// Unique instrument identifier.
 	InstrumentID string `json:"instrument_id" api:"required"`
 	// Display symbol for the security.
 	Symbol string `json:"symbol" api:"required"`
 	// Cumulative traded volume reported on the most recent trade, in shares for
-	// equities or contracts for options. Absent when no trade is available.
+	// equities or contracts for options. Absent when no trade is available. When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	CumulativeVolume int64 `json:"cumulative_volume" api:"nullable"`
 	// Theoretical price and Greeks for option instruments. `None` for equities, and
-	// for options whose Greeks have not yet been observed
+	// for options whose Greeks have not yet been observed When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	Greeks SnapshotGreeks `json:"greeks" api:"nullable"`
-	// Most recent quote if available.
+	// Most recent quote if available. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	LastQuote SnapshotQuote `json:"last_quote" api:"nullable"`
-	// Most recent last-sale trade if available.
+	// Most recent last-sale trade if available. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	LastTrade SnapshotLastTrade `json:"last_trade" api:"nullable"`
-	// Security name if available.
+	// Security name if available. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// Session metrics computed from previous close and last trade, if available.
+	// Session metrics computed from previous close and last trade, if available. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
 	Session SnapshotSession `json:"session" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -156,7 +172,7 @@ func (r *MarketDataSnapshot) UnmarshalJSON(data []byte) error {
 type MarketDataSnapshotList []MarketDataSnapshot
 
 // Theoretical price and Greeks for an options snapshot. All values are **per
-// share** as published by RENG; no contract multiplier is applied.
+// share**; no contract multiplier is applied.
 type SnapshotGreeks struct {
 	// Delta: ∂V/∂S, range \[-1, 1\].
 	Delta string `json:"delta" api:"required"`
@@ -170,7 +186,7 @@ type SnapshotGreeks struct {
 	TheoPrice string `json:"theo_price" api:"required"`
 	// Theta per trading day.
 	Theta string `json:"theta" api:"required"`
-	// Event timestamp published by RENG.
+	// Timestamp when the Greeks were calculated.
 	Timestamp time.Time `json:"timestamp" api:"required" format:"date-time"`
 	// Vega per 1.0 vol point.
 	Vega string `json:"vega" api:"required"`
@@ -196,10 +212,16 @@ func (r *SnapshotGreeks) UnmarshalJSON(data []byte) error {
 }
 
 // Last-trade fields for a market data snapshot.
+//
+// For index instruments this carries the current index _level_ — a computed value,
+// not a trade: `price` is the level and `size` is always `0` (no contract changes
+// hands).
 type SnapshotLastTrade struct {
-	// Most recent last-sale eligible trade price.
+	// Most recent last-sale eligible trade price. For index instruments, the current
+	// index level.
 	Price string `json:"price" api:"required"`
-	// Share quantity of the most recent last-sale eligible trade.
+	// Share quantity of the most recent last-sale eligible trade. Always `0` for index
+	// instruments, whose level is computed rather than traded.
 	Size int64 `json:"size" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -218,23 +240,28 @@ func (r *SnapshotLastTrade) UnmarshalJSON(data []byte) error {
 
 // L1 quote fields for a market data snapshot.
 type SnapshotQuote struct {
-	// Current best ask.
-	Ask string `json:"ask" api:"required"`
-	// Current best bid.
-	Bid string `json:"bid" api:"required"`
-	// Midpoint of bid and ask.
-	Midpoint string `json:"midpoint" api:"required"`
-	// Size at the best ask, in shares.
+	// Current best ask. Absent when no ask is available (one-sided quote). When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	Ask string `json:"ask" api:"nullable"`
+	// Size at the best ask, in shares. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	AskSize int64 `json:"ask_size" api:"nullable"`
-	// Size at the best bid, in shares.
+	// Current best bid. Absent when no bid is available (one-sided quote). When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	Bid string `json:"bid" api:"nullable"`
+	// Size at the best bid, in shares. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	BidSize int64 `json:"bid_size" api:"nullable"`
+	// Midpoint of bid and ask. Absent when either side is missing. When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	Midpoint string `json:"midpoint" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Ask         respjson.Field
-		Bid         respjson.Field
-		Midpoint    respjson.Field
 		AskSize     respjson.Field
+		Bid         respjson.Field
 		BidSize     respjson.Field
+		Midpoint    respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -305,7 +332,7 @@ func (r *V1InstrumentDataMarketDataGetSnapshotsResponse) UnmarshalJSON(data []by
 }
 
 type V1InstrumentDataMarketDataGetDailySummariesParams struct {
-	// Comma-separated OEMS instrument UUIDs (required, 1..=100)
+	// Comma-separated instrument identifiers (required, 1..=100)
 	InstrumentIDs string `query:"instrument_ids" api:"required" json:"-"`
 	paramObj
 }
@@ -320,7 +347,7 @@ func (r V1InstrumentDataMarketDataGetDailySummariesParams) URLQuery() (v url.Val
 }
 
 type V1InstrumentDataMarketDataGetSnapshotsParams struct {
-	// Comma-separated OEMS instrument UUIDs.
+	// Comma-separated instrument identifiers.
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
 }

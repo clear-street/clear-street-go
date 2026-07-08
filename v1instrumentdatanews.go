@@ -50,11 +50,13 @@ func (r *V1InstrumentDataNewsService) GetNews(ctx context.Context, query V1Instr
 
 // Instrument associated with a news item.
 type NewsInstrument struct {
-	// OEMS instrument UUID.
+	// Instrument identifier.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
-	// Instrument name/description, if available from instrument cache enrichment.
+	// Instrument name/description, if available. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// Trading symbol, if available from instrument cache enrichment.
+	// Trading symbol, if available. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	Symbol string `json:"symbol" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -88,11 +90,14 @@ type NewsItem struct {
 	Title string `json:"title" api:"required"`
 	// Canonical URL to the full article.
 	URL string `json:"url" api:"required"`
-	// URL of an associated image if provided by the source.
+	// URL of an associated image if provided by the source. When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	ImageURL string `json:"image_url" api:"nullable"`
-	// The primary domain/site of the publisher.
+	// The primary domain/site of the publisher. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	Site string `json:"site" api:"nullable"`
-	// The full or excerpted article body.
+	// The full or excerpted article body. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	Text string `json:"text" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -162,7 +167,7 @@ type V1InstrumentDataNewsGetNewsParams struct {
 	SearchQuery param.Opt[string] `query:"search_query,omitzero" json:"-"`
 	// Inclusive end timestamp. Accepts `YYYY-MM-DD` or RFC3339 datetime.
 	To param.Opt[string] `query:"to,omitzero" json:"-"`
-	// Comma-delimited OEMS instrument UUIDs to filter by.
+	// Comma-delimited instrument identifiers to filter by.
 	InstrumentIDs []string `query:"instrument_ids,omitzero" json:"-"`
 	// Filter by news type.
 	//

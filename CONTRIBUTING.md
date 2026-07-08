@@ -46,6 +46,12 @@ $ go mod edit -replace github.com/clear-street/clear-street-go=/path/to/clear-st
 
 ## Running tests
 
+Most tests require you to [set up a mock server](https://github.com/dgellow/steady) against the OpenAPI spec to run the tests.
+
+```sh
+$ ./scripts/mock
+```
+
 ```sh
 $ ./scripts/test
 ```

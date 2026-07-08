@@ -83,6 +83,12 @@ func (r *V1PositionService) ClosePositions(ctx context.Context, accountID int64,
 
 // Returns the current lifecycle state of the account's position instructions.
 // Optionally filter by a specific contract.
+//
+// Note: instructions that fail pre-acceptance validation on `POST` — duplicates,
+// `DO_NOT_EXERCISE` / `CONTRARY_EXERCISE` on a non-expiry day, insufficient
+// position, or an unresolvable instrument — are rejected (with `status = REJECTED`
+// and a `rejection_reason`) without being persisted, so they surface only in the
+// `POST` response and never appear in this list.
 func (r *V1PositionService) GetPositionInstructions(ctx context.Context, accountID int64, query V1PositionGetPositionInstructionsParams, opts ...option.RequestOption) (res *V1PositionGetPositionInstructionsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/positions/instructions", accountID)
@@ -105,12 +111,14 @@ func (r *V1PositionService) GetPositions(ctx context.Context, accountID int64, q
 //
 //   - **All rows accepted** → `200 OK`. Every row is in `data` with `status = SENT`.
 //   - **Partial success** → `207 Multi-Status`. `data` contains every row; rejected
-//     rows carry `status = ENGINE_REJECTED` (or `REJECTED`) and `rejection_reason`.
-//     The top-level `error` summarizes the batch failure.
-//   - **All rows rejected** → `4xx`/`5xx` error response. The HTTP status reflects
-//     the underlying cause: `409` for duplicate `instruction_id`, `400` for
-//     validation failures such as DNE/CEA on a non-expiry day, `503` if the clearing
-//     service is unavailable. No `data` is returned.
+//     rows carry `status = REJECTED` and `rejection_reason`. The top-level `error`
+//     summarizes the batch failure.
+//   - **All rows rejected** → `4xx`/`5xx`. The HTTP status reflects the aggregate
+//     cause: `409` when every row was a duplicate, `400` for validation failures
+//     like DNE/CEA on a non-expiry day, `503` if the clearing service is
+//     unavailable. `data` still contains every row carrying `status = REJECTED` and
+//     `rejection_reason` so callers can attribute failures by `instruction_id`; the
+//     top-level `error` summarizes the batch.
 func (r *V1PositionService) SubmitPositionInstructions(ctx context.Context, accountID int64, body V1PositionSubmitPositionInstructionsParams, opts ...option.RequestOption) (res *V1PositionSubmitPositionInstructionsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/positions/instructions", accountID)
@@ -124,7 +132,7 @@ type Position struct {
 	AccountID int64 `json:"account_id" api:"required"`
 	// The quantity of a position that is free to be operated on.
 	AvailableQuantity string `json:"available_quantity" api:"required"`
-	// OEMS instrument UUID
+	// Unique instrument identifier
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Type of security
 	//
@@ -134,34 +142,48 @@ type Position struct {
 	MarketValue string `json:"market_value" api:"required"`
 	// The type of position
 	//
-	// Any of "LONG", "SHORT", "LONG_CALL", "SHORT_CALL", "LONG_PUT", "SHORT_PUT".
+	// Any of "LONG", "SHORT".
 	PositionType PositionType `json:"position_type" api:"required"`
 	// The number of shares or contracts. Can be positive (long) or negative (short)
 	Quantity string `json:"quantity" api:"required"`
 	// The trading symbol for the instrument
 	Symbol string `json:"symbol" api:"required"`
-	// The average price paid per share or contract for this position
+	// The average price paid per share or contract for this position When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	AvgPrice string `json:"avg_price" api:"nullable"`
-	// The closing price used to value the position for the last trading day
+	// The closing price used to value the position for the last trading day When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	ClosingPrice string `json:"closing_price" api:"nullable"`
-	// The market date associated with `closing_price`
+	// The market date associated with `closing_price` When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	ClosingPriceDate time.Time `json:"closing_price_date" api:"nullable" format:"date"`
-	// The total cost basis for this position
+	// The total cost basis for this position When a null/undefined value is observed,
+	// it indicates that there is no available data.
 	CostBasis string `json:"cost_basis" api:"nullable"`
+	// The realized profit or loss for this position for the current day When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	DailyRealizedPnl string `json:"daily_realized_pnl" api:"nullable"`
 	// The unrealized profit or loss for this position relative to the previous close
+	// When a null/undefined value is observed, it indicates that there is no available
+	// data.
 	DailyUnrealizedPnl string `json:"daily_unrealized_pnl" api:"nullable"`
 	// The unrealized profit/loss for the position for the current day, expressed as a
-	// percentage of the baseline value (range: 0-100).
+	// percentage of the baseline value (range: 0-100). When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	DailyUnrealizedPnlPct string `json:"daily_unrealized_pnl_pct" api:"nullable"`
-	// The current market price of the instrument
+	// The current market price of the instrument When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	InstrumentPrice string `json:"instrument_price" api:"nullable"`
-	// OEMS instrument identifier of the underlying instrument, if resolvable
+	// Identifier of the underlying instrument, when available When a null/undefined
+	// value is observed, it indicates it does not apply.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// The total unrealized profit or loss for this position based on current market
-	// value
+	// value When a null/undefined value is observed, it indicates that there is no
+	// available data.
 	UnrealizedPnl string `json:"unrealized_pnl" api:"nullable"`
 	// The unrealized profit/loss for the position, expressed as a percentage of the
-	// position's cost basis (range: 0-100).
+	// position's cost basis (range: 0-100). When a null/undefined value is observed,
+	// it indicates that there is no available data.
 	UnrealizedPnlPct string `json:"unrealized_pnl_pct" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -177,6 +199,7 @@ type Position struct {
 		ClosingPrice           respjson.Field
 		ClosingPriceDate       respjson.Field
 		CostBasis              respjson.Field
+		DailyRealizedPnl       respjson.Field
 		DailyUnrealizedPnl     respjson.Field
 		DailyUnrealizedPnlPct  respjson.Field
 		InstrumentPrice        respjson.Field
@@ -213,22 +236,25 @@ type PositionInstruction struct {
 	Quantity string `json:"quantity" api:"required"`
 	// Current lifecycle status.
 	//
-	// Any of "SENT", "ACCEPTED", "REJECTED", "ENGINE_REJECTED", "CANCEL_REQUESTED",
-	// "CANCELLED", "CANCEL_FAILED", "UNKNOWN".
+	// Any of "SENT", "ACCEPTED", "REJECTED", "CANCEL_REQUESTED", "CANCELLED",
+	// "CANCEL_FAILED", "UNKNOWN".
 	Status PositionInstructionStatus `json:"status" api:"required"`
 	// Options symbol (OSI) for display.
 	Symbol string `json:"symbol" api:"required"`
 	// Number of contracts accepted by the clearing venue. Populated once the
-	// instruction reaches `ACCEPTED`.
+	// instruction reaches `ACCEPTED`. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	AcceptedQuantity string `json:"accepted_quantity" api:"nullable"`
-	// When the instruction was first accepted by the service.
+	// When the instruction was first accepted by the service. When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	CreatedAt time.Time `json:"created_at" api:"nullable" format:"date-time"`
 	// Human-readable explanation populated on any non-success terminal status —
-	// `REJECTED`, `ENGINE_REJECTED`, or `CANCEL_FAILED`. On a `207 Multi-Status` batch
-	// submit the top-level `error` field summarizes the batch; per-row detail
-	// continues to live here.
+	// `REJECTED` or `CANCEL_FAILED`. On a `207 Multi-Status` batch submit the
+	// top-level `error` field summarizes the batch; per-row detail continues to live
+	// here. When a null/undefined value is observed, it indicates it does not apply.
 	RejectionReason string `json:"rejection_reason" api:"nullable"`
-	// When the instruction's lifecycle state last changed.
+	// When the instruction's lifecycle state last changed. When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	UpdatedAt time.Time `json:"updated_at" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -259,28 +285,24 @@ type PositionInstructionList []PositionInstruction
 
 // Lifecycle status of a position instruction.
 //
-//   - `SENT`: accepted and forwarded to the clearing venue.
+//   - `SENT`: accepted and submitted to the clearing venue.
 //   - `ACCEPTED`: terminal — accepted by the clearing venue.
-//   - `REJECTED`: terminal rejection from the clearing venue; `rejection_reason`
-//     carries the venue-reported detail.
-//   - `ENGINE_REJECTED`: terminal rejection raised before the instruction reached
-//     the clearing venue; `rejection_reason` carries the detail. Typical causes:
-//     duplicate `instruction_id`, `DO_NOT_EXERCISE` / `CONTRARY_EXERCISE` submitted
-//     on a non-expiry day, insufficient position, or an instrument that does not
-//     resolve.
+//   - `REJECTED`: terminal rejection; `rejection_reason` carries the detail. Covers
+//     both venue-reported rejections and rejections raised before the instruction
+//     reached the clearing venue (e.g. duplicate `instruction_id`, `DO_NOT_EXERCISE`
+//     / `CONTRARY_EXERCISE` submitted on a non-expiry day, insufficient position, or
+//     an instrument that does not resolve).
 //   - `CANCEL_REQUESTED`: cancel accepted; final cancel state pending.
 //   - `CANCELLED`: terminal — cancel completed.
 //   - `CANCEL_FAILED`: cancel could not be completed; operator attention required.
 //     `rejection_reason` carries the detail.
-//   - `UNKNOWN`: status could not be mapped from the upstream service. Not expected
-//     in practice; surfaces a service version skew.
+//   - `UNKNOWN`: status could not be determined.
 type PositionInstructionStatus string
 
 const (
 	PositionInstructionStatusSent            PositionInstructionStatus = "SENT"
 	PositionInstructionStatusAccepted        PositionInstructionStatus = "ACCEPTED"
 	PositionInstructionStatusRejected        PositionInstructionStatus = "REJECTED"
-	PositionInstructionStatusEngineRejected  PositionInstructionStatus = "ENGINE_REJECTED"
 	PositionInstructionStatusCancelRequested PositionInstructionStatus = "CANCEL_REQUESTED"
 	PositionInstructionStatusCancelled       PositionInstructionStatus = "CANCELLED"
 	PositionInstructionStatusCancelFailed    PositionInstructionStatus = "CANCEL_FAILED"
@@ -302,12 +324,8 @@ type PositionList []Position
 type PositionType string
 
 const (
-	PositionTypeLong      PositionType = "LONG"
-	PositionTypeShort     PositionType = "SHORT"
-	PositionTypeLongCall  PositionType = "LONG_CALL"
-	PositionTypeShortCall PositionType = "SHORT_CALL"
-	PositionTypeLongPut   PositionType = "LONG_PUT"
-	PositionTypeShortPut  PositionType = "SHORT_PUT"
+	PositionTypeLong  PositionType = "LONG"
+	PositionTypeShort PositionType = "SHORT"
 )
 
 type V1PositionCancelPositionInstructionResponse struct {
@@ -450,7 +468,8 @@ func (r *V1PositionClosePositionsParams) UnmarshalJSON(data []byte) error {
 }
 
 type V1PositionGetPositionInstructionsParams struct {
-	// Limit results to a single contract. Accepts the instrument id or the OSI symbol.
+	// Limit results to a single contract. Instrument ID (UUID) or symbol (equity
+	// ticker or OSI option symbol).
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
@@ -471,12 +490,12 @@ type V1PositionGetPositionsParams struct {
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
-	// Comma-separated OEMS instrument UUIDs
+	// Comma-separated instrument identifiers
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Field to sort by
 	//
 	// Any of "SYMBOL", "INSTRUMENT_TYPE", "QUANTITY", "MARKET_VALUE", "POSITION_TYPE",
-	// "UNREALIZED_PNL", "DAILY_UNREALIZED_PNL".
+	// "UNREALIZED_PNL", "DAILY_UNREALIZED_PNL", "DAILY_REALIZED_PNL".
 	SortBy V1PositionGetPositionsParamsSortBy `query:"sort_by,omitzero" json:"-"`
 	// Sort direction
 	//
@@ -505,6 +524,7 @@ const (
 	V1PositionGetPositionsParamsSortByPositionType       V1PositionGetPositionsParamsSortBy = "POSITION_TYPE"
 	V1PositionGetPositionsParamsSortByUnrealizedPnl      V1PositionGetPositionsParamsSortBy = "UNREALIZED_PNL"
 	V1PositionGetPositionsParamsSortByDailyUnrealizedPnl V1PositionGetPositionsParamsSortBy = "DAILY_UNREALIZED_PNL"
+	V1PositionGetPositionsParamsSortByDailyRealizedPnl   V1PositionGetPositionsParamsSortBy = "DAILY_REALIZED_PNL"
 )
 
 // Sort direction

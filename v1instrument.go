@@ -75,13 +75,13 @@ func (r *V1InstrumentService) GetOptionContracts(ctx context.Context, query V1In
 // Search instruments by symbol, alternate identifier, or company name.
 //
 // The `q` parameter is case-insensitive and supports ticker symbols, alternate
-// identifiers such as CUSIP, ISIN, OPRA root, and CMS identifiers, and company
-// names for non-option instruments. Results are ranked by match quality plus
-// instrument quality signals including log-scaled ADV, listing status,
-// marginability, easy-to-borrow status, and OTC, restricted, and liquidation-only
-// penalties. Defaults to the `EQUITY` asset class (common stocks, preferred
+// identifiers such as CUSIP, ISIN, and OPRA root, and company names for non-option
+// instruments. Results are ranked by match quality plus instrument quality signals
+// and relevance. Defaults to the `EQUITY` asset class (common stocks, preferred
 // shares, ADRs, ETFs, and exchange-traded mutual funds). Pass `asset_class=OPTION`
-// to search option contracts by symbol or alternate identifier.
+// to search option contracts: by full OSI symbol, by an OSI prefix (root +
+// `YYMMDD` expiry, e.g. `AAPL 261217`), or by a root-scoped phrase such as
+// `AAPL Dec 250 call`.
 func (r *V1InstrumentService) SearchInstruments(ctx context.Context, query V1InstrumentSearchInstrumentsParams, opts ...option.RequestOption) (res *V1InstrumentSearchInstrumentsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/instruments/search"
@@ -107,7 +107,7 @@ const (
 
 // Represents a tradable financial instrument.
 type Instrument struct {
-	// Unique OEMS instrument identifier (UUID)
+	// Unique instrument identifier (UUID)
 	ID string `json:"id" api:"required" format:"uuid"`
 	// The ISO country code of the instrument's issue
 	CountryOfIssue string `json:"country_of_issue" api:"required"`
@@ -134,30 +134,42 @@ type Instrument struct {
 	Symbol string `json:"symbol" api:"required"`
 	// The MIC code of the primary listing venue
 	Venue string `json:"venue" api:"required"`
-	// Average daily share volume from the security definition.
+	// Average daily share volume from the security definition. When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	Adv string `json:"adv" api:"nullable"`
-	// The expiration date for options instruments
+	// Deprecated. Always null. When a null/undefined value is observed, it indicates
+	// it does not apply.
+	//
+	// Deprecated: deprecated
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
-	// The type of security (e.g., Common Stock, ETF)
+	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	//
 	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
-	// The percent of a long position's value you must post as margin
+	// The percent of a long position's value you must post as margin When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
-	// The full name of the instrument or its issuer
+	// The full name of the instrument or its issuer When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// Notional ADV (`adv × previous_close`). The primary liquidity signal used by
-	// `/instruments/search` ranking. Computed at response time so it stays consistent
-	// with whatever `adv` and `previous_close` show.
+	// Notional average daily volume (ADV multiplied by previous close price). When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	NotionalAdv string `json:"notional_adv" api:"nullable"`
 	// Available options expiration dates for this instrument. Present only when
-	// `include_options_expiry_dates=true` in the request.
+	// `include_options_expiry_dates=true` in the request. When a null/undefined value
+	// is observed, it indicates it does not apply.
 	OptionsExpiryDates []time.Time `json:"options_expiry_dates" api:"nullable" format:"date"`
-	// Last close price from the security definition.
+	// Last close price from the security definition. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	PreviousClose string `json:"previous_close" api:"nullable"`
-	// The percent of a short position's value you must post as margin
+	// The percent of a short position's value you must post as margin When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
-	// The strike price for options instruments
+	// Deprecated. Always null. When a null/undefined value is observed, it indicates
+	// it does not apply.
+	//
+	// Deprecated: deprecated
 	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -196,7 +208,7 @@ func (r *Instrument) UnmarshalJSON(data []byte) error {
 }
 
 type InstrumentCore struct {
-	// Unique OEMS instrument identifier (UUID)
+	// Unique instrument identifier (UUID)
 	ID string `json:"id" api:"required" format:"uuid"`
 	// The ISO country code of the instrument's issue
 	CountryOfIssue string `json:"country_of_issue" api:"required"`
@@ -223,27 +235,38 @@ type InstrumentCore struct {
 	Symbol string `json:"symbol" api:"required"`
 	// The MIC code of the primary listing venue
 	Venue string `json:"venue" api:"required"`
-	// Average daily share volume from the security definition.
+	// Average daily share volume from the security definition. When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	Adv string `json:"adv" api:"nullable"`
-	// The expiration date for options instruments
+	// Deprecated. Always null. When a null/undefined value is observed, it indicates
+	// it does not apply.
+	//
+	// Deprecated: deprecated
 	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
-	// The type of security (e.g., Common Stock, ETF)
+	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	//
 	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
-	// The percent of a long position's value you must post as margin
+	// The percent of a long position's value you must post as margin When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	LongMarginRate string `json:"long_margin_rate" api:"nullable"`
-	// The full name of the instrument or its issuer
+	// The full name of the instrument or its issuer When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// Notional ADV (`adv × previous_close`). The primary liquidity signal used by
-	// `/instruments/search` ranking. Computed at response time so it stays consistent
-	// with whatever `adv` and `previous_close` show.
+	// Notional average daily volume (ADV multiplied by previous close price). When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	NotionalAdv string `json:"notional_adv" api:"nullable"`
-	// Last close price from the security definition.
+	// Last close price from the security definition. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	PreviousClose string `json:"previous_close" api:"nullable"`
-	// The percent of a short position's value you must post as margin
+	// The percent of a short position's value you must post as margin When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
-	// The strike price for options instruments
+	// Deprecated. Always null. When a null/undefined value is observed, it indicates
+	// it does not apply.
+	//
+	// Deprecated: deprecated
 	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -293,7 +316,7 @@ const (
 
 // An options contract with options-specific metadata
 type OptionsContract struct {
-	// OEMS instrument identifier
+	// Instrument identifier
 	ID string `json:"id" api:"required" format:"uuid"`
 	// Whether this is a CALL or PUT
 	//
@@ -323,9 +346,11 @@ type OptionsContract struct {
 	StrikePrice string `json:"strike_price" api:"required"`
 	// OSI symbol (e.g. "AAPL 251219C00150000")
 	Symbol string `json:"symbol" api:"required"`
-	// Open interest (number of outstanding contracts), if available
+	// Open interest (number of outstanding contracts), if available When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	OpenInterest int64 `json:"open_interest" api:"nullable"`
-	// OEMS instrument ID of the underlying instrument, if resolvable
+	// Instrument ID of the underlying instrument, when available When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -459,7 +484,8 @@ type V1InstrumentGetInstrumentsParams struct {
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
-	// Comma-separated OEMS instrument UUIDs
+	// Comma-separated instrument identifiers: unique identifiers or symbols (symbol
+	// for equities, OSI for options)
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g. COMMON_STOCK, OPTION)
 	//
@@ -497,7 +523,7 @@ type V1InstrumentGetOptionContractsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Underlier symbol (e.g., AAPL, SPX)
 	Underlier param.Opt[string] `query:"underlier,omitzero" json:"-"`
-	// OEMS instrument UUID or symbol of the underlying equity/index
+	// Instrument identifier or symbol of the underlying equity/index
 	UnderlyingInstrumentID param.Opt[InstrumentIDOrSymbol] `query:"underlying_instrument_id,omitzero" format:"uuid" json:"-"`
 	// Filter by contract type: CALL or PUT
 	//
@@ -517,8 +543,8 @@ func (r V1InstrumentGetOptionContractsParams) URLQuery() (v url.Values, err erro
 
 type V1InstrumentSearchInstrumentsParams struct {
 	// Search term applied case-insensitively to ticker symbols, alternate identifiers
-	// (CUSIP, ISIN, OPRA root, CMS), and company names for non-option instruments.
-	// Option searches match symbols and alternate identifiers.
+	// (CUSIP, ISIN, OPRA root), and company names for non-option instruments. Option
+	// searches match symbols and alternate identifiers.
 	Q string `query:"q" api:"required" json:"-"`
 	// Comma-separated asset classes (EQUITY|OPTION|WARRANT|BOND|FX|OTHER). Defaults to
 	// EQUITY.

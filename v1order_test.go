@@ -15,7 +15,6 @@ import (
 )
 
 func TestV1OrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -47,7 +46,6 @@ func TestV1OrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
 }
 
 func TestV1OrderCancelOpenOrder(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -76,7 +74,6 @@ func TestV1OrderCancelOpenOrder(t *testing.T) {
 }
 
 func TestV1OrderGetExecutionsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -92,11 +89,11 @@ func TestV1OrderGetExecutionsWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.V1OrderGetExecutionsParams{
-			From:         clearstreet.Time(time.Now()),
-			InstrumentID: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
-			PageSize:     clearstreet.Int(1),
-			PageToken:    clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
-			To:           clearstreet.Time(time.Now()),
+			From:          clearstreet.Time(time.Now()),
+			InstrumentIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			PageSize:      clearstreet.Int(1),
+			PageToken:     clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+			To:            clearstreet.Time(time.Now()),
 		},
 	)
 	if err != nil {
@@ -109,7 +106,6 @@ func TestV1OrderGetExecutionsWithOptionalParams(t *testing.T) {
 }
 
 func TestV1OrderGetOrderByID(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -138,7 +134,6 @@ func TestV1OrderGetOrderByID(t *testing.T) {
 }
 
 func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -157,6 +152,7 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 			From:                    clearstreet.Time(time.Now()),
 			InstrumentIDs:           []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 			InstrumentType:          clearstreet.V1OrderGetOrdersParamsInstrumentTypeCommonStock,
+			OrderIDs:                []string{"string"},
 			PageSize:                clearstreet.Int(1),
 			PageToken:               clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 			Status:                  []string{"PENDING_NEW"},
@@ -175,7 +171,6 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 }
 
 func TestV1OrderReplaceOrderWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -192,9 +187,9 @@ func TestV1OrderReplaceOrderWithOptionalParams(t *testing.T) {
 		"order_id",
 		clearstreet.V1OrderReplaceOrderParams{
 			AccountID:   0,
-			LimitPrice:  clearstreet.String("150.50"),
-			Quantity:    clearstreet.String("125"),
-			StopPrice:   clearstreet.String("148.00"),
+			LimitPrice:  clearstreet.String("49.00"),
+			Quantity:    clearstreet.String("1"),
+			StopPrice:   clearstreet.String("52.00"),
 			TimeInForce: clearstreet.RequestTimeInForceDay,
 		},
 	)
@@ -208,7 +203,6 @@ func TestV1OrderReplaceOrderWithOptionalParams(t *testing.T) {
 }
 
 func TestV1OrderSubmitOrders(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -224,33 +218,21 @@ func TestV1OrderSubmitOrders(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.V1OrderSubmitOrdersParams{
-			Orders: []clearstreet.V1OrderSubmitOrdersParamsOrderUnion{{
-				OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest: &clearstreet.V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest{
-					Legs: []clearstreet.V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg{{
-						Ratio:          "ratio",
-						Security:       "0193bb84-447a-706f-996f-097254663f02",
-						Side:           clearstreet.SideBuy,
-						ID:             clearstreet.String("1"),
-						PositionEffect: clearstreet.PositionEffectOpen,
-					}, {
-						Ratio:          "ratio",
-						Security:       "0193bb84-4db4-78ec-b4fd-cba8be61cf8a",
-						Side:           clearstreet.SideSell,
-						ID:             clearstreet.String("2"),
-						PositionEffect: clearstreet.PositionEffectOpen,
-					}, {
-						Ratio:          "ratio",
-						Security:       "0193bb84-5264-7f20-8fd3-35df82cd6ef0",
-						Side:           clearstreet.SideBuy,
-						ID:             clearstreet.String("3"),
-						PositionEffect: clearstreet.PositionEffectOpen,
-					}},
-					OrderType:   clearstreet.RequestOrderTypeLimit,
-					TimeInForce: clearstreet.RequestTimeInForceDay,
-					ID:          clearstreet.String("my-mleg-ref-20251001-001"),
-					LimitPrice:  clearstreet.String("0.50"),
-					Quantity:    clearstreet.String("1"),
-				},
+			Orders: []clearstreet.NewOrderRequestParam{{
+				OrderType:          clearstreet.RequestOrderTypeLimit,
+				Quantity:           "1",
+				Side:               clearstreet.SideBuy,
+				TimeInForce:        clearstreet.RequestTimeInForceDay,
+				ID:                 clearstreet.String("my-ref-id-20251001-002"),
+				ExpiresAt:          clearstreet.Time(time.Now()),
+				ExtendedHours:      clearstreet.Bool(true),
+				InstrumentID:       clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+				LimitOffset:        clearstreet.String("0.50"),
+				LimitPrice:         clearstreet.String("48.00"),
+				StopPrice:          clearstreet.String("52.00"),
+				Symbol:             clearstreet.String("TSLA"),
+				TrailingOffset:     clearstreet.String("2.00"),
+				TrailingOffsetType: clearstreet.TrailingOffsetTypePrice,
 			}},
 		},
 	)

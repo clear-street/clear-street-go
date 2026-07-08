@@ -14,7 +14,6 @@ import (
 )
 
 func TestV1WatchlistAddWatchlistItem(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -43,7 +42,6 @@ func TestV1WatchlistAddWatchlistItem(t *testing.T) {
 }
 
 func TestV1WatchlistNewWatchlist(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -68,7 +66,6 @@ func TestV1WatchlistNewWatchlist(t *testing.T) {
 }
 
 func TestV1WatchlistDeleteWatchlist(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -91,7 +88,6 @@ func TestV1WatchlistDeleteWatchlist(t *testing.T) {
 }
 
 func TestV1WatchlistDeleteWatchlistItem(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -120,7 +116,6 @@ func TestV1WatchlistDeleteWatchlistItem(t *testing.T) {
 }
 
 func TestV1WatchlistGetWatchlistByID(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -143,7 +138,6 @@ func TestV1WatchlistGetWatchlistByID(t *testing.T) {
 }
 
 func TestV1WatchlistGetWatchlistsWithOptionalParams(t *testing.T) {
-	t.Skip("Mock server tests are disabled")
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL

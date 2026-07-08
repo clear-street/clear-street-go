@@ -140,7 +140,7 @@ func (r *CancelOrderRequest) UnmarshalJSON(data []byte) error {
 type Execution struct {
 	// Unique identifier for this execution report.
 	ID string `json:"id" api:"required" format:"uuid"`
-	// OEMS instrument identifier.
+	// Unique instrument identifier.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Identifier of the order this execution belongs to.
 	OrderID string `json:"order_id" api:"required" format:"uuid"`
@@ -210,20 +210,16 @@ type NewOrderRequest struct {
 	// Allow trading outside regular trading hours. Some brokers disallow options
 	// outside RTH.
 	ExtendedHours bool `json:"extended_hours" api:"nullable"`
-	// OEMS instrument UUID
+	// Instrument identifier
 	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"nullable" format:"uuid"`
 	// Limit offset for trailing stop-limit orders (signed)
 	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// Limit price (required for LIMIT and STOP_LIMIT orders)
 	LimitPrice string `json:"limit_price" api:"nullable"`
-	// Required for options. Specifies whether the order opens or closes a position.
-	//
-	// Any of "OPEN", "CLOSE".
-	PositionEffect PositionEffect `json:"position_effect"`
 	// Stop price (required for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price" api:"nullable"`
-	// Trading symbol. For equities, use the ticker symbol (e.g., "AAPL"). For options,
-	// use the OSI symbol (e.g., "AAPL 250117C00190000"). Either `symbol` or
+	// Trading symbol. For equities, use the ticker symbol (e.g., "TSLA"). For options,
+	// use the OSI symbol (e.g., "TSLA 250117C00190000"). Either `symbol` or
 	// `instrument_id` must be provided.
 	Symbol string `json:"symbol" api:"nullable"`
 	// Trailing offset amount (required for trailing orders)
@@ -244,7 +240,6 @@ type NewOrderRequest struct {
 		InstrumentID       respjson.Field
 		LimitOffset        respjson.Field
 		LimitPrice         respjson.Field
-		PositionEffect     respjson.Field
 		StopPrice          respjson.Field
 		Symbol             respjson.Field
 		TrailingOffset     respjson.Field
@@ -306,18 +301,14 @@ type NewOrderRequestParam struct {
 	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
 	// Stop price (required for STOP and STOP_LIMIT orders)
 	StopPrice param.Opt[string] `json:"stop_price,omitzero"`
-	// Trading symbol. For equities, use the ticker symbol (e.g., "AAPL"). For options,
-	// use the OSI symbol (e.g., "AAPL 250117C00190000"). Either `symbol` or
+	// Trading symbol. For equities, use the ticker symbol (e.g., "TSLA"). For options,
+	// use the OSI symbol (e.g., "TSLA 250117C00190000"). Either `symbol` or
 	// `instrument_id` must be provided.
 	Symbol param.Opt[string] `json:"symbol,omitzero"`
 	// Trailing offset amount (required for trailing orders)
 	TrailingOffset param.Opt[string] `json:"trailing_offset,omitzero"`
-	// OEMS instrument UUID
+	// Instrument identifier
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `json:"instrument_id,omitzero" format:"uuid"`
-	// Required for options. Specifies whether the order opens or closes a position.
-	//
-	// Any of "OPEN", "CLOSE".
-	PositionEffect PositionEffect `json:"position_effect,omitzero"`
 	// Trailing offset type (PRICE or PERCENT_BPS)
 	//
 	// Any of "PRICE", "BPS".
@@ -343,13 +334,13 @@ type Order struct {
 	ID string `json:"id" api:"required"`
 	// Account placing the order
 	AccountID int64 `json:"account_id" api:"required"`
-	// Client-provided identifier echoed back (FIX tag 11).
+	// Client-provided identifier echoed back.
 	ClientOrderID string `json:"client_order_id" api:"required"`
 	// Timestamp when order was created (UTC)
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Cumulative filled quantity
 	FilledQuantity string `json:"filled_quantity" api:"required"`
-	// OEMS instrument UUID for the traded instrument.
+	// Instrument identifier for the traded instrument.
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Type of security
 	//
@@ -386,45 +377,60 @@ type Order struct {
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// MIC code of the venue where the order is routed
 	Venue string `json:"venue" api:"required"`
-	// Average fill price across all executions
+	// Average fill price across all executions When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	AverageFillPrice string `json:"average_fill_price" api:"nullable"`
 	// Contains execution, rejection or cancellation details, if any
 	Details []string `json:"details"`
 	// Timestamp when the order will expire (UTC). Present when time_in_force is
-	// GOOD_TILL_DATE.
+	// GOOD_TILL_DATE. When a null/undefined value is observed, it indicates it does
+	// not apply.
 	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
 	// Whether the order is eligible for extended-hours trading.
 	ExtendedHours bool `json:"extended_hours" api:"nullable"`
-	// Limit offset for trailing stop-limit orders (signed)
+	// Limit offset for trailing stop-limit orders (signed) When a null/undefined value
+	// is observed, it indicates it does not apply.
 	LimitOffset string `json:"limit_offset" api:"nullable"`
-	// Limit price (for LIMIT and STOP_LIMIT orders)
+	// Limit price (for LIMIT and STOP_LIMIT orders) When a null/undefined value is
+	// observed, it indicates it does not apply.
 	LimitPrice string `json:"limit_price" api:"nullable"`
 	// Parent order queue state, present when the order is awaiting release or
-	// released.
+	// released. When a null/undefined value is observed, it indicates it does not
+	// apply.
 	//
 	// Any of "AWAITING_RELEASE", "RELEASED".
 	QueueState QueueState `json:"queue_state" api:"nullable"`
-	// Scheduled release time for orders awaiting release.
+	// Scheduled release time for orders awaiting release. When a null/undefined value
+	// is observed, it indicates it does not apply.
 	ReleasesAt time.Time `json:"releases_at" api:"nullable" format:"date-time"`
-	// Stop price (for STOP and STOP_LIMIT orders)
+	// Stop price (for STOP and STOP_LIMIT orders) When a null/undefined value is
+	// observed, it indicates it does not apply.
 	StopPrice string `json:"stop_price" api:"nullable"`
-	// Current trailing limit price computed by the trailing strategy
+	// Current trailing limit price computed by the trailing strategy When a
+	// null/undefined value is observed, it indicates it does not apply.
 	TrailingLimitPx string `json:"trailing_limit_px" api:"nullable"`
-	// Trailing offset amount for trailing orders
+	// Trailing offset amount for trailing orders When a null/undefined value is
+	// observed, it indicates it does not apply.
 	TrailingOffset string `json:"trailing_offset" api:"nullable"`
-	// Trailing offset type for trailing orders
+	// Trailing offset type for trailing orders When a null/undefined value is
+	// observed, it indicates it does not apply.
 	//
 	// Any of "PRICE", "BPS".
 	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
-	// Current trailing stop price computed by the trailing strategy
+	// Current trailing stop price computed by the trailing strategy When a
+	// null/undefined value is observed, it indicates it does not apply.
 	TrailingStopPx string `json:"trailing_stop_px" api:"nullable"`
-	// Trailing watermark price for trailing orders
+	// Trailing watermark price for trailing orders When a null/undefined value is
+	// observed, it indicates it does not apply.
 	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
-	// Trailing watermark timestamp for trailing orders
+	// Trailing watermark timestamp for trailing orders When a null/undefined value is
+	// observed, it indicates it does not apply.
 	TrailingWatermarkTs time.Time `json:"trailing_watermark_ts" api:"nullable" format:"date-time"`
-	// OEMS instrument ID of the option's underlying instrument. Populated only for
-	// OPTIONS orders; `null` for non-options and for options whose underlier cannot be
-	// resolved from the instrument cache.
+	// Instrument ID of the option's underlying instrument. Populated only for options
+	// orders. A `null` means one of two things: the order is not an option, so the
+	// field does not apply; or the order is an option whose underlier has not yet been
+	// resolved. When a null/undefined value is observed, it indicates it does not
+	// apply.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -505,14 +511,6 @@ const (
 	OrderTypeTrailingStop      OrderType = "TRAILING_STOP"
 	OrderTypeTrailingStopLimit OrderType = "TRAILING_STOP_LIMIT"
 	OrderTypeOther             OrderType = "OTHER"
-)
-
-// Position effect for options orders
-type PositionEffect string
-
-const (
-	PositionEffectOpen  PositionEffect = "OPEN"
-	PositionEffectClose PositionEffect = "CLOSE"
 )
 
 // Parent order queue or hold state.
@@ -721,7 +719,7 @@ func (r *V1OrderSubmitOrdersResponse) UnmarshalJSON(data []byte) error {
 }
 
 type V1OrderCancelAllOpenOrdersParams struct {
-	// Comma-separated OEMS instrument UUIDs
+	// Comma-separated instrument identifiers
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
 	//
@@ -788,9 +786,6 @@ type V1OrderCancelOpenOrderParams struct {
 type V1OrderGetExecutionsParams struct {
 	// The start date and time for the query range, inclusive (ISO 8601 format)
 	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
-	// Optional instrument to filter by. Accepts either a symbol (e.g. `AAPL`) or an
-	// OEMS instrument UUID.
-	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" format:"uuid" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
@@ -799,6 +794,10 @@ type V1OrderGetExecutionsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// The end date and time for the query range, inclusive (ISO 8601 format)
 	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
+	// Comma-separated instrument identifiers (UUIDs) or symbols (e.g. `AAPL`) to
+	// filter by. When provided, only executions for any of the listed instruments are
+	// returned.
+	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
@@ -829,19 +828,22 @@ type V1OrderGetOrdersParams struct {
 	Symbol param.Opt[string] `query:"symbol,omitzero" json:"-"`
 	// The end date and time for the query range, inclusive (ISO 8601 format)
 	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
-	// Comma-separated OEMS instrument UUIDs
+	// Comma-separated instrument identifiers
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
 	// Any of "COMMON_STOCK", "OPTION", "CASH".
 	InstrumentType V1OrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
+	// Comma-separated order IDs to filter by. When provided, only orders whose order
+	// ID is in this set are returned.
+	OrderIDs []string `query:"order_ids,omitzero" json:"-"`
 	// Comma-separated order statuses to filter by
 	//
 	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
 	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
 	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
 	Status []string `query:"status,omitzero" json:"-"`
-	// Comma-separated OEMS instrument UUIDs. Matches options orders whose resolved
+	// Comma-separated instrument identifiers. Matches options orders whose resolved
 	// underlier is any of the given IDs.
 	UnderlyingInstrumentIDs []string `query:"underlying_instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
@@ -890,7 +892,7 @@ func (r *V1OrderReplaceOrderParams) UnmarshalJSON(data []byte) error {
 }
 
 type V1OrderSubmitOrdersParams struct {
-	Orders []V1OrderSubmitOrdersParamsOrderUnion
+	Orders []NewOrderRequestParam
 	paramObj
 }
 
@@ -898,85 +900,5 @@ func (r V1OrderSubmitOrdersParams) MarshalJSON() (data []byte, err error) {
 	return shimjson.Marshal(r.Orders)
 }
 func (r *V1OrderSubmitOrdersParams) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// Only one field can be non-zero.
-//
-// Use [param.IsOmitted] to confirm if a field is set.
-type V1OrderSubmitOrdersParamsOrderUnion struct {
-	OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest `json:",omitzero,inline"`
-	OfNewOrderRequest                                  *NewOrderRequestParam                                  `json:",omitzero,inline"`
-	paramUnion
-}
-
-func (u V1OrderSubmitOrdersParamsOrderUnion) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest, u.OfNewOrderRequest)
-}
-func (u *V1OrderSubmitOrdersParamsOrderUnion) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, u)
-}
-
-// Multileg strategy order request
-//
-// The properties Legs, OrderType, TimeInForce are required.
-type V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest struct {
-	// Legs that compose the strategy.
-	Legs []V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg `json:"legs,omitzero" api:"required"`
-	// Type of order (currently MARKET or LIMIT for multileg strategy submission)
-	//
-	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
-	// "TRAILING_STOP_LIMIT".
-	OrderType RequestOrderType `json:"order_type,omitzero" api:"required"`
-	// Time in force
-	//
-	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
-	TimeInForce RequestTimeInForce `json:"time_in_force,omitzero" api:"required"`
-	// Optional client-provided unique ID (idempotency). Required to be unique per
-	// account.
-	ID param.Opt[string] `json:"id,omitzero"`
-	// Strategy price, required for LIMIT orders.
-	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
-	// Optional strategy-level quantity. Multiplies leg quantities. Defaults to 1.
-	Quantity param.Opt[string] `json:"quantity,omitzero"`
-	paramObj
-}
-
-func (r V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest) MarshalJSON() (data []byte, err error) {
-	type shadow V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// A single leg in a multileg strategy request.
-//
-// The properties Ratio, Security, Side are required.
-type V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
-	// Ratio for the leg.
-	Ratio string `json:"ratio" api:"required"`
-	// Trading symbol (e.g. "AAPL" or OSI symbol for options)
-	Security string `json:"security" api:"required"`
-	// Leg side.
-	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side Side `json:"side,omitzero" api:"required"`
-	// Optional leg reference identifier.
-	ID param.Opt[string] `json:"id,omitzero"`
-	// Optional leg position effect.
-	//
-	// Any of "OPEN", "CLOSE".
-	PositionEffect PositionEffect `json:"position_effect,omitzero"`
-	paramObj
-}
-
-func (r V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) MarshalJSON() (data []byte, err error) {
-	type shadow V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }

@@ -236,11 +236,14 @@ func (r *InstrumentAllEventsData) UnmarshalJSON(data []byte) error {
 type InstrumentAnalystConsensus struct {
 	// The date the consensus snapshot was generated
 	Date time.Time `json:"date" api:"required" format:"date"`
-	// Count of individual analyst recommendations by category
+	// Count of individual analyst recommendations by category When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	Distribution AnalystDistribution `json:"distribution" api:"nullable"`
-	// Aggregated analyst price target statistics
+	// Aggregated analyst price target statistics When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	PriceTarget PriceTarget `json:"price_target" api:"nullable"`
-	// Consensus analyst rating
+	// Consensus analyst rating When a null/undefined value is observed, it indicates
+	// that there is no available data.
 	//
 	// Any of "STRONG_BUY", "BUY", "HOLD", "SELL", "STRONG_SELL".
 	Rating AnalystRating `json:"rating" api:"nullable"`
@@ -614,20 +617,26 @@ type InstrumentDividendEvent struct {
 	AdjustedDividendAmount string `json:"adjusted_dividend_amount" api:"required"`
 	// The day the stock starts trading without the right to receive that dividend.
 	ExDate time.Time `json:"ex_date" api:"required" format:"date"`
-	// The declaration date of the dividend
+	// The declaration date of the dividend When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	DeclarationDate time.Time `json:"declaration_date" api:"nullable" format:"date"`
-	// The dividend amount per share.
+	// The dividend amount per share. When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	DividendAmount string `json:"dividend_amount" api:"nullable"`
-	// The dividend yield as a percentage of the stock price.
+	// The dividend yield as a percentage of the stock price. When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	DividendYield string `json:"dividend_yield" api:"nullable"`
-	// The frequency of the dividend payments (e.g., "Quarterly", "Annual").
+	// The frequency of the dividend payments (e.g., "Quarterly", "Annual"). When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	Frequency string `json:"frequency" api:"nullable"`
 	// The payment date is the date on which a declared stock dividend is scheduled to
-	// be paid.
+	// be paid. When a null/undefined value is observed, it indicates that there is no
+	// available data.
 	PaymentDate time.Time `json:"payment_date" api:"nullable" format:"date"`
 	// The record date, set by a company's board of directors, is when a company
 	// compiles a list of shareholders of the stock for which it has declared a
-	// dividend.
+	// dividend. When a null/undefined value is observed, it indicates that there is no
+	// available data.
 	RecordDate time.Time `json:"record_date" api:"nullable" format:"date"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -654,17 +663,23 @@ func (r *InstrumentDividendEvent) UnmarshalJSON(data []byte) error {
 type InstrumentEarnings struct {
 	// The date when the earnings report was published
 	Date time.Time `json:"date" api:"required" format:"date"`
-	// The actual earnings per share (EPS) for the period
+	// The actual earnings per share (EPS) for the period When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	EpsActual string `json:"eps_actual" api:"nullable"`
-	// The estimated earnings per share (EPS) for the period
+	// The estimated earnings per share (EPS) for the period When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	EpsEstimate string `json:"eps_estimate" api:"nullable"`
-	// The percentage difference between actual and estimated EPS
+	// The percentage difference between actual and estimated EPS When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	EpsSurprisePercent string `json:"eps_surprise_percent" api:"nullable"`
-	// The actual total revenue for the period
+	// The actual total revenue for the period When a null/undefined value is observed,
+	// it indicates that there is no available data.
 	RevenueActual string `json:"revenue_actual" api:"nullable"`
-	// The estimated total revenue for the period
+	// The estimated total revenue for the period When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	RevenueEstimate string `json:"revenue_estimate" api:"nullable"`
-	// The percentage difference between actual and estimated revenue
+	// The percentage difference between actual and estimated revenue When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	RevenueSurprisePercent string `json:"revenue_surprise_percent" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -694,20 +709,26 @@ type InstrumentEventEnvelope struct {
 	//
 	// Any of "EARNINGS", "DIVIDEND", "STOCK_SPLIT", "IPO".
 	Type AllEventsEventType `json:"type" api:"required"`
-	// Dividend payload when type is DIVIDEND.
+	// Dividend payload when type is DIVIDEND. When a null/undefined value is observed,
+	// it indicates it does not apply.
 	DividendEventData InstrumentDividendEvent `json:"dividend_event_data" api:"nullable"`
-	// Earnings payload when type is EARNINGS.
+	// Earnings payload when type is EARNINGS. When a null/undefined value is observed,
+	// it indicates it does not apply.
 	EarningsEventData InstrumentEarnings `json:"earnings_event_data" api:"nullable"`
-	// OEMS instrument identifier, when the instrument is found in the instrument
-	// cache.
+	// Instrument identifier, when available. When a null/undefined value is observed,
+	// it indicates that there is no available data.
 	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
-	// IPO payload when type is IPO.
+	// IPO payload when type is IPO. When a null/undefined value is observed, it
+	// indicates it does not apply.
 	IpoEventData InstrumentEventIpoItem `json:"ipo_event_data" api:"nullable"`
-	// Instrument name associated with the event, when available.
+	// Instrument name associated with the event, when available. When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// The currency used for reporting financial data.
+	// The currency used for reporting financial data. When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	ReportingCurrency string `json:"reporting_currency" api:"nullable"`
-	// Stock split payload when type is STOCK_SPLIT.
+	// Stock split payload when type is STOCK_SPLIT. When a null/undefined value is
+	// observed, it indicates it does not apply.
 	StockSplitEventData InstrumentSplitEvent `json:"stock_split_event_data" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -733,19 +754,26 @@ func (r *InstrumentEventEnvelope) UnmarshalJSON(data []byte) error {
 
 // IPO event in the all-events date grouping response.
 type InstrumentEventIpoItem struct {
-	// IPO action.
+	// IPO action. When a null/undefined value is observed, it indicates that there is
+	// no available data.
 	Actions string `json:"actions" api:"nullable"`
-	// IPO announced timestamp.
+	// IPO announced timestamp. When a null/undefined value is observed, it indicates
+	// that there is no available data.
 	AnnouncedAt time.Time `json:"announced_at" api:"nullable" format:"date-time"`
-	// IPO company name.
+	// IPO company name. When a null/undefined value is observed, it indicates that
+	// there is no available data.
 	Company string `json:"company" api:"nullable"`
-	// IPO exchange.
+	// IPO exchange. When a null/undefined value is observed, it indicates that there
+	// is no available data.
 	Exchange string `json:"exchange" api:"nullable"`
-	// IPO market cap.
+	// IPO market cap. When a null/undefined value is observed, it indicates that there
+	// is no available data.
 	MarketCap string `json:"market_cap" api:"nullable"`
-	// IPO price range.
+	// IPO price range. When a null/undefined value is observed, it indicates that
+	// there is no available data.
 	PriceRange string `json:"price_range" api:"nullable"`
-	// IPO shares offered.
+	// IPO shares offered. When a null/undefined value is observed, it indicates that
+	// there is no available data.
 	Shares string `json:"shares" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -794,11 +822,12 @@ type InstrumentEventsData struct {
 	Dividends []InstrumentDividendEvent `json:"dividends" api:"required"`
 	// Earnings announcement events
 	Earnings []InstrumentEarnings `json:"earnings" api:"required"`
-	// OEMS instrument UUID from the request
+	// Instrument identifier
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Stock split events
 	Splits []InstrumentSplitEvent `json:"splits" api:"required"`
-	// The currency used for reporting financial data
+	// The currency used for reporting financial data When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	ReportingCurrency string `json:"reporting_currency" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -820,36 +849,51 @@ func (r *InstrumentEventsData) UnmarshalJSON(data []byte) error {
 
 // Supplemental fundamentals and company profile data for an instrument.
 type InstrumentFundamentals struct {
-	// The average daily trading volume over the past 30 days
+	// The average daily trading volume over the past 30 days When a null/undefined
+	// value is observed, it indicates that there is no available data.
 	AverageVolume int64 `json:"average_volume" api:"nullable"`
 	// The beta value, measuring the instrument's volatility relative to the overall
-	// market
+	// market When a null/undefined value is observed, it indicates that there is no
+	// available data.
 	Beta string `json:"beta" api:"nullable"`
-	// A detailed description of the instrument or company
+	// A detailed description of the instrument or company When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	Description string `json:"description" api:"nullable"`
-	// The trailing twelve months (TTM) dividend yield
+	// The trailing twelve months (TTM) dividend yield When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	DividendYield string `json:"dividend_yield" api:"nullable"`
-	// The trailing twelve months (TTM) earnings per share
+	// The trailing twelve months (TTM) earnings per share When a null/undefined value
+	// is observed, it indicates that there is no available data.
 	EarningsPerShare string `json:"earnings_per_share" api:"nullable"`
-	// The highest price over the last 52 weeks
+	// The highest price over the last 52 weeks When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	FiftyTwoWeekHigh string `json:"fifty_two_week_high" api:"nullable"`
-	// The lowest price over the last 52 weeks
+	// The lowest price over the last 52 weeks When a null/undefined value is observed,
+	// it indicates that there is no available data.
 	FiftyTwoWeekLow string `json:"fifty_two_week_low" api:"nullable"`
-	// The specific industry of the instrument's issuer
+	// The specific industry of the instrument's issuer When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	Industry string `json:"industry" api:"nullable"`
-	// The date the instrument was first listed
+	// The date the instrument was first listed When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	ListDate time.Time `json:"list_date" api:"nullable" format:"date"`
-	// URL to a representative logo image for the instrument or issuer
+	// URL to a representative logo image for the instrument or issuer When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	LogoURL string `json:"logo_url" api:"nullable"`
-	// The total market capitalization
+	// The total market capitalization When a null/undefined value is observed, it
+	// indicates that there is no available data.
 	MarketCap string `json:"market_cap" api:"nullable"`
-	// The closing price from the previous trading day
+	// The closing price from the previous trading day When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	PreviousClose string `json:"previous_close" api:"nullable"`
-	// The price-to-earnings (P/E) ratio for the trailing twelve months (TTM)
+	// The price-to-earnings (P/E) ratio for the trailing twelve months (TTM) When a
+	// null/undefined value is observed, it indicates that there is no available data.
 	PriceToEarnings string `json:"price_to_earnings" api:"nullable"`
-	// The currency used for reporting financial data
+	// The currency used for reporting financial data When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	ReportingCurrency string `json:"reporting_currency" api:"nullable"`
-	// The business sector of the instrument's issuer
+	// The business sector of the instrument's issuer When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	Sector string `json:"sector" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -1196,7 +1240,7 @@ type V1InstrumentDataGetAllInstrumentEventsParams struct {
 	// Filter by event type(s). Comma-delimited list. Example:
 	// `event_types=EARNINGS,IPO`.
 	EventTypes []AllEventsEventType `query:"event_types,omitzero" json:"-"`
-	// Filter by OEMS instrument ID(s). Comma-delimited list of UUIDs. Example:
+	// Filter by instrument ID(s). Comma-delimited list of UUIDs. Example:
 	// `instrument_ids=550e8400-e29b-41d4-a716-446655440000`.
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj

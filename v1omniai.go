@@ -63,9 +63,11 @@ type ActionButton struct {
 	ButtonID string `json:"buttonId" api:"required"`
 	// User-visible label.
 	Label string `json:"label" api:"required"`
-	// Follow-up prompt to submit as the next user message.
+	// Follow-up prompt to submit as the next user message. When a null/undefined value
+	// is observed, it indicates it does not apply.
 	Prompt PromptButtonAction `json:"prompt" api:"nullable"`
-	// Structured action in the same message to execute on click.
+	// Structured action in the same message to execute on click. When a null/undefined
+	// value is observed, it indicates it does not apply.
 	StructuredAction StructuredActionButtonAction `json:"structuredAction" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -90,7 +92,8 @@ type ChartPayload struct {
 	ChartID string `json:"chartId" api:"required"`
 	// Buttons associated with this chart.
 	ActionButtons []ActionButton `json:"actionButtons"`
-	// Explicit series-driven chart definition.
+	// Explicit series-driven chart definition. When a null/undefined value is
+	// observed, it indicates it does not apply.
 	DataChart DataChart `json:"dataChart" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -291,9 +294,11 @@ const (
 type OpenChartAction struct {
 	// Trading symbol to chart
 	Symbol string `json:"symbol" api:"required"`
-	// Additional chart configuration (indicators, overlays, etc.)
+	// Additional chart configuration (indicators, overlays, etc.) When a
+	// null/undefined value is observed, it indicates it does not apply.
 	Extras any `json:"extras"`
-	// Chart timeframe (e.g., "1D", "1W", "1M", "3M", "1Y", "5Y")
+	// Chart timeframe (e.g., "1D", "1W", "1M", "3M", "1Y", "5Y") When a null/undefined
+	// value is observed, it indicates it does not apply.
 	Timeframe string `json:"timeframe" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -341,18 +346,22 @@ func (r *OpenEntitlementConsentAction) UnmarshalJSON(data []byte) error {
 type OpenScreenerAction struct {
 	// Filter criteria for the screener
 	Filters []ScreenerFilter `json:"filters" api:"required"`
-	// Optional field/column selection for screener results.
-	FieldFilter []string `json:"field_filter" api:"nullable"`
-	// Optional page size.
+	// Optional field/column selection for screener results. When a null/undefined
+	// value is observed, it indicates it does not apply.
+	Columns []string `json:"columns" api:"nullable"`
+	// Optional page size. When a null/undefined value is observed, it indicates it
+	// does not apply.
 	PageSize int64 `json:"page_size" api:"nullable"`
-	// Optional sort field for screener rows.
+	// Optional sort field for screener rows. When a null/undefined value is observed,
+	// it indicates it does not apply.
 	SortBy string `json:"sort_by" api:"nullable"`
-	// Optional sort direction (`ASC` or `DESC`).
+	// Optional sort direction (`ASC` or `DESC`). When a null/undefined value is
+	// observed, it indicates it does not apply.
 	SortDirection string `json:"sort_direction" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Filters       respjson.Field
-		FieldFilter   respjson.Field
+		Columns       respjson.Field
 		PageSize      respjson.Field
 		SortBy        respjson.Field
 		SortDirection respjson.Field
@@ -519,30 +528,6 @@ func (r *PromptButtonAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// A single filter criterion for the screener.
-type ScreenerFilter struct {
-	// Field to filter on (e.g., "market_cap", "sector", "price")
-	Field string `json:"field" api:"required"`
-	// Comparison operator (e.g., "eq", "gte", "lte", "in")
-	Operator string `json:"operator" api:"required"`
-	// Filter value
-	Value any `json:"value" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		Field       respjson.Field
-		Operator    respjson.Field
-		Value       respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r ScreenerFilter) RawJSON() string { return r.JSON.raw }
-func (r *ScreenerFilter) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 // StructuredActionUnion contains all possible properties and values from
 // [StructuredActionPrefillOrder], [StructuredActionOpenChart],
 // [StructuredActionOpenScreener], [StructuredActionOpenEntitlementConsent].
@@ -667,7 +652,8 @@ func (r *StructuredActionOpenEntitlementConsent) UnmarshalJSON(data []byte) erro
 
 // Structured-action button behavior.
 type StructuredActionButtonAction struct {
-	// UUID of a `structured_action` content part in the same message.
+	// UUID of a `structured_action` content part in the same message. When a
+	// null/undefined value is observed, it indicates it does not apply.
 	ActionID string `json:"actionId" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {

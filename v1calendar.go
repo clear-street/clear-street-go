@@ -144,7 +144,8 @@ type MarketStatus struct {
 	DayType DayType `json:"day_type" api:"required"`
 	// Whether the market is currently open (real-time)
 	IsOpen bool `json:"is_open" api:"required"`
-	// Current session type if market is open, null if closed
+	// Current session type if market is open, null if closed When a null/undefined
+	// value is observed, it indicates it does not apply.
 	//
 	// Any of "pre_market", "regular", "after_hours".
 	CurrentSession MarketSessionType `json:"current_session" api:"nullable"`
@@ -179,9 +180,10 @@ type SessionSchedule struct {
 	// Session open timestamp with timezone offset
 	Open time.Time `json:"open" api:"required" format:"date-time"`
 	// ISO 8601 duration until session closes. Null if session is not currently open.
+	// When a null/undefined value is observed, it indicates it does not apply.
 	TimeUntilClose string `json:"time_until_close" api:"nullable" format:"duration"`
 	// ISO 8601 duration until session opens. Null if session has already started or
-	// closed.
+	// closed. When a null/undefined value is observed, it indicates it does not apply.
 	TimeUntilOpen string `json:"time_until_open" api:"nullable" format:"duration"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -202,11 +204,14 @@ func (r *SessionSchedule) UnmarshalJSON(data []byte) error {
 
 // Trading sessions for a market day with full timestamps
 type TradingSessions struct {
-	// After-hours session schedule, null if not available
+	// After-hours session schedule, null if not available When a null/undefined value
+	// is observed, it indicates it does not apply.
 	AfterHours SessionSchedule `json:"after_hours" api:"nullable"`
-	// Pre-market session schedule, null if not available
+	// Pre-market session schedule, null if not available When a null/undefined value
+	// is observed, it indicates it does not apply.
 	PreMarket SessionSchedule `json:"pre_market" api:"nullable"`
-	// Regular trading session schedule, null if holiday/weekend
+	// Regular trading session schedule, null if holiday/weekend When a null/undefined
+	// value is observed, it indicates it does not apply.
 	Regular SessionSchedule `json:"regular" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
