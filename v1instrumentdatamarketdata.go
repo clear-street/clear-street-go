@@ -347,8 +347,9 @@ func (r V1InstrumentDataMarketDataGetDailySummariesParams) URLQuery() (v url.Val
 }
 
 type V1InstrumentDataMarketDataGetSnapshotsParams struct {
-	// Comma-separated instrument identifiers.
-	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
+	// symbols).
+	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
