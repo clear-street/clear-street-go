@@ -828,8 +828,9 @@ type V1OrderGetOrdersParams struct {
 	Symbol param.Opt[string] `query:"symbol,omitzero" json:"-"`
 	// The end date and time for the query range, inclusive (ISO 8601 format)
 	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
-	// Comma-separated instrument identifiers
-	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
+	// symbols).
+	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
 	// Any of "COMMON_STOCK", "OPTION", "CASH".
@@ -843,9 +844,10 @@ type V1OrderGetOrdersParams struct {
 	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
 	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
 	Status []string `query:"status,omitzero" json:"-"`
-	// Comma-separated instrument identifiers. Matches options orders whose resolved
-	// underlier is any of the given IDs.
-	UnderlyingInstrumentIDs []string `query:"underlying_instrument_ids,omitzero" format:"uuid" json:"-"`
+	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
+	// symbols). Matches options orders whose resolved underlier is any of the given
+	// instruments.
+	UnderlyingInstrumentIDs []InstrumentIDOrSymbol `query:"underlying_instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
