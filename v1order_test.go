@@ -150,7 +150,7 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 		0,
 		clearstreet.V1OrderGetOrdersParams{
 			From:                    clearstreet.Time(time.Now()),
-			InstrumentIDs:           []clearstreet.InstrumentIDOrSymbol{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			InstrumentIDs:           []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 			InstrumentType:          clearstreet.V1OrderGetOrdersParamsInstrumentTypeCommonStock,
 			OrderIDs:                []string{"string"},
 			PageSize:                clearstreet.Int(1),
@@ -158,7 +158,7 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 			Status:                  []string{"PENDING_NEW"},
 			Symbol:                  clearstreet.String("symbol"),
 			To:                      clearstreet.Time(time.Now()),
-			UnderlyingInstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			UnderlyingInstrumentIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 		},
 	)
 	if err != nil {

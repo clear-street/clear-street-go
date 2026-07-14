@@ -29,7 +29,7 @@ func TestV1InstrumentDataGetAllInstrumentEventsWithOptionalParams(t *testing.T) 
 	_, err := client.V1.InstrumentData.GetAllInstrumentEvents(context.TODO(), clearstreet.V1InstrumentDataGetAllInstrumentEventsParams{
 		EventTypes:    []clearstreet.AllEventsEventType{clearstreet.AllEventsEventTypeEarnings},
 		FromDate:      clearstreet.String("from_date"),
-		InstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+		InstrumentIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 		ToDate:        clearstreet.String("to_date"),
 	})
 	if err != nil {
