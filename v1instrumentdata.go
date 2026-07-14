@@ -1240,10 +1240,9 @@ type V1InstrumentDataGetAllInstrumentEventsParams struct {
 	// Filter by event type(s). Comma-delimited list. Example:
 	// `event_types=EARNINGS,IPO`.
 	EventTypes []AllEventsEventType `query:"event_types,omitzero" json:"-"`
-	// Filter by instrument. Comma-separated instrument IDs (UUID) or symbols (equity
-	// tickers or OSI option symbols). Example:
-	// `instrument_ids=550e8400-e29b-41d4-a716-446655440000,AAPL`.
-	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	// Filter by instrument ID(s). Comma-delimited list of UUIDs. Example:
+	// `instrument_ids=550e8400-e29b-41d4-a716-446655440000`.
+	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	paramObj
 }
 
