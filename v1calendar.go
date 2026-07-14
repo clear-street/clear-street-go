@@ -13,6 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/internal/apiquery"
 	"github.com/clear-street/clear-street-go/internal/requestconfig"
 	"github.com/clear-street/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/packages/param"
 	"github.com/clear-street/clear-street-go/packages/respjson"
 	"github.com/clear-street/clear-street-go/shared"
 )
@@ -266,7 +267,7 @@ func (r *V1CalendarGetMarketHoursCalendarResponse) UnmarshalJSON(data []byte) er
 
 type V1CalendarGetMarketHoursCalendarParams struct {
 	// The date to query market hours for (YYYY-MM-DD). Defaults to today.
-	Date string `query:"date" api:"required" json:"-"`
+	Date param.Opt[string] `query:"date,omitzero" json:"-"`
 	// Market type to query (us_equities, us_options). If omitted, returns all markets.
 	//
 	// Any of "us_equities", "us_options".

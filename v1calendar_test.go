@@ -48,7 +48,7 @@ func TestV1CalendarGetMarketHoursCalendarWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.Calendar.GetMarketHoursCalendar(context.TODO(), clearstreet.V1CalendarGetMarketHoursCalendarParams{
-		Date:   "date",
+		Date:   clearstreet.String("date"),
 		Market: clearstreet.MarketTypeUsEquities,
 	})
 	if err != nil {
