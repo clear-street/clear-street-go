@@ -336,6 +336,8 @@ type OptionsContract struct {
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Whether the contract is marginable
 	IsMarginable bool `json:"is_marginable" api:"required"`
+	// Whether the contract is tradable
+	IsTradable bool `json:"is_tradable" api:"required"`
 	// Listing type
 	//
 	// Any of "STANDARD", "FLEX", "OTC".
@@ -362,6 +364,7 @@ type OptionsContract struct {
 		Expiry                 respjson.Field
 		IsLiquidationOnly      respjson.Field
 		IsMarginable           respjson.Field
+		IsTradable             respjson.Field
 		ListingType            respjson.Field
 		Multiplier             respjson.Field
 		StrikePrice            respjson.Field
