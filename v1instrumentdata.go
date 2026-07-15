@@ -672,6 +672,11 @@ type InstrumentEarnings struct {
 	// The percentage difference between actual and estimated EPS When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	EpsSurprisePercent string `json:"eps_surprise_percent" api:"nullable"`
+	// Report timing: before market open or after market close When a null/undefined
+	// value is observed, it indicates that there is no available data.
+	//
+	// Any of "BMO", "AMC".
+	ReportTime ReportTime `json:"report_time" api:"nullable"`
 	// The actual total revenue for the period When a null/undefined value is observed,
 	// it indicates that there is no available data.
 	RevenueActual string `json:"revenue_actual" api:"nullable"`
@@ -687,6 +692,7 @@ type InstrumentEarnings struct {
 		EpsActual              respjson.Field
 		EpsEstimate            respjson.Field
 		EpsSurprisePercent     respjson.Field
+		ReportTime             respjson.Field
 		RevenueActual          respjson.Field
 		RevenueEstimate        respjson.Field
 		RevenueSurprisePercent respjson.Field
@@ -1106,6 +1112,14 @@ func (r PriceTarget) RawJSON() string { return r.JSON.raw }
 func (r *PriceTarget) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// Earnings report timing: before market open or after market close
+type ReportTime string
+
+const (
+	ReportTimeBmo ReportTime = "BMO"
+	ReportTimeAmc ReportTime = "AMC"
+)
 
 type V1InstrumentDataGetAllInstrumentEventsResponse struct {
 	// All-events payload grouped by date.
