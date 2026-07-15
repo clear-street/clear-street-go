@@ -138,6 +138,7 @@ type FieldPeriod string
 const (
 	FieldPeriodQuarter              FieldPeriod = "QUARTER"
 	FieldPeriodTrailingTwelveMonths FieldPeriod = "TRAILING_TWELVE_MONTHS"
+	FieldPeriodAnnual               FieldPeriod = "ANNUAL"
 )
 
 // A reference to a screener field.
@@ -151,7 +152,7 @@ type FieldRef struct {
 	Lookback FieldLookback `json:"lookback" api:"nullable"`
 	// Optional reporting period (e.g. quarter or TTM).
 	//
-	// Any of "QUARTER", "TRAILING_TWELVE_MONTHS".
+	// Any of "QUARTER", "TRAILING_TWELVE_MONTHS", "ANNUAL".
 	Period FieldPeriod `json:"period" api:"nullable"`
 	// The data type of the field value. Present only in responses.
 	//
@@ -196,7 +197,7 @@ type FieldRefParam struct {
 	Lookback FieldLookback `json:"lookback,omitzero"`
 	// Optional reporting period (e.g. quarter or TTM).
 	//
-	// Any of "QUARTER", "TRAILING_TWELVE_MONTHS".
+	// Any of "QUARTER", "TRAILING_TWELVE_MONTHS", "ANNUAL".
 	Period FieldPeriod `json:"period,omitzero"`
 	// The data type of the field value. Present only in responses.
 	//
@@ -781,7 +782,7 @@ type Variable struct {
 	Modifier Modifier `json:"modifier" api:"nullable"`
 	// Optional reporting period.
 	//
-	// Any of "QUARTER", "TRAILING_TWELVE_MONTHS".
+	// Any of "QUARTER", "TRAILING_TWELVE_MONTHS", "ANNUAL".
 	Period FieldPeriod `json:"period" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -824,7 +825,7 @@ type VariableParam struct {
 	Modifier ModifierParam `json:"modifier,omitzero"`
 	// Optional reporting period.
 	//
-	// Any of "QUARTER", "TRAILING_TWELVE_MONTHS".
+	// Any of "QUARTER", "TRAILING_TWELVE_MONTHS", "ANNUAL".
 	Period FieldPeriod `json:"period,omitzero"`
 	paramObj
 }
