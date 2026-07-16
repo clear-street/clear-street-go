@@ -96,7 +96,7 @@ func TestV1OmniAIEntitlementGetEntitlementsWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.OmniAI.Entitlements.GetEntitlements(context.TODO(), clearstreet.V1OmniAIEntitlementGetEntitlementsParams{
-		TradingAccountID: clearstreet.Int(0),
+		AccountID: clearstreet.Int(0),
 	})
 	if err != nil {
 		var apierr *clearstreet.Error
