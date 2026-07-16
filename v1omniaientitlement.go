@@ -132,23 +132,23 @@ func (r *EntitlementAgreementResource) UnmarshalJSON(data []byte) error {
 type EntitlementAgreementResourceList []EntitlementAgreementResource
 
 type EntitlementResource struct {
-	AccountID   int64  `json:"account_id" api:"required"`
 	AgreementID string `json:"agreement_id" api:"required"`
 	// Stable entitlement code granted by an agreement.
 	//
 	// Any of "omni.account_data".
-	EntitlementCode EntitlementCode `json:"entitlement_code" api:"required"`
-	EntitlementID   string          `json:"entitlement_id" api:"required"`
-	GrantedAt       string          `json:"granted_at" api:"required"`
+	EntitlementCode  EntitlementCode `json:"entitlement_code" api:"required"`
+	EntitlementID    string          `json:"entitlement_id" api:"required"`
+	GrantedAt        string          `json:"granted_at" api:"required"`
+	TradingAccountID int64           `json:"trading_account_id" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AccountID       respjson.Field
-		AgreementID     respjson.Field
-		EntitlementCode respjson.Field
-		EntitlementID   respjson.Field
-		GrantedAt       respjson.Field
-		ExtraFields     map[string]respjson.Field
-		raw             string
+		AgreementID      respjson.Field
+		EntitlementCode  respjson.Field
+		EntitlementID    respjson.Field
+		GrantedAt        respjson.Field
+		TradingAccountID respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
 	} `json:"-"`
 }
 
@@ -244,7 +244,7 @@ func (r *V1OmniAIEntitlementNewEntitlementsParams) UnmarshalJSON(data []byte) er
 }
 
 type V1OmniAIEntitlementGetEntitlementsParams struct {
-	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
+	TradingAccountID param.Opt[int64] `query:"trading_account_id,omitzero" json:"-"`
 	paramObj
 }
 
