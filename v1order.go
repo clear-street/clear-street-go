@@ -140,8 +140,6 @@ func (r *CancelOrderRequest) UnmarshalJSON(data []byte) error {
 type Execution struct {
 	// Unique identifier for this execution report.
 	ID string `json:"id" api:"required" format:"uuid"`
-	// Unique instrument identifier.
-	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Identifier of the order this execution belongs to.
 	OrderID string `json:"order_id" api:"required" format:"uuid"`
 	// Fill price.
@@ -152,20 +150,25 @@ type Execution struct {
 	//
 	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
 	Side Side `json:"side" api:"required"`
-	// Trading symbol.
-	Symbol string `json:"symbol" api:"required"`
 	// Transaction timestamp in nanosecond precision (UTC).
 	TransactionTime time.Time `json:"transaction_time" api:"required" format:"date-time"`
+	// Unique instrument identifier. `null` when this fill has no single resolvable
+	// instrument. When a null/undefined value is observed, it indicates it does not
+	// apply.
+	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
+	// Trading symbol. `null` when this fill has no single resolvable instrument. When
+	// a null/undefined value is observed, it indicates it does not apply.
+	Symbol string `json:"symbol" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID              respjson.Field
-		InstrumentID    respjson.Field
 		OrderID         respjson.Field
 		Price           respjson.Field
 		Quantity        respjson.Field
 		Side            respjson.Field
-		Symbol          respjson.Field
 		TransactionTime respjson.Field
+		InstrumentID    respjson.Field
+		Symbol          respjson.Field
 		ExtraFields     map[string]respjson.Field
 		raw             string
 	} `json:"-"`
@@ -340,12 +343,6 @@ type Order struct {
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Cumulative filled quantity
 	FilledQuantity string `json:"filled_quantity" api:"required"`
-	// Instrument identifier for the traded instrument.
-	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
-	// Type of security
-	//
-	// Any of "COMMON_STOCK", "OPTION", "CASH".
-	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// Remaining unfilled quantity
 	LeavesQuantity string `json:"leaves_quantity" api:"required"`
 	// Type of order (MARKET, LIMIT, etc.)
@@ -365,8 +362,6 @@ type Order struct {
 	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
 	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
 	Status OrderStatus `json:"status" api:"required"`
-	// Trading symbol
-	Symbol string `json:"symbol" api:"required"`
 	// Time in force instruction
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
@@ -388,6 +383,15 @@ type Order struct {
 	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
 	// Whether the order is eligible for extended-hours trading.
 	ExtendedHours bool `json:"extended_hours" api:"nullable"`
+	// Instrument identifier for the traded instrument. `null` when the order has no
+	// single resolvable instrument. When a null/undefined value is observed, it
+	// indicates it does not apply.
+	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
+	// Type of security. `null` when the order has no single resolvable instrument.
+	// When a null/undefined value is observed, it indicates it does not apply.
+	//
+	// Any of "COMMON_STOCK", "OPTION", "CASH".
+	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// Limit offset for trailing stop-limit orders (signed) When a null/undefined value
 	// is observed, it indicates it does not apply.
 	LimitOffset string `json:"limit_offset" api:"nullable"`
@@ -406,6 +410,9 @@ type Order struct {
 	// Stop price (for STOP and STOP_LIMIT orders) When a null/undefined value is
 	// observed, it indicates it does not apply.
 	StopPrice string `json:"stop_price" api:"nullable"`
+	// Trading symbol. `null` when the order has no single resolvable instrument. When
+	// a null/undefined value is observed, it indicates it does not apply.
+	Symbol string `json:"symbol" api:"nullable"`
 	// Current trailing limit price computed by the trailing strategy When a
 	// null/undefined value is observed, it indicates it does not apply.
 	TrailingLimitPx string `json:"trailing_limit_px" api:"nullable"`
@@ -439,14 +446,11 @@ type Order struct {
 		ClientOrderID          respjson.Field
 		CreatedAt              respjson.Field
 		FilledQuantity         respjson.Field
-		InstrumentID           respjson.Field
-		InstrumentType         respjson.Field
 		LeavesQuantity         respjson.Field
 		OrderType              respjson.Field
 		Quantity               respjson.Field
 		Side                   respjson.Field
 		Status                 respjson.Field
-		Symbol                 respjson.Field
 		TimeInForce            respjson.Field
 		UpdatedAt              respjson.Field
 		Venue                  respjson.Field
@@ -454,11 +458,14 @@ type Order struct {
 		Details                respjson.Field
 		ExpiresAt              respjson.Field
 		ExtendedHours          respjson.Field
+		InstrumentID           respjson.Field
+		InstrumentType         respjson.Field
 		LimitOffset            respjson.Field
 		LimitPrice             respjson.Field
 		QueueState             respjson.Field
 		ReleasesAt             respjson.Field
 		StopPrice              respjson.Field
+		Symbol                 respjson.Field
 		TrailingLimitPx        respjson.Field
 		TrailingOffset         respjson.Field
 		TrailingOffsetType     respjson.Field
