@@ -136,7 +136,7 @@ type Position struct {
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Type of security
 	//
-	// Any of "COMMON_STOCK", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// The current market value of the position
 	MarketValue string `json:"market_value" api:"required"`

@@ -59,6 +59,7 @@ type SecurityType string
 
 const (
 	SecurityTypeCommonStock SecurityType = "COMMON_STOCK"
+	SecurityTypeIndex       SecurityType = "INDEX"
 	SecurityTypeOption      SecurityType = "OPTION"
 	SecurityTypeCash        SecurityType = "CASH"
 )
