@@ -30,7 +30,7 @@ func TestV1OrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.V1OrderCancelAllOpenOrdersParams{
-			InstrumentIDs:  []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			InstrumentIDs:  []clearstreet.InstrumentIDOrSymbol{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
 			InstrumentType: clearstreet.V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock,
 			Side:           clearstreet.V1OrderCancelAllOpenOrdersParamsSideBuy,
 			Type:           clearstreet.V1OrderCancelAllOpenOrdersParamsTypeMarket,
