@@ -390,7 +390,7 @@ type Order struct {
 	// Type of security. `null` when the order has no single resolvable instrument.
 	// When a null/undefined value is observed, it indicates it does not apply.
 	//
-	// Any of "COMMON_STOCK", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// Limit offset for trailing stop-limit orders (signed) When a null/undefined value
 	// is observed, it indicates it does not apply.
@@ -731,7 +731,7 @@ type V1OrderCancelAllOpenOrdersParams struct {
 	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
 	InstrumentType V1OrderCancelAllOpenOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Filter by order side (BUY or SELL)
 	//
@@ -759,6 +759,7 @@ type V1OrderCancelAllOpenOrdersParamsInstrumentType string
 
 const (
 	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock V1OrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeIndex       V1OrderCancelAllOpenOrdersParamsInstrumentType = "INDEX"
 	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOption      V1OrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
 	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCash        V1OrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
 )
@@ -841,7 +842,7 @@ type V1OrderGetOrdersParams struct {
 	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
 	InstrumentType V1OrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Comma-separated order IDs to filter by. When provided, only orders whose order
 	// ID is in this set are returned.
@@ -872,6 +873,7 @@ type V1OrderGetOrdersParamsInstrumentType string
 
 const (
 	V1OrderGetOrdersParamsInstrumentTypeCommonStock V1OrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
+	V1OrderGetOrdersParamsInstrumentTypeIndex       V1OrderGetOrdersParamsInstrumentType = "INDEX"
 	V1OrderGetOrdersParamsInstrumentTypeOption      V1OrderGetOrdersParamsInstrumentType = "OPTION"
 	V1OrderGetOrdersParamsInstrumentTypeCash        V1OrderGetOrdersParamsInstrumentType = "CASH"
 )

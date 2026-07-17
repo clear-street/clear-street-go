@@ -145,7 +145,7 @@ type Instrument struct {
 	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	//
-	// Any of "COMMON_STOCK", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// The percent of a long position's value you must post as margin When a
 	// null/undefined value is observed, it indicates that there is no available data.
@@ -246,7 +246,7 @@ type InstrumentCore struct {
 	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	//
-	// Any of "COMMON_STOCK", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// The percent of a long position's value you must post as margin When a
 	// null/undefined value is observed, it indicates that there is no available data.
@@ -492,7 +492,7 @@ type V1InstrumentGetInstrumentsParams struct {
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g. COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
 	InstrumentType V1InstrumentGetInstrumentsParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	paramObj
 }
@@ -511,6 +511,7 @@ type V1InstrumentGetInstrumentsParamsInstrumentType string
 
 const (
 	V1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock V1InstrumentGetInstrumentsParamsInstrumentType = "COMMON_STOCK"
+	V1InstrumentGetInstrumentsParamsInstrumentTypeIndex       V1InstrumentGetInstrumentsParamsInstrumentType = "INDEX"
 	V1InstrumentGetInstrumentsParamsInstrumentTypeOption      V1InstrumentGetInstrumentsParamsInstrumentType = "OPTION"
 	V1InstrumentGetInstrumentsParamsInstrumentTypeCash        V1InstrumentGetInstrumentsParamsInstrumentType = "CASH"
 )
