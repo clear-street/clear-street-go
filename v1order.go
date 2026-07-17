@@ -726,8 +726,9 @@ func (r *V1OrderSubmitOrdersResponse) UnmarshalJSON(data []byte) error {
 }
 
 type V1OrderCancelAllOpenOrdersParams struct {
-	// Comma-separated instrument identifiers
-	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
+	// symbols).
+	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
 	//
 	// Any of "COMMON_STOCK", "OPTION", "CASH".
