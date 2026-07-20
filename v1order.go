@@ -528,6 +528,27 @@ const (
 	QueueStateReleased        QueueState = "RELEASED"
 )
 
+// Request to replace (modify) an existing order
+//
+// At least one field must be provided.
+type ReplaceOrderRequestParam struct {
+	// New limit price for the order
+	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
+	// New quantity for the order
+	Quantity param.Opt[string] `json:"quantity,omitzero"`
+	// New stop price for the order
+	StopPrice param.Opt[string] `json:"stop_price,omitzero"`
+	paramObj
+}
+
+func (r ReplaceOrderRequestParam) MarshalJSON() (data []byte, err error) {
+	type shadow ReplaceOrderRequestParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ReplaceOrderRequestParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // Strict order-type enum for order submission/replacement requests.
 type RequestOrderType string
 
@@ -540,7 +561,7 @@ const (
 	RequestOrderTypeTrailingStopLimit RequestOrderType = "TRAILING_STOP_LIMIT"
 )
 
-// Strict time-in-force enum for order submission/replacement requests.
+// Strict time-in-force enum for order submission requests.
 type RequestTimeInForce string
 
 const (
@@ -880,24 +901,15 @@ const (
 
 type V1OrderReplaceOrderParams struct {
 	AccountID int64 `path:"account_id" api:"required" json:"-"`
-	// New limit price for the order
-	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
-	// New quantity for the order
-	Quantity param.Opt[string] `json:"quantity,omitzero"`
-	// New stop price for the order
-	StopPrice param.Opt[string] `json:"stop_price,omitzero"`
-	// New time in force for the order
+	// Request to replace (modify) an existing order
 	//
-	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
-	TimeInForce RequestTimeInForce `json:"time_in_force,omitzero"`
+	// At least one field must be provided.
+	ReplaceOrderRequest ReplaceOrderRequestParam
 	paramObj
 }
 
 func (r V1OrderReplaceOrderParams) MarshalJSON() (data []byte, err error) {
-	type shadow V1OrderReplaceOrderParams
-	return param.MarshalObject(r, (*shadow)(&r))
+	return shimjson.Marshal(r.ReplaceOrderRequest)
 }
 func (r *V1OrderReplaceOrderParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)

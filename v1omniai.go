@@ -394,6 +394,56 @@ func (r *PrefillCancelOrderAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Modify-order prefill action.
+type PrefillModifyOrderAction struct {
+	// Modification targets and deltas needed to construct replace-order API requests.
+	Orders []PrefillModifyOrderRequest `json:"orders" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Orders      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PrefillModifyOrderAction) RawJSON() string { return r.JSON.raw }
+func (r *PrefillModifyOrderAction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Request to replace (modify) an existing order
+//
+// At least one field must be provided.
+type PrefillModifyOrderRequest struct {
+	// Account ID that owns the order.
+	AccountID int64 `json:"account_id"`
+	// New limit price for the order
+	LimitPrice string `json:"limit_price" api:"nullable"`
+	// Order ID to modify.
+	OrderID string `json:"order_id"`
+	// New quantity for the order
+	Quantity string `json:"quantity" api:"nullable"`
+	// New stop price for the order
+	StopPrice string `json:"stop_price" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AccountID   respjson.Field
+		LimitPrice  respjson.Field
+		OrderID     respjson.Field
+		Quantity    respjson.Field
+		StopPrice   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PrefillModifyOrderRequest) RawJSON() string { return r.JSON.raw }
+func (r *PrefillModifyOrderRequest) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // New-order prefill action.
 type PrefillNewOrderAction struct {
 	// Orders to prefill using the same shape accepted by the orders API.
@@ -414,11 +464,13 @@ func (r *PrefillNewOrderAction) UnmarshalJSON(data []byte) error {
 
 // PrefillOrderActionUnion contains all possible properties and values from
 // [PrefillOrderActionPrefillNewOrderAction],
-// [PrefillOrderActionPrefillCancelOrderAction].
+// [PrefillOrderActionPrefillCancelOrderAction],
+// [PrefillOrderActionPrefillModifyOrderAction].
 //
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type PrefillOrderActionUnion struct {
-	// This field is a union of [[]NewOrderRequest], [[]CancelOrderRequest]
+	// This field is a union of [[]NewOrderRequest], [[]CancelOrderRequest],
+	// [[]PrefillModifyOrderRequest]
 	Orders     PrefillOrderActionUnionOrders `json:"orders"`
 	ActionType string                        `json:"action_type"`
 	JSON       struct {
@@ -438,6 +490,11 @@ func (u PrefillOrderActionUnion) AsPrefillCancelOrderAction() (v PrefillOrderAct
 	return
 }
 
+func (u PrefillOrderActionUnion) AsPrefillModifyOrderAction() (v PrefillOrderActionPrefillModifyOrderAction) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
 // Returns the unmodified JSON received from the API
 func (u PrefillOrderActionUnion) RawJSON() string { return u.JSON.raw }
 
@@ -453,7 +510,8 @@ func (r *PrefillOrderActionUnion) UnmarshalJSON(data []byte) error {
 // [PrefillOrderActionUnion].
 //
 // If the underlying value is not a json object, one of the following properties
-// will be valid: OfNewOrderRequestArray OfCancelOrderRequestArray]
+// will be valid: OfNewOrderRequestArray OfCancelOrderRequestArray
+// OfPrefillModifyOrderRequestArray]
 type PrefillOrderActionUnionOrders struct {
 	// This field will be present if the value is a [[]NewOrderRequest] instead of an
 	// object.
@@ -461,10 +519,14 @@ type PrefillOrderActionUnionOrders struct {
 	// This field will be present if the value is a [[]CancelOrderRequest] instead of
 	// an object.
 	OfCancelOrderRequestArray []CancelOrderRequest `json:",inline"`
-	JSON                      struct {
-		OfNewOrderRequestArray    respjson.Field
-		OfCancelOrderRequestArray respjson.Field
-		raw                       string
+	// This field will be present if the value is a [[]PrefillModifyOrderRequest]
+	// instead of an object.
+	OfPrefillModifyOrderRequestArray []PrefillModifyOrderRequest `json:",inline"`
+	JSON                             struct {
+		OfNewOrderRequestArray           respjson.Field
+		OfCancelOrderRequestArray        respjson.Field
+		OfPrefillModifyOrderRequestArray respjson.Field
+		raw                              string
 	} `json:"-"`
 }
 
@@ -507,6 +569,25 @@ type PrefillOrderActionPrefillCancelOrderAction struct {
 // Returns the unmodified JSON received from the API
 func (r PrefillOrderActionPrefillCancelOrderAction) RawJSON() string { return r.JSON.raw }
 func (r *PrefillOrderActionPrefillCancelOrderAction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Modify one or more existing orders.
+type PrefillOrderActionPrefillModifyOrderAction struct {
+	// Any of "MODIFY".
+	ActionType string `json:"action_type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ActionType  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	PrefillModifyOrderAction
+}
+
+// Returns the unmodified JSON received from the API
+func (r PrefillOrderActionPrefillModifyOrderAction) RawJSON() string { return r.JSON.raw }
+func (r *PrefillOrderActionPrefillModifyOrderAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

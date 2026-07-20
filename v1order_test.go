@@ -186,11 +186,12 @@ func TestV1OrderReplaceOrderWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"order_id",
 		clearstreet.V1OrderReplaceOrderParams{
-			AccountID:   0,
-			LimitPrice:  clearstreet.String("49.00"),
-			Quantity:    clearstreet.String("1"),
-			StopPrice:   clearstreet.String("52.00"),
-			TimeInForce: clearstreet.RequestTimeInForceDay,
+			AccountID: 0,
+			ReplaceOrderRequest: clearstreet.ReplaceOrderRequestParam{
+				LimitPrice: clearstreet.String("49.00"),
+				Quantity:   clearstreet.String("1"),
+				StopPrice:  clearstreet.String("52.00"),
+			},
 		},
 	)
 	if err != nil {
