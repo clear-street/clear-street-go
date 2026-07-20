@@ -137,11 +137,6 @@ type Instrument struct {
 	// Average daily share volume from the security definition. When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	Adv string `json:"adv" api:"nullable"`
-	// Deprecated. Always null. When a null/undefined value is observed, it indicates
-	// it does not apply.
-	//
-	// Deprecated: deprecated
-	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	//
@@ -166,11 +161,6 @@ type Instrument struct {
 	// The percent of a short position's value you must post as margin When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
-	// Deprecated. Always null. When a null/undefined value is observed, it indicates
-	// it does not apply.
-	//
-	// Deprecated: deprecated
-	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                  respjson.Field
@@ -187,7 +177,6 @@ type Instrument struct {
 		Symbol              respjson.Field
 		Venue               respjson.Field
 		Adv                 respjson.Field
-		Expiry              respjson.Field
 		InstrumentType      respjson.Field
 		LongMarginRate      respjson.Field
 		Name                respjson.Field
@@ -195,7 +184,6 @@ type Instrument struct {
 		OptionsExpiryDates  respjson.Field
 		PreviousClose       respjson.Field
 		ShortMarginRate     respjson.Field
-		StrikePrice         respjson.Field
 		ExtraFields         map[string]respjson.Field
 		raw                 string
 	} `json:"-"`
@@ -238,11 +226,6 @@ type InstrumentCore struct {
 	// Average daily share volume from the security definition. When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	Adv string `json:"adv" api:"nullable"`
-	// Deprecated. Always null. When a null/undefined value is observed, it indicates
-	// it does not apply.
-	//
-	// Deprecated: deprecated
-	Expiry time.Time `json:"expiry" api:"nullable" format:"date"`
 	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	//
@@ -263,11 +246,6 @@ type InstrumentCore struct {
 	// The percent of a short position's value you must post as margin When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
-	// Deprecated. Always null. When a null/undefined value is observed, it indicates
-	// it does not apply.
-	//
-	// Deprecated: deprecated
-	StrikePrice string `json:"strike_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                  respjson.Field
@@ -284,14 +262,12 @@ type InstrumentCore struct {
 		Symbol              respjson.Field
 		Venue               respjson.Field
 		Adv                 respjson.Field
-		Expiry              respjson.Field
 		InstrumentType      respjson.Field
 		LongMarginRate      respjson.Field
 		Name                respjson.Field
 		NotionalAdv         respjson.Field
 		PreviousClose       respjson.Field
 		ShortMarginRate     respjson.Field
-		StrikePrice         respjson.Field
 		ExtraFields         map[string]respjson.Field
 		raw                 string
 	} `json:"-"`
