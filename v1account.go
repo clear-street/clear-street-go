@@ -49,7 +49,8 @@ func (r *V1AccountService) GetAccountBalances(ctx context.Context, accountID int
 	return res, err
 }
 
-// Fetch account details by ID
+// Fetch account details by ID, including the mailing address, date of birth, phone
+// number, and country of tax residency of the account-holder entity when on file.
 func (r *V1AccountService) GetAccountByID(ctx context.Context, accountID int64, opts ...option.RequestOption) (res *V1AccountGetAccountByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v", accountID)
@@ -321,6 +322,113 @@ const (
 	AccountTypeOther    AccountType = "OTHER"
 )
 
+// Represents a trading account
+type AccountWithPersonalDetails struct {
+	// The unique identifier for the account
+	ID int64 `json:"id" api:"required"`
+	// The account holder entity identifier
+	AccountHolderEntityID int64 `json:"account_holder_entity_id" api:"required"`
+	// The full legal name of the account
+	FullName string `json:"full_name" api:"required"`
+	// The date the account was opened
+	OpenDate time.Time `json:"open_date" api:"required" format:"date"`
+	// The options level of the account
+	OptionsLevel int64 `json:"options_level" api:"required"`
+	// The short name of the account
+	ShortName string `json:"short_name" api:"required"`
+	// The current status of the account
+	//
+	// Any of "ACTIVE", "INACTIVE", "CLOSED".
+	Status AccountStatus `json:"status" api:"required"`
+	// The sub-type of account
+	//
+	// Any of "CASH", "MARGIN", "OTHER".
+	Subtype AccountSubtype `json:"subtype" api:"required"`
+	// The type of account
+	//
+	// Any of "CUSTOMER", "OTHER".
+	Type AccountType `json:"type" api:"required"`
+	// The date the account was closed, if applicable When a null/undefined value is
+	// observed, it indicates it does not apply.
+	CloseDate time.Time `json:"close_date" api:"nullable" format:"date"`
+	// The country of tax residency of the account-holder entity. `null` when not on
+	// file or entity reference data is unavailable. When a null/undefined value is
+	// observed, it indicates that there is no available data.
+	CountryOfTaxResidency string `json:"country_of_tax_residency" api:"nullable"`
+	// The date of birth of the account holder's primary contact. `null` when not on
+	// file or entity reference data is unavailable. When a null/undefined value is
+	// observed, it indicates that there is no available data.
+	DateOfBirth time.Time `json:"date_of_birth" api:"nullable" format:"date"`
+	// The mailing address of the account-holder entity. `null` when no mailing address
+	// is on file or entity reference data is unavailable. When a null/undefined value
+	// is observed, it indicates that there is no available data.
+	MailingAddress Address `json:"mailing_address" api:"nullable"`
+	// The phone number of the account holder's primary contact. `null` when not on
+	// file or entity reference data is unavailable. When a null/undefined value is
+	// observed, it indicates that there is no available data.
+	PhoneNumber string `json:"phone_number" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID                    respjson.Field
+		AccountHolderEntityID respjson.Field
+		FullName              respjson.Field
+		OpenDate              respjson.Field
+		OptionsLevel          respjson.Field
+		ShortName             respjson.Field
+		Status                respjson.Field
+		Subtype               respjson.Field
+		Type                  respjson.Field
+		CloseDate             respjson.Field
+		CountryOfTaxResidency respjson.Field
+		DateOfBirth           respjson.Field
+		MailingAddress        respjson.Field
+		PhoneNumber           respjson.Field
+		ExtraFields           map[string]respjson.Field
+		raw                   string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r AccountWithPersonalDetails) RawJSON() string { return r.JSON.raw }
+func (r *AccountWithPersonalDetails) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A postal address.
+type Address struct {
+	// City
+	City string `json:"city" api:"required"`
+	// Country
+	Country string `json:"country" api:"required"`
+	// First street address line
+	Line1 string `json:"line1" api:"required"`
+	// Postal code
+	PostalCode string `json:"postal_code" api:"required"`
+	// Second street address line When a null/undefined value is observed, it indicates
+	// it does not apply.
+	Line2 string `json:"line2" api:"nullable"`
+	// State or province When a null/undefined value is observed, it indicates it does
+	// not apply.
+	State string `json:"state" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		City        respjson.Field
+		Country     respjson.Field
+		Line1       respjson.Field
+		PostalCode  respjson.Field
+		Line2       respjson.Field
+		State       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Address) RawJSON() string { return r.JSON.raw }
+func (r *Address) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type MarginDetails struct {
 	// The number of day trades executed over the 5 most recent trading days.
 	//
@@ -590,7 +698,7 @@ func (r *V1AccountGetAccountBalancesResponse) UnmarshalJSON(data []byte) error {
 
 type V1AccountGetAccountByIDResponse struct {
 	// Represents a trading account
-	Data Account `json:"data" api:"required"`
+	Data AccountWithPersonalDetails `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Data        respjson.Field
