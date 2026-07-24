@@ -28,7 +28,7 @@ func TestV1InstrumentGetInstrumentByIDWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.V1.Instruments.GetInstrumentByID(
 		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		"x",
 		clearstreet.V1InstrumentGetInstrumentByIDParams{
 			IncludeOptionsExpiryDates: clearstreet.Bool(true),
 		},
@@ -56,7 +56,7 @@ func TestV1InstrumentGetInstrumentsWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.V1.Instruments.GetInstruments(context.TODO(), clearstreet.V1InstrumentGetInstrumentsParams{
 		EasyToBorrow:        clearstreet.Bool(true),
-		InstrumentIDs:       []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+		InstrumentIDs:       []string{"x"},
 		InstrumentType:      clearstreet.V1InstrumentGetInstrumentsParamsInstrumentTypeCommonStock,
 		IsLiquidationOnly:   clearstreet.Bool(true),
 		IsMarginable:        clearstreet.Bool(true),
@@ -88,12 +88,12 @@ func TestV1InstrumentGetOptionContractsWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.Instruments.GetOptionContracts(context.TODO(), clearstreet.V1InstrumentGetOptionContractsParams{
-		ContractType:           clearstreet.ContractTypeCall,
+		ContractType:           clearstreet.V1InstrumentGetOptionContractsParamsContractTypeCall,
 		Expiry:                 clearstreet.Time(time.Now()),
 		PageSize:               clearstreet.Int(1),
 		PageToken:              clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 		Underlier:              clearstreet.String("underlier"),
-		UnderlyingInstrumentID: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+		UnderlyingInstrumentID: clearstreet.String("x"),
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

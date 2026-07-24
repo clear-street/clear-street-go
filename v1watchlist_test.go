@@ -29,7 +29,7 @@ func TestV1WatchlistAddWatchlistItem(t *testing.T) {
 		context.TODO(),
 		"550e8400-e29b-41d4-a716-446655440000",
 		clearstreet.V1WatchlistAddWatchlistItemParams{
-			InstrumentID: "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+			InstrumentID: "x",
 		},
 	)
 	if err != nil {

@@ -42,13 +42,13 @@ func NewV1InstrumentService(opts ...option.RequestOption) (r V1InstrumentService
 }
 
 // Retrieves detailed information for a specific instrument.
-func (r *V1InstrumentService) GetInstrumentByID(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentGetInstrumentByIDParams, opts ...option.RequestOption) (res *V1InstrumentGetInstrumentByIDResponse, err error) {
+func (r *V1InstrumentService) GetInstrumentByID(ctx context.Context, instrumentID string, query V1InstrumentGetInstrumentByIDParams, opts ...option.RequestOption) (res *V1InstrumentGetInstrumentByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("v1/instruments/%s", instrumentID)
+	path := fmt.Sprintf("v1/instruments/%s", url.PathEscape(instrumentID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
@@ -465,7 +465,7 @@ type V1InstrumentGetInstrumentsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Comma-separated instrument identifiers: unique identifiers or symbols (symbol
 	// for equities, OSI for options)
-	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	InstrumentIDs []string `query:"instrument_ids,omitzero" json:"-"`
 	// Filter by instrument type (e.g. COMMON_STOCK, OPTION)
 	//
 	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
@@ -504,11 +504,11 @@ type V1InstrumentGetOptionContractsParams struct {
 	// Underlier symbol (e.g., AAPL, SPX)
 	Underlier param.Opt[string] `query:"underlier,omitzero" json:"-"`
 	// Instrument identifier or symbol of the underlying equity/index
-	UnderlyingInstrumentID param.Opt[InstrumentIDOrSymbol] `query:"underlying_instrument_id,omitzero" format:"uuid" json:"-"`
+	UnderlyingInstrumentID param.Opt[string] `query:"underlying_instrument_id,omitzero" json:"-"`
 	// Filter by contract type: CALL or PUT
 	//
 	// Any of "CALL", "PUT".
-	ContractType ContractType `query:"contract_type,omitzero" json:"-"`
+	ContractType V1InstrumentGetOptionContractsParamsContractType `query:"contract_type,omitzero" json:"-"`
 	paramObj
 }
 
@@ -520,6 +520,14 @@ func (r V1InstrumentGetOptionContractsParams) URLQuery() (v url.Values, err erro
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Filter by contract type: CALL or PUT
+type V1InstrumentGetOptionContractsParamsContractType string
+
+const (
+	V1InstrumentGetOptionContractsParamsContractTypeCall V1InstrumentGetOptionContractsParamsContractType = "CALL"
+	V1InstrumentGetOptionContractsParamsContractTypePut  V1InstrumentGetOptionContractsParamsContractType = "PUT"
+)
 
 type V1InstrumentSearchInstrumentsParams struct {
 	// Search term applied case-insensitively to ticker symbols, alternate identifiers

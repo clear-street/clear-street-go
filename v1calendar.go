@@ -271,7 +271,7 @@ type V1CalendarGetMarketHoursCalendarParams struct {
 	// Market type to query (us_equities, us_options). If omitted, returns all markets.
 	//
 	// Any of "us_equities", "us_options".
-	Market MarketType `query:"market,omitzero" json:"-"`
+	Market V1CalendarGetMarketHoursCalendarParamsMarket `query:"market,omitzero" json:"-"`
 	paramObj
 }
 
@@ -283,3 +283,11 @@ func (r V1CalendarGetMarketHoursCalendarParams) URLQuery() (v url.Values, err er
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Market type to query (us_equities, us_options). If omitted, returns all markets.
+type V1CalendarGetMarketHoursCalendarParamsMarket string
+
+const (
+	V1CalendarGetMarketHoursCalendarParamsMarketUsEquities V1CalendarGetMarketHoursCalendarParamsMarket = "us_equities"
+	V1CalendarGetMarketHoursCalendarParamsMarketUsOptions  V1CalendarGetMarketHoursCalendarParamsMarket = "us_options"
+)

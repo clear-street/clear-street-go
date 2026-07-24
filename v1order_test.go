@@ -30,7 +30,7 @@ func TestV1OrderCancelAllOpenOrdersWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.V1OrderCancelAllOpenOrdersParams{
-			InstrumentIDs:  []clearstreet.InstrumentIDOrSymbol{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			InstrumentIDs:  []clearstreet.InstrumentIDOrSymbol{"x"},
 			InstrumentType: clearstreet.V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock,
 			Side:           clearstreet.V1OrderCancelAllOpenOrdersParamsSideBuy,
 			Type:           clearstreet.V1OrderCancelAllOpenOrdersParamsTypeMarket,
@@ -90,7 +90,7 @@ func TestV1OrderGetExecutionsWithOptionalParams(t *testing.T) {
 		0,
 		clearstreet.V1OrderGetExecutionsParams{
 			From:          clearstreet.Time(time.Now()),
-			InstrumentIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			InstrumentIDs: []string{"x"},
 			PageSize:      clearstreet.Int(1),
 			PageToken:     clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 			To:            clearstreet.Time(time.Now()),
@@ -150,7 +150,7 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 		0,
 		clearstreet.V1OrderGetOrdersParams{
 			From:                    clearstreet.Time(time.Now()),
-			InstrumentIDs:           []clearstreet.InstrumentIDOrSymbol{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			InstrumentIDs:           []clearstreet.InstrumentIDOrSymbol{"x"},
 			InstrumentType:          clearstreet.V1OrderGetOrdersParamsInstrumentTypeCommonStock,
 			OrderIDs:                []string{"string"},
 			PageSize:                clearstreet.Int(1),
@@ -158,7 +158,7 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 			Status:                  []string{"PENDING_NEW"},
 			Symbol:                  clearstreet.String("symbol"),
 			To:                      clearstreet.Time(time.Now()),
-			UnderlyingInstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			UnderlyingInstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"x"},
 		},
 	)
 	if err != nil {
@@ -227,7 +227,7 @@ func TestV1OrderSubmitOrders(t *testing.T) {
 				ID:                 clearstreet.String("my-ref-id-20251001-002"),
 				ExpiresAt:          clearstreet.Time(time.Now()),
 				ExtendedHours:      clearstreet.Bool(true),
-				InstrumentID:       clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+				InstrumentID:       clearstreet.String("x"),
 				LimitOffset:        clearstreet.String("0.50"),
 				LimitPrice:         clearstreet.String("48.00"),
 				StopPrice:          clearstreet.String("52.00"),

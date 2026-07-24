@@ -66,7 +66,7 @@ func (r *V1PositionService) ClosePosition(ctx context.Context, instrumentID Inst
 		err = errors.New("missing required instrument_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("v1/accounts/%v/positions/%s", params.AccountID, instrumentID)
+	path := fmt.Sprintf("v1/accounts/%v/positions/%s", params.AccountID, url.PathEscape(instrumentID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, params, &res, opts...)
 	return res, err
 }
@@ -470,7 +470,7 @@ func (r *V1PositionClosePositionsParams) UnmarshalJSON(data []byte) error {
 type V1PositionGetPositionInstructionsParams struct {
 	// Limit results to a single contract. Instrument ID (UUID) or symbol (equity
 	// ticker or OSI option symbol).
-	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" format:"uuid" json:"-"`
+	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" json:"-"`
 	paramObj
 }
 

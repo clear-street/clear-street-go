@@ -49,7 +49,7 @@ func TestV1CalendarGetMarketHoursCalendarWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.V1.Calendar.GetMarketHoursCalendar(context.TODO(), clearstreet.V1CalendarGetMarketHoursCalendarParams{
 		Date:   clearstreet.String("date"),
-		Market: clearstreet.MarketTypeUsEquities,
+		Market: clearstreet.V1CalendarGetMarketHoursCalendarParamsMarketUsEquities,
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

@@ -64,13 +64,13 @@ func (r *V1InstrumentDataService) GetAllInstrumentEvents(ctx context.Context, qu
 }
 
 // Retrieves analyst ratings and price targets for an instrument.
-func (r *V1InstrumentDataService) GetInstrumentAnalystConsensus(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentDataGetInstrumentAnalystConsensusParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentAnalystConsensusResponse, err error) {
+func (r *V1InstrumentDataService) GetInstrumentAnalystConsensus(ctx context.Context, instrumentID string, query V1InstrumentDataGetInstrumentAnalystConsensusParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentAnalystConsensusResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("v1/instruments/%s/analyst-reporting", instrumentID)
+	path := fmt.Sprintf("v1/instruments/%s/analyst-reporting", url.PathEscape(instrumentID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
@@ -84,13 +84,13 @@ func (r *V1InstrumentDataService) GetInstrumentAnalystConsensus(ctx context.Cont
 //
 // - `from_date`: None (no lower bound)
 // - `to_date`: None (no upper bound)
-func (r *V1InstrumentDataService) GetInstrumentBalanceSheetStatements(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentDataGetInstrumentBalanceSheetStatementsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentBalanceSheetStatementsResponse, err error) {
+func (r *V1InstrumentDataService) GetInstrumentBalanceSheetStatements(ctx context.Context, instrumentID string, query V1InstrumentDataGetInstrumentBalanceSheetStatementsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentBalanceSheetStatementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("v1/instruments/%s/balance-sheets", instrumentID)
+	path := fmt.Sprintf("v1/instruments/%s/balance-sheets", url.PathEscape(instrumentID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
@@ -100,13 +100,13 @@ func (r *V1InstrumentDataService) GetInstrumentBalanceSheetStatements(ctx contex
 // Retrieves historical cash flow statements for the specified instrument. Cash
 // flow statements show cash inflows and outflows from operating, investing, and
 // financing activities.
-func (r *V1InstrumentDataService) GetInstrumentCashFlowStatements(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentDataGetInstrumentCashFlowStatementsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentCashFlowStatementsResponse, err error) {
+func (r *V1InstrumentDataService) GetInstrumentCashFlowStatements(ctx context.Context, instrumentID string, query V1InstrumentDataGetInstrumentCashFlowStatementsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentCashFlowStatementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("v1/instruments/%s/cash-flow-statements", instrumentID)
+	path := fmt.Sprintf("v1/instruments/%s/cash-flow-statements", url.PathEscape(instrumentID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
@@ -118,25 +118,25 @@ func (r *V1InstrumentDataService) GetInstrumentCashFlowStatements(ctx context.Co
 //
 // - `from_date`: today - 365 days
 // - `to_date`: today + 60 days
-func (r *V1InstrumentDataService) GetInstrumentEvents(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentDataGetInstrumentEventsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentEventsResponse, err error) {
+func (r *V1InstrumentDataService) GetInstrumentEvents(ctx context.Context, instrumentID string, query V1InstrumentDataGetInstrumentEventsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentEventsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("v1/instruments/%s/events", instrumentID)
+	path := fmt.Sprintf("v1/instruments/%s/events", url.PathEscape(instrumentID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
 
 // Retrieves supplemental fundamentals and company profile data for an instrument.
-func (r *V1InstrumentDataService) GetInstrumentFundamentals(ctx context.Context, instrumentID InstrumentIDOrSymbol, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentFundamentalsResponse, err error) {
+func (r *V1InstrumentDataService) GetInstrumentFundamentals(ctx context.Context, instrumentID string, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentFundamentalsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("v1/instruments/%s/fundamentals", instrumentID)
+	path := fmt.Sprintf("v1/instruments/%s/fundamentals", url.PathEscape(instrumentID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
 	return res, err
 }
@@ -148,13 +148,13 @@ func (r *V1InstrumentDataService) GetInstrumentFundamentals(ctx context.Context,
 //
 // - `from_date`: None (no lower bound)
 // - `to_date`: None (no upper bound)
-func (r *V1InstrumentDataService) GetInstrumentIncomeStatements(ctx context.Context, instrumentID InstrumentIDOrSymbol, query V1InstrumentDataGetInstrumentIncomeStatementsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentIncomeStatementsResponse, err error) {
+func (r *V1InstrumentDataService) GetInstrumentIncomeStatements(ctx context.Context, instrumentID string, query V1InstrumentDataGetInstrumentIncomeStatementsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentIncomeStatementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
 		err = errors.New("missing required instrument_id parameter")
 		return nil, err
 	}
-	path := fmt.Sprintf("v1/instruments/%s/income-statements", instrumentID)
+	path := fmt.Sprintf("v1/instruments/%s/income-statements", url.PathEscape(instrumentID))
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
@@ -1263,7 +1263,7 @@ type V1InstrumentDataGetAllInstrumentEventsParams struct {
 	// Filter by instrument. Comma-separated instrument IDs (UUID) or symbols (equity
 	// tickers or OSI option symbols). Example:
 	// `instrument_ids=550e8400-e29b-41d4-a716-446655440000,AAPL`.
-	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" json:"-"`
 	paramObj
 }
 

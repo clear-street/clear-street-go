@@ -213,8 +213,9 @@ type NewOrderRequest struct {
 	// Allow trading outside regular trading hours. Some brokers disallow options
 	// outside RTH.
 	ExtendedHours bool `json:"extended_hours" api:"nullable"`
-	// Instrument identifier
-	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"nullable" format:"uuid"`
+	// Instrument ID (UUID) or symbol (equity ticker or OSI option symbol). Either
+	// `symbol` or `instrument_id` must be provided.
+	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"nullable"`
 	// Limit offset for trailing stop-limit orders (signed)
 	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// Limit price (required for LIMIT and STOP_LIMIT orders)
@@ -310,8 +311,9 @@ type NewOrderRequestParam struct {
 	Symbol param.Opt[string] `json:"symbol,omitzero"`
 	// Trailing offset amount (required for trailing orders)
 	TrailingOffset param.Opt[string] `json:"trailing_offset,omitzero"`
-	// Instrument identifier
-	InstrumentID param.Opt[InstrumentIDOrSymbol] `json:"instrument_id,omitzero" format:"uuid"`
+	// Instrument ID (UUID) or symbol (equity ticker or OSI option symbol). Either
+	// `symbol` or `instrument_id` must be provided.
+	InstrumentID param.Opt[InstrumentIDOrSymbol] `json:"instrument_id,omitzero"`
 	// Trailing offset type (PRICE or PERCENT_BPS)
 	//
 	// Any of "PRICE", "BPS".
@@ -749,7 +751,7 @@ func (r *V1OrderSubmitOrdersResponse) UnmarshalJSON(data []byte) error {
 type V1OrderCancelAllOpenOrdersParams struct {
 	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
 	// symbols).
-	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" json:"-"`
 	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
 	//
 	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
@@ -827,7 +829,7 @@ type V1OrderGetExecutionsParams struct {
 	// Comma-separated instrument identifiers (UUIDs) or symbols (e.g. `AAPL`) to
 	// filter by. When provided, only executions for any of the listed instruments are
 	// returned.
-	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	InstrumentIDs []string `query:"instrument_ids,omitzero" json:"-"`
 	paramObj
 }
 
@@ -860,7 +862,7 @@ type V1OrderGetOrdersParams struct {
 	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
 	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
 	// symbols).
-	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
 	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
@@ -877,7 +879,7 @@ type V1OrderGetOrdersParams struct {
 	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
 	// symbols). Matches options orders whose resolved underlier is any of the given
 	// instruments.
-	UnderlyingInstrumentIDs []InstrumentIDOrSymbol `query:"underlying_instrument_ids,omitzero" format:"uuid" json:"-"`
+	UnderlyingInstrumentIDs []InstrumentIDOrSymbol `query:"underlying_instrument_ids,omitzero" json:"-"`
 	paramObj
 }
 

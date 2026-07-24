@@ -55,7 +55,7 @@ func TestV1PositionClosePositionWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.V1.Positions.ClosePosition(
 		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		"x",
 		clearstreet.V1PositionClosePositionParams{
 			AccountID:    0,
 			CancelOrders: clearstreet.Bool(false),
@@ -114,7 +114,7 @@ func TestV1PositionGetPositionInstructionsWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.V1PositionGetPositionInstructionsParams{
-			InstrumentID: clearstreet.String("182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"),
+			InstrumentID: clearstreet.String("x"),
 		},
 	)
 	if err != nil {

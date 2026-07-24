@@ -315,8 +315,8 @@ func (r *V1WatchlistGetWatchlistsResponse) UnmarshalJSON(data []byte) error {
 }
 
 type V1WatchlistAddWatchlistItemParams struct {
-	// Instrument identifier
-	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"required" format:"uuid"`
+	// Instrument ID (UUID) or symbol (equity ticker or OSI option symbol).
+	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"required"`
 	paramObj
 }
 

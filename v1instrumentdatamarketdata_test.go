@@ -50,7 +50,7 @@ func TestV1InstrumentDataMarketDataGetSnapshotsWithOptionalParams(t *testing.T) 
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.InstrumentData.MarketData.GetSnapshots(context.TODO(), clearstreet.V1InstrumentDataMarketDataGetSnapshotsParams{
-		InstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+		InstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"x"},
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

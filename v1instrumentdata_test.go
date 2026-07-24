@@ -29,7 +29,7 @@ func TestV1InstrumentDataGetAllInstrumentEventsWithOptionalParams(t *testing.T) 
 	_, err := client.V1.InstrumentData.GetAllInstrumentEvents(context.TODO(), clearstreet.V1InstrumentDataGetAllInstrumentEventsParams{
 		EventTypes:    []clearstreet.AllEventsEventType{clearstreet.AllEventsEventTypeEarnings},
 		FromDate:      clearstreet.String("from_date"),
-		InstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+		InstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"x"},
 		ToDate:        clearstreet.String("to_date"),
 	})
 	if err != nil {
@@ -55,7 +55,7 @@ func TestV1InstrumentDataGetInstrumentAnalystConsensusWithOptionalParams(t *test
 	)
 	_, err := client.V1.InstrumentData.GetInstrumentAnalystConsensus(
 		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		"x",
 		clearstreet.V1InstrumentDataGetInstrumentAnalystConsensusParams{
 			From: clearstreet.Time(time.Now()),
 			To:   clearstreet.Time(time.Now()),
@@ -84,7 +84,7 @@ func TestV1InstrumentDataGetInstrumentBalanceSheetStatementsWithOptionalParams(t
 	)
 	_, err := client.V1.InstrumentData.GetInstrumentBalanceSheetStatements(
 		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		"x",
 		clearstreet.V1InstrumentDataGetInstrumentBalanceSheetStatementsParams{
 			FromDate:  clearstreet.String("from_date"),
 			PageSize:  clearstreet.Int(1),
@@ -115,7 +115,7 @@ func TestV1InstrumentDataGetInstrumentCashFlowStatementsWithOptionalParams(t *te
 	)
 	_, err := client.V1.InstrumentData.GetInstrumentCashFlowStatements(
 		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		"x",
 		clearstreet.V1InstrumentDataGetInstrumentCashFlowStatementsParams{
 			FromDate:  clearstreet.String("from_date"),
 			PageSize:  clearstreet.Int(1),
@@ -146,7 +146,7 @@ func TestV1InstrumentDataGetInstrumentEventsWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.V1.InstrumentData.GetInstrumentEvents(
 		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		"x",
 		clearstreet.V1InstrumentDataGetInstrumentEventsParams{
 			FromDate: clearstreet.String("from_date"),
 			ToDate:   clearstreet.String("to_date"),
@@ -173,7 +173,7 @@ func TestV1InstrumentDataGetInstrumentFundamentals(t *testing.T) {
 		option.WithBaseURL(baseURL),
 		option.WithAPIKey("My API Key"),
 	)
-	_, err := client.V1.InstrumentData.GetInstrumentFundamentals(context.TODO(), "182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e")
+	_, err := client.V1.InstrumentData.GetInstrumentFundamentals(context.TODO(), "x")
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {
@@ -197,7 +197,7 @@ func TestV1InstrumentDataGetInstrumentIncomeStatementsWithOptionalParams(t *test
 	)
 	_, err := client.V1.InstrumentData.GetInstrumentIncomeStatements(
 		context.TODO(),
-		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+		"x",
 		clearstreet.V1InstrumentDataGetInstrumentIncomeStatementsParams{
 			FromDate:  clearstreet.String("from_date"),
 			PageSize:  clearstreet.Int(1),
