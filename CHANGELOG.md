@@ -1,5 +1,44 @@
 # Changelog
 
+## [0.8.0](https://github.com/clear-street/clear-street-go/compare/v0.7.0...v0.8.0) (2026-07-27)
+
+
+### Features
+
+* `stlc` automation ([0ecd6d4](https://github.com/clear-street/clear-street-go/commit/0ecd6d493b662b97ebd98de813d4086e52004ab1))
+* `stlc` automation ([75b0eeb](https://github.com/clear-street/clear-street-go/commit/75b0eebc6c3c2f3fbaf396854ef3dd5eb94bd00b))
+* `stlc` automation ([99ab719](https://github.com/clear-street/clear-street-go/commit/99ab71981eb34f431aa8fed0b2b232f9f9f71740))
+* **api:** api update ([9895b37](https://github.com/clear-street/clear-street-go/commit/9895b37a60ae0e47c312b2edac92b25c3443e0db))
+* **api:** api update ([9663435](https://github.com/clear-street/clear-street-go/commit/9663435a246e6e024951406142c41b21f40b7049))
+* **api:** api update ([1e00786](https://github.com/clear-street/clear-street-go/commit/1e0078624d160f3956d8d18cc3e3b135a304e119))
+* **api:** api update ([4bec8e1](https://github.com/clear-street/clear-street-go/commit/4bec8e15f1c932180b32c127013c76107509a08f))
+* **api:** api update ([c3daf9a](https://github.com/clear-street/clear-street-go/commit/c3daf9ae6d9d01556e7b4e073886669d23fa2a6c))
+* **api:** api update ([1a8f736](https://github.com/clear-street/clear-street-go/commit/1a8f7366c0a58220ed9ccb7f358dc5b16139f547))
+* **api:** api update ([cfe02e1](https://github.com/clear-street/clear-street-go/commit/cfe02e138ec30aeba58fdcdab5ddd67610449a80))
+* **api:** api update ([ef79a57](https://github.com/clear-street/clear-street-go/commit/ef79a57afa0c134396bca486e55bee8db8ffde89))
+* **api:** api update ([f946040](https://github.com/clear-street/clear-street-go/commit/f9460408e8859b6f3dc533076406162cab5e5db9))
+* **api:** api update ([3d5b8ae](https://github.com/clear-street/clear-street-go/commit/3d5b8ae10ebb48d9d8e51adefd11ab2cd98f58bd))
+* **api:** api update ([119cf24](https://github.com/clear-street/clear-street-go/commit/119cf241a0095adaa5cea51f8ad82e89d95c235d))
+* **api:** api update ([17073dc](https://github.com/clear-street/clear-street-go/commit/17073dc3699fecb35421b58c5baf32eb7a584933))
+* **api:** api update ([5641ca0](https://github.com/clear-street/clear-street-go/commit/5641ca0b4a965e0517364f97b5fab7db7ec90a2b))
+* **api:** api update ([d7f93c1](https://github.com/clear-street/clear-street-go/commit/d7f93c1f1a56609597c0c8b1222f67cf7ca54473))
+* **api:** api update ([2b440a4](https://github.com/clear-street/clear-street-go/commit/2b440a4614db23192f810f67fb3e69748f89acf9))
+* **api:** manual updates ([849f9ea](https://github.com/clear-street/clear-street-go/commit/849f9ea967c83fb48e40daf739d5ab8a7337d12f))
+* **api:** manual updates ([ca4b1a1](https://github.com/clear-street/clear-street-go/commit/ca4b1a15d49707063eb8a89c4c18f8d4cee60c4c))
+* **stlc:** configurable CI runner and private-production-repo support in workflow templates ([2209a91](https://github.com/clear-street/clear-street-go/commit/2209a91c288adcfa6cae6511deb358f21e618e16))
+
+
+### Bug Fixes
+
+* Use GitHub App token for staging sync ([a205bef](https://github.com/clear-street/clear-street-go/commit/a205bef1537089f8749519ac80c145dc2790496b))
+* Use GitHub App token for staging sync ([9f59adc](https://github.com/clear-street/clear-street-go/commit/9f59adcfecbcf5e305fbfc168ba9ab60e4873003))
+
+
+### Chores
+
+* add .github/workflows/security.yml (secure-by-default bootstrap) ([42aa08f](https://github.com/clear-street/clear-street-go/commit/42aa08fe9408bda09bbeacea52bee56b14350e77))
+* add CODEOWNERS (secure-by-default bootstrap) ([fa4dfb7](https://github.com/clear-street/clear-street-go/commit/fa4dfb753a861ec0dc0aca6d0e9cb8130fc6bde9))
+
 ## 0.7.0 (2026-07-08)
 
 Full Changelog: [v0.6.0...v0.7.0](https://github.com/clear-street/clear-street-go/compare/v0.6.0...v0.7.0)
