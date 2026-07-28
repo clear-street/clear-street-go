@@ -142,8 +142,6 @@ type Execution struct {
 	ID string `json:"id" api:"required" format:"uuid"`
 	// Identifier of the order this execution belongs to.
 	OrderID string `json:"order_id" api:"required" format:"uuid"`
-	// Fill price.
-	Price string `json:"price" api:"required"`
 	// Filled quantity.
 	Quantity string `json:"quantity" api:"required"`
 	// Side of the fill.
@@ -156,6 +154,9 @@ type Execution struct {
 	// instrument. When a null/undefined value is observed, it indicates it does not
 	// apply.
 	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
+	// Fill price. `null` for multileg fills, whose price lives only at the leg level.
+	// When a null/undefined value is observed, it indicates it does not apply.
+	Price string `json:"price" api:"nullable"`
 	// Trading symbol. `null` when this fill has no single resolvable instrument. When
 	// a null/undefined value is observed, it indicates it does not apply.
 	Symbol string `json:"symbol" api:"nullable"`
@@ -163,11 +164,11 @@ type Execution struct {
 	JSON struct {
 		ID              respjson.Field
 		OrderID         respjson.Field
-		Price           respjson.Field
 		Quantity        respjson.Field
 		Side            respjson.Field
 		TransactionTime respjson.Field
 		InstrumentID    respjson.Field
+		Price           respjson.Field
 		Symbol          respjson.Field
 		ExtraFields     map[string]respjson.Field
 		raw             string
