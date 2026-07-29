@@ -324,6 +324,12 @@ type OptionsContract struct {
 	StrikePrice string `json:"strike_price" api:"required"`
 	// OSI symbol (e.g. "AAPL 251219C00150000")
 	Symbol string `json:"symbol" api:"required"`
+	// Whether the option settles on the opening price (AM settlement), if known When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	IsSettleOnOpen bool `json:"is_settle_on_open" api:"nullable"`
+	// Last moment the option can trade (UTC), if known When a null/undefined value is
+	// observed, it indicates that there is no available data.
+	LastTradeCutoff time.Time `json:"last_trade_cutoff" api:"nullable" format:"date-time"`
 	// Open interest (number of outstanding contracts), if available When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	OpenInterest int64 `json:"open_interest" api:"nullable"`
@@ -345,6 +351,8 @@ type OptionsContract struct {
 		Multiplier             respjson.Field
 		StrikePrice            respjson.Field
 		Symbol                 respjson.Field
+		IsSettleOnOpen         respjson.Field
+		LastTradeCutoff        respjson.Field
 		OpenInterest           respjson.Field
 		UnderlyingInstrumentID respjson.Field
 		ExtraFields            map[string]respjson.Field
