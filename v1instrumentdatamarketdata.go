@@ -67,9 +67,11 @@ func (r *V1InstrumentDataMarketDataService) GetSnapshots(ctx context.Context, qu
 //
 //   - Unresolvable `instrument_id` → all other fields `None` (including `symbol`).
 //   - Resolvable `instrument_id` with no realtime cache entry → `symbol` populated,
-//     OHLV/`trade_date` `None`.
+//     OHLV/`trade_date`/`open_interest` `None`.
 //   - `trade_date` reflects the session the OHLV represents (today during trading
 //     hours, the last trading date during weekends/holidays).
+//   - `open_interest` is populated for options only; `None` for equities and
+//     indices.
 //   - `not_applicable` is a non-optional `bool`, always serialized: `true` for
 //     instrument types with no daily summary by definition (e.g. an index, whose
 //     OHLV/`trade_date` are `None`), `false` otherwise.
@@ -89,6 +91,10 @@ type DailySummary struct {
 	// Opening price for the session. When a null/undefined value is observed, it
 	// indicates that there is no available data.
 	Open string `json:"open" api:"nullable"`
+	// Open interest (outstanding contracts). Populated for options only; `None` for
+	// equities and indices. When a null/undefined value is observed, it indicates that
+	// there is no available data.
+	OpenInterest int64 `json:"open_interest" api:"nullable"`
 	// Display symbol for the security. `None` for unresolvable IDs. When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	Symbol string `json:"symbol" api:"nullable"`
@@ -105,6 +111,7 @@ type DailySummary struct {
 		Low           respjson.Field
 		NotApplicable respjson.Field
 		Open          respjson.Field
+		OpenInterest  respjson.Field
 		Symbol        respjson.Field
 		TradeDate     respjson.Field
 		Volume        respjson.Field
