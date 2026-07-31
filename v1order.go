@@ -375,8 +375,11 @@ type Order struct {
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// MIC code of the venue where the order is routed
 	Venue string `json:"venue" api:"required"`
-	// Average fill price across all executions When a null/undefined value is
-	// observed, it indicates that there is no available data.
+	// Average fill price across all executions. For multileg orders this is the
+	// venue's strategy-level average when reported, else the signed net package price
+	// derived from the leg averages: net debit positive, net credit negative, zero
+	// possible. When a null/undefined value is observed, it indicates that there is no
+	// available data.
 	AverageFillPrice string `json:"average_fill_price" api:"nullable"`
 	// Contains execution, rejection or cancellation details, if any
 	Details []string `json:"details"`
