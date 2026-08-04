@@ -137,6 +137,10 @@ type Instrument struct {
 	// Average daily share volume from the security definition. When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	Adv string `json:"adv" api:"nullable"`
+	// Corporate-action-adjusted last close; present only when an adjustment exists for
+	// the previous_close date. When a null/undefined value is observed, it indicates
+	// that there is no available data.
+	CaxAdjustedPreviousClose string `json:"cax_adjusted_previous_close" api:"nullable"`
 	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	//
@@ -148,8 +152,9 @@ type Instrument struct {
 	// The full name of the instrument or its issuer When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// Notional average daily volume (ADV multiplied by previous close price). When a
-	// null/undefined value is observed, it indicates that there is no available data.
+	// Notional average daily volume (ADV multiplied by the cax-adjusted close when
+	// present, the raw previous close otherwise). When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	NotionalAdv string `json:"notional_adv" api:"nullable"`
 	// Available options expiration dates for this instrument. Present only when
 	// `include_options_expiry_dates=true` in the request. When a null/undefined value
@@ -163,29 +168,30 @@ type Instrument struct {
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                  respjson.Field
-		CountryOfIssue      respjson.Field
-		Currency            respjson.Field
-		EasyToBorrow        respjson.Field
-		IsFractionable      respjson.Field
-		IsLiquidationOnly   respjson.Field
-		IsMarginable        respjson.Field
-		IsPtp               respjson.Field
-		IsShortProhibited   respjson.Field
-		IsThresholdSecurity respjson.Field
-		IsTradable          respjson.Field
-		Symbol              respjson.Field
-		Venue               respjson.Field
-		Adv                 respjson.Field
-		InstrumentType      respjson.Field
-		LongMarginRate      respjson.Field
-		Name                respjson.Field
-		NotionalAdv         respjson.Field
-		OptionsExpiryDates  respjson.Field
-		PreviousClose       respjson.Field
-		ShortMarginRate     respjson.Field
-		ExtraFields         map[string]respjson.Field
-		raw                 string
+		ID                       respjson.Field
+		CountryOfIssue           respjson.Field
+		Currency                 respjson.Field
+		EasyToBorrow             respjson.Field
+		IsFractionable           respjson.Field
+		IsLiquidationOnly        respjson.Field
+		IsMarginable             respjson.Field
+		IsPtp                    respjson.Field
+		IsShortProhibited        respjson.Field
+		IsThresholdSecurity      respjson.Field
+		IsTradable               respjson.Field
+		Symbol                   respjson.Field
+		Venue                    respjson.Field
+		Adv                      respjson.Field
+		CaxAdjustedPreviousClose respjson.Field
+		InstrumentType           respjson.Field
+		LongMarginRate           respjson.Field
+		Name                     respjson.Field
+		NotionalAdv              respjson.Field
+		OptionsExpiryDates       respjson.Field
+		PreviousClose            respjson.Field
+		ShortMarginRate          respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
 	} `json:"-"`
 }
 
@@ -226,6 +232,10 @@ type InstrumentCore struct {
 	// Average daily share volume from the security definition. When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	Adv string `json:"adv" api:"nullable"`
+	// Corporate-action-adjusted last close; present only when an adjustment exists for
+	// the previous_close date. When a null/undefined value is observed, it indicates
+	// that there is no available data.
+	CaxAdjustedPreviousClose string `json:"cax_adjusted_previous_close" api:"nullable"`
 	// The type of security (e.g., Common Stock, ETF) When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	//
@@ -237,8 +247,9 @@ type InstrumentCore struct {
 	// The full name of the instrument or its issuer When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// Notional average daily volume (ADV multiplied by previous close price). When a
-	// null/undefined value is observed, it indicates that there is no available data.
+	// Notional average daily volume (ADV multiplied by the cax-adjusted close when
+	// present, the raw previous close otherwise). When a null/undefined value is
+	// observed, it indicates that there is no available data.
 	NotionalAdv string `json:"notional_adv" api:"nullable"`
 	// Last close price from the security definition. When a null/undefined value is
 	// observed, it indicates that there is no available data.
@@ -248,28 +259,29 @@ type InstrumentCore struct {
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                  respjson.Field
-		CountryOfIssue      respjson.Field
-		Currency            respjson.Field
-		EasyToBorrow        respjson.Field
-		IsFractionable      respjson.Field
-		IsLiquidationOnly   respjson.Field
-		IsMarginable        respjson.Field
-		IsPtp               respjson.Field
-		IsShortProhibited   respjson.Field
-		IsThresholdSecurity respjson.Field
-		IsTradable          respjson.Field
-		Symbol              respjson.Field
-		Venue               respjson.Field
-		Adv                 respjson.Field
-		InstrumentType      respjson.Field
-		LongMarginRate      respjson.Field
-		Name                respjson.Field
-		NotionalAdv         respjson.Field
-		PreviousClose       respjson.Field
-		ShortMarginRate     respjson.Field
-		ExtraFields         map[string]respjson.Field
-		raw                 string
+		ID                       respjson.Field
+		CountryOfIssue           respjson.Field
+		Currency                 respjson.Field
+		EasyToBorrow             respjson.Field
+		IsFractionable           respjson.Field
+		IsLiquidationOnly        respjson.Field
+		IsMarginable             respjson.Field
+		IsPtp                    respjson.Field
+		IsShortProhibited        respjson.Field
+		IsThresholdSecurity      respjson.Field
+		IsTradable               respjson.Field
+		Symbol                   respjson.Field
+		Venue                    respjson.Field
+		Adv                      respjson.Field
+		CaxAdjustedPreviousClose respjson.Field
+		InstrumentType           respjson.Field
+		LongMarginRate           respjson.Field
+		Name                     respjson.Field
+		NotionalAdv              respjson.Field
+		PreviousClose            respjson.Field
+		ShortMarginRate          respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
 	} `json:"-"`
 }
 
