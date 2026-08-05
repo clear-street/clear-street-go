@@ -154,8 +154,6 @@ type AccountBalances struct {
 	DailyPnl string `json:"daily_pnl" api:"required"`
 	// Realized profit or loss since start of day.
 	DailyRealizedPnl string `json:"daily_realized_pnl" api:"required"`
-	// Total profit or loss since start of day.
-	DailyTotalPnl string `json:"daily_total_pnl" api:"required"`
 	// Total unrealized profit or loss across all positions relative to prior close.
 	DailyUnrealizedPnl string `json:"daily_unrealized_pnl" api:"required"`
 	// The total equity in the account.
@@ -201,7 +199,6 @@ type AccountBalances struct {
 		DailyChange         respjson.Field
 		DailyPnl            respjson.Field
 		DailyRealizedPnl    respjson.Field
-		DailyTotalPnl       respjson.Field
 		DailyUnrealizedPnl  respjson.Field
 		Equity              respjson.Field
 		LongMarketValue     respjson.Field
@@ -240,11 +237,6 @@ type AccountBalancesSod struct {
 	// Timestamp for the start-of-day values. When a null/undefined value is observed,
 	// it indicates that there is no available data.
 	Asof time.Time `json:"asof" api:"nullable" format:"date"`
-	// Start-of-day day-trade buying power. When a null/undefined value is observed, it
-	// indicates it does not apply.
-	//
-	// Deprecated: deprecated
-	DayTradeBuyingPower string `json:"day_trade_buying_power" api:"nullable"`
 	// Start-of-day maintenance margin excess. When a null/undefined value is observed,
 	// it indicates it does not apply.
 	MaintenanceMarginExcess string `json:"maintenance_margin_excess" api:"nullable"`
@@ -261,7 +253,6 @@ type AccountBalancesSod struct {
 		LongMarketValue              respjson.Field
 		ShortMarketValue             respjson.Field
 		Asof                         respjson.Field
-		DayTradeBuyingPower          respjson.Field
 		MaintenanceMarginExcess      respjson.Field
 		MaintenanceMarginRequirement respjson.Field
 		TradeCash                    respjson.Field
@@ -430,10 +421,6 @@ func (r *Address) UnmarshalJSON(data []byte) error {
 }
 
 type MarginDetails struct {
-	// The number of day trades executed over the 5 most recent trading days.
-	//
-	// Deprecated: deprecated
-	DayTradeCount int64 `json:"day_trade_count" api:"required"`
 	// Initial margin excess for trade-date balances.
 	InitialMarginExcess string `json:"initial_margin_excess" api:"required"`
 	// Initial margin requirement for trade-date balances.
@@ -446,16 +433,6 @@ type MarginDetails struct {
 	MaintenanceMarginRequirement string `json:"maintenance_margin_requirement" api:"required"`
 	// Overnight session margin calculation details.
 	OvernightDetails MarginSessionDetails `json:"overnight_details" api:"required"`
-	// `true` if the account is currently flagged as a PDT, otherwise `false`.
-	//
-	// Deprecated: deprecated
-	PatternDayTrader bool `json:"pattern_day_trader" api:"required"`
-	// The amount of day-trade buying power used during the current trading day. When
-	// null/undefined, the value should be assumed to be zero. The field is omitted to
-	// simplify the response.
-	//
-	// Deprecated: deprecated
-	DayTradeBuyingPowerUsage string `json:"day_trade_buying_power_usage" api:"nullable"`
 	// Optional top margin contributors, returned only when explicitly requested.
 	TopContributors []MarginTopContributor `json:"top_contributors"`
 	// Current usage totals. When a null/undefined value is observed, it indicates that
@@ -463,15 +440,12 @@ type MarginDetails struct {
 	Usage MarginDetailsUsage `json:"usage" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		DayTradeCount                respjson.Field
 		InitialMarginExcess          respjson.Field
 		InitialMarginRequirement     respjson.Field
 		IntradayDetails              respjson.Field
 		MaintenanceMarginExcess      respjson.Field
 		MaintenanceMarginRequirement respjson.Field
 		OvernightDetails             respjson.Field
-		PatternDayTrader             respjson.Field
-		DayTradeBuyingPowerUsage     respjson.Field
 		TopContributors              respjson.Field
 		Usage                        respjson.Field
 		ExtraFields                  map[string]respjson.Field
@@ -526,11 +500,6 @@ func (r *MarginSessionDetails) UnmarshalJSON(data []byte) error {
 }
 
 type MarginTopContributor struct {
-	// Day-trade buying power consumed by fills against this underlying on the current
-	// trade date. Populated only for pattern day trader accounts.
-	//
-	// Deprecated: deprecated
-	DayTradeBuyingPowerUsage string `json:"day_trade_buying_power_usage" api:"required"`
 	// Initial margin requirement attributable to this underlying.
 	InitialMarginRequirement string `json:"initial_margin_requirement" api:"required"`
 	// Maintenance margin requirement attributable to this underlying.
@@ -541,7 +510,6 @@ type MarginTopContributor struct {
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"required" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		DayTradeBuyingPowerUsage     respjson.Field
 		InitialMarginRequirement     respjson.Field
 		MaintenanceMarginRequirement respjson.Field
 		MarketValue                  respjson.Field
