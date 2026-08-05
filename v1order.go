@@ -72,7 +72,11 @@ func (r *V1OrderService) GetExecutions(ctx context.Context, accountID int64, que
 	return res, err
 }
 
-// Get Order By ID
+// Fetch a single order. The `{order_id}` path parameter accepts either the order's
+// `id` or its `client_order_id`. A `client_order_id` can only be used while the
+// order is open; after that, use the `id` returned in every order response, or
+// find the order with the list-orders endpoint's `order_ids` filter, which accepts
+// both identifiers at any time.
 func (r *V1OrderService) GetOrderByID(ctx context.Context, orderID string, query V1OrderGetOrderByIDParams, opts ...option.RequestOption) (res *V1OrderGetOrderByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if orderID == "" {
@@ -871,8 +875,9 @@ type V1OrderGetOrdersParams struct {
 	//
 	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
 	InstrumentType V1OrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
-	// Comma-separated order IDs to filter by. When provided, only orders whose order
-	// ID is in this set are returned.
+	// Comma-separated list of order identifiers. Each value may be an order's `id` or
+	// its `client_order_id`; only orders matching one of the given identifiers are
+	// returned.
 	OrderIDs []string `query:"order_ids,omitzero" json:"-"`
 	// Comma-separated order statuses to filter by
 	//
