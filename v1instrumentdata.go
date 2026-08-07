@@ -47,13 +47,15 @@ func NewV1InstrumentDataService(opts ...option.RequestOption) (r V1InstrumentDat
 	return
 }
 
-// List instrument events across all securities, grouped by date.
+// List instrument events across all securities, grouped by date. Results are
+// paginated via `page_size` / `page_token`; a date's events may span two pages.
 //
 // Date range defaults (anchored on the current trading day, or the next trading
 // day if today is a weekend or US market holiday):
 //
 //   - Unfiltered (no `instrument_ids`): a single trading day (`from_date` =
-//     `to_date` = anchor); the requested span is capped at 6 days.
+//     `to_date` = anchor). If only one bound is given, the other defaults to 6 days
+//     from it; there is no maximum span once both bounds are given.
 //   - Filtered (with `instrument_ids`): a 30-day lookback ending on the anchor
 //     (`from_date` = anchor − 30 days, `to_date` = anchor).
 func (r *V1InstrumentDataService) GetAllInstrumentEvents(ctx context.Context, query V1InstrumentDataGetAllInstrumentEventsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetAllInstrumentEventsResponse, err error) {
@@ -111,8 +113,8 @@ func (r *V1InstrumentDataService) GetInstrumentCashFlowStatements(ctx context.Co
 	return res, err
 }
 
-// Retrieves corporate events (dividends, splits, etc.) for an instrument, grouped
-// by event type.
+// Retrieves corporate events (earnings, dividends, splits, IPO) for an instrument,
+// grouped by event type. Filter to specific types via `event_types`.
 //
 // Date range defaults:
 //
@@ -836,6 +838,8 @@ type InstrumentEventsData struct {
 	Earnings []InstrumentEarnings `json:"earnings" api:"required"`
 	// Instrument identifier
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
+	// IPO events
+	Ipos []InstrumentIpoEvent `json:"ipos" api:"required"`
 	// Stock split events
 	Splits []InstrumentSplitEvent `json:"splits" api:"required"`
 	// The currency used for reporting financial data When a null/undefined value is
@@ -846,6 +850,7 @@ type InstrumentEventsData struct {
 		Dividends         respjson.Field
 		Earnings          respjson.Field
 		InstrumentID      respjson.Field
+		Ipos              respjson.Field
 		Splits            respjson.Field
 		ReportingCurrency respjson.Field
 		ExtraFields       map[string]respjson.Field
@@ -1065,6 +1070,52 @@ func (r *InstrumentIncomeStatement) UnmarshalJSON(data []byte) error {
 
 type InstrumentIncomeStatementList []InstrumentIncomeStatement
 
+// Represents an IPO event for an instrument
+type InstrumentIpoEvent struct {
+	// The date of the IPO
+	Date time.Time `json:"date" api:"required" format:"date"`
+	// IPO action. When a null/undefined value is observed, it indicates that there is
+	// no available data.
+	Actions string `json:"actions" api:"nullable"`
+	// IPO announced timestamp. When a null/undefined value is observed, it indicates
+	// that there is no available data.
+	AnnouncedAt time.Time `json:"announced_at" api:"nullable" format:"date-time"`
+	// IPO company name. When a null/undefined value is observed, it indicates that
+	// there is no available data.
+	Company string `json:"company" api:"nullable"`
+	// IPO exchange. When a null/undefined value is observed, it indicates that there
+	// is no available data.
+	Exchange string `json:"exchange" api:"nullable"`
+	// IPO market cap. When a null/undefined value is observed, it indicates that there
+	// is no available data.
+	MarketCap string `json:"market_cap" api:"nullable"`
+	// IPO price range. When a null/undefined value is observed, it indicates that
+	// there is no available data.
+	PriceRange string `json:"price_range" api:"nullable"`
+	// IPO shares offered. When a null/undefined value is observed, it indicates that
+	// there is no available data.
+	Shares string `json:"shares" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Date        respjson.Field
+		Actions     respjson.Field
+		AnnouncedAt respjson.Field
+		Company     respjson.Field
+		Exchange    respjson.Field
+		MarketCap   respjson.Field
+		PriceRange  respjson.Field
+		Shares      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r InstrumentIpoEvent) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentIpoEvent) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // Represents a stock split event for an instrument
 type InstrumentSplitEvent struct {
 	// The date of the stock split
@@ -1255,6 +1306,12 @@ func (r *V1InstrumentDataGetInstrumentIncomeStatementsResponse) UnmarshalJSON(da
 type V1InstrumentDataGetAllInstrumentEventsParams struct {
 	// The start date for the query range, inclusive (YYYY-MM-DD).
 	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
+	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// The end date for the query range, inclusive (YYYY-MM-DD).
 	ToDate param.Opt[string] `query:"to_date,omitzero" json:"-"`
 	// Filter by event type(s). Comma-delimited list. Example:
@@ -1345,6 +1402,9 @@ type V1InstrumentDataGetInstrumentEventsParams struct {
 	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
 	// The end date for the query range, inclusive (YYYY-MM-DD).
 	ToDate param.Opt[string] `query:"to_date,omitzero" json:"-"`
+	// Filter by event type(s). Comma-delimited list. Example:
+	// `event_types=EARNINGS,IPO`.
+	EventTypes []AllEventsEventType `query:"event_types,omitzero" json:"-"`
 	paramObj
 }
 

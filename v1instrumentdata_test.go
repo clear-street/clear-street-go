@@ -30,6 +30,8 @@ func TestV1InstrumentDataGetAllInstrumentEventsWithOptionalParams(t *testing.T) 
 		EventTypes:    []clearstreet.AllEventsEventType{clearstreet.AllEventsEventTypeEarnings},
 		FromDate:      clearstreet.String("from_date"),
 		InstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"x"},
+		PageSize:      clearstreet.Int(1),
+		PageToken:     clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 		ToDate:        clearstreet.String("to_date"),
 	})
 	if err != nil {
@@ -148,8 +150,9 @@ func TestV1InstrumentDataGetInstrumentEventsWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"x",
 		clearstreet.V1InstrumentDataGetInstrumentEventsParams{
-			FromDate: clearstreet.String("from_date"),
-			ToDate:   clearstreet.String("to_date"),
+			EventTypes: []clearstreet.AllEventsEventType{clearstreet.AllEventsEventTypeEarnings},
+			FromDate:   clearstreet.String("from_date"),
+			ToDate:     clearstreet.String("to_date"),
 		},
 	)
 	if err != nil {
