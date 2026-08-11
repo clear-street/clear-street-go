@@ -286,15 +286,23 @@ type SnapshotSession struct {
 	Change string `json:"change" api:"required"`
 	// Percent change from previous close to last trade.
 	ChangePercent string `json:"change_percent" api:"required"`
-	// Previous session close price.
+	// Previous session close price. Corporate-action-adjusted (stock dividends, cash
+	// dividends, and forward/reverse splits) when an adjustment exists for the close
+	// date; the raw close otherwise.
 	PreviousClose string `json:"previous_close" api:"required"`
+	// Unadjusted (raw) previous session close. Present only when a corporate-action
+	// adjustment exists for the previous close date; when no adjustment exists,
+	// `previous_close` is the raw close and this field is omitted. When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	PreviousCloseUnadjusted string `json:"previous_close_unadjusted" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Change        respjson.Field
-		ChangePercent respjson.Field
-		PreviousClose respjson.Field
-		ExtraFields   map[string]respjson.Field
-		raw           string
+		Change                  respjson.Field
+		ChangePercent           respjson.Field
+		PreviousClose           respjson.Field
+		PreviousCloseUnadjusted respjson.Field
+		ExtraFields             map[string]respjson.Field
+		raw                     string
 	} `json:"-"`
 }
 
