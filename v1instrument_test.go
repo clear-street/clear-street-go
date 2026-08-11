@@ -88,6 +88,7 @@ func TestV1InstrumentGetOptionContractsWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.Instruments.GetOptionContracts(context.TODO(), clearstreet.V1InstrumentGetOptionContractsParams{
+		ContractIDs:            []clearstreet.InstrumentIDOrSymbol{"x"},
 		ContractType:           clearstreet.V1InstrumentGetOptionContractsParamsContractTypeCall,
 		Expiry:                 clearstreet.Time(time.Now()),
 		PageSize:               clearstreet.Int(1),

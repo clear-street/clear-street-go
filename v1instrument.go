@@ -63,8 +63,10 @@ func (r *V1InstrumentService) GetInstruments(ctx context.Context, query V1Instru
 
 // List options contracts.
 //
-// Returns options contracts for a given underlier with options-specific metadata.
-// Exactly one underlier identifier must be provided.
+// Returns options contracts with options-specific metadata. Exactly one identifier
+// must be provided: `underlier`/`underlying_instrument_id` (list all contracts for
+// that underlier) or `contract_ids` (look up specific contracts directly).
+// `expiry`/`contract_type` apply as filters in either case.
 func (r *V1InstrumentService) GetOptionContracts(ctx context.Context, query V1InstrumentGetOptionContractsParams, opts ...option.RequestOption) (res *V1InstrumentGetOptionContractsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/instruments/options/contracts"
@@ -525,6 +527,10 @@ type V1InstrumentGetOptionContractsParams struct {
 	Underlier param.Opt[string] `query:"underlier,omitzero" json:"-"`
 	// Instrument identifier or symbol of the underlying equity/index
 	UnderlyingInstrumentID param.Opt[string] `query:"underlying_instrument_id,omitzero" json:"-"`
+	// Comma-separated contract instrument IDs (UUID) or OSI option symbols to look up
+	// directly, bypassing underlier expansion. Mutually exclusive with
+	// underlier/underlying_instrument_id; up to 100 values.
+	ContractIDs []InstrumentIDOrSymbol `query:"contract_ids,omitzero" json:"-"`
 	// Filter by contract type: CALL or PUT
 	//
 	// Any of "CALL", "PUT".
