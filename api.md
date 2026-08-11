@@ -55,6 +55,33 @@ Methods:
 - <code title="get /v1/accounts/{account_id}/portfolio-history">client.V1.Accounts.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountService.GetPortfolioHistory">GetPortfolioHistory</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountGetPortfolioHistoryParams">V1AccountGetPortfolioHistoryParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountGetPortfolioHistoryResponse">V1AccountGetPortfolioHistoryResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="patch /v1/accounts/{account_id}">client.V1.Accounts.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountService.PatchAccountByID">PatchAccountByID</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, accountID <a href="https://pkg.go.dev/builtin#int64">int64</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPatchAccountByIDParams">V1AccountPatchAccountByIDParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AccountPatchAccountByIDResponse">V1AccountPatchAccountByIDResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
+## Alerts
+
+Params Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Schedule">Schedule</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#TriggerMode">TriggerMode</a>
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Alert">Alert</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#AlertList">AlertList</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#AlertSource">AlertSource</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#AlertStatus">AlertStatus</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#CreateAlertResponse">CreateAlertResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Schedule">Schedule</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#TriggerMode">TriggerMode</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertNewAlertResponse">V1AlertNewAlertResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertGetAlertByIDResponse">V1AlertGetAlertByIDResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertGetAlertsResponse">V1AlertGetAlertsResponse</a>
+
+Methods:
+
+- <code title="post /v1/alerts">client.V1.Alerts.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertService.NewAlert">NewAlert</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertNewAlertParams">V1AlertNewAlertParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertNewAlertResponse">V1AlertNewAlertResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="delete /v1/alerts/{alert_id}">client.V1.Alerts.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertService.DeleteAlert">DeleteAlert</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, alertID <a href="https://pkg.go.dev/builtin#string">string</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
+- <code title="get /v1/alerts/{alert_id}">client.V1.Alerts.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertService.GetAlertByID">GetAlertByID</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, alertID <a href="https://pkg.go.dev/builtin#string">string</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertGetAlertByIDResponse">V1AlertGetAlertByIDResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="get /v1/alerts">client.V1.Alerts.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertService.GetAlerts">GetAlerts</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertGetAlertsParams">V1AlertGetAlertsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1AlertGetAlertsResponse">V1AlertGetAlertsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
 ## APIVersion
 
 Response Types:
