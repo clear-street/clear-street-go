@@ -91,6 +91,7 @@ func TestV1InstrumentGetOptionContractsWithOptionalParams(t *testing.T) {
 		ContractIDs:            []clearstreet.InstrumentIDOrSymbol{"x"},
 		ContractType:           clearstreet.V1InstrumentGetOptionContractsParamsContractTypeCall,
 		Expiry:                 clearstreet.Time(time.Now()),
+		IsSettleOnOpen:         clearstreet.Bool(true),
 		PageSize:               clearstreet.Int(1),
 		PageToken:              clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 		Underlier:              clearstreet.String("underlier"),

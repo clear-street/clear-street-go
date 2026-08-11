@@ -158,9 +158,19 @@ type Instrument struct {
 	// present, the raw previous close otherwise). When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	NotionalAdv string `json:"notional_adv" api:"nullable"`
-	// Available options expiration dates for this instrument. Present only when
+	// Available options expiration dates for this instrument, each annotated with
+	// which settlement cycles have listed contracts on it. Present only when
 	// `include_options_expiry_dates=true` in the request. When a null/undefined value
 	// is observed, it indicates it does not apply.
+	OptionsContractExpiryDates []OptionExpiryDate `json:"options_contract_expiry_dates" api:"nullable"`
+	// Available options expiration dates for this instrument. Present only when
+	// `include_options_expiry_dates=true` in the request.
+	//
+	// Deprecated: use `options_contract_expiry_dates`, which carries the same dates
+	// annotated with settlement-cycle information. When a null/undefined value is
+	// observed, it indicates it does not apply.
+	//
+	// Deprecated: deprecated
 	OptionsExpiryDates []time.Time `json:"options_expiry_dates" api:"nullable" format:"date"`
 	// Last close price from the security definition. When a null/undefined value is
 	// observed, it indicates that there is no available data.
@@ -170,30 +180,31 @@ type Instrument struct {
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                       respjson.Field
-		CountryOfIssue           respjson.Field
-		Currency                 respjson.Field
-		EasyToBorrow             respjson.Field
-		IsFractionable           respjson.Field
-		IsLiquidationOnly        respjson.Field
-		IsMarginable             respjson.Field
-		IsPtp                    respjson.Field
-		IsShortProhibited        respjson.Field
-		IsThresholdSecurity      respjson.Field
-		IsTradable               respjson.Field
-		Symbol                   respjson.Field
-		Venue                    respjson.Field
-		Adv                      respjson.Field
-		CaxAdjustedPreviousClose respjson.Field
-		InstrumentType           respjson.Field
-		LongMarginRate           respjson.Field
-		Name                     respjson.Field
-		NotionalAdv              respjson.Field
-		OptionsExpiryDates       respjson.Field
-		PreviousClose            respjson.Field
-		ShortMarginRate          respjson.Field
-		ExtraFields              map[string]respjson.Field
-		raw                      string
+		ID                         respjson.Field
+		CountryOfIssue             respjson.Field
+		Currency                   respjson.Field
+		EasyToBorrow               respjson.Field
+		IsFractionable             respjson.Field
+		IsLiquidationOnly          respjson.Field
+		IsMarginable               respjson.Field
+		IsPtp                      respjson.Field
+		IsShortProhibited          respjson.Field
+		IsThresholdSecurity        respjson.Field
+		IsTradable                 respjson.Field
+		Symbol                     respjson.Field
+		Venue                      respjson.Field
+		Adv                        respjson.Field
+		CaxAdjustedPreviousClose   respjson.Field
+		InstrumentType             respjson.Field
+		LongMarginRate             respjson.Field
+		Name                       respjson.Field
+		NotionalAdv                respjson.Field
+		OptionsContractExpiryDates respjson.Field
+		OptionsExpiryDates         respjson.Field
+		PreviousClose              respjson.Field
+		ShortMarginRate            respjson.Field
+		ExtraFields                map[string]respjson.Field
+		raw                        string
 	} `json:"-"`
 }
 
@@ -303,6 +314,33 @@ const (
 	ListingTypeFlex     ListingType = "FLEX"
 	ListingTypeOtc      ListingType = "OTC"
 )
+
+// An options expiry date, annotated with which settlement cycles have listed
+// contracts on it.
+type OptionExpiryDate struct {
+	// The expiration date.
+	Date time.Time `json:"date" api:"required" format:"date"`
+	// Whether this date has at least one listed contract that settles at the close (PM
+	// settlement) -- the standard cycle.
+	HasSettlesOnClose bool `json:"has_settles_on_close" api:"required"`
+	// Whether this date has at least one listed contract that settles on the opening
+	// print (AM settlement).
+	HasSettlesOnOpen bool `json:"has_settles_on_open" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Date              respjson.Field
+		HasSettlesOnClose respjson.Field
+		HasSettlesOnOpen  respjson.Field
+		ExtraFields       map[string]respjson.Field
+		raw               string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OptionExpiryDate) RawJSON() string { return r.JSON.raw }
+func (r *OptionExpiryDate) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // An options contract with options-specific metadata
 type OptionsContract struct {
@@ -517,6 +555,9 @@ const (
 type V1InstrumentGetOptionContractsParams struct {
 	// Filter to contracts expiring on this date (YYYY-MM-DD)
 	Expiry param.Opt[time.Time] `query:"expiry,omitzero" format:"date" json:"-"`
+	// Filter by settlement cycle: true for early-settling (AM, settle-on-open)
+	// contracts, false for normal (PM) contracts. Omit to return both.
+	IsSettleOnOpen param.Opt[bool] `query:"is_settle_on_open,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
