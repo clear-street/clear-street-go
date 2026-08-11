@@ -164,18 +164,30 @@ type Execution struct {
 	// Trading symbol. `null` when this fill has no single resolvable instrument. When
 	// a null/undefined value is observed, it indicates it does not apply.
 	Symbol string `json:"symbol" api:"nullable"`
+	// Underlying instrument identifier for a derivative fill. `null` for a
+	// non-derivative fill, when the underlier could not be resolved, or when a
+	// multileg fill's legs resolve to different underliers. When a null/undefined
+	// value is observed, it indicates it does not apply.
+	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
+	// Venue where this fill occurred, as reported by that venue. Distinct from an
+	// order's `venue`, which is the routing destination. Codes are not normalized, so
+	// the format varies by venue. When a null/undefined value is observed, it
+	// indicates that there is no available data.
+	Venue string `json:"venue" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID              respjson.Field
-		OrderID         respjson.Field
-		Quantity        respjson.Field
-		Side            respjson.Field
-		TransactionTime respjson.Field
-		InstrumentID    respjson.Field
-		Price           respjson.Field
-		Symbol          respjson.Field
-		ExtraFields     map[string]respjson.Field
-		raw             string
+		ID                     respjson.Field
+		OrderID                respjson.Field
+		Quantity               respjson.Field
+		Side                   respjson.Field
+		TransactionTime        respjson.Field
+		InstrumentID           respjson.Field
+		Price                  respjson.Field
+		Symbol                 respjson.Field
+		UnderlyingInstrumentID respjson.Field
+		Venue                  respjson.Field
+		ExtraFields            map[string]respjson.Field
+		raw                    string
 	} `json:"-"`
 }
 
@@ -838,6 +850,13 @@ type V1OrderGetExecutionsParams struct {
 	// filter by. When provided, only executions for any of the listed instruments are
 	// returned.
 	InstrumentIDs []string `query:"instrument_ids,omitzero" json:"-"`
+	// Comma-separated order IDs to filter by. When provided, only executions belonging
+	// to an order in this set are returned.
+	OrderIDs []string `query:"order_ids,omitzero" json:"-"`
+	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
+	// symbols). Matches option fills whose resolved underlier is any of the given
+	// instruments.
+	UnderlyingInstrumentIDs []string `query:"underlying_instrument_ids,omitzero" json:"-"`
 	paramObj
 }
 

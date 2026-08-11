@@ -89,11 +89,13 @@ func TestV1OrderGetExecutionsWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.V1OrderGetExecutionsParams{
-			From:          clearstreet.Time(time.Now()),
-			InstrumentIDs: []string{"x"},
-			PageSize:      clearstreet.Int(1),
-			PageToken:     clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
-			To:            clearstreet.Time(time.Now()),
+			From:                    clearstreet.Time(time.Now()),
+			InstrumentIDs:           []string{"x"},
+			OrderIDs:                []string{"string"},
+			PageSize:                clearstreet.Int(1),
+			PageToken:               clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+			To:                      clearstreet.Time(time.Now()),
+			UnderlyingInstrumentIDs: []string{"x"},
 		},
 	)
 	if err != nil {
