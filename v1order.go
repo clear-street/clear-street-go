@@ -554,12 +554,20 @@ const (
 //
 // At least one field must be provided.
 type ReplaceOrderRequestParam struct {
+	// New limit offset for trailing stop-limit orders (signed)
+	LimitOffset param.Opt[string] `json:"limit_offset,omitzero"`
 	// New limit price for the order
 	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
 	// New quantity for the order
 	Quantity param.Opt[string] `json:"quantity,omitzero"`
 	// New stop price for the order
 	StopPrice param.Opt[string] `json:"stop_price,omitzero"`
+	// New trailing offset for trailing orders
+	TrailingOffset param.Opt[string] `json:"trailing_offset,omitzero"`
+	// New trailing offset type (PRICE or BPS)
+	//
+	// Any of "PRICE", "BPS".
+	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type,omitzero"`
 	paramObj
 }
 

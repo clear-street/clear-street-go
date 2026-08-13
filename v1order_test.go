@@ -190,9 +190,12 @@ func TestV1OrderReplaceOrderWithOptionalParams(t *testing.T) {
 		clearstreet.V1OrderReplaceOrderParams{
 			AccountID: 0,
 			ReplaceOrderRequest: clearstreet.ReplaceOrderRequestParam{
-				LimitPrice: clearstreet.String("49.00"),
-				Quantity:   clearstreet.String("1"),
-				StopPrice:  clearstreet.String("52.00"),
+				LimitOffset:        clearstreet.String("0.50"),
+				LimitPrice:         clearstreet.String("49.00"),
+				Quantity:           clearstreet.String("1"),
+				StopPrice:          clearstreet.String("52.00"),
+				TrailingOffset:     clearstreet.String("2.00"),
+				TrailingOffsetType: clearstreet.TrailingOffsetTypePrice,
 			},
 		},
 	)

@@ -418,6 +418,8 @@ func (r *PrefillModifyOrderAction) UnmarshalJSON(data []byte) error {
 type PrefillModifyOrderRequest struct {
 	// Account ID that owns the order.
 	AccountID int64 `json:"account_id"`
+	// New limit offset for trailing stop-limit orders (signed)
+	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// New limit price for the order
 	LimitPrice string `json:"limit_price" api:"nullable"`
 	// Order ID to modify.
@@ -426,15 +428,24 @@ type PrefillModifyOrderRequest struct {
 	Quantity string `json:"quantity" api:"nullable"`
 	// New stop price for the order
 	StopPrice string `json:"stop_price" api:"nullable"`
+	// New trailing offset for trailing orders
+	TrailingOffset string `json:"trailing_offset" api:"nullable"`
+	// New trailing offset type (PRICE or BPS)
+	//
+	// Any of "PRICE", "BPS".
+	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AccountID   respjson.Field
-		LimitPrice  respjson.Field
-		OrderID     respjson.Field
-		Quantity    respjson.Field
-		StopPrice   respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		AccountID          respjson.Field
+		LimitOffset        respjson.Field
+		LimitPrice         respjson.Field
+		OrderID            respjson.Field
+		Quantity           respjson.Field
+		StopPrice          respjson.Field
+		TrailingOffset     respjson.Field
+		TrailingOffsetType respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
 	} `json:"-"`
 }
 
