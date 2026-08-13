@@ -218,8 +218,7 @@ type NewOrderRequest struct {
 	// Time in force
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
+	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE".
 	TimeInForce RequestTimeInForce `json:"time_in_force" api:"required"`
 	// Optional client-provided unique ID (idempotency). Required to be unique per
 	// account.
@@ -304,8 +303,7 @@ type NewOrderRequestParam struct {
 	// Time in force
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING".
+	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE".
 	TimeInForce RequestTimeInForce `json:"time_in_force,omitzero" api:"required"`
 	// Optional client-provided unique ID (idempotency). Required to be unique per
 	// account.
@@ -384,8 +382,7 @@ type Order struct {
 	// Time in force instruction
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "GOOD_TILL_CROSSING",
-	// "GOOD_THROUGH_CROSSING", "AT_CROSSING", "OTHER".
+	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "OTHER".
 	TimeInForce TimeInForce `json:"time_in_force" api:"required"`
 	// Timestamp of the most recent update (UTC)
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
@@ -595,16 +592,13 @@ const (
 type RequestTimeInForce string
 
 const (
-	RequestTimeInForceDay                 RequestTimeInForce = "DAY"
-	RequestTimeInForceGoodTillCancel      RequestTimeInForce = "GOOD_TILL_CANCEL"
-	RequestTimeInForceImmediateOrCancel   RequestTimeInForce = "IMMEDIATE_OR_CANCEL"
-	RequestTimeInForceFillOrKill          RequestTimeInForce = "FILL_OR_KILL"
-	RequestTimeInForceGoodTillDate        RequestTimeInForce = "GOOD_TILL_DATE"
-	RequestTimeInForceAtTheOpening        RequestTimeInForce = "AT_THE_OPENING"
-	RequestTimeInForceAtTheClose          RequestTimeInForce = "AT_THE_CLOSE"
-	RequestTimeInForceGoodTillCrossing    RequestTimeInForce = "GOOD_TILL_CROSSING"
-	RequestTimeInForceGoodThroughCrossing RequestTimeInForce = "GOOD_THROUGH_CROSSING"
-	RequestTimeInForceAtCrossing          RequestTimeInForce = "AT_CROSSING"
+	RequestTimeInForceDay               RequestTimeInForce = "DAY"
+	RequestTimeInForceGoodTillCancel    RequestTimeInForce = "GOOD_TILL_CANCEL"
+	RequestTimeInForceImmediateOrCancel RequestTimeInForce = "IMMEDIATE_OR_CANCEL"
+	RequestTimeInForceFillOrKill        RequestTimeInForce = "FILL_OR_KILL"
+	RequestTimeInForceGoodTillDate      RequestTimeInForce = "GOOD_TILL_DATE"
+	RequestTimeInForceAtTheOpening      RequestTimeInForce = "AT_THE_OPENING"
+	RequestTimeInForceAtTheClose        RequestTimeInForce = "AT_THE_CLOSE"
 )
 
 // Side of an order
@@ -621,17 +615,14 @@ const (
 type TimeInForce string
 
 const (
-	TimeInForceDay                 TimeInForce = "DAY"
-	TimeInForceGoodTillCancel      TimeInForce = "GOOD_TILL_CANCEL"
-	TimeInForceImmediateOrCancel   TimeInForce = "IMMEDIATE_OR_CANCEL"
-	TimeInForceFillOrKill          TimeInForce = "FILL_OR_KILL"
-	TimeInForceGoodTillDate        TimeInForce = "GOOD_TILL_DATE"
-	TimeInForceAtTheOpening        TimeInForce = "AT_THE_OPENING"
-	TimeInForceAtTheClose          TimeInForce = "AT_THE_CLOSE"
-	TimeInForceGoodTillCrossing    TimeInForce = "GOOD_TILL_CROSSING"
-	TimeInForceGoodThroughCrossing TimeInForce = "GOOD_THROUGH_CROSSING"
-	TimeInForceAtCrossing          TimeInForce = "AT_CROSSING"
-	TimeInForceOther               TimeInForce = "OTHER"
+	TimeInForceDay               TimeInForce = "DAY"
+	TimeInForceGoodTillCancel    TimeInForce = "GOOD_TILL_CANCEL"
+	TimeInForceImmediateOrCancel TimeInForce = "IMMEDIATE_OR_CANCEL"
+	TimeInForceFillOrKill        TimeInForce = "FILL_OR_KILL"
+	TimeInForceGoodTillDate      TimeInForce = "GOOD_TILL_DATE"
+	TimeInForceAtTheOpening      TimeInForce = "AT_THE_OPENING"
+	TimeInForceAtTheClose        TimeInForce = "AT_THE_CLOSE"
+	TimeInForceOther             TimeInForce = "OTHER"
 )
 
 // Trailing offset type for trailing stop orders.
