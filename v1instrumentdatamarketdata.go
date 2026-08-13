@@ -230,10 +230,22 @@ type SnapshotLastTrade struct {
 	// Share quantity of the most recent last-sale eligible trade. Always `0` for index
 	// instruments, whose level is computed rather than traded.
 	Size int64 `json:"size" api:"required"`
+	// Exchange timestamp of the most recent last-sale eligible trade. For index
+	// instruments, the time the index level was computed. Absent when the trade
+	// carries no timestamp. When a null/undefined value is observed, it indicates that
+	// there is no available data.
+	Timestamp time.Time `json:"timestamp" api:"nullable" format:"date-time"`
+	// ISO 10383 Market Identifier Code (MIC) of the venue where the most recent
+	// last-sale eligible trade took place. Absent when the trade carries no venue;
+	// index levels are computed rather than traded and have no venue. When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	Venue string `json:"venue" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Price       respjson.Field
 		Size        respjson.Field
+		Timestamp   respjson.Field
+		Venue       respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
@@ -253,24 +265,44 @@ type SnapshotQuote struct {
 	// Size at the best ask, in shares. When a null/undefined value is observed, it
 	// indicates that there is no available data.
 	AskSize int64 `json:"ask_size" api:"nullable"`
+	// Exchange timestamp of the best ask. Absent when the ask side carries no
+	// timestamp. When a null/undefined value is observed, it indicates that there is
+	// no available data.
+	AskTimestamp time.Time `json:"ask_timestamp" api:"nullable" format:"date-time"`
+	// ISO 10383 Market Identifier Code (MIC) of the venue currently holding the
+	// national best offer (NBBO). Absent when the ask side carries no venue. When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	AskVenue string `json:"ask_venue" api:"nullable"`
 	// Current best bid. Absent when no bid is available (one-sided quote). When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	Bid string `json:"bid" api:"nullable"`
 	// Size at the best bid, in shares. When a null/undefined value is observed, it
 	// indicates that there is no available data.
 	BidSize int64 `json:"bid_size" api:"nullable"`
+	// Exchange timestamp of the best bid. Absent when the bid side carries no
+	// timestamp. When a null/undefined value is observed, it indicates that there is
+	// no available data.
+	BidTimestamp time.Time `json:"bid_timestamp" api:"nullable" format:"date-time"`
+	// ISO 10383 Market Identifier Code (MIC) of the venue currently holding the
+	// national best bid (NBBO). Absent when the bid side carries no venue. When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	BidVenue string `json:"bid_venue" api:"nullable"`
 	// Midpoint of bid and ask. Absent when either side is missing. When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	Midpoint string `json:"midpoint" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Ask         respjson.Field
-		AskSize     respjson.Field
-		Bid         respjson.Field
-		BidSize     respjson.Field
-		Midpoint    respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		Ask          respjson.Field
+		AskSize      respjson.Field
+		AskTimestamp respjson.Field
+		AskVenue     respjson.Field
+		Bid          respjson.Field
+		BidSize      respjson.Field
+		BidTimestamp respjson.Field
+		BidVenue     respjson.Field
+		Midpoint     respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
 	} `json:"-"`
 }
 
