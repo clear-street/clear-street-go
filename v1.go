@@ -16,9 +16,6 @@ type V1Service struct {
 	options []option.RequestOption
 	// Manage trading accounts, balances, and portfolio history.
 	Accounts V1AccountService
-	// Create and manage alerts that watch market and portfolio conditions on an
-	// account and notify when they trigger.
-	Alerts V1AlertService
 	// Endpoints for API service metadata.
 	APIVersion V1APIVersionService
 	// Access clocks and financial calendars for market sessions and events.
@@ -45,7 +42,6 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 	r = V1Service{}
 	r.options = opts
 	r.Accounts = NewV1AccountService(opts...)
-	r.Alerts = NewV1AlertService(opts...)
 	r.APIVersion = NewV1APIVersionService(opts...)
 	r.Calendar = NewV1CalendarService(opts...)
 	r.InstrumentData = NewV1InstrumentDataService(opts...)
