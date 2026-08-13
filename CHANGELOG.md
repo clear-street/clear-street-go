@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.9.0](https://github.com/clear-street/clear-street-go/compare/v0.8.0...v0.9.0) (2026-08-13)
+
+
+### Features
+
+* **api:** api update ([8f5aba1](https://github.com/clear-street/clear-street-go/commit/8f5aba101cc857b0bf37f478d8ad50aa91f18744))
+* **api:** api update ([464b2ee](https://github.com/clear-street/clear-street-go/commit/464b2ee891257010ce52903a708e87c114b07b45))
+* **api:** api update ([bb65cef](https://github.com/clear-street/clear-street-go/commit/bb65cef3ad0718df6c075b9263e30fcc554f79fe))
+* **api:** api update ([e0306ab](https://github.com/clear-street/clear-street-go/commit/e0306abbae0c06588030ab79ade65e39de4a9d4d))
+* **api:** api update ([7f72a13](https://github.com/clear-street/clear-street-go/commit/7f72a1305192a9f7afb7502c98818a6cc5577dd4))
+* **api:** api update ([b00a5fa](https://github.com/clear-street/clear-street-go/commit/b00a5fa90ef2fe927ee6066fe9805ec5fff1b34d))
+* **api:** api update ([311b226](https://github.com/clear-street/clear-street-go/commit/311b22649a1ee50357baf1ab55b2adf3c0d943e5))
+* **api:** api update ([f4bf69a](https://github.com/clear-street/clear-street-go/commit/f4bf69a90aea37b5e71e07fd6ea84d8e01d1f06e))
+* **api:** api update ([b0f82bb](https://github.com/clear-street/clear-street-go/commit/b0f82bb652e56885213a21fe90ef8e36927ffdcc))
+* **api:** api update ([7431ddf](https://github.com/clear-street/clear-street-go/commit/7431ddf6bb39864fca523e8f6fecbb8cb19ca910))
+* **api:** api update ([330a57c](https://github.com/clear-street/clear-street-go/commit/330a57ceeeab6c2dbd3fc8911ea804635af9de2f))
+* **api:** api update ([1f7a246](https://github.com/clear-street/clear-street-go/commit/1f7a24681afe4b2b81056a8514fef0879fc600a1))
+* **api:** api update ([4c33b7d](https://github.com/clear-street/clear-street-go/commit/4c33b7d0d5e0d23fa45fbbaa6f3f1c9d7c08dbcd))
+
+
+### Chores
+
+* Change versioning strategy to default and disable prerelease ([140e47e](https://github.com/clear-street/clear-street-go/commit/140e47e756938aa97668e6559983e1de33568c38))
+
 ## [0.8.0](https://github.com/clear-street/clear-street-go/compare/v0.7.0...v0.8.0) (2026-07-27)
 
 
