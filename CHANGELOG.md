@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.1](https://github.com/clear-street/clear-street-go/compare/v0.10.0...v0.10.1) (2026-08-14)
+
+
+### Bug Fixes
+
+* reconcile forked trunks with production (2026-08-14) ([4d16252](https://github.com/clear-street/clear-street-go/commit/4d16252eab0513473d4996de4ce8ae0c8ca5c895))
+
 ## [0.10.0](https://github.com/clear-street/clear-street-go/compare/v0.9.0...v0.10.0) (2026-08-13)
 
 
