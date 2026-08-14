@@ -190,16 +190,25 @@ type ResponseContentPartUnion struct {
 	Action StructuredActionUnion `json:"action"`
 	// This field is from variant [ResponseContentPartContentPartStructuredAction].
 	ActionID string `json:"action_id"`
+	// This field is from variant [ResponseContentPartContentPartStructuredAction].
+	Clicked bool `json:"clicked"`
+	// This field is from variant [ResponseContentPartContentPartStructuredAction].
+	ClickedItemIDs []string `json:"clicked_item_ids"`
+	// This field is from variant [ResponseContentPartContentPartStructuredAction].
+	ItemID string `json:"item_id"`
 	// This field is a union of [ChartPayload], [SuggestedActionsPayload], [any]
 	Payload ResponseContentPartUnionPayload `json:"payload"`
 	JSON    struct {
-		Text     respjson.Field
-		Type     respjson.Field
-		Thoughts respjson.Field
-		Action   respjson.Field
-		ActionID respjson.Field
-		Payload  respjson.Field
-		raw      string
+		Text           respjson.Field
+		Type           respjson.Field
+		Thoughts       respjson.Field
+		Action         respjson.Field
+		ActionID       respjson.Field
+		Clicked        respjson.Field
+		ClickedItemIDs respjson.Field
+		ItemID         respjson.Field
+		Payload        respjson.Field
+		raw            string
 	} `json:"-"`
 }
 
@@ -253,15 +262,24 @@ type ResponseContentPartUnionPayload struct {
 	// This field will be present if the value is a [any] instead of an object.
 	OfContentPartCustomPayloadPayload any `json:",inline"`
 	// This field is from variant [ChartPayload].
-	ChartID       string         `json:"chartId"`
+	ChartID string `json:"chartId"`
+	// This field is from variant [ChartPayload].
+	Clicked       bool           `json:"clicked"`
 	ActionButtons []ActionButton `json:"actionButtons"`
 	// This field is from variant [ChartPayload].
 	DataChart DataChart `json:"dataChart"`
-	JSON      struct {
+	// This field is from variant [ChartPayload].
+	ItemID string `json:"itemId"`
+	// This field is from variant [SuggestedActionsPayload].
+	ClickedItemIDs []string `json:"clickedItemIds"`
+	JSON           struct {
 		OfContentPartCustomPayloadPayload respjson.Field
 		ChartID                           respjson.Field
+		Clicked                           respjson.Field
 		ActionButtons                     respjson.Field
 		DataChart                         respjson.Field
+		ItemID                            respjson.Field
+		ClickedItemIDs                    respjson.Field
 		raw                               string
 	} `json:"-"`
 }

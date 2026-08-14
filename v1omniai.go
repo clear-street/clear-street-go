@@ -4,6 +4,7 @@ package clearstreet
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/clear-street/clear-street-go/internal/apijson"
 	"github.com/clear-street/clear-street-go/option"
@@ -63,6 +64,10 @@ type ActionButton struct {
 	ButtonID string `json:"buttonId" api:"required"`
 	// User-visible label.
 	Label string `json:"label" api:"required"`
+	// Interaction-tracking identity. Absent on messages created before tracking. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
+	ItemID string `json:"itemId" api:"nullable" format:"uuid"`
 	// Follow-up prompt to submit as the next user message. When a null/undefined value
 	// is observed, it indicates it does not apply.
 	Prompt PromptButtonAction `json:"prompt" api:"nullable"`
@@ -73,6 +78,7 @@ type ActionButton struct {
 	JSON struct {
 		ButtonID         respjson.Field
 		Label            respjson.Field
+		ItemID           respjson.Field
 		Prompt           respjson.Field
 		StructuredAction respjson.Field
 		ExtraFields      map[string]respjson.Field
@@ -90,16 +96,24 @@ func (r *ActionButton) UnmarshalJSON(data []byte) error {
 type ChartPayload struct {
 	// Stable chart identifier scoped to the content part.
 	ChartID string `json:"chartId" api:"required"`
+	// Whether the current user clicked this chart.
+	Clicked bool `json:"clicked" api:"required"`
 	// Buttons associated with this chart.
 	ActionButtons []ActionButton `json:"actionButtons"`
 	// Explicit series-driven chart definition. When a null/undefined value is
 	// observed, it indicates it does not apply.
 	DataChart DataChart `json:"dataChart" api:"nullable"`
+	// Interaction-tracking identity. Absent on messages created before tracking. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
+	ItemID string `json:"itemId" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ChartID       respjson.Field
+		Clicked       respjson.Field
 		ActionButtons respjson.Field
 		DataChart     respjson.Field
+		ItemID        respjson.Field
 		ExtraFields   map[string]respjson.Field
 		raw           string
 	} `json:"-"`
@@ -192,12 +206,23 @@ type ContentPartStructuredActionPayload struct {
 	// such as prefilling an order ticket, opening a chart, or navigating to a route.
 	Action   StructuredActionUnion `json:"action" api:"required"`
 	ActionID string                `json:"action_id" api:"required" format:"uuid"`
+	// Whether the current user clicked this action.
+	Clicked bool `json:"clicked" api:"required"`
+	// IDs of nested items clicked by the current user.
+	ClickedItemIDs []string `json:"clicked_item_ids" format:"uuid"`
+	// Interaction-tracking identity. Absent on messages created before tracking. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
+	ItemID string `json:"item_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Action      respjson.Field
-		ActionID    respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		Action         respjson.Field
+		ActionID       respjson.Field
+		Clicked        respjson.Field
+		ClickedItemIDs respjson.Field
+		ItemID         respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
 	} `json:"-"`
 }
 
@@ -297,6 +322,10 @@ type OpenChartAction struct {
 	// Additional chart configuration (indicators, overlays, etc.) When a
 	// null/undefined value is observed, it indicates it does not apply.
 	Extras any `json:"extras"`
+	// Interaction-tracking identity. Absent on messages created before tracking. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
+	ItemID string `json:"item_id" api:"nullable" format:"uuid"`
 	// Chart timeframe (e.g., "1D", "1W", "1M", "3M", "1Y", "5Y") When a null/undefined
 	// value is observed, it indicates it does not apply.
 	Timeframe string `json:"timeframe" api:"nullable"`
@@ -304,6 +333,7 @@ type OpenChartAction struct {
 	JSON struct {
 		Symbol      respjson.Field
 		Extras      respjson.Field
+		ItemID      respjson.Field
 		Timeframe   respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -325,12 +355,17 @@ type OpenEntitlementConsentAction struct {
 	AgreementKey     EntitlementAgreementKey `json:"agreement_key" api:"required"`
 	EntitlementCodes []EntitlementCode       `json:"entitlement_codes" api:"required"`
 	Reason           string                  `json:"reason" api:"required"`
+	// Interaction-tracking identity. Absent on messages created before tracking. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
+	ItemID string `json:"item_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AccountIDs       respjson.Field
 		AgreementKey     respjson.Field
 		EntitlementCodes respjson.Field
 		Reason           respjson.Field
+		ItemID           respjson.Field
 		ExtraFields      map[string]respjson.Field
 		raw              string
 	} `json:"-"`
@@ -349,6 +384,10 @@ type OpenScreenerAction struct {
 	// Optional field/column selection for screener results. When a null/undefined
 	// value is observed, it indicates it does not apply.
 	Columns []string `json:"columns" api:"nullable"`
+	// Interaction-tracking identity. Absent on messages created before tracking. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
+	ItemID string `json:"item_id" api:"nullable" format:"uuid"`
 	// Optional page size. When a null/undefined value is observed, it indicates it
 	// does not apply.
 	PageSize int64 `json:"page_size" api:"nullable"`
@@ -362,6 +401,7 @@ type OpenScreenerAction struct {
 	JSON struct {
 		Filters       respjson.Field
 		Columns       respjson.Field
+		ItemID        respjson.Field
 		PageSize      respjson.Field
 		SortBy        respjson.Field
 		SortDirection respjson.Field
@@ -379,7 +419,7 @@ func (r *OpenScreenerAction) UnmarshalJSON(data []byte) error {
 // Cancel-order prefill action.
 type PrefillCancelOrderAction struct {
 	// Orders to cancel using the same identifiers required by the cancel-order API.
-	Orders []CancelOrderRequest `json:"orders" api:"required"`
+	Orders []PrefillCancelOrderRequest `json:"orders" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Orders      respjson.Field
@@ -391,6 +431,35 @@ type PrefillCancelOrderAction struct {
 // Returns the unmodified JSON received from the API
 func (r PrefillCancelOrderAction) RawJSON() string { return r.JSON.raw }
 func (r *PrefillCancelOrderAction) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Request to cancel an existing order
+//
+// Note: In the API, order cancellation is done via DELETE request without a body.
+// The order_id and account_id come from the URL path parameters.
+type PrefillCancelOrderRequest struct {
+	// Account ID (from path parameter)
+	AccountID int64 `json:"account_id" api:"required"`
+	// Order ID to cancel (from path parameter)
+	OrderID string `json:"order_id" api:"required"`
+	// Interaction-tracking identity. Absent on messages created before tracking. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
+	ItemID string `json:"item_id" api:"nullable" format:"uuid"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AccountID   respjson.Field
+		OrderID     respjson.Field
+		ItemID      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PrefillCancelOrderRequest) RawJSON() string { return r.JSON.raw }
+func (r *PrefillCancelOrderRequest) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -418,6 +487,10 @@ func (r *PrefillModifyOrderAction) UnmarshalJSON(data []byte) error {
 type PrefillModifyOrderRequest struct {
 	// Account ID that owns the order.
 	AccountID int64 `json:"account_id"`
+	// Interaction-tracking identity. Absent on messages created before tracking. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
+	ItemID string `json:"item_id" api:"nullable" format:"uuid"`
 	// New limit offset for trailing stop-limit orders (signed)
 	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// New limit price for the order
@@ -437,6 +510,7 @@ type PrefillModifyOrderRequest struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AccountID          respjson.Field
+		ItemID             respjson.Field
 		LimitOffset        respjson.Field
 		LimitPrice         respjson.Field
 		OrderID            respjson.Field
@@ -458,7 +532,7 @@ func (r *PrefillModifyOrderRequest) UnmarshalJSON(data []byte) error {
 // New-order prefill action.
 type PrefillNewOrderAction struct {
 	// Orders to prefill using the same shape accepted by the orders API.
-	Orders []NewOrderRequest `json:"orders" api:"required"`
+	Orders []PrefillNewOrderRequest `json:"orders" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Orders      respjson.Field
@@ -473,6 +547,85 @@ func (r *PrefillNewOrderAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Request to submit a new order (PlaceOrderRequest from spec)
+type PrefillNewOrderRequest struct {
+	// Type of order
+	//
+	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
+	// "TRAILING_STOP_LIMIT".
+	OrderType RequestOrderType `json:"order_type" api:"required"`
+	// Quantity to trade. For COMMON_STOCK: shares (may be fractional if supported).
+	// For OPTION (single-leg): contracts (must be an integer)
+	Quantity string `json:"quantity" api:"required"`
+	// Side of the order
+	//
+	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	Side Side `json:"side" api:"required"`
+	// Time in force
+	//
+	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
+	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE".
+	TimeInForce RequestTimeInForce `json:"time_in_force" api:"required"`
+	// Optional client-provided unique ID (idempotency). Required to be unique per
+	// account.
+	ID string `json:"id" api:"nullable"`
+	// The timestamp when the order should expire (UTC). Required when time_in_force is
+	// GOOD_TILL_DATE.
+	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
+	// Allow trading outside regular trading hours. Some brokers disallow options
+	// outside RTH.
+	ExtendedHours bool `json:"extended_hours" api:"nullable"`
+	// Instrument ID (UUID) or symbol (equity ticker or OSI option symbol). Either
+	// `symbol` or `instrument_id` must be provided.
+	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"nullable"`
+	// Interaction-tracking identity. Absent on messages created before tracking. When
+	// a null/undefined value is observed, it indicates that there is no available
+	// data.
+	ItemID string `json:"item_id" api:"nullable" format:"uuid"`
+	// Limit offset for trailing stop-limit orders (signed)
+	LimitOffset string `json:"limit_offset" api:"nullable"`
+	// Limit price (required for LIMIT and STOP_LIMIT orders)
+	LimitPrice string `json:"limit_price" api:"nullable"`
+	// Stop price (required for STOP and STOP_LIMIT orders)
+	StopPrice string `json:"stop_price" api:"nullable"`
+	// Trading symbol. For equities, use the ticker symbol (e.g., "TSLA"). For options,
+	// use the OSI symbol (e.g., "TSLA 250117C00190000"). Either `symbol` or
+	// `instrument_id` must be provided.
+	Symbol string `json:"symbol" api:"nullable"`
+	// Trailing offset amount (required for trailing orders)
+	TrailingOffset string `json:"trailing_offset" api:"nullable"`
+	// Trailing offset type (PRICE or PERCENT_BPS)
+	//
+	// Any of "PRICE", "BPS".
+	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		OrderType          respjson.Field
+		Quantity           respjson.Field
+		Side               respjson.Field
+		TimeInForce        respjson.Field
+		ID                 respjson.Field
+		ExpiresAt          respjson.Field
+		ExtendedHours      respjson.Field
+		InstrumentID       respjson.Field
+		ItemID             respjson.Field
+		LimitOffset        respjson.Field
+		LimitPrice         respjson.Field
+		StopPrice          respjson.Field
+		Symbol             respjson.Field
+		TrailingOffset     respjson.Field
+		TrailingOffsetType respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PrefillNewOrderRequest) RawJSON() string { return r.JSON.raw }
+func (r *PrefillNewOrderRequest) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // PrefillOrderActionUnion contains all possible properties and values from
 // [PrefillOrderActionPrefillNewOrderAction],
 // [PrefillOrderActionPrefillCancelOrderAction],
@@ -480,8 +633,8 @@ func (r *PrefillNewOrderAction) UnmarshalJSON(data []byte) error {
 //
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type PrefillOrderActionUnion struct {
-	// This field is a union of [[]NewOrderRequest], [[]CancelOrderRequest],
-	// [[]PrefillModifyOrderRequest]
+	// This field is a union of [[]PrefillNewOrderRequest],
+	// [[]PrefillCancelOrderRequest], [[]PrefillModifyOrderRequest]
 	Orders     PrefillOrderActionUnionOrders `json:"orders"`
 	ActionType string                        `json:"action_type"`
 	JSON       struct {
@@ -521,21 +674,21 @@ func (r *PrefillOrderActionUnion) UnmarshalJSON(data []byte) error {
 // [PrefillOrderActionUnion].
 //
 // If the underlying value is not a json object, one of the following properties
-// will be valid: OfNewOrderRequestArray OfCancelOrderRequestArray
+// will be valid: OfPrefillNewOrderRequestArray OfPrefillCancelOrderRequestArray
 // OfPrefillModifyOrderRequestArray]
 type PrefillOrderActionUnionOrders struct {
-	// This field will be present if the value is a [[]NewOrderRequest] instead of an
-	// object.
-	OfNewOrderRequestArray []NewOrderRequest `json:",inline"`
-	// This field will be present if the value is a [[]CancelOrderRequest] instead of
-	// an object.
-	OfCancelOrderRequestArray []CancelOrderRequest `json:",inline"`
+	// This field will be present if the value is a [[]PrefillNewOrderRequest] instead
+	// of an object.
+	OfPrefillNewOrderRequestArray []PrefillNewOrderRequest `json:",inline"`
+	// This field will be present if the value is a [[]PrefillCancelOrderRequest]
+	// instead of an object.
+	OfPrefillCancelOrderRequestArray []PrefillCancelOrderRequest `json:",inline"`
 	// This field will be present if the value is a [[]PrefillModifyOrderRequest]
 	// instead of an object.
 	OfPrefillModifyOrderRequestArray []PrefillModifyOrderRequest `json:",inline"`
 	JSON                             struct {
-		OfNewOrderRequestArray           respjson.Field
-		OfCancelOrderRequestArray        respjson.Field
+		OfPrefillNewOrderRequestArray    respjson.Field
+		OfPrefillCancelOrderRequestArray respjson.Field
 		OfPrefillModifyOrderRequestArray respjson.Field
 		raw                              string
 	} `json:"-"`
@@ -765,11 +918,14 @@ func (r *StructuredActionButtonAction) UnmarshalJSON(data []byte) error {
 type SuggestedActionsPayload struct {
 	// Ordered message-level buttons.
 	ActionButtons []ActionButton `json:"actionButtons"`
+	// IDs of buttons clicked by the current user.
+	ClickedItemIDs []string `json:"clickedItemIds" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ActionButtons respjson.Field
-		ExtraFields   map[string]respjson.Field
-		raw           string
+		ActionButtons  respjson.Field
+		ClickedItemIDs respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
 	} `json:"-"`
 }
 

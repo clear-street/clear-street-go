@@ -4,7 +4,6 @@ package clearstreet
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -116,30 +115,6 @@ func (r *V1OrderService) SubmitOrders(ctx context.Context, accountID int64, body
 	return res, err
 }
 
-// Request to cancel an existing order
-//
-// Note: In the API, order cancellation is done via DELETE request without a body.
-// The order_id and account_id come from the URL path parameters.
-type CancelOrderRequest struct {
-	// Account ID (from path parameter)
-	AccountID int64 `json:"account_id" api:"required"`
-	// Order ID to cancel (from path parameter)
-	OrderID string `json:"order_id" api:"required"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		AccountID   respjson.Field
-		OrderID     respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r CancelOrderRequest) RawJSON() string { return r.JSON.raw }
-func (r *CancelOrderRequest) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
 // Represents a single fill of an order for an account.
 type Execution struct {
 	// Unique identifier for this execution report.
@@ -200,89 +175,6 @@ func (r *Execution) UnmarshalJSON(data []byte) error {
 type ExecutionList []Execution
 
 type InstrumentIDOrSymbol = string
-
-// Request to submit a new order (PlaceOrderRequest from spec)
-type NewOrderRequest struct {
-	// Type of order
-	//
-	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
-	// "TRAILING_STOP_LIMIT".
-	OrderType RequestOrderType `json:"order_type" api:"required"`
-	// Quantity to trade. For COMMON_STOCK: shares (may be fractional if supported).
-	// For OPTION (single-leg): contracts (must be an integer)
-	Quantity string `json:"quantity" api:"required"`
-	// Side of the order
-	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
-	Side Side `json:"side" api:"required"`
-	// Time in force
-	//
-	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE".
-	TimeInForce RequestTimeInForce `json:"time_in_force" api:"required"`
-	// Optional client-provided unique ID (idempotency). Required to be unique per
-	// account.
-	ID string `json:"id" api:"nullable"`
-	// The timestamp when the order should expire (UTC). Required when time_in_force is
-	// GOOD_TILL_DATE.
-	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
-	// Allow trading outside regular trading hours. Some brokers disallow options
-	// outside RTH.
-	ExtendedHours bool `json:"extended_hours" api:"nullable"`
-	// Instrument ID (UUID) or symbol (equity ticker or OSI option symbol). Either
-	// `symbol` or `instrument_id` must be provided.
-	InstrumentID InstrumentIDOrSymbol `json:"instrument_id" api:"nullable"`
-	// Limit offset for trailing stop-limit orders (signed)
-	LimitOffset string `json:"limit_offset" api:"nullable"`
-	// Limit price (required for LIMIT and STOP_LIMIT orders)
-	LimitPrice string `json:"limit_price" api:"nullable"`
-	// Stop price (required for STOP and STOP_LIMIT orders)
-	StopPrice string `json:"stop_price" api:"nullable"`
-	// Trading symbol. For equities, use the ticker symbol (e.g., "TSLA"). For options,
-	// use the OSI symbol (e.g., "TSLA 250117C00190000"). Either `symbol` or
-	// `instrument_id` must be provided.
-	Symbol string `json:"symbol" api:"nullable"`
-	// Trailing offset amount (required for trailing orders)
-	TrailingOffset string `json:"trailing_offset" api:"nullable"`
-	// Trailing offset type (PRICE or PERCENT_BPS)
-	//
-	// Any of "PRICE", "BPS".
-	TrailingOffsetType TrailingOffsetType `json:"trailing_offset_type" api:"nullable"`
-	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
-	JSON struct {
-		OrderType          respjson.Field
-		Quantity           respjson.Field
-		Side               respjson.Field
-		TimeInForce        respjson.Field
-		ID                 respjson.Field
-		ExpiresAt          respjson.Field
-		ExtendedHours      respjson.Field
-		InstrumentID       respjson.Field
-		LimitOffset        respjson.Field
-		LimitPrice         respjson.Field
-		StopPrice          respjson.Field
-		Symbol             respjson.Field
-		TrailingOffset     respjson.Field
-		TrailingOffsetType respjson.Field
-		ExtraFields        map[string]respjson.Field
-		raw                string
-	} `json:"-"`
-}
-
-// Returns the unmodified JSON received from the API
-func (r NewOrderRequest) RawJSON() string { return r.JSON.raw }
-func (r *NewOrderRequest) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// ToParam converts this NewOrderRequest to a NewOrderRequestParam.
-//
-// Warning: the fields of the param type will not be present. ToParam should only
-// be used at the last possible moment before sending a request. Test for this with
-// NewOrderRequestParam.Overrides()
-func (r NewOrderRequest) ToParam() NewOrderRequestParam {
-	return param.Override[NewOrderRequestParam](json.RawMessage(r.RawJSON()))
-}
 
 // Request to submit a new order (PlaceOrderRequest from spec)
 //
