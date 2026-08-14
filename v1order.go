@@ -139,10 +139,10 @@ type Execution struct {
 	// Trading symbol. `null` when this fill has no single resolvable instrument. When
 	// a null/undefined value is observed, it indicates it does not apply.
 	Symbol string `json:"symbol" api:"nullable"`
-	// Underlying instrument identifier for a derivative fill. `null` for a
-	// non-derivative fill, when the underlier could not be resolved, or when a
-	// multileg fill's legs resolve to different underliers. When a null/undefined
-	// value is observed, it indicates it does not apply.
+	// Underlying instrument identifier for an option fill. Omitted for a
+	// non-derivative fill, when the underlier could not be resolved, or for a multileg
+	// fill (per-leg underliers live in `legs[]`). When a null/undefined value is
+	// observed, it indicates it does not apply.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// Venue where this fill occurred, as reported by that venue. Distinct from an
 	// order's `venue`, which is the routing destination. Codes are not normalized, so
