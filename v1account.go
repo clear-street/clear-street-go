@@ -144,7 +144,10 @@ func (r *Account) UnmarshalJSON(data []byte) error {
 type AccountBalances struct {
 	// The unique identifier for the account
 	AccountID int64 `json:"account_id" api:"required"`
-	// The total buying power available in the account.
+	// The total buying power available in the account: base buying power plus the open
+	// order adjustment, where base buying power is maintenance margin excess times the
+	// multiplier for intraday and initial margin excess times the multiplier for
+	// overnight.
 	BuyingPower string `json:"buying_power" api:"required"`
 	// Currency identifier for all monetary values.
 	Currency string `json:"currency" api:"required"`
@@ -156,7 +159,8 @@ type AccountBalances struct {
 	DailyRealizedPnl string `json:"daily_realized_pnl" api:"required"`
 	// Total unrealized profit or loss across all positions relative to prior close.
 	DailyUnrealizedPnl string `json:"daily_unrealized_pnl" api:"required"`
-	// The total equity in the account.
+	// The total equity in the account: cash plus long market value plus short market
+	// value, where short market value is negative.
 	Equity string `json:"equity" api:"required"`
 	// The total market value of all long positions.
 	LongMarketValue string `json:"long_market_value" api:"required"`
@@ -166,7 +170,9 @@ type AccountBalances struct {
 	// "REG_T", "RISK_BASED_HAIRCUT_MARKET_MAKER", "CIRO", "FUTURES_NLV",
 	// "FUTURES_TOT_EQ".
 	MarginType MarginType `json:"margin_type" api:"required"`
-	// Signed buying-power correction from open orders.
+	// Buying power correction from open orders, computed as projected buying power
+	// minus actual buying power. A negative value means open orders are consuming
+	// buying power.
 	OpenOrderAdjustment string `json:"open_order_adjustment" api:"required"`
 	// The amount of cash that is settled and available for withdrawal or trading.
 	SettledCash string `json:"settled_cash" api:"required"`
@@ -185,7 +191,8 @@ type AccountBalances struct {
 	// Margin-account-only details. When a null/undefined value is observed, it
 	// indicates it does not apply.
 	MarginDetails MarginDetails `json:"margin_details" api:"nullable"`
-	// Applied multiplier for margin calculations. When a null/undefined value is
+	// Margin multiplier: 4 during intraday sessions (pre-market, regular, and
+	// after-hours) and 2 during the overnight session. When a null/undefined value is
 	// observed, it indicates it does not apply.
 	Multiplier string `json:"multiplier" api:"nullable"`
 	// The total market value of all short positions. When null/undefined, the value
@@ -237,11 +244,13 @@ type AccountBalancesSod struct {
 	// Timestamp for the start-of-day values. When a null/undefined value is observed,
 	// it indicates that there is no available data.
 	Asof time.Time `json:"asof" api:"nullable" format:"date"`
-	// Start-of-day maintenance margin excess. When a null/undefined value is observed,
-	// it indicates it does not apply.
+	// Start-of-day maintenance margin excess: the difference between equity and the
+	// maintenance margin requirement. When a null/undefined value is observed, it
+	// indicates it does not apply.
 	MaintenanceMarginExcess string `json:"maintenance_margin_excess" api:"nullable"`
-	// Start-of-day maintenance margin requirement. When a null/undefined value is
-	// observed, it indicates it does not apply.
+	// Start-of-day maintenance margin requirement: the amount of equity required to
+	// maintain current positions. When a null/undefined value is observed, it
+	// indicates it does not apply.
 	MaintenanceMarginRequirement string `json:"maintenance_margin_requirement" api:"nullable"`
 	// Start-of-day trade cash. When a null/undefined value is observed, it indicates
 	// it does not apply.
@@ -421,15 +430,15 @@ func (r *Address) UnmarshalJSON(data []byte) error {
 }
 
 type MarginDetails struct {
-	// Initial margin excess for trade-date balances.
+	// The difference between equity and the initial margin requirement.
 	InitialMarginExcess string `json:"initial_margin_excess" api:"required"`
-	// Initial margin requirement for trade-date balances.
+	// The amount of equity required to open new positions.
 	InitialMarginRequirement string `json:"initial_margin_requirement" api:"required"`
 	// Intraday session margin calculation details.
 	IntradayDetails MarginSessionDetails `json:"intraday_details" api:"required"`
-	// Maintenance margin excess for trade-date balances.
+	// The difference between equity and the maintenance margin requirement.
 	MaintenanceMarginExcess string `json:"maintenance_margin_excess" api:"required"`
-	// Maintenance margin requirement for trade-date balances.
+	// The amount of equity required to maintain current positions.
 	MaintenanceMarginRequirement string `json:"maintenance_margin_requirement" api:"required"`
 	// Overnight session margin calculation details.
 	OvernightDetails MarginSessionDetails `json:"overnight_details" api:"required"`
@@ -480,9 +489,13 @@ func (r *MarginDetailsUsage) UnmarshalJSON(data []byte) error {
 }
 
 type MarginSessionDetails struct {
-	// Maximum buying power available in the account during the session.
+	// Maximum buying power available in the account during the session: base buying
+	// power plus the open order adjustment, where base buying power is maintenance
+	// margin excess times the multiplier for intraday and initial margin excess times
+	// the multiplier for overnight.
 	BuyingPower string `json:"buying_power" api:"required"`
-	// Effective multiplier for margin calculations during the session.
+	// Margin multiplier for the session: 4 during intraday sessions (pre-market,
+	// regular, and after-hours) and 2 during the overnight session.
 	Multiplier string `json:"multiplier" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {

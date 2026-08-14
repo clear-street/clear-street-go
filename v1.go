@@ -28,7 +28,8 @@ type V1Service struct {
 	// Place, monitor, and manage trading orders.
 	Orders V1OrderService
 	// View positions and manage position instructions.
-	Positions V1PositionService
+	Positions      V1PositionService
+	PrivateMarkets V1PrivateMarketService
 	// Search instruments and manage saved screeners.
 	Screener V1ScreenerService
 	// Create and manage watchlists.
@@ -49,6 +50,7 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 	r.OmniAI = NewV1OmniAIService(opts...)
 	r.Orders = NewV1OrderService(opts...)
 	r.Positions = NewV1PositionService(opts...)
+	r.PrivateMarkets = NewV1PrivateMarketService(opts...)
 	r.Screener = NewV1ScreenerService(opts...)
 	r.Watchlist = NewV1WatchlistService(opts...)
 	return

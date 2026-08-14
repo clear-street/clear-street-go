@@ -112,6 +112,9 @@ func (r *V1ScreenerService) ReplaceScreener(ctx context.Context, screenerID stri
 //
 // Use `columns` to select which columns appear in each row. When omitted, the
 // default field set is returned.
+//
+// Due to the volatility of screener responses we recommend reconciling page
+// results since results can shuffle between calls.
 func (r *V1ScreenerService) SearchScreener(ctx context.Context, body V1ScreenerSearchScreenerParams, opts ...option.RequestOption) (res *V1ScreenerSearchScreenerResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/screener"
