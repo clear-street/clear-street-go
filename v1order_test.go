@@ -235,6 +235,7 @@ func TestV1OrderSubmitOrders(t *testing.T) {
 				InstrumentID:       clearstreet.String("x"),
 				LimitOffset:        clearstreet.String("0.50"),
 				LimitPrice:         clearstreet.String("48.00"),
+				PositionIntent:     clearstreet.RequestPositionEffectOpen,
 				StopPrice:          clearstreet.String("52.00"),
 				Symbol:             clearstreet.String("TSLA"),
 				TrailingOffset:     clearstreet.String("2.00"),

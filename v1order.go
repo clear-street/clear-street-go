@@ -125,7 +125,7 @@ type Execution struct {
 	Quantity string `json:"quantity" api:"required"`
 	// Side of the fill.
 	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	// Any of "BUY", "SELL".
 	Side Side `json:"side" api:"required"`
 	// Transaction timestamp in nanosecond precision (UTC).
 	TransactionTime time.Time `json:"transaction_time" api:"required" format:"date-time"`
@@ -190,7 +190,7 @@ type NewOrderRequestParam struct {
 	Quantity string `json:"quantity" api:"required"`
 	// Side of the order
 	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	// Any of "BUY", "SELL".
 	Side Side `json:"side,omitzero" api:"required"`
 	// Time in force
 	//
@@ -221,6 +221,11 @@ type NewOrderRequestParam struct {
 	// Instrument ID (UUID) or symbol (equity ticker or OSI option symbol). Either
 	// `symbol` or `instrument_id` must be provided.
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `json:"instrument_id,omitzero"`
+	// Optional open/close intent for this order. When omitted, the platform determines
+	// the position effect.
+	//
+	// Any of "OPEN", "CLOSE".
+	PositionIntent RequestPositionEffect `json:"position_intent,omitzero"`
 	// Trailing offset type (PRICE or PERCENT_BPS)
 	//
 	// Any of "PRICE", "BPS".
@@ -261,9 +266,9 @@ type Order struct {
 	OrderType OrderType `json:"order_type" api:"required"`
 	// Total order quantity
 	Quantity string `json:"quantity" api:"required"`
-	// Side of the order (BUY, SELL, SELL_SHORT)
+	// Side of the order (BUY or SELL)
 	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	// Any of "BUY", "SELL".
 	Side Side `json:"side" api:"required"`
 	// Current status of the order
 	//
@@ -480,6 +485,15 @@ const (
 	RequestOrderTypeTrailingStopLimit RequestOrderType = "TRAILING_STOP_LIMIT"
 )
 
+// Position effect for a multileg strategy leg: client-attested open/close intent.
+// Required on every leg of a multileg order submission.
+type RequestPositionEffect string
+
+const (
+	RequestPositionEffectOpen  RequestPositionEffect = "OPEN"
+	RequestPositionEffectClose RequestPositionEffect = "CLOSE"
+)
+
 // Strict time-in-force enum for order submission requests.
 type RequestTimeInForce string
 
@@ -493,14 +507,12 @@ const (
 	RequestTimeInForceAtTheClose        RequestTimeInForce = "AT_THE_CLOSE"
 )
 
-// Side of an order
+// Side of the order (BUY or SELL).
 type Side string
 
 const (
-	SideBuy       Side = "BUY"
-	SideSell      Side = "SELL"
-	SideSellShort Side = "SELL_SHORT"
-	SideOther     Side = "OTHER"
+	SideBuy  Side = "BUY"
+	SideSell Side = "SELL"
 )
 
 // Time in force
@@ -669,7 +681,7 @@ type V1OrderCancelAllOpenOrdersParams struct {
 	InstrumentType V1OrderCancelAllOpenOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Filter by order side (BUY or SELL)
 	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	// Any of "BUY", "SELL".
 	Side V1OrderCancelAllOpenOrdersParamsSide `query:"side,omitzero" json:"-"`
 	// Filter by order type (e.g., MARKET, LIMIT)
 	//
@@ -702,10 +714,8 @@ const (
 type V1OrderCancelAllOpenOrdersParamsSide string
 
 const (
-	V1OrderCancelAllOpenOrdersParamsSideBuy       V1OrderCancelAllOpenOrdersParamsSide = "BUY"
-	V1OrderCancelAllOpenOrdersParamsSideSell      V1OrderCancelAllOpenOrdersParamsSide = "SELL"
-	V1OrderCancelAllOpenOrdersParamsSideSellShort V1OrderCancelAllOpenOrdersParamsSide = "SELL_SHORT"
-	V1OrderCancelAllOpenOrdersParamsSideOther     V1OrderCancelAllOpenOrdersParamsSide = "OTHER"
+	V1OrderCancelAllOpenOrdersParamsSideBuy  V1OrderCancelAllOpenOrdersParamsSide = "BUY"
+	V1OrderCancelAllOpenOrdersParamsSideSell V1OrderCancelAllOpenOrdersParamsSide = "SELL"
 )
 
 // Filter by order type (e.g., MARKET, LIMIT)

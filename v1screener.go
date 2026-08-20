@@ -79,6 +79,19 @@ func (r *V1ScreenerService) GetScreenerByID(ctx context.Context, screenerID stri
 	return res, err
 }
 
+// Returns the complete screener field catalog: the field `kinds`, the per-field
+// data, the enum universes, the request-side `rules`, the built-in variables and
+// modifiers, and the `POST /screener` default response fields.
+//
+// `POST /screener` field references are validated against this catalog; its
+// `rules` object documents how to compose a valid request.
+func (r *V1ScreenerService) GetScreenerCatalog(ctx context.Context, opts ...option.RequestOption) (res *V1ScreenerGetScreenerCatalogResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "v1/screener/catalog"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, nil, &res, opts...)
+	return res, err
+}
+
 // List saved screener configurations.
 //
 // Returns all screener configurations for the authenticated user.
@@ -106,12 +119,19 @@ func (r *V1ScreenerService) ReplaceScreener(ctx context.Context, screenerID stri
 
 // Search instruments using structured filters.
 //
-// Returns a columnar response where each row is an array of column objects. Each
-// column contains a human-readable name, a field reference, an optional type hint
-// (e.g. `CURR_USD`, `PERCENT`), and the value.
+// Compose a request with `filters`, plus optional `sorts`, `columns`, and
+// `page_size`/`page_token` for pagination. Each filter pairs a field reference
+// (`left`) with an operator (`op`, e.g. `GREATER_OR_EQUAL`, `BETWEEN`) and
+// comparison values (`right`), which can be literals or date variables such as
+// `today` with a modifier. Field names, periods, and lookbacks come from the
+// screener field catalog. `sorts` order results; `columns` selects which fields
+// appear in each row (the default field set when omitted).
 //
-// Use `columns` to select which columns appear in each row. When omitted, the
-// default field set is returned.
+// The response is a paginated, columnar list of matching instruments. Each row is
+// an array of column objects, each with a display `name`, the `field` reference,
+// an optional value `type` hint (e.g. `CURR_USD`, `PERCENT`), and the `value`. An
+// `instrument_id` column is always prepended. Metadata carries `total_items`,
+// `total_pages`, and `next_page_token` for paging.
 //
 // Due to the volatility of screener responses we recommend reconciling page
 // results since results can shuffle between calls.
@@ -120,6 +140,184 @@ func (r *V1ScreenerService) SearchScreener(ctx context.Context, body V1ScreenerS
 	path := "v1/screener"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
+}
+
+// The complete screener field catalog, serialized as the `data` payload of
+// `GET /screener/catalog`.
+type Catalog struct {
+	// The `api_name`s that resolve to the POST default column set when `columns` is
+	// omitted.
+	DefaultResponseFields []string `json:"default_response_fields" api:"required"`
+	// The enum universes every other section's values are drawn from.
+	Enums Enums `json:"enums" api:"required"`
+	// Struct-of-arrays of the remaining per-field scalars.
+	Fields FieldColumns `json:"fields" api:"required"`
+	// The deduplicated
+	// `(category, format, value_type, combinations, default combination)` tuples;
+	// `fields.kind[i]` indexes into this.
+	Kinds []FieldKind `json:"kinds" api:"required"`
+	// The modifier operations and their legal `args` forms.
+	Modifiers []ModifierDef `json:"modifiers" api:"required"`
+	// `value_type` -> canonically-ordered valid operators.
+	OperatorsByValueType map[string][]string `json:"operators_by_value_type" api:"required"`
+	// Request-side semantics for turning the data into a valid call.
+	Rules Rules `json:"rules" api:"required"`
+	// Axis token -> abbreviation, for every token in use in `kinds`.
+	Suffixes map[string]string `json:"suffixes" api:"required"`
+	// The built-in variables accepted in `filters[].right[].variable`.
+	Variables []VariableDef `json:"variables" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		DefaultResponseFields respjson.Field
+		Enums                 respjson.Field
+		Fields                respjson.Field
+		Kinds                 respjson.Field
+		Modifiers             respjson.Field
+		OperatorsByValueType  respjson.Field
+		Rules                 respjson.Field
+		Suffixes              respjson.Field
+		Variables             respjson.Field
+		ExtraFields           map[string]respjson.Field
+		raw                   string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Catalog) RawJSON() string { return r.JSON.raw }
+func (r *Catalog) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A single combination, expressed with the API's own parameter names.
+//
+// At most one of `period` / `lookback` is set; a combination with neither selects
+// the field's current or most recent value.
+type Combination struct {
+	// The lookback, a member of `enums.lookback`.
+	Lookback string `json:"lookback" api:"nullable"`
+	// The period, a member of `enums.period`.
+	Period string `json:"period" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Lookback    respjson.Field
+		Period      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Combination) RawJSON() string { return r.JSON.raw }
+func (r *Combination) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The enum universes every other section's values are drawn from.
+type Enums struct {
+	// The built-in variable names, e.g. `"today"`, `"start_of_year"`.
+	BuiltinVariable []string `json:"builtin_variable" api:"required"`
+	// `FieldCategory` variants, e.g. `"PROFILE"`, `"VALUATION"`.
+	Category []string `json:"category" api:"required"`
+	// The modifier date units, e.g. `"DAY"`, `"YEAR"`.
+	DateUnit []string `json:"date_unit" api:"required"`
+	// `FieldFormat` variants, e.g. `"CURRENCY"`, `"PERCENT"`.
+	Format []string `json:"format" api:"required"`
+	// `FieldLookback` variants, e.g. `"ONE_WEEK"`, `"YEAR_TO_DATE"`.
+	Lookback []string `json:"lookback" api:"required"`
+	// The modifier operation names, `"ADD"` and `"SUBTRACT"`.
+	ModifierOp []string `json:"modifier_op" api:"required"`
+	// `FilterOperator` variants, e.g. `"BETWEEN"`, `"ONE_OF"`.
+	Operator []string `json:"operator" api:"required"`
+	// The modifier arg forms, e.g. `"LEFT_INCLUSIVE"`.
+	OperatorArg []string `json:"operator_arg" api:"required"`
+	// `FieldPeriod` variants, e.g. `"QUARTER"`, `"ANNUAL"`.
+	Period []string `json:"period" api:"required"`
+	// `FieldValueType` variants, e.g. `"DECIMAL"`, `"DATE"`.
+	ValueType []string `json:"value_type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		BuiltinVariable respjson.Field
+		Category        respjson.Field
+		DateUnit        respjson.Field
+		Format          respjson.Field
+		Lookback        respjson.Field
+		ModifierOp      respjson.Field
+		Operator        respjson.Field
+		OperatorArg     respjson.Field
+		Period          respjson.Field
+		ValueType       respjson.Field
+		ExtraFields     map[string]respjson.Field
+		raw             string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Enums) RawJSON() string { return r.JSON.raw }
+func (r *Enums) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Struct-of-arrays: all four fields are the same length, index `i` is one field.
+type FieldColumns struct {
+	// A human-readable description of the field.
+	Description []string `json:"description" api:"required"`
+	// The display name of the column when no `period` / `lookback` is set.
+	DisplayName []string `json:"display_name" api:"required"`
+	// Index into `Catalog::kinds`.
+	Kind []int64 `json:"kind" api:"required"`
+	// The base field name, as accepted in a request's `left.name` / `right[].variable`
+	// field reference.
+	Name []string `json:"name" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Description respjson.Field
+		DisplayName respjson.Field
+		Kind        respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r FieldColumns) RawJSON() string { return r.JSON.raw }
+func (r *FieldColumns) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// One deduplicated
+// `(category, format, value_type, combinations, default combination)` tuple;
+// `fields.kind[i]` indexes into `Catalog::kinds`.
+type FieldKind struct {
+	// The field's category, a member of `enums.category`.
+	Category string `json:"category" api:"required"`
+	// Ordered, in declaration order. The empty combination is the current or most
+	// recent value.
+	Combinations []Combination `json:"combinations" api:"required"`
+	// The combination a bare field reference resolves to: the field's current or most
+	// recent value when the kind offers it, otherwise the kind's default `period` /
+	// `lookback`.
+	DefaultCombination Combination `json:"default_combination" api:"required"`
+	// The field's format, a member of `enums.format`.
+	Format string `json:"format" api:"required"`
+	// The field's value type, a member of `enums.value_type`.
+	ValueType string `json:"value_type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Category           respjson.Field
+		Combinations       respjson.Field
+		DefaultCombination respjson.Field
+		Format             respjson.Field
+		ValueType          respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r FieldKind) RawJSON() string { return r.JSON.raw }
+func (r *FieldKind) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Historical lookback window for price/change fields.
@@ -509,6 +707,60 @@ func (u *ModifierArgUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
 }
 
+// One positional `modifier.args` slot.
+type ModifierArg struct {
+	// `"NUMBER"` or `"ENUM"`.
+	Kind string `json:"kind" api:"required"`
+	// The arg's meaning and constraints.
+	Note string `json:"note" api:"required"`
+	// Zero-based position in the `args` array.
+	Position int64 `json:"position" api:"required"`
+	// Whether the arg must be present in every modifier use.
+	Required bool `json:"required" api:"required"`
+	// For optional args: the value used when the arg is omitted.
+	Default string `json:"default" api:"nullable"`
+	// For `"ENUM"` args: the `enums` list the value must be a member of.
+	Ref string `json:"ref" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Kind        respjson.Field
+		Note        respjson.Field
+		Position    respjson.Field
+		Required    respjson.Field
+		Default     respjson.Field
+		Ref         respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ModifierArg) RawJSON() string { return r.JSON.raw }
+func (r *ModifierArg) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A modifier operation and the positional `args` each context accepts.
+type ModifierDef struct {
+	// The positional `args` slots, in order.
+	Args []ModifierArg `json:"args" api:"required"`
+	// `"ADD"` or `"SUBTRACT"`.
+	Name string `json:"name" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Args        respjson.Field
+		Name        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ModifierDef) RawJSON() string { return r.JSON.raw }
+func (r *ModifierDef) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // Modifier operation applied to a variable.
 type ModifierOp string
 
@@ -527,6 +779,45 @@ const (
 	OperatorArgRightExclusive  OperatorArg = "RIGHT_EXCLUSIVE"
 	OperatorArgCaseInsensitive OperatorArg = "CASE_INSENSITIVE"
 )
+
+// Request-side semantics: how to turn the catalog data into a valid
+// `POST /screener` call.
+type Rules struct {
+	// Requests and response `field` objects use the same reference shape: base name
+	// plus at most one of `period` / `lookback`; `default_response_fields` (the POST
+	// default column set when `columns` is omitted) carries api_names, each decoding
+	// via `suffixes`.
+	APINameComposition string `json:"api_name_composition" api:"required"`
+	// At most one of `period` / `lookback`; the empty combination selects the field's
+	// current or most recent value.
+	Axes string `json:"axes" api:"required"`
+	// Omitting both is always valid; it resolves to the field's current or most recent
+	// value when the kind offers it, otherwise to `default_combination`.
+	Defaults string `json:"defaults" api:"required"`
+	// Where `modifier` is legal, its `args` forms, and unit semantics.
+	Modifiers string `json:"modifiers" api:"required"`
+	// Filter operator value counts for the `right` array.
+	Operators string `json:"operators" api:"required"`
+	// Built-in variables and field references in `right[].variable`.
+	Variables string `json:"variables" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		APINameComposition respjson.Field
+		Axes               respjson.Field
+		Defaults           respjson.Field
+		Modifiers          respjson.Field
+		Operators          respjson.Field
+		Variables          respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Rules) RawJSON() string { return r.JSON.raw }
+func (r *Rules) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // A single column in the screener search response.
 type ScreenerColumn struct {
@@ -597,7 +888,9 @@ type ScreenerEntry struct {
 	CreatedAt time.Time      `json:"created_at" api:"required" format:"date-time"`
 	Filters   []SearchFilter `json:"filters" api:"required"`
 	Name      string         `json:"name" api:"required"`
-	UpdatedAt time.Time      `json:"updated_at" api:"required" format:"date-time"`
+	// Whether any user may fetch this screener by id.
+	Shared    bool      `json:"shared" api:"required"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// Field references included when running this screener.
 	Columns []FieldRef `json:"columns" api:"nullable"`
 	Sorts   []SortSpec `json:"sorts" api:"nullable"`
@@ -607,6 +900,7 @@ type ScreenerEntry struct {
 		CreatedAt   respjson.Field
 		Filters     respjson.Field
 		Name        respjson.Field
+		Shared      respjson.Field
 		UpdatedAt   respjson.Field
 		Columns     respjson.Field
 		Sorts       respjson.Field
@@ -841,6 +1135,30 @@ func (r *VariableParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// A built-in variable, as accepted in `filters[].right[].variable`.
+type VariableDef struct {
+	// A human-readable description of what the variable resolves to.
+	Description string `json:"description" api:"required"`
+	// The variable name as accepted in `filters[].right[].variable`.
+	Name string `json:"name" api:"required"`
+	// What the variable resolves to at call time (`DATE` for all built-ins).
+	ResolvesTo string `json:"resolves_to" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Description respjson.Field
+		Name        respjson.Field
+		ResolvesTo  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r VariableDef) RawJSON() string { return r.JSON.raw }
+func (r *VariableDef) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1ScreenerNewScreenerResponse struct {
 	// A saved screener configuration entry
 	Data ScreenerEntry `json:"data" api:"required"`
@@ -874,6 +1192,25 @@ type V1ScreenerGetScreenerByIDResponse struct {
 // Returns the unmodified JSON received from the API
 func (r V1ScreenerGetScreenerByIDResponse) RawJSON() string { return r.JSON.raw }
 func (r *V1ScreenerGetScreenerByIDResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1ScreenerGetScreenerCatalogResponse struct {
+	// The complete screener field catalog, serialized as the `data` payload of
+	// `GET /screener/catalog`.
+	Data Catalog `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1ScreenerGetScreenerCatalogResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1ScreenerGetScreenerCatalogResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -932,6 +1269,9 @@ func (r *V1ScreenerSearchScreenerResponse) UnmarshalJSON(data []byte) error {
 type V1ScreenerNewScreenerParams struct {
 	// The name for this screener configuration
 	Name param.Opt[string] `json:"name,omitzero"`
+	// Whether any user may fetch this screener by id. Omit to leave the existing value
+	// unchanged (defaults to `false` when creating).
+	Shared param.Opt[bool] `json:"shared,omitzero"`
 	// Structured field references to include when running this screener
 	Columns []FieldRefParam `json:"columns,omitzero"`
 	// Structured search filter criteria
@@ -952,6 +1292,9 @@ func (r *V1ScreenerNewScreenerParams) UnmarshalJSON(data []byte) error {
 type V1ScreenerReplaceScreenerParams struct {
 	// The name for this screener configuration
 	Name param.Opt[string] `json:"name,omitzero"`
+	// Whether any user may fetch this screener by id. Omit to leave the existing value
+	// unchanged (defaults to `false` when creating).
+	Shared param.Opt[bool] `json:"shared,omitzero"`
 	// Structured field references to include when running this screener
 	Columns []FieldRefParam `json:"columns,omitzero"`
 	// Structured search filter criteria

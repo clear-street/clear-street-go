@@ -62,7 +62,8 @@ func TestV1ScreenerNewScreenerWithOptionalParams(t *testing.T) {
 				},
 			}},
 		}},
-		Name: clearstreet.String("name"),
+		Name:   clearstreet.String("name"),
+		Shared: clearstreet.Bool(true),
 		Sorts: []clearstreet.SortSpecParam{{
 			Field: clearstreet.FieldRefParam{
 				Name:      "market_cap",
@@ -117,6 +118,28 @@ func TestV1ScreenerGetScreenerByID(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.Screener.GetScreenerByID(context.TODO(), "550e8400-e29b-41d4-a716-446655440000")
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestV1ScreenerGetScreenerCatalog(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.Screener.GetScreenerCatalog(context.TODO())
 	if err != nil {
 		var apierr *clearstreet.Error
 		if errors.As(err, &apierr) {
@@ -200,7 +223,8 @@ func TestV1ScreenerReplaceScreenerWithOptionalParams(t *testing.T) {
 					},
 				}},
 			}},
-			Name: clearstreet.String("name"),
+			Name:   clearstreet.String("name"),
+			Shared: clearstreet.Bool(true),
 			Sorts: []clearstreet.SortSpecParam{{
 				Field: clearstreet.FieldRefParam{
 					Name:      "market_cap",

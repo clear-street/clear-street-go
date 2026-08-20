@@ -559,7 +559,7 @@ type PrefillNewOrderRequest struct {
 	Quantity string `json:"quantity" api:"required"`
 	// Side of the order
 	//
-	// Any of "BUY", "SELL", "SELL_SHORT", "OTHER".
+	// Any of "BUY", "SELL".
 	Side Side `json:"side" api:"required"`
 	// Time in force
 	//
@@ -586,6 +586,11 @@ type PrefillNewOrderRequest struct {
 	LimitOffset string `json:"limit_offset" api:"nullable"`
 	// Limit price (required for LIMIT and STOP_LIMIT orders)
 	LimitPrice string `json:"limit_price" api:"nullable"`
+	// Optional open/close intent for this order. When omitted, the platform determines
+	// the position effect.
+	//
+	// Any of "OPEN", "CLOSE".
+	PositionIntent RequestPositionEffect `json:"position_intent" api:"nullable"`
 	// Stop price (required for STOP and STOP_LIMIT orders)
 	StopPrice string `json:"stop_price" api:"nullable"`
 	// Trading symbol. For equities, use the ticker symbol (e.g., "TSLA"). For options,
@@ -611,6 +616,7 @@ type PrefillNewOrderRequest struct {
 		ItemID             respjson.Field
 		LimitOffset        respjson.Field
 		LimitPrice         respjson.Field
+		PositionIntent     respjson.Field
 		StopPrice          respjson.Field
 		Symbol             respjson.Field
 		TrailingOffset     respjson.Field
