@@ -117,8 +117,8 @@ func (r *V1PositionService) GetPositions(ctx context.Context, accountID int64, q
 //     cause: `409` when every row was a duplicate, `400` for validation failures
 //     like DNE/CEA on a non-expiry day, `503` if the clearing service is
 //     unavailable. `data` still contains every row carrying `status = REJECTED` and
-//     `rejection_reason` so callers can attribute failures by `instruction_id`; the
-//     top-level `error` summarizes the batch.
+//     `rejection_reason` so callers can attribute failures by
+//     `client_instruction_id`; the top-level `error` summarizes the batch.
 func (r *V1PositionService) SubmitPositionInstructions(ctx context.Context, accountID int64, body V1PositionSubmitPositionInstructionsParams, opts ...option.RequestOption) (res *V1PositionSubmitPositionInstructionsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := fmt.Sprintf("v1/accounts/%v/positions/instructions", accountID)
@@ -225,7 +225,7 @@ type PositionInstruction struct {
 	AccountID int64 `json:"account_id" api:"required"`
 	// Caller-supplied idempotency key echoed from the submit request; the
 	// server-assigned fallback when none was supplied.
-	InstructionID string `json:"instruction_id" api:"required"`
+	ClientInstructionID string `json:"client_instruction_id" api:"required"`
 	// The action this instruction requests.
 	//
 	// Any of "EXERCISE", "DO_NOT_EXERCISE", "CONTRARY_EXERCISE".
@@ -258,20 +258,20 @@ type PositionInstruction struct {
 	UpdatedAt time.Time `json:"updated_at" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID               respjson.Field
-		AccountID        respjson.Field
-		InstructionID    respjson.Field
-		InstructionType  respjson.Field
-		InstrumentID     respjson.Field
-		Quantity         respjson.Field
-		Status           respjson.Field
-		Symbol           respjson.Field
-		AcceptedQuantity respjson.Field
-		CreatedAt        respjson.Field
-		RejectionReason  respjson.Field
-		UpdatedAt        respjson.Field
-		ExtraFields      map[string]respjson.Field
-		raw              string
+		ID                  respjson.Field
+		AccountID           respjson.Field
+		ClientInstructionID respjson.Field
+		InstructionType     respjson.Field
+		InstrumentID        respjson.Field
+		Quantity            respjson.Field
+		Status              respjson.Field
+		Symbol              respjson.Field
+		AcceptedQuantity    respjson.Field
+		CreatedAt           respjson.Field
+		RejectionReason     respjson.Field
+		UpdatedAt           respjson.Field
+		ExtraFields         map[string]respjson.Field
+		raw                 string
 	} `json:"-"`
 }
 
@@ -289,9 +289,9 @@ type PositionInstructionList []PositionInstruction
 //   - `ACCEPTED`: terminal — accepted by the clearing venue.
 //   - `REJECTED`: terminal rejection; `rejection_reason` carries the detail. Covers
 //     both venue-reported rejections and rejections raised before the instruction
-//     reached the clearing venue (e.g. duplicate `instruction_id`, `DO_NOT_EXERCISE`
-//     / `CONTRARY_EXERCISE` submitted on a non-expiry day, insufficient position, or
-//     an instrument that does not resolve).
+//     reached the clearing venue (e.g. duplicate `client_instruction_id`,
+//     `DO_NOT_EXERCISE` / `CONTRARY_EXERCISE` submitted on a non-expiry day,
+//     insufficient position, or an instrument that does not resolve).
 //   - `CANCEL_REQUESTED`: cancel accepted; final cancel state pending.
 //   - `CANCELLED`: terminal — cancel completed.
 //   - `CANCEL_FAILED`: cancel could not be completed; operator attention required.
@@ -564,7 +564,7 @@ type V1PositionSubmitPositionInstructionsParamsInstruction struct {
 	Quantity string `json:"quantity" api:"required"`
 	// Caller-supplied idempotency key. Echoed on the response. The server generates a
 	// unique id when omitted.
-	InstructionID param.Opt[string] `json:"instruction_id,omitzero"`
+	ClientInstructionID param.Opt[string] `json:"client_instruction_id,omitzero"`
 	paramObj
 }
 

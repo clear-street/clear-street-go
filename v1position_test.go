@@ -175,10 +175,10 @@ func TestV1PositionSubmitPositionInstructions(t *testing.T) {
 		0,
 		clearstreet.V1PositionSubmitPositionInstructionsParams{
 			Instructions: []clearstreet.V1PositionSubmitPositionInstructionsParamsInstruction{{
-				InstructionType: clearstreet.PositionInstructionTypeExercise,
-				InstrumentID:    "0195f6d0-a1b2-7c3d-8e4f-5a6b7c8d9e02",
-				Quantity:        "1",
-				InstructionID:   clearstreet.String("ui-20260424-001"),
+				InstructionType:     clearstreet.PositionInstructionTypeExercise,
+				InstrumentID:        "0195f6d0-a1b2-7c3d-8e4f-5a6b7c8d9e02",
+				Quantity:            "1",
+				ClientInstructionID: clearstreet.String("ui-20260424-001"),
 			}},
 		},
 	)
