@@ -253,25 +253,29 @@ type PositionInstruction struct {
 	// top-level `error` field summarizes the batch; per-row detail continues to live
 	// here. When a null/undefined value is observed, it indicates it does not apply.
 	RejectionReason string `json:"rejection_reason" api:"nullable"`
+	// Identifier of the underlying instrument, when available. When a null/undefined
+	// value is observed, it indicates it does not apply.
+	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
 	// When the instruction's lifecycle state last changed. When a null/undefined value
 	// is observed, it indicates that there is no available data.
 	UpdatedAt time.Time `json:"updated_at" api:"nullable" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                  respjson.Field
-		AccountID           respjson.Field
-		ClientInstructionID respjson.Field
-		InstructionType     respjson.Field
-		InstrumentID        respjson.Field
-		Quantity            respjson.Field
-		Status              respjson.Field
-		Symbol              respjson.Field
-		AcceptedQuantity    respjson.Field
-		CreatedAt           respjson.Field
-		RejectionReason     respjson.Field
-		UpdatedAt           respjson.Field
-		ExtraFields         map[string]respjson.Field
-		raw                 string
+		ID                     respjson.Field
+		AccountID              respjson.Field
+		ClientInstructionID    respjson.Field
+		InstructionType        respjson.Field
+		InstrumentID           respjson.Field
+		Quantity               respjson.Field
+		Status                 respjson.Field
+		Symbol                 respjson.Field
+		AcceptedQuantity       respjson.Field
+		CreatedAt              respjson.Field
+		RejectionReason        respjson.Field
+		UnderlyingInstrumentID respjson.Field
+		UpdatedAt              respjson.Field
+		ExtraFields            map[string]respjson.Field
+		raw                    string
 	} `json:"-"`
 }
 
@@ -471,6 +475,10 @@ type V1PositionGetPositionInstructionsParams struct {
 	// Limit results to a single contract. Instrument ID (UUID) or symbol (equity
 	// ticker or OSI option symbol).
 	InstrumentID param.Opt[InstrumentIDOrSymbol] `query:"instrument_id,omitzero" json:"-"`
+	// Limit results to instructions whose contract has this underlier. Instrument ID
+	// (UUID) or symbol (equity ticker or OSI option symbol). Combined with
+	// `instrument_id` as a logical AND when both are supplied.
+	UnderlyingInstrumentID param.Opt[InstrumentIDOrSymbol] `query:"underlying_instrument_id,omitzero" json:"-"`
 	paramObj
 }
 

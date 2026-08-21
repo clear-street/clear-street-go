@@ -114,7 +114,8 @@ func TestV1PositionGetPositionInstructionsWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.V1PositionGetPositionInstructionsParams{
-			InstrumentID: clearstreet.String("x"),
+			InstrumentID:           clearstreet.String("x"),
+			UnderlyingInstrumentID: clearstreet.String("x"),
 		},
 	)
 	if err != nil {
