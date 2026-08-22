@@ -29,11 +29,13 @@ import (
 // automatically. You should not instantiate this service directly, and instead use
 // the [NewV1PrivateMarketService] method instead.
 type V1PrivateMarketService struct {
-	options []option.RequestOption
-	Iois    V1PrivateMarketIoisService
+	options   []option.RequestOption
+	Companies V1PrivateMarketCompanyService
+	Iois      V1PrivateMarketIoisService
 	// Browse private-market offerings and their indicative terms. Access requires the
 	// account holder to hold an accreditation attestation.
 	Offerings V1PrivateMarketOfferingService
+	Spvs      V1PrivateMarketSpvService
 }
 
 // NewV1PrivateMarketService generates a new service that applies the given options
@@ -42,8 +44,10 @@ type V1PrivateMarketService struct {
 func NewV1PrivateMarketService(opts ...option.RequestOption) (r V1PrivateMarketService) {
 	r = V1PrivateMarketService{}
 	r.options = opts
+	r.Companies = NewV1PrivateMarketCompanyService(opts...)
 	r.Iois = NewV1PrivateMarketIoisService(opts...)
 	r.Offerings = NewV1PrivateMarketOfferingService(opts...)
+	r.Spvs = NewV1PrivateMarketSpvService(opts...)
 	return
 }
 
@@ -68,10 +72,38 @@ func (r *V1PrivateMarketService) DeleteIoi(ctx context.Context, ioiID string, bo
 	return err
 }
 
+// Fetch one published private-market company with its complete versioned profile.
+// Requires the account holder to have attested. Returns `404` when the company
+// does not exist or is not yet published.
+func (r *V1PrivateMarketService) GetCompanyByID(ctx context.Context, companyID string, query V1PrivateMarketGetCompanyByIDParams, opts ...option.RequestOption) (res *V1PrivateMarketGetCompanyByIDResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	if companyID == "" {
+		err = errors.New("missing required company_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("v1/private-markets/companies/%s", companyID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
 // List every live IOI for the caller's account-holder entity.
 func (r *V1PrivateMarketService) GetIois(ctx context.Context, query V1PrivateMarketGetIoisParams, opts ...option.RequestOption) (res *V1PrivateMarketGetIoisResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/private-markets/iois"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
+// Fetch one private-market SPV's complete economics and fee schedule. Requires the
+// account holder to have attested. Returns `404` unless the SPV is `OPEN` and
+// attached to a currently visible `ACTIVE` offering.
+func (r *V1PrivateMarketService) GetSpvByID(ctx context.Context, spvID string, query V1PrivateMarketGetSpvByIDParams, opts ...option.RequestOption) (res *V1PrivateMarketGetSpvByIDResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	if spvID == "" {
+		err = errors.New("missing required spv_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("v1/private-markets/spvs/%s", spvID)
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
 }
@@ -106,6 +138,24 @@ func (r *V1PrivateMarketNewIoiResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1PrivateMarketGetCompanyByIDResponse struct {
+	// A company's identity and its complete published profile.
+	Data CompanyDetail `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1PrivateMarketGetCompanyByIDResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1PrivateMarketGetCompanyByIDResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1PrivateMarketGetIoisResponse struct {
 	Data IoiListingResourceList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -120,6 +170,24 @@ type V1PrivateMarketGetIoisResponse struct {
 // Returns the unmodified JSON received from the API
 func (r V1PrivateMarketGetIoisResponse) RawJSON() string { return r.JSON.raw }
 func (r *V1PrivateMarketGetIoisResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1PrivateMarketGetSpvByIDResponse struct {
+	// An OPEN SPV's identity, exact economics, and typed fee schedule.
+	Data SpvDetail `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1PrivateMarketGetSpvByIDResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1PrivateMarketGetSpvByIDResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -202,6 +270,22 @@ func (r V1PrivateMarketDeleteIoiParams) URLQuery() (v url.Values, err error) {
 	})
 }
 
+type V1PrivateMarketGetCompanyByIDParams struct {
+	// Account whose account-holder entity must hold an accreditation attestation to
+	// browse private-market offerings.
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1PrivateMarketGetCompanyByIDParams]'s query parameters as
+// `url.Values`.
+func (r V1PrivateMarketGetCompanyByIDParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
 type V1PrivateMarketGetIoisParams struct {
 	AccountID int64 `query:"account_id" api:"required" json:"-"`
 	paramObj
@@ -210,6 +294,22 @@ type V1PrivateMarketGetIoisParams struct {
 // URLQuery serializes [V1PrivateMarketGetIoisParams]'s query parameters as
 // `url.Values`.
 func (r V1PrivateMarketGetIoisParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+type V1PrivateMarketGetSpvByIDParams struct {
+	// Account whose account-holder entity must hold an accreditation attestation to
+	// browse private-market offerings.
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1PrivateMarketGetSpvByIDParams]'s query parameters as
+// `url.Values`.
+func (r V1PrivateMarketGetSpvByIDParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
