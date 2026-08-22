@@ -393,6 +393,30 @@ Methods:
 
 ## PrivateMarkets
 
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketNewIoiResponse">V1PrivateMarketNewIoiResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketGetIoisResponse">V1PrivateMarketGetIoisResponse</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketUpdateIoiResponse">V1PrivateMarketUpdateIoiResponse</a>
+
+Methods:
+
+- <code title="post /v1/private-markets/iois">client.V1.PrivateMarkets.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketService.NewIoi">NewIoi</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, params <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketNewIoiParams">V1PrivateMarketNewIoiParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketNewIoiResponse">V1PrivateMarketNewIoiResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="delete /v1/private-markets/iois/{ioi_id}">client.V1.PrivateMarkets.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketService.DeleteIoi">DeleteIoi</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, ioiID <a href="https://pkg.go.dev/builtin#string">string</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketDeleteIoiParams">V1PrivateMarketDeleteIoiParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
+- <code title="get /v1/private-markets/iois">client.V1.PrivateMarkets.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketService.GetIois">GetIois</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketGetIoisParams">V1PrivateMarketGetIoisParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketGetIoisResponse">V1PrivateMarketGetIoisResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="patch /v1/private-markets/iois/{ioi_id}">client.V1.PrivateMarkets.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketService.UpdateIoi">UpdateIoi</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, ioiID <a href="https://pkg.go.dev/builtin#string">string</a>, params <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketUpdateIoiParams">V1PrivateMarketUpdateIoiParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1PrivateMarketUpdateIoiResponse">V1PrivateMarketUpdateIoiResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+
+### Iois
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#IoiCompanyResource">IoiCompanyResource</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#IoiListingResource">IoiListingResource</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#IoiListingResourceList">IoiListingResourceList</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#IoiOfferingResource">IoiOfferingResource</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#IoiResource">IoiResource</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#NdaAcceptanceResource">NdaAcceptanceResource</a>
+
 ### Offerings
 
 Response Types:
@@ -400,6 +424,7 @@ Response Types:
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#Currency">Currency</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#MetricUnit">MetricUnit</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#MetricValueType">MetricValueType</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#NdaAgreementResource">NdaAgreementResource</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OfferingCard">OfferingCard</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OfferingCardList">OfferingCardList</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#OfferingClass">OfferingClass</a>

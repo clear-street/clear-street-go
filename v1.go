@@ -28,7 +28,9 @@ type V1Service struct {
 	// Place, monitor, and manage trading orders.
 	Orders V1OrderService
 	// View positions and manage position instructions.
-	Positions      V1PositionService
+	Positions V1PositionService
+	// Browse private-market offerings and their indicative terms. Access requires the
+	// account holder to hold an accreditation attestation.
 	PrivateMarkets V1PrivateMarketService
 	// Search instruments and manage saved screeners.
 	Screener V1ScreenerService

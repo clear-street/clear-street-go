@@ -90,6 +90,42 @@ const (
 	MetricValueTypeEstimated  MetricValueType = "ESTIMATED"
 )
 
+// Current NDA agreement for an SPV-backed deal.
+type NdaAgreementResource struct {
+	// Exact assent and authority representation shown to the signer.
+	AcceptanceText string `json:"acceptance_text" api:"required"`
+	// Version of the acceptance representation.
+	AcceptanceTextVersion int64 `json:"acceptance_text_version" api:"required"`
+	// Stable agreement identifier submitted with an IOI acceptance.
+	AgreementID string `json:"agreement_id" api:"required" format:"uuid"`
+	// Durable reference to the immutable NDA artifact.
+	DocumentReference string `json:"document_reference" api:"required"`
+	// Lowercase SHA-256 digest of the artifact bytes.
+	DocumentSha256 string `json:"document_sha256" api:"required"`
+	// Time this version became effective.
+	EffectiveAt time.Time `json:"effective_at" api:"required" format:"date-time"`
+	// Strictly increasing SPV-local agreement version.
+	Version int64 `json:"version" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AcceptanceText        respjson.Field
+		AcceptanceTextVersion respjson.Field
+		AgreementID           respjson.Field
+		DocumentReference     respjson.Field
+		DocumentSha256        respjson.Field
+		EffectiveAt           respjson.Field
+		Version               respjson.Field
+		ExtraFields           map[string]respjson.Field
+		raw                   string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r NdaAgreementResource) RawJSON() string { return r.JSON.raw }
+func (r *NdaAgreementResource) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // One offering as it appears in a list: its derived class, indicative terms, a
 // company identity summary, and any attached SPV.
 type OfferingCard struct {
@@ -398,6 +434,8 @@ type OfferingSpv struct {
 	CustodianName string `json:"custodian_name" api:"nullable"`
 	// SPV manager.
 	ManagerName string `json:"manager_name" api:"nullable"`
+	// Current NDA agreement. Absent when this SPV does not require one.
+	NdaAgreement NdaAgreementResource `json:"nda_agreement" api:"nullable"`
 	// Underlying share class, when specified.
 	ShareClass string `json:"share_class" api:"nullable"`
 	// Plain-text vehicle structure.
@@ -409,6 +447,7 @@ type OfferingSpv struct {
 		Status               respjson.Field
 		CustodianName        respjson.Field
 		ManagerName          respjson.Field
+		NdaAgreement         respjson.Field
 		ShareClass           respjson.Field
 		StructureDescription respjson.Field
 		ExtraFields          map[string]respjson.Field
