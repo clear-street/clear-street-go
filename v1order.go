@@ -195,7 +195,7 @@ type NewOrderRequestParam struct {
 	// Time in force
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE".
+	// "GOOD_TILL_DATE", "AT_OPEN", "AT_CLOSE".
 	TimeInForce RequestTimeInForce `json:"time_in_force,omitzero" api:"required"`
 	// Optional client-provided unique ID (idempotency). Required to be unique per
 	// account.
@@ -272,14 +272,15 @@ type Order struct {
 	Side Side `json:"side" api:"required"`
 	// Current status of the order
 	//
-	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
-	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
-	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
+	// Any of "PENDING_NEW", "QUEUED", "PENDING_TRIGGER", "NEW", "PARTIALLY_FILLED",
+	// "FILLED", "CANCELED", "REJECTED", "EXPIRED", "PENDING_CANCEL",
+	// "PENDING_REPLACE", "REPLACED", "DONE_FOR_DAY", "STOPPED", "SUSPENDED",
+	// "CALCULATED", "OTHER".
 	Status OrderStatus `json:"status" api:"required"`
 	// Time in force instruction
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE", "OTHER".
+	// "GOOD_TILL_DATE", "AT_OPEN", "AT_CLOSE", "OTHER".
 	TimeInForce TimeInForce `json:"time_in_force" api:"required"`
 	// Timestamp of the most recent update (UTC)
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
@@ -407,6 +408,8 @@ type OrderStatus string
 
 const (
 	OrderStatusPendingNew      OrderStatus = "PENDING_NEW"
+	OrderStatusQueued          OrderStatus = "QUEUED"
+	OrderStatusPendingTrigger  OrderStatus = "PENDING_TRIGGER"
 	OrderStatusNew             OrderStatus = "NEW"
 	OrderStatusPartiallyFilled OrderStatus = "PARTIALLY_FILLED"
 	OrderStatusFilled          OrderStatus = "FILLED"
@@ -503,8 +506,8 @@ const (
 	RequestTimeInForceImmediateOrCancel RequestTimeInForce = "IMMEDIATE_OR_CANCEL"
 	RequestTimeInForceFillOrKill        RequestTimeInForce = "FILL_OR_KILL"
 	RequestTimeInForceGoodTillDate      RequestTimeInForce = "GOOD_TILL_DATE"
-	RequestTimeInForceAtTheOpening      RequestTimeInForce = "AT_THE_OPENING"
-	RequestTimeInForceAtTheClose        RequestTimeInForce = "AT_THE_CLOSE"
+	RequestTimeInForceAtOpen            RequestTimeInForce = "AT_OPEN"
+	RequestTimeInForceAtClose           RequestTimeInForce = "AT_CLOSE"
 )
 
 // Side of the order (BUY or SELL).
@@ -524,8 +527,8 @@ const (
 	TimeInForceImmediateOrCancel TimeInForce = "IMMEDIATE_OR_CANCEL"
 	TimeInForceFillOrKill        TimeInForce = "FILL_OR_KILL"
 	TimeInForceGoodTillDate      TimeInForce = "GOOD_TILL_DATE"
-	TimeInForceAtTheOpening      TimeInForce = "AT_THE_OPENING"
-	TimeInForceAtTheClose        TimeInForce = "AT_THE_CLOSE"
+	TimeInForceAtOpen            TimeInForce = "AT_OPEN"
+	TimeInForceAtClose           TimeInForce = "AT_CLOSE"
 	TimeInForceOther             TimeInForce = "OTHER"
 )
 
@@ -801,9 +804,10 @@ type V1OrderGetOrdersParams struct {
 	OrderIDs []string `query:"order_ids,omitzero" json:"-"`
 	// Comma-separated order statuses to filter by
 	//
-	// Any of "PENDING_NEW", "NEW", "PARTIALLY_FILLED", "FILLED", "CANCELED",
-	// "REJECTED", "EXPIRED", "PENDING_CANCEL", "PENDING_REPLACE", "REPLACED",
-	// "DONE_FOR_DAY", "STOPPED", "SUSPENDED", "CALCULATED", "OTHER".
+	// Any of "PENDING_NEW", "QUEUED", "PENDING_TRIGGER", "NEW", "PARTIALLY_FILLED",
+	// "FILLED", "CANCELED", "REJECTED", "EXPIRED", "PENDING_CANCEL",
+	// "PENDING_REPLACE", "REPLACED", "DONE_FOR_DAY", "STOPPED", "SUSPENDED",
+	// "CALCULATED", "OTHER".
 	Status []string `query:"status,omitzero" json:"-"`
 	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
 	// symbols). Matches options orders whose resolved underlier is any of the given

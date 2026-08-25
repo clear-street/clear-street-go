@@ -564,7 +564,7 @@ type PrefillNewOrderRequest struct {
 	// Time in force
 	//
 	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
-	// "GOOD_TILL_DATE", "AT_THE_OPENING", "AT_THE_CLOSE".
+	// "GOOD_TILL_DATE", "AT_OPEN", "AT_CLOSE".
 	TimeInForce RequestTimeInForce `json:"time_in_force" api:"required"`
 	// Optional client-provided unique ID (idempotency). Required to be unique per
 	// account.
