@@ -41,6 +41,9 @@ func NewV1InstrumentDataNewsService(opts ...option.RequestOption) (r V1Instrumen
 
 // Retrieves news items with optional filtering by security IDs, time range,
 // publisher, type, and text query.
+//
+// Pagination metadata does not include `total_items` or `total_pages` for this
+// endpoint. Use `next_page_token` to detect whether more results exist.
 func (r *V1InstrumentDataNewsService) GetNews(ctx context.Context, query V1InstrumentDataNewsGetNewsParams, opts ...option.RequestOption) (res *V1InstrumentDataNewsGetNewsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/news"

@@ -58,6 +58,9 @@ func NewV1InstrumentDataService(opts ...option.RequestOption) (r V1InstrumentDat
 //     from it; there is no maximum span once both bounds are given.
 //   - Filtered (with `instrument_ids`): a 30-day lookback ending on the anchor
 //     (`from_date` = anchor − 30 days, `to_date` = anchor).
+//
+// Pagination metadata does not include `total_items` or `total_pages` for this
+// endpoint. Use `next_page_token` to detect whether more results exist.
 func (r *V1InstrumentDataService) GetAllInstrumentEvents(ctx context.Context, query V1InstrumentDataGetAllInstrumentEventsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetAllInstrumentEventsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/instruments/events"
@@ -86,6 +89,9 @@ func (r *V1InstrumentDataService) GetInstrumentAnalystConsensus(ctx context.Cont
 //
 // - `from_date`: None (no lower bound)
 // - `to_date`: None (no upper bound)
+//
+// Pagination metadata does not include `total_items` or `total_pages` for this
+// endpoint. Use `next_page_token` to detect whether more results exist.
 func (r *V1InstrumentDataService) GetInstrumentBalanceSheetStatements(ctx context.Context, instrumentID string, query V1InstrumentDataGetInstrumentBalanceSheetStatementsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentBalanceSheetStatementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
@@ -102,6 +108,9 @@ func (r *V1InstrumentDataService) GetInstrumentBalanceSheetStatements(ctx contex
 // Retrieves historical cash flow statements for the specified instrument. Cash
 // flow statements show cash inflows and outflows from operating, investing, and
 // financing activities.
+//
+// Pagination metadata does not include `total_items` or `total_pages` for this
+// endpoint. Use `next_page_token` to detect whether more results exist.
 func (r *V1InstrumentDataService) GetInstrumentCashFlowStatements(ctx context.Context, instrumentID string, query V1InstrumentDataGetInstrumentCashFlowStatementsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentCashFlowStatementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
@@ -150,6 +159,9 @@ func (r *V1InstrumentDataService) GetInstrumentFundamentals(ctx context.Context,
 //
 // - `from_date`: None (no lower bound)
 // - `to_date`: None (no upper bound)
+//
+// Pagination metadata does not include `total_items` or `total_pages` for this
+// endpoint. Use `next_page_token` to detect whether more results exist.
 func (r *V1InstrumentDataService) GetInstrumentIncomeStatements(ctx context.Context, instrumentID string, query V1InstrumentDataGetInstrumentIncomeStatementsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentIncomeStatementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if instrumentID == "" {
