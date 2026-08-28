@@ -161,6 +161,12 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 			Symbol:                  clearstreet.String("symbol"),
 			To:                      clearstreet.Time(time.Now()),
 			UnderlyingInstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"x"},
+			UpdatedAt: clearstreet.V1OrderGetOrdersParamsUpdatedAt{
+				Gt:  clearstreet.Time(time.Now()),
+				Gte: clearstreet.Time(time.Now()),
+				Lt:  clearstreet.Time(time.Now()),
+				Lte: clearstreet.Time(time.Now()),
+			},
 		},
 	)
 	if err != nil {

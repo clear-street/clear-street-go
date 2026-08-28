@@ -812,7 +812,8 @@ type V1OrderGetOrdersParams struct {
 	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
 	// symbols). Matches options orders whose resolved underlier is any of the given
 	// instruments.
-	UnderlyingInstrumentIDs []InstrumentIDOrSymbol `query:"underlying_instrument_ids,omitzero" json:"-"`
+	UnderlyingInstrumentIDs []InstrumentIDOrSymbol          `query:"underlying_instrument_ids,omitzero" json:"-"`
+	UpdatedAt               V1OrderGetOrdersParamsUpdatedAt `query:"updated_at,omitzero" json:"-"`
 	paramObj
 }
 
@@ -833,6 +834,23 @@ const (
 	V1OrderGetOrdersParamsInstrumentTypeOption      V1OrderGetOrdersParamsInstrumentType = "OPTION"
 	V1OrderGetOrdersParamsInstrumentTypeCash        V1OrderGetOrdersParamsInstrumentType = "CASH"
 )
+
+type V1OrderGetOrdersParamsUpdatedAt struct {
+	Gt  param.Opt[time.Time] `query:"gt,omitzero" format:"date-time" json:"-"`
+	Gte param.Opt[time.Time] `query:"gte,omitzero" format:"date-time" json:"-"`
+	Lt  param.Opt[time.Time] `query:"lt,omitzero" format:"date-time" json:"-"`
+	Lte param.Opt[time.Time] `query:"lte,omitzero" format:"date-time" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1OrderGetOrdersParamsUpdatedAt]'s query parameters as
+// `url.Values`.
+func (r V1OrderGetOrdersParamsUpdatedAt) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
 
 type V1OrderReplaceOrderParams struct {
 	AccountID int64 `path:"account_id" api:"required" json:"-"`
