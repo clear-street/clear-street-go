@@ -94,6 +94,10 @@ type Account struct {
 	ID int64 `json:"id" api:"required"`
 	// The account holder entity identifier
 	AccountHolderEntityID int64 `json:"account_holder_entity_id" api:"required"`
+	// Whether the account holder is a natural person or a legal entity.
+	//
+	// Any of "NATURAL_PERSON", "LEGAL_ENTITY", "OTHER".
+	AccountHolderEntityKind AccountHolderEntityKind `json:"account_holder_entity_kind" api:"required"`
 	// The full legal name of the account
 	FullName string `json:"full_name" api:"required"`
 	// The date the account was opened
@@ -119,18 +123,19 @@ type Account struct {
 	CloseDate time.Time `json:"close_date" api:"nullable" format:"date"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                    respjson.Field
-		AccountHolderEntityID respjson.Field
-		FullName              respjson.Field
-		OpenDate              respjson.Field
-		OptionsLevel          respjson.Field
-		ShortName             respjson.Field
-		Status                respjson.Field
-		Subtype               respjson.Field
-		Type                  respjson.Field
-		CloseDate             respjson.Field
-		ExtraFields           map[string]respjson.Field
-		raw                   string
+		ID                      respjson.Field
+		AccountHolderEntityID   respjson.Field
+		AccountHolderEntityKind respjson.Field
+		FullName                respjson.Field
+		OpenDate                respjson.Field
+		OptionsLevel            respjson.Field
+		ShortName               respjson.Field
+		Status                  respjson.Field
+		Subtype                 respjson.Field
+		Type                    respjson.Field
+		CloseDate               respjson.Field
+		ExtraFields             map[string]respjson.Field
+		raw                     string
 	} `json:"-"`
 }
 
@@ -276,6 +281,15 @@ func (r *AccountBalancesSod) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Whether an account holder is a natural person or a legal entity.
+type AccountHolderEntityKind string
+
+const (
+	AccountHolderEntityKindNaturalPerson AccountHolderEntityKind = "NATURAL_PERSON"
+	AccountHolderEntityKindLegalEntity   AccountHolderEntityKind = "LEGAL_ENTITY"
+	AccountHolderEntityKindOther         AccountHolderEntityKind = "OTHER"
+)
+
 type AccountList []Account
 
 type AccountSettings struct {
@@ -328,6 +342,10 @@ type AccountWithPersonalDetails struct {
 	ID int64 `json:"id" api:"required"`
 	// The account holder entity identifier
 	AccountHolderEntityID int64 `json:"account_holder_entity_id" api:"required"`
+	// Whether the account holder is a natural person or a legal entity.
+	//
+	// Any of "NATURAL_PERSON", "LEGAL_ENTITY", "OTHER".
+	AccountHolderEntityKind AccountHolderEntityKind `json:"account_holder_entity_kind" api:"required"`
 	// The full legal name of the account
 	FullName string `json:"full_name" api:"required"`
 	// The date the account was opened
@@ -369,22 +387,23 @@ type AccountWithPersonalDetails struct {
 	PhoneNumber string `json:"phone_number" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                    respjson.Field
-		AccountHolderEntityID respjson.Field
-		FullName              respjson.Field
-		OpenDate              respjson.Field
-		OptionsLevel          respjson.Field
-		ShortName             respjson.Field
-		Status                respjson.Field
-		Subtype               respjson.Field
-		Type                  respjson.Field
-		CloseDate             respjson.Field
-		CountryOfTaxResidency respjson.Field
-		DateOfBirth           respjson.Field
-		MailingAddress        respjson.Field
-		PhoneNumber           respjson.Field
-		ExtraFields           map[string]respjson.Field
-		raw                   string
+		ID                      respjson.Field
+		AccountHolderEntityID   respjson.Field
+		AccountHolderEntityKind respjson.Field
+		FullName                respjson.Field
+		OpenDate                respjson.Field
+		OptionsLevel            respjson.Field
+		ShortName               respjson.Field
+		Status                  respjson.Field
+		Subtype                 respjson.Field
+		Type                    respjson.Field
+		CloseDate               respjson.Field
+		CountryOfTaxResidency   respjson.Field
+		DateOfBirth             respjson.Field
+		MailingAddress          respjson.Field
+		PhoneNumber             respjson.Field
+		ExtraFields             map[string]respjson.Field
+		raw                     string
 	} `json:"-"`
 }
 
