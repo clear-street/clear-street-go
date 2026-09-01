@@ -132,6 +132,7 @@ type MarketHoursDetailList []MarketHoursDetail
 type MarketSessionType string
 
 const (
+	MarketSessionTypeOvernight  MarketSessionType = "overnight"
 	MarketSessionTypePreMarket  MarketSessionType = "pre_market"
 	MarketSessionTypeRegular    MarketSessionType = "regular"
 	MarketSessionTypeAfterHours MarketSessionType = "after_hours"
@@ -148,7 +149,7 @@ type MarketStatus struct {
 	// Current session type if market is open, null if closed When a null/undefined
 	// value is observed, it indicates it does not apply.
 	//
-	// Any of "pre_market", "regular", "after_hours".
+	// Any of "overnight", "pre_market", "regular", "after_hours".
 	CurrentSession MarketSessionType `json:"current_session" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -208,6 +209,10 @@ type TradingSessions struct {
 	// After-hours session schedule, null if not available When a null/undefined value
 	// is observed, it indicates it does not apply.
 	AfterHours SessionSchedule `json:"after_hours" api:"nullable"`
+	// Overnight session schedule (prior evening through early morning), null if not
+	// available When a null/undefined value is observed, it indicates it does not
+	// apply.
+	Overnight SessionSchedule `json:"overnight" api:"nullable"`
 	// Pre-market session schedule, null if not available When a null/undefined value
 	// is observed, it indicates it does not apply.
 	PreMarket SessionSchedule `json:"pre_market" api:"nullable"`
@@ -217,6 +222,7 @@ type TradingSessions struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AfterHours  respjson.Field
+		Overnight   respjson.Field
 		PreMarket   respjson.Field
 		Regular     respjson.Field
 		ExtraFields map[string]respjson.Field
