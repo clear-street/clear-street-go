@@ -323,8 +323,11 @@ type OptionExpiryDate struct {
 	// Whether this date has at least one listed contract that settles at the close (PM
 	// settlement) -- the standard cycle.
 	HasSettlesOnClose bool `json:"has_settles_on_close" api:"required"`
-	// Whether this date has at least one listed contract that settles on the opening
-	// print (AM settlement).
+	// Whether this date has at least one contract that settles on the opening print
+	// (AM settlement) and can still be traded. AM-settled contracts stop trading at
+	// the close of the business day before settlement, so this turns false before the
+	// expiration date arrives. A date leaves the list once no contract on it can be
+	// traded in either settlement cycle.
 	HasSettlesOnOpen bool `json:"has_settles_on_open" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
