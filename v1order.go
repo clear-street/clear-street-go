@@ -836,9 +836,17 @@ const (
 )
 
 type V1OrderGetOrdersParamsUpdatedAt struct {
-	Gt  param.Opt[time.Time] `query:"gt,omitzero" format:"date-time" json:"-"`
+	// > **Alpha** — this parameter is experimental and may change or be removed at any
+	// > time.
+	Gt param.Opt[time.Time] `query:"gt,omitzero" format:"date-time" json:"-"`
+	// > **Alpha** — this parameter is experimental and may change or be removed at any
+	// > time.
 	Gte param.Opt[time.Time] `query:"gte,omitzero" format:"date-time" json:"-"`
-	Lt  param.Opt[time.Time] `query:"lt,omitzero" format:"date-time" json:"-"`
+	// > **Alpha** — this parameter is experimental and may change or be removed at any
+	// > time.
+	Lt param.Opt[time.Time] `query:"lt,omitzero" format:"date-time" json:"-"`
+	// > **Alpha** — this parameter is experimental and may change or be removed at any
+	// > time.
 	Lte param.Opt[time.Time] `query:"lte,omitzero" format:"date-time" json:"-"`
 	paramObj
 }
