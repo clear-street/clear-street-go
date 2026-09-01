@@ -314,6 +314,22 @@ Methods:
 - <code title="get /v1/omni-ai/threads/{thread_id}/response">client.V1.OmniAI.Threads.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniAIThreadService.GetThreadResponse">GetThreadResponse</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, threadID <a href="https://pkg.go.dev/builtin#string">string</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniAIThreadGetThreadResponseParams">V1OmniAIThreadGetThreadResponseParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniAIThreadGetThreadResponseResponse">V1OmniAIThreadGetThreadResponseResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 - <code title="get /v1/omni-ai/threads">client.V1.OmniAI.Threads.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniAIThreadService.GetThreads">GetThreads</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniAIThreadGetThreadsParams">V1OmniAIThreadGetThreadsParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniAIThreadGetThreadsResponse">V1OmniAIThreadGetThreadsResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
 
+## OmniFeed
+
+Response Types:
+
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#FeedItem">FeedItem</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#FeedItemKind">FeedItemKind</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#FeedItemMetric">FeedItemMetric</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#FeedMetricType">FeedMetricType</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#FeedPage">FeedPage</a>
+- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniFeedGetFeedResponse">V1OmniFeedGetFeedResponse</a>
+
+Methods:
+
+- <code title="get /v1/omni-ai/feed">client.V1.OmniFeed.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniFeedService.GetFeed">GetFeed</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, query <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniFeedGetFeedParams">V1OmniFeedGetFeedParams</a>) (\*<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniFeedGetFeedResponse">V1OmniFeedGetFeedResponse</a>, <a href="https://pkg.go.dev/builtin#error">error</a>)</code>
+- <code title="post /v1/omni-ai/feed/events">client.V1.OmniFeed.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniFeedService.PostFeedEvent">PostFeedEvent</a>(ctx <a href="https://pkg.go.dev/context">context</a>.<a href="https://pkg.go.dev/context#Context">Context</a>, body <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go">clearstreet</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go#V1OmniFeedPostFeedEventParams">V1OmniFeedPostFeedEventParams</a>) <a href="https://pkg.go.dev/builtin#error">error</a></code>
+
 ## Orders
 
 Params Types:

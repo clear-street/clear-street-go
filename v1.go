@@ -25,6 +25,10 @@ type V1Service struct {
 	// Retrieve core details and discovery endpoints for tradable instruments.
 	Instruments V1InstrumentService
 	OmniAI      V1OmniAIService
+	// Personalized feed of market stories: upcoming earnings, dividends, and splits,
+	// plus market news. Served per caller in a stable order; item ids double as
+	// pagination cursors, so any previously returned page can be re-read.
+	OmniFeed V1OmniFeedService
 	// Place, monitor, and manage trading orders.
 	Orders V1OrderService
 	// View positions and manage position instructions.
@@ -47,6 +51,7 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 	r.InstrumentData = NewV1InstrumentDataService(opts...)
 	r.Instruments = NewV1InstrumentService(opts...)
 	r.OmniAI = NewV1OmniAIService(opts...)
+	r.OmniFeed = NewV1OmniFeedService(opts...)
 	r.Orders = NewV1OrderService(opts...)
 	r.Positions = NewV1PositionService(opts...)
 	r.Screener = NewV1ScreenerService(opts...)
