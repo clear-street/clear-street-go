@@ -102,10 +102,35 @@ func (r *V1ScreenerService) GetScreeners(ctx context.Context, opts ...option.Req
 	return res, err
 }
 
+// Partially update a saved screener configuration.
+//
+// Every field is optional. Omitting a field, or sending it as `null`, leaves the
+// stored value unchanged. Sending a field's empty value clears it: `columns: []`
+// clears the stored columns, `sorts: []` clears the stored sort, and `filters: []`
+// clears the stored filters. `name: ""` is rejected -- a screener's name cannot be
+// cleared. `shared: false` sets it to `false`; it is a value, not a clear.
+//
+// Unknown fields are rejected with a 422.
+func (r *V1ScreenerService) PatchScreener(ctx context.Context, screenerID string, body V1ScreenerPatchScreenerParams, opts ...option.RequestOption) (res *V1ScreenerPatchScreenerResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	if screenerID == "" {
+		err = errors.New("missing required screener_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("v1/saved-screeners/%s", screenerID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, body, &res, opts...)
+	return res, err
+}
+
 // Update a saved screener configuration.
 //
 // Replaces the screener configuration for the authenticated user. If `name` is
 // null, the existing name is preserved.
+//
+// Deprecated -- use `PATCH /saved-screeners/{screener_id}`; PUT replaces omitted
+// `columns`, `filters` and `sorts` with empty values.
+//
+// Deprecated: deprecated
 func (r *V1ScreenerService) ReplaceScreener(ctx context.Context, screenerID string, body V1ScreenerReplaceScreenerParams, opts ...option.RequestOption) (res *V1ScreenerReplaceScreenerResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if screenerID == "" {
@@ -1231,6 +1256,24 @@ func (r *V1ScreenerGetScreenersResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1ScreenerPatchScreenerResponse struct {
+	// A saved screener configuration entry
+	Data ScreenerEntry `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1ScreenerPatchScreenerResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1ScreenerPatchScreenerResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1ScreenerReplaceScreenerResponse struct {
 	// A saved screener configuration entry
 	Data ScreenerEntry `json:"data" api:"required"`
@@ -1286,6 +1329,33 @@ func (r V1ScreenerNewScreenerParams) MarshalJSON() (data []byte, err error) {
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *V1ScreenerNewScreenerParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1ScreenerPatchScreenerParams struct {
+	// The name for this screener configuration. Omit or send `null` to leave
+	// unchanged. Cannot be set to an empty string.
+	Name param.Opt[string] `json:"name,omitzero"`
+	// Whether any user may fetch this screener by id. Omit or send `null` to leave
+	// unchanged. `false` is a value, not a clear.
+	Shared param.Opt[bool] `json:"shared,omitzero"`
+	// Structured field references to include when running this screener. Omit or send
+	// `null` to leave unchanged; `[]` clears the stored columns.
+	Columns []FieldRefParam `json:"columns,omitzero"`
+	// Structured search filter criteria. Omit or send `null` to leave unchanged; `[]`
+	// clears the stored filters.
+	Filters []SearchFilterParam `json:"filters,omitzero"`
+	// Multi-field sort specifications. Omit or send `null` to leave unchanged; `[]`
+	// clears the stored sort.
+	Sorts []SortSpecParam `json:"sorts,omitzero"`
+	paramObj
+}
+
+func (r V1ScreenerPatchScreenerParams) MarshalJSON() (data []byte, err error) {
+	type shadow V1ScreenerPatchScreenerParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1ScreenerPatchScreenerParams) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
