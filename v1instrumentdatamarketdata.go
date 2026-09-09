@@ -41,10 +41,11 @@ func NewV1InstrumentDataMarketDataService(opts ...option.RequestOption) (r V1Ins
 // Returns the most recent open, high, low, volume (OHLV) and current price for the
 // requested instruments.
 //
-// Response contract: every request returns one row per **unique** `instrument_id`,
-// in first-seen request order. Unresolvable IDs come back with `symbol = null` and
-// every market-data field `null`; resolvable IDs with no available data come back
-// with `symbol` populated but market-data fields `null`.
+// Response contract: every request returns one row per **unique** resolved
+// `instrument_id`, in first-seen request order. Resolvable ids with no available
+// data come back with `symbol` populated but market-data fields `null`. Ids that
+// fail to resolve are omitted from `data` and reported in `error` instead (see the
+// 207/404 responses below).
 func (r *V1InstrumentDataMarketDataService) GetDailySummaries(ctx context.Context, query V1InstrumentDataMarketDataGetDailySummariesParams, opts ...option.RequestOption) (res *V1InstrumentDataMarketDataGetDailySummariesResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/market-data/daily-summary"
