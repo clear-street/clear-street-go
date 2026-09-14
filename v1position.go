@@ -248,6 +248,12 @@ type PositionInstruction struct {
 	// When the instruction was first accepted by the service. When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	CreatedAt time.Time `json:"created_at" api:"nullable" format:"date-time"`
+	// Machine-readable counterpart to `rejection_reason`: a stable reason code plus
+	// params, populated on the submit and cancel responses for a row rejected with a
+	// structured reason. Branch on `rejection.reason` instead of parsing
+	// `rejection_reason`. Absent when listing historical instructions. When a
+	// null/undefined value is observed, it indicates it does not apply.
+	Rejection PositionInstructionRejection `json:"rejection" api:"nullable"`
 	// Human-readable explanation populated on any non-success terminal status —
 	// `REJECTED` or `CANCEL_FAILED`. On a `207 Multi-Status` batch submit the
 	// top-level `error` field summarizes the batch; per-row detail continues to live
@@ -271,6 +277,7 @@ type PositionInstruction struct {
 		Symbol                 respjson.Field
 		AcceptedQuantity       respjson.Field
 		CreatedAt              respjson.Field
+		Rejection              respjson.Field
 		RejectionReason        respjson.Field
 		UnderlyingInstrumentID respjson.Field
 		UpdatedAt              respjson.Field
@@ -286,6 +293,40 @@ func (r *PositionInstruction) UnmarshalJSON(data []byte) error {
 }
 
 type PositionInstructionList []PositionInstruction
+
+// Machine-readable detail for a rejected position instruction.
+//
+// Populated on the submit and cancel responses for a row rejected with a
+// structured reason. Branch on `reason` for programmatic handling and render your
+// own copy; `rejection_reason` remains the human-readable fallback and is the
+// field to use when listing historical instructions.
+type PositionInstructionRejection struct {
+	// Namespacing domain of the `reason` code — `com.clearstreet.oems.exercise` for
+	// reasons OEMS validates, `com.clearstreet.oems.clearing` for clearing-owned
+	// reasons.
+	Domain string `json:"domain" api:"required"`
+	// Reason-specific parameters as string key/value pairs (e.g. `available` /
+	// `requested`, `expiry` / `business_date`, `required_level` / `account_level`).
+	// May be empty.
+	Metadata any `json:"metadata" api:"required"`
+	// Stable, machine-readable reason code, e.g. `DNE_NOT_ON_EXPIRY`,
+	// `INSUFFICIENT_POSITION`, `OPTIONS_LEVEL_EXCEEDED`, `EXERCISE_PAST_CUTOFF`.
+	Reason string `json:"reason" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Domain      respjson.Field
+		Metadata    respjson.Field
+		Reason      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PositionInstructionRejection) RawJSON() string { return r.JSON.raw }
+func (r *PositionInstructionRejection) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Lifecycle status of a position instruction.
 //
