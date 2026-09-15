@@ -38,6 +38,10 @@ func NewV1InstrumentDataMarketDataService(opts ...option.RequestOption) (r V1Ins
 	return
 }
 
+// **Deprecated**: use `GET /market-data/snapshot` instead, which now reports the
+// same open/high/low/volume/open-interest fields under `session` and top-level
+// `open_interest`.
+//
 // Returns the most recent open, high, low, volume (OHLV) and current price for the
 // requested instruments.
 //
@@ -46,6 +50,8 @@ func NewV1InstrumentDataMarketDataService(opts ...option.RequestOption) (r V1Ins
 // data come back with `symbol` populated but market-data fields `null`. Ids that
 // fail to resolve are omitted from `data` and reported in `error` instead (see the
 // 207/404 responses below).
+//
+// Deprecated: deprecated
 func (r *V1InstrumentDataMarketDataService) GetDailySummaries(ctx context.Context, query V1InstrumentDataMarketDataGetDailySummariesParams, opts ...option.RequestOption) (res *V1InstrumentDataMarketDataGetDailySummariesResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/market-data/daily-summary"
@@ -133,11 +139,19 @@ type DailySummaryList []DailySummary
 type MarketDataSnapshot struct {
 	// Unique instrument identifier.
 	InstrumentID string `json:"instrument_id" api:"required"`
+	// Session-level pricing and OHLV metrics. Always present; each inner field is
+	// independently nullable.
+	Session SnapshotSession `json:"session" api:"required"`
 	// Display symbol for the security.
 	Symbol string `json:"symbol" api:"required"`
 	// Cumulative traded volume reported on the most recent trade, in shares for
-	// equities or contracts for options. Absent when no trade is available. When a
-	// null/undefined value is observed, it indicates that there is no available data.
+	// equities or contracts for options. Absent when no trade is available.
+	//
+	// Deprecated: use `session.cumulative_volume`, the same value from the same
+	// source. When a null/undefined value is observed, it indicates that there is no
+	// available data.
+	//
+	// Deprecated: deprecated
 	CumulativeVolume int64 `json:"cumulative_volume" api:"nullable"`
 	// Theoretical price and Greeks for option instruments. `None` for equities, and
 	// for options whose Greeks have not yet been observed When a null/undefined value
@@ -154,20 +168,21 @@ type MarketDataSnapshot struct {
 	// Security name if available. When a null/undefined value is observed, it
 	// indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
-	// Session metrics computed from previous close and last trade, if available. When
-	// a null/undefined value is observed, it indicates that there is no available
-	// data.
-	Session SnapshotSession `json:"session" api:"nullable"`
+	// Open interest (outstanding contracts) as of the most recent OPRA Refresh.
+	// Populated for options only; absent for equities and indices. When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	OpenInterest int64 `json:"open_interest" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		InstrumentID     respjson.Field
+		Session          respjson.Field
 		Symbol           respjson.Field
 		CumulativeVolume respjson.Field
 		Greeks           respjson.Field
 		LastQuote        respjson.Field
 		LastTrade        respjson.Field
 		Name             respjson.Field
-		Session          respjson.Field
+		OpenInterest     respjson.Field
 		ExtraFields      map[string]respjson.Field
 		raw              string
 	} `json:"-"`
@@ -315,17 +330,51 @@ func (r *SnapshotQuote) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Session-level pricing metrics for a market data snapshot.
+// Session-level pricing and OHLV metrics for a market data snapshot. Always
+// present on the snapshot row; every field here is independently nullable except
+// `ohlv_applicable`.
 type SnapshotSession struct {
+	// `false` only for instrument types with no OHLV by definition (e.g. an index
+	// instrument, whose price is a computed level rather than a traded security) --
+	// `open`/`high`/`low`/`ohlv_date`/`cumulative_volume` are then always absent.
+	// `true` otherwise, even when those fields simply haven't loaded yet. Always
+	// serialized.
+	OhlvApplicable bool `json:"ohlv_applicable" api:"required"`
 	// Absolute change from previous close to the most recent last-sale-eligible trade.
-	Change string `json:"change" api:"required"`
+	// Absent when either side of the computation is unavailable. When a null/undefined
+	// value is observed, it indicates that there is no available data.
+	Change string `json:"change" api:"nullable"`
 	// Percent change from previous close to the most recent last-sale-eligible trade.
-	ChangePercent string `json:"change_percent" api:"required"`
+	// Absent under the same conditions as `change`. When a null/undefined value is
+	// observed, it indicates that there is no available data.
+	ChangePercent string `json:"change_percent" api:"nullable"`
+	// Cumulative traded volume for the current session, in shares for equities or
+	// contracts for options. Always reflects the current session, even when
+	// `ohlv_date` trails it. Absent when `ohlv_applicable` is `false`, or when no
+	// trade is available. When a null/undefined value is observed, it indicates that
+	// there is no available data.
+	CumulativeVolume int64 `json:"cumulative_volume" api:"nullable"`
+	// Session high. When a null/undefined value is observed, it indicates that there
+	// is no available data.
+	High string `json:"high" api:"nullable"`
+	// Session low. When a null/undefined value is observed, it indicates that there is
+	// no available data.
+	Low string `json:"low" api:"nullable"`
+	// Session date the open/high/low values represent, US/Eastern. May trail the
+	// current session until the upstream feed rolls. When a null/undefined value is
+	// observed, it indicates that there is no available data.
+	OhlvDate time.Time `json:"ohlv_date" api:"nullable" format:"date"`
+	// Session opening price, from the day's OHLC bar. Absent when `ohlv_applicable` is
+	// `false`, or when the bar has not loaded yet. When a null/undefined value is
+	// observed, it indicates that there is no available data.
+	Open string `json:"open" api:"nullable"`
 	// Previous session close price. Corporate-action-adjusted (stock dividends, cash
 	// dividends, and forward/reverse splits) when an adjustment exists for the close
 	// date; the raw close otherwise. An adjustment can carry the price beyond 2
-	// decimal places.
-	PreviousClose string `json:"previous_close" api:"required"`
+	// decimal places. Absent when no previous close is on record (e.g. an instrument's
+	// first session). When a null/undefined value is observed, it indicates that there
+	// is no available data.
+	PreviousClose string `json:"previous_close" api:"nullable"`
 	// Unadjusted (raw) previous session close. Present only when a corporate-action
 	// adjustment exists for the previous close date; when no adjustment exists,
 	// `previous_close` is the raw close and this field is omitted. When a
@@ -333,8 +382,14 @@ type SnapshotSession struct {
 	PreviousCloseUnadjusted string `json:"previous_close_unadjusted" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		OhlvApplicable          respjson.Field
 		Change                  respjson.Field
 		ChangePercent           respjson.Field
+		CumulativeVolume        respjson.Field
+		High                    respjson.Field
+		Low                     respjson.Field
+		OhlvDate                respjson.Field
+		Open                    respjson.Field
 		PreviousClose           respjson.Field
 		PreviousCloseUnadjusted respjson.Field
 		ExtraFields             map[string]respjson.Field
@@ -399,7 +454,8 @@ func (r V1InstrumentDataMarketDataGetDailySummariesParams) URLQuery() (v url.Val
 
 type V1InstrumentDataMarketDataGetSnapshotsParams struct {
 	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
-	// symbols).
+	// symbols). Required; accepts 1 to 100 IDs. Duplicate resolved ids collapse to a
+	// single row.
 	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" json:"-"`
 	paramObj
 }
