@@ -177,6 +177,11 @@ type Position struct {
 	// Identifier of the underlying instrument, when available When a null/undefined
 	// value is observed, it indicates it does not apply.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
+	// Type of the underlying instrument, alongside `underlying_instrument_id` When a
+	// null/undefined value is observed, it indicates it does not apply.
+	//
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	UnderlyingInstrumentType SecurityType `json:"underlying_instrument_type" api:"nullable"`
 	// The total unrealized profit or loss for this position based on current market
 	// value When a null/undefined value is observed, it indicates that there is no
 	// available data.
@@ -187,27 +192,28 @@ type Position struct {
 	UnrealizedPnlPct string `json:"unrealized_pnl_pct" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		AccountID              respjson.Field
-		AvailableQuantity      respjson.Field
-		InstrumentID           respjson.Field
-		InstrumentType         respjson.Field
-		MarketValue            respjson.Field
-		PositionType           respjson.Field
-		Quantity               respjson.Field
-		Symbol                 respjson.Field
-		AvgPrice               respjson.Field
-		ClosingPrice           respjson.Field
-		ClosingPriceDate       respjson.Field
-		CostBasis              respjson.Field
-		DailyRealizedPnl       respjson.Field
-		DailyUnrealizedPnl     respjson.Field
-		DailyUnrealizedPnlPct  respjson.Field
-		InstrumentPrice        respjson.Field
-		UnderlyingInstrumentID respjson.Field
-		UnrealizedPnl          respjson.Field
-		UnrealizedPnlPct       respjson.Field
-		ExtraFields            map[string]respjson.Field
-		raw                    string
+		AccountID                respjson.Field
+		AvailableQuantity        respjson.Field
+		InstrumentID             respjson.Field
+		InstrumentType           respjson.Field
+		MarketValue              respjson.Field
+		PositionType             respjson.Field
+		Quantity                 respjson.Field
+		Symbol                   respjson.Field
+		AvgPrice                 respjson.Field
+		ClosingPrice             respjson.Field
+		ClosingPriceDate         respjson.Field
+		CostBasis                respjson.Field
+		DailyRealizedPnl         respjson.Field
+		DailyUnrealizedPnl       respjson.Field
+		DailyUnrealizedPnlPct    respjson.Field
+		InstrumentPrice          respjson.Field
+		UnderlyingInstrumentID   respjson.Field
+		UnderlyingInstrumentType respjson.Field
+		UnrealizedPnl            respjson.Field
+		UnrealizedPnlPct         respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
 	} `json:"-"`
 }
 

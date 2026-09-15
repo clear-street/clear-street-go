@@ -144,6 +144,11 @@ type Execution struct {
 	// fill (per-leg underliers live in `legs[]`). When a null/undefined value is
 	// observed, it indicates it does not apply.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
+	// Type of the underlying instrument, alongside `underlying_instrument_id`. When a
+	// null/undefined value is observed, it indicates it does not apply.
+	//
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	UnderlyingInstrumentType SecurityType `json:"underlying_instrument_type" api:"nullable"`
 	// Venue where this fill occurred, as reported by that venue. Distinct from an
 	// order's `venue`, which is the routing destination. Codes are not normalized, so
 	// the format varies by venue. When a null/undefined value is observed, it
@@ -151,18 +156,19 @@ type Execution struct {
 	Venue string `json:"venue" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                     respjson.Field
-		OrderID                respjson.Field
-		Quantity               respjson.Field
-		Side                   respjson.Field
-		TransactionTime        respjson.Field
-		InstrumentID           respjson.Field
-		Price                  respjson.Field
-		Symbol                 respjson.Field
-		UnderlyingInstrumentID respjson.Field
-		Venue                  respjson.Field
-		ExtraFields            map[string]respjson.Field
-		raw                    string
+		ID                       respjson.Field
+		OrderID                  respjson.Field
+		Quantity                 respjson.Field
+		Side                     respjson.Field
+		TransactionTime          respjson.Field
+		InstrumentID             respjson.Field
+		Price                    respjson.Field
+		Symbol                   respjson.Field
+		UnderlyingInstrumentID   respjson.Field
+		UnderlyingInstrumentType respjson.Field
+		Venue                    respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
 	} `json:"-"`
 }
 
@@ -356,42 +362,48 @@ type Order struct {
 	// resolved. When a null/undefined value is observed, it indicates it does not
 	// apply.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
+	// Type of the underlying instrument, alongside `underlying_instrument_id`. When a
+	// null/undefined value is observed, it indicates it does not apply.
+	//
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	UnderlyingInstrumentType SecurityType `json:"underlying_instrument_type" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                     respjson.Field
-		AccountID              respjson.Field
-		ClientOrderID          respjson.Field
-		CreatedAt              respjson.Field
-		FilledQuantity         respjson.Field
-		LeavesQuantity         respjson.Field
-		OrderType              respjson.Field
-		Quantity               respjson.Field
-		Side                   respjson.Field
-		Status                 respjson.Field
-		TimeInForce            respjson.Field
-		UpdatedAt              respjson.Field
-		Venue                  respjson.Field
-		AverageFillPrice       respjson.Field
-		Details                respjson.Field
-		ExpiresAt              respjson.Field
-		ExtendedHours          respjson.Field
-		InstrumentID           respjson.Field
-		InstrumentType         respjson.Field
-		LimitOffset            respjson.Field
-		LimitPrice             respjson.Field
-		QueueState             respjson.Field
-		ReleasesAt             respjson.Field
-		StopPrice              respjson.Field
-		Symbol                 respjson.Field
-		TrailingLimitPx        respjson.Field
-		TrailingOffset         respjson.Field
-		TrailingOffsetType     respjson.Field
-		TrailingStopPx         respjson.Field
-		TrailingWatermarkPx    respjson.Field
-		TrailingWatermarkTs    respjson.Field
-		UnderlyingInstrumentID respjson.Field
-		ExtraFields            map[string]respjson.Field
-		raw                    string
+		ID                       respjson.Field
+		AccountID                respjson.Field
+		ClientOrderID            respjson.Field
+		CreatedAt                respjson.Field
+		FilledQuantity           respjson.Field
+		LeavesQuantity           respjson.Field
+		OrderType                respjson.Field
+		Quantity                 respjson.Field
+		Side                     respjson.Field
+		Status                   respjson.Field
+		TimeInForce              respjson.Field
+		UpdatedAt                respjson.Field
+		Venue                    respjson.Field
+		AverageFillPrice         respjson.Field
+		Details                  respjson.Field
+		ExpiresAt                respjson.Field
+		ExtendedHours            respjson.Field
+		InstrumentID             respjson.Field
+		InstrumentType           respjson.Field
+		LimitOffset              respjson.Field
+		LimitPrice               respjson.Field
+		QueueState               respjson.Field
+		ReleasesAt               respjson.Field
+		StopPrice                respjson.Field
+		Symbol                   respjson.Field
+		TrailingLimitPx          respjson.Field
+		TrailingOffset           respjson.Field
+		TrailingOffsetType       respjson.Field
+		TrailingStopPx           respjson.Field
+		TrailingWatermarkPx      respjson.Field
+		TrailingWatermarkTs      respjson.Field
+		UnderlyingInstrumentID   respjson.Field
+		UnderlyingInstrumentType respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
 	} `json:"-"`
 }
 
