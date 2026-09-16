@@ -129,13 +129,13 @@ func (r *AddWatchlistItemData) UnmarshalJSON(data []byte) error {
 
 // Detailed watchlist with all items
 type WatchlistDetail struct {
-	// Watchlist ID
+	// The unique identifier for the watchlist.
 	ID string `json:"id" api:"required" format:"uuid"`
-	// Creation timestamp
+	// The timestamp when the watchlist was created.
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	// Items in the watchlist
 	Items []WatchlistItemEntry `json:"items" api:"required"`
-	// Watchlist name
+	// The user-provided watchlist name.
 	Name string `json:"name" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {

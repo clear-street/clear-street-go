@@ -73,7 +73,7 @@ const (
 	SecurityTypeCash        SecurityType = "CASH"
 )
 
-// Sort direction sorted results
+// Sort direction for sorted results
 type SortDirection string
 
 const (

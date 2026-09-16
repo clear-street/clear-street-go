@@ -158,8 +158,8 @@ func (r *V1ScreenerService) ReplaceScreener(ctx context.Context, screenerID stri
 // `instrument_id` column is always prepended. Metadata carries `total_items`,
 // `total_pages`, and `next_page_token` for paging.
 //
-// Due to the volatility of screener responses we recommend reconciling page
-// results since results can shuffle between calls.
+// Screener results can shuffle between calls; reconcile by re-checking rows across
+// pages rather than assuming stable ordering.
 func (r *V1ScreenerService) SearchScreener(ctx context.Context, body V1ScreenerSearchScreenerParams, opts ...option.RequestOption) (res *V1ScreenerSearchScreenerResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/screener"
@@ -769,7 +769,7 @@ func (r *ModifierArg) UnmarshalJSON(data []byte) error {
 type ModifierDef struct {
 	// The positional `args` slots, in order.
 	Args []ModifierArg `json:"args" api:"required"`
-	// `"ADD"` or `"SUBTRACT"`.
+	// The modifier operation name: one of `"ADD"` or `"SUBTRACT"`.
 	Name string `json:"name" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {

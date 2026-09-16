@@ -182,7 +182,7 @@ type ExecutionList []Execution
 
 type InstrumentIDOrSymbol = string
 
-// Request to submit a new order (PlaceOrderRequest from spec)
+// Request to submit a new order
 //
 // The properties OrderType, Quantity, Side, TimeInForce are required.
 type NewOrderRequestParam struct {
@@ -350,11 +350,15 @@ type Order struct {
 	// Current trailing stop price computed by the trailing strategy When a
 	// null/undefined value is observed, it indicates it does not apply.
 	TrailingStopPx string `json:"trailing_stop_px" api:"nullable"`
-	// Trailing watermark price for trailing orders When a null/undefined value is
-	// observed, it indicates it does not apply.
+	// Trailing watermark price for trailing orders. Strategy-computed, so it is absent
+	// on the order-submission acknowledgement and only appears once fetched via the
+	// order fetch or list endpoints. When a null/undefined value is observed, it
+	// indicates it does not apply.
 	TrailingWatermarkPx string `json:"trailing_watermark_px" api:"nullable"`
-	// Trailing watermark timestamp for trailing orders When a null/undefined value is
-	// observed, it indicates it does not apply.
+	// Trailing watermark timestamp for trailing orders. Strategy-computed, so it is
+	// absent on the order-submission acknowledgement and only appears once fetched via
+	// the order fetch or list endpoints. When a null/undefined value is observed, it
+	// indicates it does not apply.
 	TrailingWatermarkTs time.Time `json:"trailing_watermark_ts" api:"nullable" format:"date-time"`
 	// Instrument ID of the option's underlying instrument. Populated only for options
 	// orders. A `null` means one of two things: the order is not an option, so the
@@ -500,8 +504,7 @@ const (
 	RequestOrderTypeTrailingStopLimit RequestOrderType = "TRAILING_STOP_LIMIT"
 )
 
-// Position effect for a multileg strategy leg: client-attested open/close intent.
-// Required on every leg of a multileg order submission.
+// Client-attested open/close intent for an order.
 type RequestPositionEffect string
 
 const (

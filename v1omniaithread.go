@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"slices"
+	"time"
 
 	"github.com/clear-street/clear-street-go/internal/apijson"
 	"github.com/clear-street/clear-street-go/internal/apiquery"
@@ -197,7 +198,7 @@ type Message struct {
 	ID string `json:"id" api:"required" format:"uuid"`
 	// Finalized immutable message content container. Never includes thinking parts.
 	Content   MessageContent `json:"content" api:"required"`
-	CreatedAt string         `json:"created_at" api:"required"`
+	CreatedAt time.Time      `json:"created_at" api:"required" format:"date-time"`
 	// Immutable terminal outcome for a finalized assistant message.
 	//
 	// Any of "completed", "errored", "canceled".
@@ -472,10 +473,10 @@ const (
 
 // Thread metadata returned by list/get thread endpoints.
 type Thread struct {
-	ID        string `json:"id" api:"required" format:"uuid"`
-	CreatedAt string `json:"created_at" api:"required"`
-	Title     string `json:"title" api:"required"`
-	UpdatedAt string `json:"updated_at" api:"required"`
+	ID        string    `json:"id" api:"required" format:"uuid"`
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	Title     string    `json:"title" api:"required"`
+	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID          respjson.Field

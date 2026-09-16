@@ -547,7 +547,7 @@ func (r *PrefillNewOrderAction) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
-// Request to submit a new order (PlaceOrderRequest from spec)
+// Request to submit a new order
 type PrefillNewOrderRequest struct {
 	// Type of order
 	//
