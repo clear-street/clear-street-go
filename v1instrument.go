@@ -126,7 +126,9 @@ type Instrument struct {
 	// Indicates if the instrument is a publicly traded partnership (PTP). PTP sales
 	// are subject to a 10% withholding tax for non-US tax residents.
 	IsPtp bool `json:"is_ptp" api:"required"`
-	// Indicates if short selling is prohibited for the instrument
+	// Indicates if short selling is prohibited for the instrument. This is a standing
+	// property of the security. For the live Rule 201 circuit breaker, see `rule_201`
+	// on the market-data snapshot.
 	IsShortProhibited bool `json:"is_short_prohibited" api:"required"`
 	// Indicates if the instrument is on the Regulation SHO Threshold Security List
 	IsThresholdSecurity bool `json:"is_threshold_security" api:"required"`
@@ -237,7 +239,9 @@ type InstrumentCore struct {
 	// Indicates if the instrument is a publicly traded partnership (PTP). PTP sales
 	// are subject to a 10% withholding tax for non-US tax residents.
 	IsPtp bool `json:"is_ptp" api:"required"`
-	// Indicates if short selling is prohibited for the instrument
+	// Indicates if short selling is prohibited for the instrument. This is a standing
+	// property of the security. For the live Rule 201 circuit breaker, see `rule_201`
+	// on the market-data snapshot.
 	IsShortProhibited bool `json:"is_short_prohibited" api:"required"`
 	// Indicates if the instrument is on the Regulation SHO Threshold Security List
 	IsThresholdSecurity bool `json:"is_threshold_security" api:"required"`

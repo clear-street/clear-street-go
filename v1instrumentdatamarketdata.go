@@ -139,6 +139,14 @@ type DailySummaryList []DailySummary
 type MarketDataSnapshot struct {
 	// Unique instrument identifier.
 	InstrumentID string `json:"instrument_id" api:"required"`
+	// Live SEC Rule 201 short-sale price test state, from the trading-status feed.
+	// Always present.
+	//
+	// This is the current market condition, not a statement about whether Clear Street
+	// will reject your order. It is also distinct from `is_short_prohibited` on the
+	// instrument endpoints, which is a standing property of the security rather than a
+	// live circuit breaker.
+	Rule201 SnapshotRule201 `json:"rule_201" api:"required"`
 	// Session-level pricing and OHLV metrics. Always present; each inner field is
 	// independently nullable.
 	Session SnapshotSession `json:"session" api:"required"`
@@ -175,6 +183,7 @@ type MarketDataSnapshot struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		InstrumentID     respjson.Field
+		Rule201          respjson.Field
 		Session          respjson.Field
 		Symbol           respjson.Field
 		CumulativeVolume respjson.Field
@@ -195,6 +204,16 @@ func (r *MarketDataSnapshot) UnmarshalJSON(data []byte) error {
 }
 
 type MarketDataSnapshotList []MarketDataSnapshot
+
+// Whether Rule 201 is currently restricting short sales in a security.
+type Rule201State string
+
+const (
+	Rule201StateRestricted    Rule201State = "RESTRICTED"
+	Rule201StateNotRestricted Rule201State = "NOT_RESTRICTED"
+	Rule201StateUnknown       Rule201State = "UNKNOWN"
+	Rule201StateNotApplicable Rule201State = "NOT_APPLICABLE"
+)
 
 // Theoretical price and Greeks for an options snapshot. All values are **per
 // share**; no contract multiplier is applied.
@@ -327,6 +346,30 @@ type SnapshotQuote struct {
 // Returns the unmodified JSON received from the API
 func (r SnapshotQuote) RawJSON() string { return r.JSON.raw }
 func (r *SnapshotQuote) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Live SEC Rule 201 short-sale price test state for a single security.
+//
+// Rule 201 triggers when a security falls 10% below the previous close, and then
+// restricts non-exempt short sales at or below the national best bid for the rest
+// of that day and all of the next trading day.
+type SnapshotRule201 struct {
+	// Current price test state for this security.
+	//
+	// Any of "RESTRICTED", "NOT_RESTRICTED", "UNKNOWN", "NOT_APPLICABLE".
+	State Rule201State `json:"state" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		State       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r SnapshotRule201) RawJSON() string { return r.JSON.raw }
+func (r *SnapshotRule201) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
