@@ -178,6 +178,10 @@ type Instrument struct {
 	// The percent of a short position's value you must post as margin When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
+	// Price bands this instrument quotes on, ascending. Absent when we have no
+	// schedule for it, which includes an option whose penny-program status our
+	// reference data never supplied.
+	TickRules []TickRule `json:"tick_rules"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                         respjson.Field
@@ -203,6 +207,7 @@ type Instrument struct {
 		OptionsExpiryDates         respjson.Field
 		PreviousClose              respjson.Field
 		ShortMarginRate            respjson.Field
+		TickRules                  respjson.Field
 		ExtraFields                map[string]respjson.Field
 		raw                        string
 	} `json:"-"`
@@ -270,6 +275,10 @@ type InstrumentCore struct {
 	// The percent of a short position's value you must post as margin When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
+	// Price bands this instrument quotes on, ascending. Absent when we have no
+	// schedule for it, which includes an option whose penny-program status our
+	// reference data never supplied.
+	TickRules []TickRule `json:"tick_rules"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                       respjson.Field
@@ -293,6 +302,7 @@ type InstrumentCore struct {
 		NotionalAdv              respjson.Field
 		PreviousClose            respjson.Field
 		ShortMarginRate          respjson.Field
+		TickRules                respjson.Field
 		ExtraFields              map[string]respjson.Field
 		raw                      string
 	} `json:"-"`
@@ -388,6 +398,9 @@ type OptionsContract struct {
 	// Open interest (number of outstanding contracts), if available When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	OpenInterest int64 `json:"open_interest" api:"nullable"`
+	// Price bands this contract quotes on, ascending. Absent when our reference data
+	// never supplied the contract's penny-program status.
+	TickRules []TickRule `json:"tick_rules"`
 	// Instrument ID of the underlying instrument, when available When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
@@ -409,6 +422,7 @@ type OptionsContract struct {
 		IsSettleOnOpen         respjson.Field
 		LastTradeCutoff        respjson.Field
 		OpenInterest           respjson.Field
+		TickRules              respjson.Field
 		UnderlyingInstrumentID respjson.Field
 		ExtraFields            map[string]respjson.Field
 		raw                    string
@@ -422,6 +436,34 @@ func (r *OptionsContract) UnmarshalJSON(data []byte) error {
 }
 
 type OptionsContractList []OptionsContract
+
+// One band of an instrument's tick schedule. A price in the band is valid only if
+// it is a whole multiple of `tick_size`. Bands describe the instrument itself: on
+// an equity they say nothing about that equity's option chain.
+type TickRule struct {
+	// Lowest price in the band, inclusive.
+	StartPrice string `json:"start_price" api:"required"`
+	// Minimum price increment within the band.
+	TickSize string `json:"tick_size" api:"required"`
+	// Upper bound of the band, exclusive. Absent on the last band, which runs to
+	// infinity. When a null/undefined value is observed, it indicates it does not
+	// apply.
+	EndPrice string `json:"end_price" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		StartPrice  respjson.Field
+		TickSize    respjson.Field
+		EndPrice    respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r TickRule) RawJSON() string { return r.JSON.raw }
+func (r *TickRule) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type V1InstrumentGetInstrumentByIDResponse struct {
 	// Represents a tradable financial instrument.
