@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.12.0](https://github.com/clear-street/clear-street-go/compare/v0.11.0...v0.12.0) (2026-09-18)
+
+
+### Features
+
+* **api:** api update ([8509ad9](https://github.com/clear-street/clear-street-go/commit/8509ad94529dc6a47551e095192101bc111a5ba0))
+* **api:** api update ([7fe09c7](https://github.com/clear-street/clear-street-go/commit/7fe09c7ddc04c63f3a82c4a65375beb27e5c2eb2))
+* **api:** api update ([8f4dbb8](https://github.com/clear-street/clear-street-go/commit/8f4dbb87798afa4a242b43b3328af4465f11d2bf))
+* **api:** api update ([af389e8](https://github.com/clear-street/clear-street-go/commit/af389e83bda4af698482e5e21c4d104296b1eb4b))
+* **api:** api update ([9b097a5](https://github.com/clear-street/clear-street-go/commit/9b097a5650580367db3fd61566bc2e2c55fbec44))
+* **api:** api update ([293c7dc](https://github.com/clear-street/clear-street-go/commit/293c7dc8da9ccc86bafcf36e4a5f9923e9797f10))
+* **api:** api update ([3c26c5a](https://github.com/clear-street/clear-street-go/commit/3c26c5a4de42cf58b8b6cae5df051cb77c82a3d9))
+* **api:** api update ([31d636b](https://github.com/clear-street/clear-street-go/commit/31d636b0597f5a7a78142ca415eb5c8fb5ae1e96))
+* **api:** api update ([9e9e959](https://github.com/clear-street/clear-street-go/commit/9e9e9590aea2e6a23b51f01ae7533ff8ab8ad8de))
+* **api:** api update ([66e859a](https://github.com/clear-street/clear-street-go/commit/66e859a9061afb3a52ca24634812d2c9e601af64))
+
 ## [0.11.0](https://github.com/clear-street/clear-street-go/compare/v0.10.1...v0.11.0) (2026-09-14)
 
 
