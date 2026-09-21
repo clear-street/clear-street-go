@@ -44,11 +44,9 @@ func NewV1OmniAIMessageService(opts ...option.RequestOption) (r V1OmniAIMessageS
 	return
 }
 
-// Get a finalized message by ID.
-//
-// Returns a single finalized message. Returns **404** if the message belongs to an
-// in-progress assistant turn (use the response endpoint for live output). Once the
-// turn completes, the message becomes available here.
+// Read a finalized message using its parent thread for ownership and
+// linked-account authorization. In-progress assistant messages are not available
+// here; use the response polling endpoint instead.
 func (r *V1OmniAIMessageService) GetMessageByID(ctx context.Context, messageID string, query V1OmniAIMessageGetMessageByIDParams, opts ...option.RequestOption) (res *V1OmniAIMessageGetMessageByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if messageID == "" {
@@ -60,11 +58,12 @@ func (r *V1OmniAIMessageService) GetMessageByID(ctx context.Context, messageID s
 	return res, err
 }
 
-// Submit feedback on a finalized assistant message.
-//
-// Attaches a score and optional comment to a finalized assistant message. Feedback
+// Attach a score and optional comment to a finalized assistant message. Feedback
 // is only valid for messages with role `ASSISTANT` that have reached a terminal
 // outcome.
+//
+// The current thread account governs access even when the message predates its
+// account link.
 func (r *V1OmniAIMessageService) SubmitFeedback(ctx context.Context, messageID string, body V1OmniAIMessageSubmitFeedbackParams, opts ...option.RequestOption) (res *V1OmniAIMessageSubmitFeedbackResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if messageID == "" {
@@ -132,8 +131,10 @@ func (r *V1OmniAIMessageSubmitFeedbackResponse) UnmarshalJSON(data []byte) error
 }
 
 type V1OmniAIMessageGetMessageByIDParams struct {
-	// Account ID for the request
-	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// Lists only conversations for this account, or unlinked conversations when
+	// omitted. Other reads authorize the resource's linked account. Omit when no
+	// account is selected; empty values and the string null are invalid.
+	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
 	paramObj
 }
 
@@ -147,10 +148,10 @@ func (r V1OmniAIMessageGetMessageByIDParams) URLQuery() (v url.Values, err error
 }
 
 type V1OmniAIMessageSubmitFeedbackParams struct {
-	// Account ID for the request
-	AccountID int64 `json:"account_id" api:"required"`
-	// Feedback score (-1, 0, +1 or 1-5)
+	// Feedback score (-1, 0, +1 or 1-5).
 	Score int64 `json:"score" api:"required"`
+	// Optional selection. Feedback always uses the thread's linked account.
+	AccountID param.Opt[int64] `json:"account_id,omitzero"`
 	// Optional feedback comment
 	Comment param.Opt[string] `json:"comment,omitzero"`
 	// Optional metadata

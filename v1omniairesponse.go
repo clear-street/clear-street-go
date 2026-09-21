@@ -15,6 +15,7 @@ import (
 	"github.com/clear-street/clear-street-go/internal/apiquery"
 	"github.com/clear-street/clear-street-go/internal/requestconfig"
 	"github.com/clear-street/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/packages/param"
 	"github.com/clear-street/clear-street-go/packages/respjson"
 	"github.com/clear-street/clear-street-go/shared"
 )
@@ -44,12 +45,11 @@ func NewV1OmniAIResponseService(opts ...option.RequestOption) (r V1OmniAIRespons
 	return
 }
 
-// Cancel a response.
+// Cancel a queued or running response. Cancellation is idempotent after the
+// response becomes terminal. A canceled turn still produces a finalized assistant
+// message with outcome `canceled` in the thread history.
 //
-// Requests cancellation of a queued or running response. If the response has
-// already reached a terminal status, this is an idempotent success. A canceled
-// turn still produces a final assistant message with outcome `canceled` in the
-// thread history.
+// Authorization uses the linked account before any cancellation.
 func (r *V1OmniAIResponseService) CancelResponse(ctx context.Context, responseID string, body V1OmniAIResponseCancelResponseParams, opts ...option.RequestOption) (res *V1OmniAIResponseCancelResponseResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if responseID == "" {
@@ -61,15 +61,14 @@ func (r *V1OmniAIResponseService) CancelResponse(ctx context.Context, responseID
 	return res, err
 }
 
-// Poll a response for assistant output.
+// Poll the current snapshot of an in-progress or completed assistant response.
+// While its status is `queued` or `running`, content may be partial and include
+// thinking parts. Continue polling until it becomes `succeeded`, `failed`, or
+// `canceled`.
 //
-// Returns the current snapshot of an in-progress or completed response. While the
-// status is `queued` or `running`, the content may be partial and may include
-// `thinking` parts. Poll this endpoint periodically until the status reaches a
-// terminal value (`succeeded`, `failed`, or `canceled`).
-//
-// Once terminal, the finalized assistant message is available in thread history
-// via `GET /omni-ai/threads/{thread_id}/messages`.
+// Once terminal, the finalized message is available through
+// `GET /omni-ai/threads/{thread_id}/messages`. Authorization uses the current
+// parent thread account, including for responses created before the account link.
 func (r *V1OmniAIResponseService) GetResponseByID(ctx context.Context, responseID string, query V1OmniAIResponseGetResponseByIDParams, opts ...option.RequestOption) (res *V1OmniAIResponseGetResponseByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if responseID == "" {
@@ -449,8 +448,10 @@ func (r *V1OmniAIResponseGetResponseByIDResponse) UnmarshalJSON(data []byte) err
 }
 
 type V1OmniAIResponseCancelResponseParams struct {
-	// Account ID for the request
-	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// Lists only conversations for this account, or unlinked conversations when
+	// omitted. Other reads authorize the resource's linked account. Omit when no
+	// account is selected; empty values and the string null are invalid.
+	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
 	paramObj
 }
 
@@ -464,8 +465,10 @@ func (r V1OmniAIResponseCancelResponseParams) URLQuery() (v url.Values, err erro
 }
 
 type V1OmniAIResponseGetResponseByIDParams struct {
-	// Account ID for the request
-	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// Lists only conversations for this account, or unlinked conversations when
+	// omitted. Other reads authorize the resource's linked account. Omit when no
+	// account is selected; empty values and the string null are invalid.
+	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
 	paramObj
 }
 

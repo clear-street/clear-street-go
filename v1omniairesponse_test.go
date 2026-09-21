@@ -13,7 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestV1OmniAIResponseCancelResponse(t *testing.T) {
+func TestV1OmniAIResponseCancelResponseWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -29,7 +29,7 @@ func TestV1OmniAIResponseCancelResponse(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		clearstreet.V1OmniAIResponseCancelResponseParams{
-			AccountID: 0,
+			AccountID: clearstreet.Int(1),
 		},
 	)
 	if err != nil {
@@ -41,7 +41,7 @@ func TestV1OmniAIResponseCancelResponse(t *testing.T) {
 	}
 }
 
-func TestV1OmniAIResponseGetResponseByID(t *testing.T) {
+func TestV1OmniAIResponseGetResponseByIDWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -57,7 +57,7 @@ func TestV1OmniAIResponseGetResponseByID(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		clearstreet.V1OmniAIResponseGetResponseByIDParams{
-			AccountID: 0,
+			AccountID: clearstreet.Int(1),
 		},
 	)
 	if err != nil {

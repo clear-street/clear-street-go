@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/clear-street/clear-street-go"
 	"github.com/clear-street/clear-street-go/internal/testutil"
@@ -29,9 +30,21 @@ func TestV1OmniAIThreadNewMessageWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		clearstreet.V1OmniAIThreadNewMessageParams{
-			AccountID:    19816,
 			Text:         "Compare that to AMD.",
+			AccountID:    clearstreet.Int(19816),
 			Capabilities: []string{"PREFILL_ORDER"},
+			Context: clearstreet.TurnContextParam{
+				Items: []clearstreet.ContextItemParam{{
+					Data: map[string]any{
+						"change_pct": "bar",
+						"range":      "bar",
+						"ticker":     "bar",
+					},
+					Kind:       "chart",
+					Label:      "NVDA intraday performance",
+					CapturedAt: clearstreet.Time(time.Now()),
+				}},
+			},
 		},
 	)
 	if err != nil {
@@ -56,9 +69,21 @@ func TestV1OmniAIThreadNewThreadWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.OmniAI.Threads.NewThread(context.TODO(), clearstreet.V1OmniAIThreadNewThreadParams{
-		AccountID:    19816,
 		Type:         clearstreet.V1OmniAIThreadNewThreadParamsTypeInstant,
+		AccountID:    clearstreet.Int(19816),
 		Capabilities: []string{"PREFILL_ORDER"},
+		Context: clearstreet.TurnContextParam{
+			Items: []clearstreet.ContextItemParam{{
+				Data: map[string]any{
+					"change_pct": "bar",
+					"range":      "bar",
+					"ticker":     "bar",
+				},
+				Kind:       "chart",
+				Label:      "NVDA intraday performance",
+				CapturedAt: clearstreet.Time(time.Now()),
+			}},
+		},
 		Target: clearstreet.V1OmniAIThreadNewThreadParamsTarget{
 			Ticker: "ticker",
 			Type:   "ticker",
@@ -91,7 +116,7 @@ func TestV1OmniAIThreadGetMessagesWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		clearstreet.V1OmniAIThreadGetMessagesParams{
-			AccountID: 0,
+			AccountID: clearstreet.Int(1),
 			PageSize:  clearstreet.Int(1),
 			PageToken: clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 		},
@@ -105,7 +130,7 @@ func TestV1OmniAIThreadGetMessagesWithOptionalParams(t *testing.T) {
 	}
 }
 
-func TestV1OmniAIThreadGetThreadByID(t *testing.T) {
+func TestV1OmniAIThreadGetThreadByIDWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -121,7 +146,7 @@ func TestV1OmniAIThreadGetThreadByID(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		clearstreet.V1OmniAIThreadGetThreadByIDParams{
-			AccountID: 0,
+			AccountID: clearstreet.Int(1),
 		},
 	)
 	if err != nil {
@@ -133,7 +158,7 @@ func TestV1OmniAIThreadGetThreadByID(t *testing.T) {
 	}
 }
 
-func TestV1OmniAIThreadGetThreadResponse(t *testing.T) {
+func TestV1OmniAIThreadGetThreadResponseWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -149,7 +174,7 @@ func TestV1OmniAIThreadGetThreadResponse(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		clearstreet.V1OmniAIThreadGetThreadResponseParams{
-			AccountID: 0,
+			AccountID: clearstreet.Int(1),
 		},
 	)
 	if err != nil {
@@ -174,7 +199,7 @@ func TestV1OmniAIThreadGetThreadsWithOptionalParams(t *testing.T) {
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.OmniAI.Threads.GetThreads(context.TODO(), clearstreet.V1OmniAIThreadGetThreadsParams{
-		AccountID: 0,
+		AccountID: clearstreet.Int(1),
 		PageSize:  clearstreet.Int(1),
 		PageToken: clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
 	})

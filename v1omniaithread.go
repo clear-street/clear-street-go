@@ -46,15 +46,16 @@ func NewV1OmniAIThreadService(opts ...option.RequestOption) (r V1OmniAIThreadSer
 	return
 }
 
-// Continue an existing conversation thread.
-//
-// Appends a new user message to the thread and starts an assistant response. Only
-// one response may be active per thread at a time — if the previous turn is still
-// in progress, this endpoint returns **409 Conflict**. Wait for the active
-// response to reach a terminal status before submitting the next turn.
-//
+// Append a user message to an existing thread and start an assistant response.
 // Poll the returned `response_id` via `GET /omni-ai/responses/{response_id}` for
 // assistant output.
+//
+// Only one response may be active per thread. Wait for it to reach a terminal
+// status before submitting another turn; otherwise this endpoint returns 409.
+//
+// The first accepted selected-account message links an unlinked thread. A linked
+// thread keeps its account regardless of omission or another selection. A changed
+// scope also returns 409 without accepting a turn.
 func (r *V1OmniAIThreadService) NewMessage(ctx context.Context, threadID string, body V1OmniAIThreadNewMessageParams, opts ...option.RequestOption) (res *V1OmniAIThreadNewMessageResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
@@ -66,17 +67,16 @@ func (r *V1OmniAIThreadService) NewMessage(ctx context.Context, threadID string,
 	return res, err
 }
 
-// Create a new conversation thread.
+// Atomically create a conversation and submit its first user turn. Use `instant`
+// with `text` for a prompt, or `deep_insights` with a ticker `target` and optional
+// `thesis` for long-form research.
 //
-// Atomically creates a new thread and submits the first user turn. The response
-// contains a `response_id` that should be polled via
-// `GET /omni-ai/responses/{response_id}` for assistant output.
+// Poll the returned `response_id` via `GET /omni-ai/responses/{response_id}` for
+// assistant output.
 //
-// Two creation modes are supported:
-//
-//   - **instant** — provide `text` with a natural-language prompt.
-//   - **deep_insights** — provide a `target` ticker and optional `thesis` for
-//     long-form research.
+// Omit `account_id` to start without an account. The first accepted turn with a
+// selected account links that account permanently. Reuse `Idempotency-Key` only
+// for an identical request.
 func (r *V1OmniAIThreadService) NewThread(ctx context.Context, body V1OmniAIThreadNewThreadParams, opts ...option.RequestOption) (res *V1OmniAIThreadNewThreadResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/omni-ai/threads"
@@ -84,15 +84,13 @@ func (r *V1OmniAIThreadService) NewThread(ctx context.Context, body V1OmniAIThre
 	return res, err
 }
 
-// List finalized messages in a thread.
+// List finalized messages, including messages created before the account link.
+// Return the latest page by default, in chronological order within each page. Use
+// the returned page token to navigate history.
 //
-// Returns the latest page of **finalized** messages by default, with messages
-// within each page ordered chronologically. Messages from in-progress assistant
-// turns are excluded — use `GET /omni-ai/threads/{thread_id}/response` or
-// `GET /omni-ai/responses/{response_id}` for live output.
-//
-// If the last finalized message has role `USER`, an active response likely exists
-// and should be polled separately.
+// In-progress assistant output is not included. Poll
+// `GET /omni-ai/responses/{response_id}` until the response reaches a terminal
+// status, then read its finalized message here.
 func (r *V1OmniAIThreadService) GetMessages(ctx context.Context, threadID string, query V1OmniAIThreadGetMessagesParams, opts ...option.RequestOption) (res *V1OmniAIThreadGetMessagesResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
@@ -104,11 +102,10 @@ func (r *V1OmniAIThreadService) GetMessages(ctx context.Context, threadID string
 	return res, err
 }
 
-// Get a specific thread.
+// Read an owned thread's metadata. Use `GET /omni-ai/threads/{thread_id}/messages`
+// for conversation history.
 //
-// Returns metadata (title, timestamps) for a single thread. Does not include
-// messages — use `GET /omni-ai/threads/{thread_id}/messages` for conversation
-// history.
+// Omission or another account selection does not change authorization.
 func (r *V1OmniAIThreadService) GetThreadByID(ctx context.Context, threadID string, query V1OmniAIThreadGetThreadByIDParams, opts ...option.RequestOption) (res *V1OmniAIThreadGetThreadByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
@@ -120,14 +117,11 @@ func (r *V1OmniAIThreadService) GetThreadByID(ctx context.Context, threadID stri
 	return res, err
 }
 
-// Get the active response for a thread.
+// Look up the currently active response without knowing its `response_id`. Use
+// this endpoint when reopening a thread whose assistant turn may still be in
+// progress.
 //
-// Convenience endpoint to look up the currently active response for a thread
-// without knowing the `response_id`. Useful when reloading a thread whose last
-// finalized message is a `USER` message — this indicates an assistant turn is
-// likely in progress.
-//
-// Returns **404** if no active response exists (the thread is idle).
+// An idle owned thread returns HTTP 200 with `data: null`.
 func (r *V1OmniAIThreadService) GetThreadResponse(ctx context.Context, threadID string, query V1OmniAIThreadGetThreadResponseParams, opts ...option.RequestOption) (res *V1OmniAIThreadGetThreadResponseResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
@@ -139,16 +133,78 @@ func (r *V1OmniAIThreadService) GetThreadResponse(ctx context.Context, threadID 
 	return res, err
 }
 
-// List conversation threads.
+// List authorized conversation metadata, newest first. Use `page_size` and
+// `page_token` for pagination, and the messages endpoint for conversation history.
 //
-// Returns thread metadata ordered by most recently created first. Use `page_size`
-// and `page_token` for pagination. Thread objects contain only metadata (title,
-// timestamps) — use the messages endpoint for conversation history.
+// With `account_id`, list only conversations linked to that account and require
+// current account access. Without it, list only conversations with no linked
+// account.
 func (r *V1OmniAIThreadService) GetThreads(ctx context.Context, query V1OmniAIThreadGetThreadsParams, opts ...option.RequestOption) (res *V1OmniAIThreadGetThreadsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/omni-ai/threads"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
 	return res, err
+}
+
+// A snapshot of the widget the user asks about.
+type ContextItem struct {
+	// Relevant widget data, selections, and units. Use strings for exact decimals and
+	// large IDs.
+	Data map[string]any `json:"data" api:"required"`
+	// Nonblank descriptive kind. New kinds do not require a backend release.
+	Kind string `json:"kind" api:"required"`
+	// Nonblank attachment label for conversation rendering.
+	Label string `json:"label" api:"required"`
+	// Client-reported snapshot time. Omit when unknown.
+	CapturedAt time.Time `json:"captured_at" api:"nullable" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		Kind        respjson.Field
+		Label       respjson.Field
+		CapturedAt  respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContextItem) RawJSON() string { return r.JSON.raw }
+func (r *ContextItem) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this ContextItem to a ContextItemParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// ContextItemParam.Overrides()
+func (r ContextItem) ToParam() ContextItemParam {
+	return param.Override[ContextItemParam](json.RawMessage(r.RawJSON()))
+}
+
+// A snapshot of the widget the user asks about.
+//
+// The properties Data, Kind, Label are required.
+type ContextItemParam struct {
+	// Relevant widget data, selections, and units. Use strings for exact decimals and
+	// large IDs.
+	Data map[string]any `json:"data,omitzero" api:"required"`
+	// Nonblank descriptive kind. New kinds do not require a backend release.
+	Kind string `json:"kind" api:"required"`
+	// Nonblank attachment label for conversation rendering.
+	Label string `json:"label" api:"required"`
+	// Client-reported snapshot time. Omit when unknown.
+	CapturedAt param.Opt[time.Time] `json:"captured_at,omitzero" format:"date-time"`
+	paramObj
+}
+
+func (r ContextItemParam) MarshalJSON() (data []byte, err error) {
+	type shadow ContextItemParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *ContextItemParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 // Response payload for continuing a thread with a new message.
@@ -209,6 +265,10 @@ type Message struct {
 	Role     MessageRole `json:"role" api:"required"`
 	Seq      int64       `json:"seq" api:"required"`
 	ThreadID string      `json:"thread_id" api:"required" format:"uuid"`
+	// Immutable snapshots attached to this user message. Omitted when none were
+	// supplied. When a null/undefined value is observed, it indicates that there is no
+	// available data.
+	Context TurnContext `json:"context" api:"nullable"`
 	// When a null/undefined value is observed, it indicates it does not apply.
 	Error ErrorStatus `json:"error" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -220,6 +280,7 @@ type Message struct {
 		Role        respjson.Field
 		Seq         respjson.Field
 		ThreadID    respjson.Field
+		Context     respjson.Field
 		Error       respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
@@ -471,7 +532,7 @@ const (
 	MessageRoleAssistant MessageRole = "ASSISTANT"
 )
 
-// Thread metadata returned by list/get thread endpoints.
+// Thread metadata.
 type Thread struct {
 	ID        string    `json:"id" api:"required" format:"uuid"`
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
@@ -495,6 +556,58 @@ func (r *Thread) UnmarshalJSON(data []byte) error {
 }
 
 type ThreadList []Thread
+
+// Client snapshots attached to one instant-chat user message.
+//
+// Context is separate from visible message text and does not grant account access.
+// The compact JSON representation must not exceed 64 KiB.
+type TurnContext struct {
+	// One to four snapshots. Each snapshot's data may contain at most 32 levels of
+	// nesting.
+	Items []ContextItem `json:"items" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Items       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r TurnContext) RawJSON() string { return r.JSON.raw }
+func (r *TurnContext) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this TurnContext to a TurnContextParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// TurnContextParam.Overrides()
+func (r TurnContext) ToParam() TurnContextParam {
+	return param.Override[TurnContextParam](json.RawMessage(r.RawJSON()))
+}
+
+// Client snapshots attached to one instant-chat user message.
+//
+// Context is separate from visible message text and does not grant account access.
+// The compact JSON representation must not exceed 64 KiB.
+//
+// The property Items is required.
+type TurnContextParam struct {
+	// One to four snapshots. Each snapshot's data may contain at most 32 levels of
+	// nesting.
+	Items []ContextItemParam `json:"items,omitzero" api:"required"`
+	paramObj
+}
+
+func (r TurnContextParam) MarshalJSON() (data []byte, err error) {
+	type shadow TurnContextParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *TurnContextParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type V1OmniAIThreadNewMessageResponse struct {
 	// Response payload for continuing a thread with a new message.
@@ -550,7 +663,7 @@ func (r *V1OmniAIThreadGetMessagesResponse) UnmarshalJSON(data []byte) error {
 }
 
 type V1OmniAIThreadGetThreadByIDResponse struct {
-	// Thread metadata returned by list/get thread endpoints.
+	// Thread metadata.
 	Data Thread `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -603,11 +716,17 @@ func (r *V1OmniAIThreadGetThreadsResponse) UnmarshalJSON(data []byte) error {
 }
 
 type V1OmniAIThreadNewMessageParams struct {
-	AccountID int64  `json:"account_id" api:"required"`
-	Text      string `json:"text" api:"required"`
+	Text string `json:"text" api:"required"`
+	// Selected account for creation or the first account-linked turn. Omit for an
+	// unlinked conversation. An existing account link remains authoritative even when
+	// another account is selected.
+	AccountID param.Opt[int64] `json:"account_id,omitzero"`
 	// Any of "PREFILL_ORDER", "OPEN_CHART", "OPEN_SCREENER",
 	// "OPEN_ENTITLEMENT_CONSENT".
 	Capabilities []string `json:"capabilities,omitzero"`
+	// Snapshots for this instant-chat message. Omission does not remove earlier
+	// attachments.
+	Context TurnContextParam `json:"context,omitzero"`
 	paramObj
 }
 
@@ -620,18 +739,23 @@ func (r *V1OmniAIThreadNewMessageParams) UnmarshalJSON(data []byte) error {
 }
 
 type V1OmniAIThreadNewThreadParams struct {
-	AccountID int64 `json:"account_id" api:"required"`
 	// Thread creation mode.
 	//
 	// Any of "instant", "deep_insights".
-	Type   V1OmniAIThreadNewThreadParamsType `json:"type,omitzero" api:"required"`
-	Text   param.Opt[string]                 `json:"text,omitzero"`
-	Thesis param.Opt[string]                 `json:"thesis,omitzero"`
+	Type V1OmniAIThreadNewThreadParamsType `json:"type,omitzero" api:"required"`
+	// Selected account for creation or the first account-linked turn. Omit for an
+	// unlinked conversation. An existing account link remains authoritative even when
+	// another account is selected.
+	AccountID param.Opt[int64]  `json:"account_id,omitzero"`
+	Text      param.Opt[string] `json:"text,omitzero"`
+	Thesis    param.Opt[string] `json:"thesis,omitzero"`
 	// Deep-insights target payload.
 	Target V1OmniAIThreadNewThreadParamsTarget `json:"target,omitzero"`
 	// Any of "PREFILL_ORDER", "OPEN_CHART", "OPEN_SCREENER",
 	// "OPEN_ENTITLEMENT_CONSENT".
 	Capabilities []string `json:"capabilities,omitzero"`
+	// Snapshots for the first instant-chat message. Omit to attach no new context.
+	Context TurnContextParam `json:"context,omitzero"`
 	paramObj
 }
 
@@ -678,8 +802,10 @@ func init() {
 }
 
 type V1OmniAIThreadGetMessagesParams struct {
-	// Account ID for the request
-	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// Lists only conversations for this account, or unlinked conversations when
+	// omitted. Other reads authorize the resource's linked account. Omit when no
+	// account is selected; empty values and the string null are invalid.
+	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
@@ -699,8 +825,10 @@ func (r V1OmniAIThreadGetMessagesParams) URLQuery() (v url.Values, err error) {
 }
 
 type V1OmniAIThreadGetThreadByIDParams struct {
-	// Account ID for the request
-	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// Lists only conversations for this account, or unlinked conversations when
+	// omitted. Other reads authorize the resource's linked account. Omit when no
+	// account is selected; empty values and the string null are invalid.
+	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
 	paramObj
 }
 
@@ -714,8 +842,10 @@ func (r V1OmniAIThreadGetThreadByIDParams) URLQuery() (v url.Values, err error) 
 }
 
 type V1OmniAIThreadGetThreadResponseParams struct {
-	// Account ID for the request
-	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// Lists only conversations for this account, or unlinked conversations when
+	// omitted. Other reads authorize the resource's linked account. Omit when no
+	// account is selected; empty values and the string null are invalid.
+	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
 	paramObj
 }
 
@@ -729,8 +859,10 @@ func (r V1OmniAIThreadGetThreadResponseParams) URLQuery() (v url.Values, err err
 }
 
 type V1OmniAIThreadGetThreadsParams struct {
-	// Account ID for the request
-	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	// Lists only conversations for this account, or unlinked conversations when
+	// omitted. Other reads authorize the resource's linked account. Omit when no
+	// account is selected; empty values and the string null are invalid.
+	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`

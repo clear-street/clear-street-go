@@ -13,7 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/option"
 )
 
-func TestV1OmniAIMessageGetMessageByID(t *testing.T) {
+func TestV1OmniAIMessageGetMessageByIDWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
 		baseURL = envURL
@@ -29,7 +29,7 @@ func TestV1OmniAIMessageGetMessageByID(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		clearstreet.V1OmniAIMessageGetMessageByIDParams{
-			AccountID: 0,
+			AccountID: clearstreet.Int(1),
 		},
 	)
 	if err != nil {
@@ -57,8 +57,8 @@ func TestV1OmniAIMessageSubmitFeedbackWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
 		clearstreet.V1OmniAIMessageSubmitFeedbackParams{
-			AccountID: 0,
 			Score:     0,
+			AccountID: clearstreet.Int(1),
 			Comment:   clearstreet.String("comment"),
 			Metadata:  map[string]any{},
 		},
