@@ -4,6 +4,7 @@ package clearstreet
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -232,6 +233,10 @@ type NewOrderRequestParam struct {
 	//
 	// Any of "OPEN", "CLOSE".
 	PositionIntent RequestPositionEffect `json:"position_intent,omitzero"`
+	// Optional execution strategy. Omit to use standard routing. One of `SOR`, `VWAP`,
+	// or `TWAP`. Supported only on `MARKET` and `LIMIT` orders with `DAY`
+	// time-in-force, and not supported on OTC common-stock orders.
+	Strategy OrderStrategyUnionParam `json:"strategy,omitzero"`
 	// Trailing offset type (PRICE or PERCENT_BPS)
 	//
 	// Any of "PRICE", "BPS".
@@ -333,6 +338,8 @@ type Order struct {
 	// Stop price (for STOP and STOP_LIMIT orders) When a null/undefined value is
 	// observed, it indicates it does not apply.
 	StopPrice string `json:"stop_price" api:"nullable"`
+	// The execution strategy the order was submitted with, if any.
+	Strategy OrderStrategy `json:"strategy"`
 	// Trading symbol. `null` when the order has no single resolvable instrument. When
 	// a null/undefined value is observed, it indicates it does not apply.
 	Symbol string `json:"symbol" api:"nullable"`
@@ -397,6 +404,7 @@ type Order struct {
 		QueueState               respjson.Field
 		ReleasesAt               respjson.Field
 		StopPrice                respjson.Field
+		Strategy                 respjson.Field
 		Symbol                   respjson.Field
 		TrailingLimitPx          respjson.Field
 		TrailingOffset           respjson.Field
@@ -414,6 +422,31 @@ type Order struct {
 // Returns the unmodified JSON received from the API
 func (r Order) RawJSON() string { return r.JSON.raw }
 func (r *Order) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The execution strategy the order was submitted with, if any.
+type OrderStrategy struct {
+	// Execution strategy type.
+	Type string `json:"type" api:"required"`
+	// UTC timestamp (RFC 3339) at which execution ends.
+	EndAt time.Time `json:"end_at" format:"date-time"`
+	// UTC timestamp (RFC 3339) at which execution begins.
+	StartAt     time.Time      `json:"start_at" format:"date-time"`
+	ExtraFields map[string]any `json:"" api:"extrafields"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		EndAt       respjson.Field
+		StartAt     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderStrategy) RawJSON() string { return r.JSON.raw }
+func (r *OrderStrategy) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -441,6 +474,255 @@ const (
 	OrderStatusCalculated      OrderStatus = "CALCULATED"
 	OrderStatusOther           OrderStatus = "OTHER"
 )
+
+// OrderStrategyUnion contains all possible properties and values from
+// [OrderStrategyType], [OrderStrategyObject], [OrderStrategyObject2].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type OrderStrategyUnion struct {
+	Type    string    `json:"type"`
+	EndAt   time.Time `json:"end_at"`
+	StartAt time.Time `json:"start_at"`
+	JSON    struct {
+		Type    respjson.Field
+		EndAt   respjson.Field
+		StartAt respjson.Field
+		raw     string
+	} `json:"-"`
+}
+
+func (u OrderStrategyUnion) AsOrderStrategyType() (v OrderStrategyType) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u OrderStrategyUnion) AsOrderStrategyObject() (v OrderStrategyObject) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u OrderStrategyUnion) AsOrderStrategyObject2() (v OrderStrategyObject2) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u OrderStrategyUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *OrderStrategyUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// ToParam converts this OrderStrategyUnion to a OrderStrategyUnionParam.
+//
+// Warning: the fields of the param type will not be present. ToParam should only
+// be used at the last possible moment before sending a request. Test for this with
+// OrderStrategyUnionParam.Overrides()
+func (r OrderStrategyUnion) ToParam() OrderStrategyUnionParam {
+	return param.Override[OrderStrategyUnionParam](json.RawMessage(r.RawJSON()))
+}
+
+// Smart Order Router. Routes the order to the best available venue(s).
+type OrderStrategyType struct {
+	// Execution strategy type.
+	//
+	// Any of "SOR".
+	Type string `json:"type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderStrategyType) RawJSON() string { return r.JSON.raw }
+func (r *OrderStrategyType) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Volume-Weighted Average Price. Works the order to track the volume-weighted
+// average price over the execution window.
+type OrderStrategyObject struct {
+	// Execution strategy type.
+	//
+	// Any of "VWAP".
+	Type string `json:"type" api:"required"`
+	// UTC timestamp (RFC 3339) by which to finish working the order. Defaults to
+	// market close.
+	EndAt time.Time `json:"end_at" format:"date-time"`
+	// UTC timestamp (RFC 3339) at which to begin working the order. Defaults to the
+	// time the order is received.
+	StartAt time.Time `json:"start_at" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		EndAt       respjson.Field
+		StartAt     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderStrategyObject) RawJSON() string { return r.JSON.raw }
+func (r *OrderStrategyObject) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Time-Weighted Average Price. Spreads execution evenly across the execution
+// window.
+type OrderStrategyObject2 struct {
+	// Execution strategy type.
+	//
+	// Any of "TWAP".
+	Type string `json:"type" api:"required"`
+	// UTC timestamp (RFC 3339) by which to finish working the order. Defaults to
+	// market close.
+	EndAt time.Time `json:"end_at" format:"date-time"`
+	// UTC timestamp (RFC 3339) at which to begin working the order. Defaults to the
+	// time the order is received.
+	StartAt time.Time `json:"start_at" format:"date-time"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		EndAt       respjson.Field
+		StartAt     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderStrategyObject2) RawJSON() string { return r.JSON.raw }
+func (r *OrderStrategyObject2) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func OrderStrategyParamOfOrderStrategyType(type_ string) OrderStrategyUnionParam {
+	var variant OrderStrategyTypeParam
+	variant.Type = type_
+	return OrderStrategyUnionParam{OfOrderStrategyType: &variant}
+}
+
+func OrderStrategyParamOfOrderStrategyObject(type_ string) OrderStrategyUnionParam {
+	var variant OrderStrategyObjectParam
+	variant.Type = type_
+	return OrderStrategyUnionParam{OfOrderStrategyObject: &variant}
+}
+
+func OrderStrategyParamOfOrderStrategyObject2(type_ string) OrderStrategyUnionParam {
+	var variant OrderStrategyObject2Param
+	variant.Type = type_
+	return OrderStrategyUnionParam{OfOrderStrategyObject2: &variant}
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type OrderStrategyUnionParam struct {
+	OfOrderStrategyType    *OrderStrategyTypeParam    `json:",omitzero,inline"`
+	OfOrderStrategyObject  *OrderStrategyObjectParam  `json:",omitzero,inline"`
+	OfOrderStrategyObject2 *OrderStrategyObject2Param `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u OrderStrategyUnionParam) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfOrderStrategyType, u.OfOrderStrategyObject, u.OfOrderStrategyObject2)
+}
+func (u *OrderStrategyUnionParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+// Smart Order Router. Routes the order to the best available venue(s).
+//
+// The property Type is required.
+type OrderStrategyTypeParam struct {
+	// Execution strategy type.
+	//
+	// Any of "SOR".
+	Type string `json:"type,omitzero" api:"required"`
+	paramObj
+}
+
+func (r OrderStrategyTypeParam) MarshalJSON() (data []byte, err error) {
+	type shadow OrderStrategyTypeParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrderStrategyTypeParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[OrderStrategyTypeParam](
+		"type", "SOR",
+	)
+}
+
+// Volume-Weighted Average Price. Works the order to track the volume-weighted
+// average price over the execution window.
+//
+// The property Type is required.
+type OrderStrategyObjectParam struct {
+	// Execution strategy type.
+	//
+	// Any of "VWAP".
+	Type string `json:"type,omitzero" api:"required"`
+	// UTC timestamp (RFC 3339) by which to finish working the order. Defaults to
+	// market close.
+	EndAt param.Opt[time.Time] `json:"end_at,omitzero" format:"date-time"`
+	// UTC timestamp (RFC 3339) at which to begin working the order. Defaults to the
+	// time the order is received.
+	StartAt param.Opt[time.Time] `json:"start_at,omitzero" format:"date-time"`
+	paramObj
+}
+
+func (r OrderStrategyObjectParam) MarshalJSON() (data []byte, err error) {
+	type shadow OrderStrategyObjectParam
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrderStrategyObjectParam) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[OrderStrategyObjectParam](
+		"type", "VWAP",
+	)
+}
+
+// Time-Weighted Average Price. Spreads execution evenly across the execution
+// window.
+//
+// The property Type is required.
+type OrderStrategyObject2Param struct {
+	// Execution strategy type.
+	//
+	// Any of "TWAP".
+	Type string `json:"type,omitzero" api:"required"`
+	// UTC timestamp (RFC 3339) by which to finish working the order. Defaults to
+	// market close.
+	EndAt param.Opt[time.Time] `json:"end_at,omitzero" format:"date-time"`
+	// UTC timestamp (RFC 3339) at which to begin working the order. Defaults to the
+	// time the order is received.
+	StartAt param.Opt[time.Time] `json:"start_at,omitzero" format:"date-time"`
+	paramObj
+}
+
+func (r OrderStrategyObject2Param) MarshalJSON() (data []byte, err error) {
+	type shadow OrderStrategyObject2Param
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrderStrategyObject2Param) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[OrderStrategyObject2Param](
+		"type", "TWAP",
+	)
+}
 
 // Order type
 type OrderType string
