@@ -254,12 +254,11 @@ type PositionInstruction struct {
 	// When the instruction was first accepted by the service. When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	CreatedAt time.Time `json:"created_at" api:"nullable" format:"date-time"`
-	// Machine-readable counterpart to `rejection_reason`: a stable reason code plus
-	// params, present on every rejected row that has a `rejection_reason` — on submit,
-	// cancel, get, and list alike. Branch on `rejection.reason` instead of parsing
-	// `rejection_reason`. Forward-only: instructions rejected before this field
-	// shipped may carry only `rejection_reason`. When a null/undefined value is
-	// observed, it indicates it does not apply.
+	// Machine-readable counterpart to `rejection_reason`: a stable reason code,
+	// human-readable `description`, and params, present on every rejected row — on
+	// submit, cancel, get, and list alike. Branch on `rejection.reason` and read
+	// `rejection.description` instead of the top-level `rejection_reason`. When a
+	// null/undefined value is observed, it indicates it does not apply.
 	Rejection PositionInstructionRejection `json:"rejection" api:"nullable"`
 	// Human-readable explanation populated on any non-success terminal status —
 	// `REJECTED` or `CANCEL_FAILED`. On a `207 Multi-Status` batch submit the
@@ -303,12 +302,13 @@ type PositionInstructionList []PositionInstruction
 
 // Machine-readable detail for a rejected position instruction.
 //
-// Present on every rejected row that carries a `rejection_reason`, across the full
-// lifecycle — submit, cancel, get, and list. Branch on `reason` for programmatic
-// handling and template your own copy from `metadata`; `rejection_reason` remains
-// the human-readable fallback. Forward-only: instructions rejected before this
-// field shipped may carry only `rejection_reason`.
+// Present on every rejected row, across the full lifecycle — submit, cancel, get,
+// and list. Branch on `reason` for programmatic handling and template your own
+// copy from `metadata`, or show `description` directly.
 type PositionInstructionRejection struct {
+	// Human-readable explanation of the rejection. Duplicates the top-level
+	// `rejection_reason`; prefer this field.
+	Description string `json:"description" api:"required"`
 	// Namespacing domain of the `reason` code — `com.clearstreet.oems.exercise` for
 	// reasons OEMS validates, `com.clearstreet.oems.clearing` for clearing-owned
 	// reasons.
@@ -329,6 +329,7 @@ type PositionInstructionRejection struct {
 	Reason string `json:"reason" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
+		Description respjson.Field
 		Domain      respjson.Field
 		Metadata    respjson.Field
 		Reason      respjson.Field
