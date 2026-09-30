@@ -1137,18 +1137,32 @@ const (
 )
 
 type V1OrderGetOrdersParamsUpdatedAt struct {
-	// > **Alpha** — this parameter is experimental and may change or be removed at any
-	// > time.
-	Gt param.Opt[time.Time] `query:"gt,omitzero" format:"date-time" json:"-"`
-	// > **Alpha** — this parameter is experimental and may change or be removed at any
-	// > time.
-	Gte param.Opt[time.Time] `query:"gte,omitzero" format:"date-time" json:"-"`
-	// > **Alpha** — this parameter is experimental and may change or be removed at any
-	// > time.
-	Lt param.Opt[time.Time] `query:"lt,omitzero" format:"date-time" json:"-"`
-	// > **Alpha** — this parameter is experimental and may change or be removed at any
-	// > time.
-	Lte param.Opt[time.Time] `query:"lte,omitzero" format:"date-time" json:"-"`
+	// Return only rows where `updated_at` is strictly after the given value. A bare
+	// `YYYY-MM-DD` date expands to the end of that day (UTC), so this matches from the
+	// start of the following day. See
+	// [Range filters](https://docs.clearstreet.com/guides/api-fundamentals#range-filters)
+	// for accepted formats, bare-date expansion, and combining bounds. Returns 400 if
+	// the resulting range is inverted.
+	Gt param.Opt[string] `query:"gt,omitzero" json:"-"`
+	// Return only rows where `updated_at` is on or after the given value. A bare
+	// `YYYY-MM-DD` date expands to the start of that day (UTC). See
+	// [Range filters](https://docs.clearstreet.com/guides/api-fundamentals#range-filters)
+	// for accepted formats, bare-date expansion, and combining bounds. Returns 400 if
+	// the resulting range is inverted.
+	Gte param.Opt[string] `query:"gte,omitzero" json:"-"`
+	// Return only rows where `updated_at` is strictly before the given value. A bare
+	// `YYYY-MM-DD` date expands to the start of that day (UTC). See
+	// [Range filters](https://docs.clearstreet.com/guides/api-fundamentals#range-filters)
+	// for accepted formats, bare-date expansion, and combining bounds. Returns 400 if
+	// the resulting range is inverted.
+	Lt param.Opt[string] `query:"lt,omitzero" json:"-"`
+	// Return only rows where `updated_at` is on or before the given value. A bare
+	// `YYYY-MM-DD` date expands to the end of that day (UTC), so this matches through
+	// the end of that day. See
+	// [Range filters](https://docs.clearstreet.com/guides/api-fundamentals#range-filters)
+	// for accepted formats, bare-date expansion, and combining bounds. Returns 400 if
+	// the resulting range is inverted.
+	Lte param.Opt[string] `query:"lte,omitzero" json:"-"`
 	paramObj
 }
 
