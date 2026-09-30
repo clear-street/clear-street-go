@@ -122,7 +122,8 @@ type Execution struct {
 	ID string `json:"id" api:"required" format:"uuid"`
 	// Identifier of the order this execution belongs to.
 	OrderID string `json:"order_id" api:"required" format:"uuid"`
-	// Filled quantity.
+	// Filled quantity. For a strategy-level multileg fill this is the net strategy
+	// quantity, not a per-leg quantity.
 	Quantity string `json:"quantity" api:"required"`
 	// Side of the fill.
 	//
@@ -130,15 +131,16 @@ type Execution struct {
 	Side Side `json:"side" api:"required"`
 	// Transaction timestamp in nanosecond precision (UTC).
 	TransactionTime time.Time `json:"transaction_time" api:"required" format:"date-time"`
-	// Unique instrument identifier. `null` when this fill has no single resolvable
-	// instrument. When a null/undefined value is observed, it indicates it does not
-	// apply.
+	// Unique instrument identifier. `null` when this is a strategy-level multileg fill
+	// whose legs are reported individually in `legs[]`. When a null/undefined value is
+	// observed, it indicates it does not apply.
 	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
 	// Fill price. `null` for multileg fills, whose price lives only at the leg level.
 	// When a null/undefined value is observed, it indicates it does not apply.
 	Price string `json:"price" api:"nullable"`
-	// Trading symbol. `null` when this fill has no single resolvable instrument. When
-	// a null/undefined value is observed, it indicates it does not apply.
+	// Trading symbol. `null` when this is a strategy-level multileg fill whose legs
+	// are reported individually in `legs[]`. When a null/undefined value is observed,
+	// it indicates it does not apply.
 	Symbol string `json:"symbol" api:"nullable"`
 	// Underlying instrument identifier for an option fill. Omitted for a
 	// non-derivative fill, when the underlier could not be resolved, or for a multileg
@@ -311,12 +313,13 @@ type Order struct {
 	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
 	// Whether the order is eligible for extended-hours trading.
 	ExtendedHours bool `json:"extended_hours" api:"nullable"`
-	// Instrument identifier for the traded instrument. `null` when the order has no
-	// single resolvable instrument. When a null/undefined value is observed, it
-	// indicates it does not apply.
+	// Instrument identifier for the traded instrument. `null` when the order is a
+	// multileg strategy whose legs are reported individually in `legs[]`. When a
+	// null/undefined value is observed, it indicates it does not apply.
 	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
-	// Type of security. `null` when the order has no single resolvable instrument.
-	// When a null/undefined value is observed, it indicates it does not apply.
+	// Type of security. `null` when the order is a multileg strategy whose legs are
+	// reported individually in `legs[]`. When a null/undefined value is observed, it
+	// indicates it does not apply.
 	//
 	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
@@ -340,8 +343,9 @@ type Order struct {
 	StopPrice string `json:"stop_price" api:"nullable"`
 	// The execution strategy the order was submitted with, if any.
 	Strategy OrderStrategy `json:"strategy"`
-	// Trading symbol. `null` when the order has no single resolvable instrument. When
-	// a null/undefined value is observed, it indicates it does not apply.
+	// Trading symbol. `null` when the order is a multileg strategy whose legs are
+	// reported individually in `legs[]`. When a null/undefined value is observed, it
+	// indicates it does not apply.
 	Symbol string `json:"symbol" api:"nullable"`
 	// Current trailing limit price computed by the trailing strategy When a
 	// null/undefined value is observed, it indicates it does not apply.
