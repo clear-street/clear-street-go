@@ -235,9 +235,10 @@ type NewOrderRequestParam struct {
 	//
 	// Any of "OPEN", "CLOSE".
 	PositionIntent RequestPositionEffect `json:"position_intent,omitzero"`
-	// Optional execution strategy. One of `SOR`, `VWAP`, or `TWAP`. Defaults to `SOR`.
-	// `VWAP` and `TWAP` are supported only on `MARKET` and `LIMIT` orders with `DAY`
-	// time-in-force, and are not supported on OTC common-stock orders.
+	// Optional execution strategy. One of `SOR`, `VWAP`, `TWAP`, or `DMA`. Defaults to
+	// `SOR`, the only strategy OTC common-stock orders support. `VWAP` and `TWAP` are
+	// supported only on `MARKET` and `LIMIT` orders, and `DMA` only on `LIMIT` orders;
+	// all three require `DAY` time-in-force.
 	Strategy OrderStrategyUnionParam `json:"strategy,omitzero"`
 	// Trailing offset type (PRICE or PERCENT_BPS)
 	//
@@ -432,7 +433,11 @@ func (r *Order) UnmarshalJSON(data []byte) error {
 // The execution strategy the order was submitted with, if any.
 type OrderStrategy struct {
 	// Execution strategy type.
+	//
+	// Any of "SOR", "VWAP", "TWAP", "DMA".
 	Type string `json:"type" api:"required"`
+	// Venue code the order is routed to. DMA only.
+	Destination string `json:"destination"`
 	// UTC timestamp (RFC 3339) at which execution ends.
 	EndAt time.Time `json:"end_at" format:"date-time"`
 	// UTC timestamp (RFC 3339) at which execution begins.
@@ -441,6 +446,7 @@ type OrderStrategy struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Type        respjson.Field
+		Destination respjson.Field
 		EndAt       respjson.Field
 		StartAt     respjson.Field
 		ExtraFields map[string]respjson.Field
@@ -480,18 +486,22 @@ const (
 )
 
 // OrderStrategyUnion contains all possible properties and values from
-// [OrderStrategyType], [OrderStrategyObject], [OrderStrategyObject2].
+// [OrderStrategyType], [OrderStrategyObject], [OrderStrategyObject2],
+// [OrderStrategyObject3].
 //
 // Use the methods beginning with 'As' to cast the union to one of its variants.
 type OrderStrategyUnion struct {
 	Type    string    `json:"type"`
 	EndAt   time.Time `json:"end_at"`
 	StartAt time.Time `json:"start_at"`
-	JSON    struct {
-		Type    respjson.Field
-		EndAt   respjson.Field
-		StartAt respjson.Field
-		raw     string
+	// This field is from variant [OrderStrategyObject3].
+	Destination string `json:"destination"`
+	JSON        struct {
+		Type        respjson.Field
+		EndAt       respjson.Field
+		StartAt     respjson.Field
+		Destination respjson.Field
+		raw         string
 	} `json:"-"`
 }
 
@@ -506,6 +516,11 @@ func (u OrderStrategyUnion) AsOrderStrategyObject() (v OrderStrategyObject) {
 }
 
 func (u OrderStrategyUnion) AsOrderStrategyObject2() (v OrderStrategyObject2) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u OrderStrategyUnion) AsOrderStrategyObject3() (v OrderStrategyObject3) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
@@ -604,6 +619,29 @@ func (r *OrderStrategyObject2) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Direct Market Access. Routes the order straight to the named venue.
+type OrderStrategyObject3 struct {
+	// Venue code the order is routed to.
+	Destination string `json:"destination" api:"required"`
+	// Execution strategy type.
+	//
+	// Any of "DMA".
+	Type string `json:"type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Destination respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderStrategyObject3) RawJSON() string { return r.JSON.raw }
+func (r *OrderStrategyObject3) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 func OrderStrategyParamOfOrderStrategyType(type_ string) OrderStrategyUnionParam {
 	var variant OrderStrategyTypeParam
 	variant.Type = type_
@@ -622,6 +660,13 @@ func OrderStrategyParamOfOrderStrategyObject2(type_ string) OrderStrategyUnionPa
 	return OrderStrategyUnionParam{OfOrderStrategyObject2: &variant}
 }
 
+func OrderStrategyParamOfOrderStrategyObject3(destination string, type_ string) OrderStrategyUnionParam {
+	var variant OrderStrategyObject3Param
+	variant.Destination = destination
+	variant.Type = type_
+	return OrderStrategyUnionParam{OfOrderStrategyObject3: &variant}
+}
+
 // Only one field can be non-zero.
 //
 // Use [param.IsOmitted] to confirm if a field is set.
@@ -629,11 +674,12 @@ type OrderStrategyUnionParam struct {
 	OfOrderStrategyType    *OrderStrategyTypeParam    `json:",omitzero,inline"`
 	OfOrderStrategyObject  *OrderStrategyObjectParam  `json:",omitzero,inline"`
 	OfOrderStrategyObject2 *OrderStrategyObject2Param `json:",omitzero,inline"`
+	OfOrderStrategyObject3 *OrderStrategyObject3Param `json:",omitzero,inline"`
 	paramUnion
 }
 
 func (u OrderStrategyUnionParam) MarshalJSON() ([]byte, error) {
-	return param.MarshalUnion(u, u.OfOrderStrategyType, u.OfOrderStrategyObject, u.OfOrderStrategyObject2)
+	return param.MarshalUnion(u, u.OfOrderStrategyType, u.OfOrderStrategyObject, u.OfOrderStrategyObject2, u.OfOrderStrategyObject3)
 }
 func (u *OrderStrategyUnionParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, u)
@@ -725,6 +771,33 @@ func (r *OrderStrategyObject2Param) UnmarshalJSON(data []byte) error {
 func init() {
 	apijson.RegisterFieldValidator[OrderStrategyObject2Param](
 		"type", "TWAP",
+	)
+}
+
+// Direct Market Access. Routes the order straight to the named venue.
+//
+// The properties Destination, Type are required.
+type OrderStrategyObject3Param struct {
+	// Venue code the order is routed to.
+	Destination string `json:"destination" api:"required"`
+	// Execution strategy type.
+	//
+	// Any of "DMA".
+	Type string `json:"type,omitzero" api:"required"`
+	paramObj
+}
+
+func (r OrderStrategyObject3Param) MarshalJSON() (data []byte, err error) {
+	type shadow OrderStrategyObject3Param
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *OrderStrategyObject3Param) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+func init() {
+	apijson.RegisterFieldValidator[OrderStrategyObject3Param](
+		"type", "DMA",
 	)
 }
 
