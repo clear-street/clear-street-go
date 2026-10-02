@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/clear-street/clear-street-go"
 	"github.com/clear-street/clear-street-go/internal/testutil"
@@ -50,7 +51,9 @@ func TestV1InstrumentDataMarketDataGetSnapshotsWithOptionalParams(t *testing.T) 
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.InstrumentData.MarketData.GetSnapshots(context.TODO(), clearstreet.V1InstrumentDataMarketDataGetSnapshotsParams{
-		InstrumentIDs: []clearstreet.InstrumentIDOrSymbol{"x"},
+		Expiry:                 clearstreet.Time(time.Now()),
+		InstrumentIDs:          []clearstreet.InstrumentIDOrSymbol{"x"},
+		UnderlyingInstrumentID: clearstreet.String("x"),
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

@@ -792,9 +792,18 @@ type InstrumentEventIpoItem struct {
 	// IPO exchange. When a null/undefined value is observed, it indicates that there
 	// is no available data.
 	Exchange string `json:"exchange" api:"nullable"`
-	// IPO market cap. When a null/undefined value is observed, it indicates that there
-	// is no available data.
+	// Deprecated: use `offering_amount`, which carries the same value. This is not a
+	// market capitalization. When a null/undefined value is observed, it indicates
+	// that there is no available data.
+	//
+	// Deprecated: deprecated
 	MarketCap string `json:"market_cap" api:"nullable"`
+	// IPO maximum aggregate offering value: all offered shares, including
+	// over-allotment (greenshoe) shares, at the top of the price range. This is an
+	// upper bound. It assumes full exercise of the over-allotment option and pricing
+	// at the top of the range. When a null/undefined value is observed, it indicates
+	// that there is no available data.
+	OfferingAmount string `json:"offering_amount" api:"nullable"`
 	// IPO price range. When a null/undefined value is observed, it indicates that
 	// there is no available data.
 	PriceRange string `json:"price_range" api:"nullable"`
@@ -803,15 +812,16 @@ type InstrumentEventIpoItem struct {
 	Shares string `json:"shares" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Actions     respjson.Field
-		AnnouncedAt respjson.Field
-		Company     respjson.Field
-		Exchange    respjson.Field
-		MarketCap   respjson.Field
-		PriceRange  respjson.Field
-		Shares      respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		Actions        respjson.Field
+		AnnouncedAt    respjson.Field
+		Company        respjson.Field
+		Exchange       respjson.Field
+		MarketCap      respjson.Field
+		OfferingAmount respjson.Field
+		PriceRange     respjson.Field
+		Shares         respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
 	} `json:"-"`
 }
 
@@ -1098,9 +1108,18 @@ type InstrumentIpoEvent struct {
 	// IPO exchange. When a null/undefined value is observed, it indicates that there
 	// is no available data.
 	Exchange string `json:"exchange" api:"nullable"`
-	// IPO market cap. When a null/undefined value is observed, it indicates that there
-	// is no available data.
+	// Deprecated: use `offering_amount`, which carries the same value. This is not a
+	// market capitalization. When a null/undefined value is observed, it indicates
+	// that there is no available data.
+	//
+	// Deprecated: deprecated
 	MarketCap string `json:"market_cap" api:"nullable"`
+	// IPO maximum aggregate offering value: all offered shares, including
+	// over-allotment (greenshoe) shares, at the top of the price range. This is an
+	// upper bound. It assumes full exercise of the over-allotment option and pricing
+	// at the top of the range. When a null/undefined value is observed, it indicates
+	// that there is no available data.
+	OfferingAmount string `json:"offering_amount" api:"nullable"`
 	// IPO price range. When a null/undefined value is observed, it indicates that
 	// there is no available data.
 	PriceRange string `json:"price_range" api:"nullable"`
@@ -1109,16 +1128,17 @@ type InstrumentIpoEvent struct {
 	Shares string `json:"shares" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Date        respjson.Field
-		Actions     respjson.Field
-		AnnouncedAt respjson.Field
-		Company     respjson.Field
-		Exchange    respjson.Field
-		MarketCap   respjson.Field
-		PriceRange  respjson.Field
-		Shares      respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		Date           respjson.Field
+		Actions        respjson.Field
+		AnnouncedAt    respjson.Field
+		Company        respjson.Field
+		Exchange       respjson.Field
+		MarketCap      respjson.Field
+		OfferingAmount respjson.Field
+		PriceRange     respjson.Field
+		Shares         respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
 	} `json:"-"`
 }
 

@@ -13,6 +13,7 @@ import (
 	"github.com/clear-street/clear-street-go/internal/apiquery"
 	"github.com/clear-street/clear-street-go/internal/requestconfig"
 	"github.com/clear-street/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/packages/param"
 	"github.com/clear-street/clear-street-go/packages/respjson"
 	"github.com/clear-street/clear-street-go/shared"
 )
@@ -60,6 +61,11 @@ func (r *V1InstrumentDataMarketDataService) GetDailySummaries(ctx context.Contex
 }
 
 // Get market data snapshots for one or more securities.
+//
+// Two targeting modes, mutually exclusive: `instrument_ids` (1-100 ids), or
+// `underlying_instrument_id` + `expiry` together, which resolves the underlier's
+// option chain for that expiry and returns a snapshot for every contract in it
+// (uncapped).
 func (r *V1InstrumentDataMarketDataService) GetSnapshots(ctx context.Context, query V1InstrumentDataMarketDataGetSnapshotsParams, opts ...option.RequestOption) (res *V1InstrumentDataMarketDataGetSnapshotsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/market-data/snapshot"
@@ -469,9 +475,17 @@ func (r V1InstrumentDataMarketDataGetDailySummariesParams) URLQuery() (v url.Val
 }
 
 type V1InstrumentDataMarketDataGetSnapshotsParams struct {
+	// Filter the option chain to contracts expiring on this date (YYYY-MM-DD). Must be
+	// provided together with `underlying_instrument_id`.
+	Expiry param.Opt[time.Time] `query:"expiry,omitzero" format:"date" json:"-"`
+	// Instrument identifier or symbol of the underlying equity/index for an option
+	// chain. Must be provided together with `expiry`; mutually exclusive with
+	// `instrument_ids`.
+	UnderlyingInstrumentID param.Opt[string] `query:"underlying_instrument_id,omitzero" json:"-"`
 	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
-	// symbols). Required; accepts 1 to 100 IDs. Duplicate resolved ids collapse to a
-	// single row.
+	// symbols). Accepts 1 to 100 IDs; duplicate resolved ids collapse to a single row.
+	// Required unless `underlying_instrument_id` and `expiry` are provided; mutually
+	// exclusive with that pair.
 	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" json:"-"`
 	paramObj
 }
