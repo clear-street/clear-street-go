@@ -133,8 +133,10 @@ func (r *V1OmniAIThreadService) GetThreadResponse(ctx context.Context, threadID 
 	return res, err
 }
 
-// List authorized conversation metadata, newest first. Use `page_size` and
-// `page_token` for pagination, and the messages endpoint for conversation history.
+// List authorized conversation metadata, most recently active first (by
+// `updated_at`, which a new message moves). Use `page_size` and `page_token` for
+// pagination, and the messages endpoint for conversation history. A thread that
+// gets a message while you page moves to the first page.
 //
 // With `account_id`, list only conversations linked to that account and require
 // current account access. Without it, list only conversations with no linked
@@ -537,6 +539,8 @@ type Thread struct {
 	ID        string    `json:"id" api:"required" format:"uuid"`
 	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
 	Title     string    `json:"title" api:"required"`
+	// Time of the last activity: a new message in the thread or a change to the
+	// thread.
 	UpdatedAt time.Time `json:"updated_at" api:"required" format:"date-time"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
