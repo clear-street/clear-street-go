@@ -24,7 +24,9 @@ type V1Service struct {
 	InstrumentData V1InstrumentDataService
 	// Retrieve core details and discovery endpoints for tradable instruments.
 	Instruments V1InstrumentService
-	OmniAI      V1OmniAIService
+	// Query locate requests, granted locates, and cached locate borrow rates.
+	Locates V1LocateService
+	OmniAI  V1OmniAIService
 	// Personalized feed of market stories: upcoming earnings, dividends, and splits,
 	// plus market news. Served per caller in a stable order; item ids double as
 	// pagination cursors, so any previously returned page can be re-read.
@@ -53,6 +55,7 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 	r.Calendar = NewV1CalendarService(opts...)
 	r.InstrumentData = NewV1InstrumentDataService(opts...)
 	r.Instruments = NewV1InstrumentService(opts...)
+	r.Locates = NewV1LocateService(opts...)
 	r.OmniAI = NewV1OmniAIService(opts...)
 	r.OmniFeed = NewV1OmniFeedService(opts...)
 	r.Orders = NewV1OrderService(opts...)
