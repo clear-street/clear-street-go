@@ -2,7 +2,6 @@
 
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared#APIError">APIError</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared#BaseResponse">BaseResponse</a>
-- <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared#ErrorDetails">ErrorDetails</a>
 - <a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared">shared</a>.<a href="https://pkg.go.dev/github.com/clear-street/clear-street-go/shared#ResponseMetadata">ResponseMetadata</a>
 
 # V1

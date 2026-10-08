@@ -24,9 +24,6 @@ type APIError = shared.APIError
 // This is an alias to an internal type.
 type BaseResponse = shared.BaseResponse
 
-// This is an alias to an internal type.
-type ErrorDetails = shared.ErrorDetails
-
 // Metadata for the response. This will always contain a request ID which can be
 // used to identify the request to Clear Street for tracing, and optionally may
 // include pagination data.

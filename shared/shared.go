@@ -23,7 +23,7 @@ type APIError struct {
 	Message string `json:"message" api:"required"`
 	// Additional error details, if any. This can include structured information such
 	// as field violations or error metadata.
-	Details ErrorDetails `json:"details"`
+	Details []map[string]any `json:"details"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Code        respjson.Field
@@ -59,8 +59,6 @@ func (r BaseResponse) RawJSON() string { return r.JSON.raw }
 func (r *BaseResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
-
-type ErrorDetails []map[string]any
 
 // Metadata for the response. This will always contain a request ID which can be
 // used to identify the request to Clear Street for tracing, and optionally may
