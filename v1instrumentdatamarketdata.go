@@ -225,7 +225,8 @@ type SnapshotGreeks struct {
 	Delta string `json:"delta" api:"required"`
 	// Gamma: ∂²V/∂S².
 	Gamma string `json:"gamma" api:"required"`
-	// Implied volatility, annualized (`0.20` == 20%).
+	// Implied volatility. Temporarily withheld: always `0`. Do not use this value; it
+	// is not a market implied volatility.
 	Iv string `json:"iv" api:"required"`
 	// Rho per 1.0 rate point.
 	Rho string `json:"rho" api:"required"`
