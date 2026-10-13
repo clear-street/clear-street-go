@@ -3,13 +3,26 @@
 package clearstreet
 
 import (
+	"context"
+	"errors"
+	"fmt"
+	"net/http"
+	"net/url"
+	"slices"
 	"time"
 
 	"github.com/clear-street/clear-street-go/internal/apijson"
+	"github.com/clear-street/clear-street-go/internal/apiquery"
+	"github.com/clear-street/clear-street-go/internal/requestconfig"
 	"github.com/clear-street/clear-street-go/option"
+	"github.com/clear-street/clear-street-go/packages/param"
 	"github.com/clear-street/clear-street-go/packages/respjson"
+	"github.com/clear-street/clear-street-go/shared"
 )
 
+// Browse private-market offerings and their indicative terms. Access requires the
+// account holder to hold an accreditation attestation.
+//
 // V1PrivateMarketIoisService contains methods and other services that help with
 // interacting with the clear-street API.
 //
@@ -27,6 +40,47 @@ func NewV1PrivateMarketIoisService(opts ...option.RequestOption) (r V1PrivateMar
 	r = V1PrivateMarketIoisService{}
 	r.options = opts
 	return
+}
+
+// Create an IOI for a visible upcoming offering.
+func (r *V1PrivateMarketIoisService) NewIoi(ctx context.Context, params V1PrivateMarketIoisNewIoiParams, opts ...option.RequestOption) (res *V1PrivateMarketIoisNewIoiResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "v1/private-markets/iois"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, params, &res, opts...)
+	return res, err
+}
+
+// Withdraw a live IOI. Repeating a withdrawal returns 404.
+func (r *V1PrivateMarketIoisService) DeleteIoi(ctx context.Context, ioiID string, body V1PrivateMarketIoisDeleteIoiParams, opts ...option.RequestOption) (err error) {
+	opts = slices.Concat(r.options, opts)
+	opts = append([]option.RequestOption{option.WithHeader("Accept", "*/*")}, opts...)
+	if ioiID == "" {
+		err = errors.New("missing required ioi_id parameter")
+		return err
+	}
+	path := fmt.Sprintf("v1/private-markets/iois/%s", ioiID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodDelete, path, body, nil, opts...)
+	return err
+}
+
+// List every live IOI for the caller's account-holder entity.
+func (r *V1PrivateMarketIoisService) GetIois(ctx context.Context, query V1PrivateMarketIoisGetIoisParams, opts ...option.RequestOption) (res *V1PrivateMarketIoisGetIoisResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "v1/private-markets/iois"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
+// Update an IOI's notional, accepting the current NDA revision when required.
+func (r *V1PrivateMarketIoisService) UpdateIoi(ctx context.Context, ioiID string, params V1PrivateMarketIoisUpdateIoiParams, opts ...option.RequestOption) (res *V1PrivateMarketIoisUpdateIoiResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	if ioiID == "" {
+		err = errors.New("missing required ioi_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("v1/private-markets/iois/%s", ioiID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPatch, path, params, &res, opts...)
+	return res, err
 }
 
 // Company identity embedded in an IOI list item.
@@ -145,5 +199,181 @@ type NdaAcceptanceResource struct {
 // Returns the unmodified JSON received from the API
 func (r NdaAcceptanceResource) RawJSON() string { return r.JSON.raw }
 func (r *NdaAcceptanceResource) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1PrivateMarketIoisNewIoiResponse struct {
+	// IOI list item with the campaign identity needed to render it.
+	Data IoiListingResource `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1PrivateMarketIoisNewIoiResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1PrivateMarketIoisNewIoiResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1PrivateMarketIoisGetIoisResponse struct {
+	Data IoiListingResourceList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1PrivateMarketIoisGetIoisResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1PrivateMarketIoisGetIoisResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1PrivateMarketIoisUpdateIoiResponse struct {
+	// IOI list item with the campaign identity needed to render it.
+	Data IoiListingResource `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1PrivateMarketIoisUpdateIoiResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1PrivateMarketIoisUpdateIoiResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1PrivateMarketIoisNewIoiParams struct {
+	AccountID      int64  `query:"account_id" api:"required" json:"-"`
+	NotionalAmount string `json:"notional_amount" api:"required"`
+	OfferingID     string `json:"offering_id" api:"required" format:"uuid"`
+	// Required only when the offering's attached SPV has an NDA agreement.
+	NdaAcceptance V1PrivateMarketIoisNewIoiParamsNdaAcceptance `json:"nda_acceptance,omitzero"`
+	paramObj
+}
+
+func (r V1PrivateMarketIoisNewIoiParams) MarshalJSON() (data []byte, err error) {
+	type shadow V1PrivateMarketIoisNewIoiParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1PrivateMarketIoisNewIoiParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// URLQuery serializes [V1PrivateMarketIoisNewIoiParams]'s query parameters as
+// `url.Values`.
+func (r V1PrivateMarketIoisNewIoiParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+// Required only when the offering's attached SPV has an NDA agreement.
+//
+// The properties Accepted, AgreementID, AuthorityConfirmed are required.
+type V1PrivateMarketIoisNewIoiParamsNdaAcceptance struct {
+	// Must be true; confirms affirmative assent.
+	Accepted bool `json:"accepted" api:"required"`
+	// Exact agreement id returned by offering detail.
+	AgreementID string `json:"agreement_id" api:"required" format:"uuid"`
+	// Must be true; confirms the signer may bind the account-holder entity.
+	AuthorityConfirmed bool `json:"authority_confirmed" api:"required"`
+	paramObj
+}
+
+func (r V1PrivateMarketIoisNewIoiParamsNdaAcceptance) MarshalJSON() (data []byte, err error) {
+	type shadow V1PrivateMarketIoisNewIoiParamsNdaAcceptance
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1PrivateMarketIoisNewIoiParamsNdaAcceptance) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1PrivateMarketIoisDeleteIoiParams struct {
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1PrivateMarketIoisDeleteIoiParams]'s query parameters as
+// `url.Values`.
+func (r V1PrivateMarketIoisDeleteIoiParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+type V1PrivateMarketIoisGetIoisParams struct {
+	AccountID int64 `query:"account_id" api:"required" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1PrivateMarketIoisGetIoisParams]'s query parameters as
+// `url.Values`.
+func (r V1PrivateMarketIoisGetIoisParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+type V1PrivateMarketIoisUpdateIoiParams struct {
+	AccountID      int64  `query:"account_id" api:"required" json:"-"`
+	NotionalAmount string `json:"notional_amount" api:"required"`
+	// Required when the SPV's current NDA version is newer than the IOI's latest
+	// acceptance. Irrelevant acceptances are rejected.
+	NdaAcceptance V1PrivateMarketIoisUpdateIoiParamsNdaAcceptance `json:"nda_acceptance,omitzero"`
+	paramObj
+}
+
+func (r V1PrivateMarketIoisUpdateIoiParams) MarshalJSON() (data []byte, err error) {
+	type shadow V1PrivateMarketIoisUpdateIoiParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1PrivateMarketIoisUpdateIoiParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// URLQuery serializes [V1PrivateMarketIoisUpdateIoiParams]'s query parameters as
+// `url.Values`.
+func (r V1PrivateMarketIoisUpdateIoiParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+// Required when the SPV's current NDA version is newer than the IOI's latest
+// acceptance. Irrelevant acceptances are rejected.
+//
+// The properties Accepted, AgreementID, AuthorityConfirmed are required.
+type V1PrivateMarketIoisUpdateIoiParamsNdaAcceptance struct {
+	// Must be true; confirms affirmative assent.
+	Accepted bool `json:"accepted" api:"required"`
+	// Exact agreement id returned by offering detail.
+	AgreementID string `json:"agreement_id" api:"required" format:"uuid"`
+	// Must be true; confirms the signer may bind the account-holder entity.
+	AuthorityConfirmed bool `json:"authority_confirmed" api:"required"`
+	paramObj
+}
+
+func (r V1PrivateMarketIoisUpdateIoiParamsNdaAcceptance) MarshalJSON() (data []byte, err error) {
+	type shadow V1PrivateMarketIoisUpdateIoiParamsNdaAcceptance
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1PrivateMarketIoisUpdateIoiParamsNdaAcceptance) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
