@@ -53,6 +53,10 @@ func (r *V1OmniAIEntitlementService) NewEntitlements(ctx context.Context, body V
 }
 
 // Revoke one entitlement grant by id.
+//
+// Deprecated -- use `POST /omni-ai/entitlements/opt-out`.
+//
+// Deprecated: deprecated
 func (r *V1OmniAIEntitlementService) DeleteEntitlement(ctx context.Context, entitlementID string, opts ...option.RequestOption) (res *V1OmniAIEntitlementDeleteEntitlementResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if entitlementID == "" {
@@ -72,11 +76,36 @@ func (r *V1OmniAIEntitlementService) GetEntitlementAgreements(ctx context.Contex
 	return res, err
 }
 
+// Whether each entitlement is enabled, per account. Accounts with no recorded
+// choice are enabled by default. Without `account_id`, covers every account the
+// caller can access.
+func (r *V1OmniAIEntitlementService) GetEntitlementStatus(ctx context.Context, query V1OmniAIEntitlementGetEntitlementStatusParams, opts ...option.RequestOption) (res *V1OmniAIEntitlementGetEntitlementStatusResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "v1/omni-ai/entitlement-status"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
 // List caller's active entitlement grants.
+//
+// Deprecated -- use `GET /omni-ai/entitlement-status`; this lists explicit grants
+// only and omits accounts that are enabled by default.
+//
+// Deprecated: deprecated
 func (r *V1OmniAIEntitlementService) GetEntitlements(ctx context.Context, query V1OmniAIEntitlementGetEntitlementsParams, opts ...option.RequestOption) (res *V1OmniAIEntitlementGetEntitlementsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/omni-ai/entitlements"
 	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
+// Turn off one-or-more entitlements for the given accounts. Idempotent: accounts
+// that are already opted out are left as they are. To turn an entitlement back on,
+// sign the agreement with `POST /omni-ai/entitlements`.
+func (r *V1OmniAIEntitlementService) OptOutEntitlements(ctx context.Context, body V1OmniAIEntitlementOptOutEntitlementsParams, opts ...option.RequestOption) (res *V1OmniAIEntitlementOptOutEntitlementsResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := "v1/omni-ai/entitlements/opt-out"
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
 	return res, err
 }
 
@@ -160,6 +189,33 @@ func (r *EntitlementResource) UnmarshalJSON(data []byte) error {
 
 type EntitlementResourceList []EntitlementResource
 
+// Whether an entitlement is enabled for one account. Accounts the user never chose
+// for are enabled by default.
+type EntitlementStatusResource struct {
+	AccountID int64 `json:"account_id" api:"required"`
+	Enabled   bool  `json:"enabled" api:"required"`
+	// Stable entitlement code granted by an agreement.
+	//
+	// Any of "omni.account_data".
+	EntitlementCode EntitlementCode `json:"entitlement_code" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AccountID       respjson.Field
+		Enabled         respjson.Field
+		EntitlementCode respjson.Field
+		ExtraFields     map[string]respjson.Field
+		raw             string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EntitlementStatusResource) RawJSON() string { return r.JSON.raw }
+func (r *EntitlementStatusResource) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type EntitlementStatusResourceList []EntitlementStatusResource
+
 type V1OmniAIEntitlementNewEntitlementsResponse struct {
 	Data EntitlementResourceList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -211,6 +267,23 @@ func (r *V1OmniAIEntitlementGetEntitlementAgreementsResponse) UnmarshalJSON(data
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1OmniAIEntitlementGetEntitlementStatusResponse struct {
+	Data EntitlementStatusResourceList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1OmniAIEntitlementGetEntitlementStatusResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OmniAIEntitlementGetEntitlementStatusResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1OmniAIEntitlementGetEntitlementsResponse struct {
 	Data EntitlementResourceList `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -225,6 +298,23 @@ type V1OmniAIEntitlementGetEntitlementsResponse struct {
 // Returns the unmodified JSON received from the API
 func (r V1OmniAIEntitlementGetEntitlementsResponse) RawJSON() string { return r.JSON.raw }
 func (r *V1OmniAIEntitlementGetEntitlementsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type V1OmniAIEntitlementOptOutEntitlementsResponse struct {
+	Data EntitlementStatusResourceList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1OmniAIEntitlementOptOutEntitlementsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OmniAIEntitlementOptOutEntitlementsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -243,6 +333,20 @@ func (r *V1OmniAIEntitlementNewEntitlementsParams) UnmarshalJSON(data []byte) er
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1OmniAIEntitlementGetEntitlementStatusParams struct {
+	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1OmniAIEntitlementGetEntitlementStatusParams]'s query
+// parameters as `url.Values`.
+func (r V1OmniAIEntitlementGetEntitlementStatusParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
 type V1OmniAIEntitlementGetEntitlementsParams struct {
 	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
 	paramObj
@@ -255,4 +359,18 @@ func (r V1OmniAIEntitlementGetEntitlementsParams) URLQuery() (v url.Values, err 
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
+}
+
+type V1OmniAIEntitlementOptOutEntitlementsParams struct {
+	AccountIDs       []int64           `json:"account_ids,omitzero" api:"required"`
+	EntitlementCodes []EntitlementCode `json:"entitlement_codes,omitzero" api:"required"`
+	paramObj
+}
+
+func (r V1OmniAIEntitlementOptOutEntitlementsParams) MarshalJSON() (data []byte, err error) {
+	type shadow V1OmniAIEntitlementOptOutEntitlementsParams
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1OmniAIEntitlementOptOutEntitlementsParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }

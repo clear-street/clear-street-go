@@ -83,6 +83,30 @@ func TestV1OmniAIEntitlementGetEntitlementAgreements(t *testing.T) {
 	}
 }
 
+func TestV1OmniAIEntitlementGetEntitlementStatusWithOptionalParams(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.OmniAI.Entitlements.GetEntitlementStatus(context.TODO(), clearstreet.V1OmniAIEntitlementGetEntitlementStatusParams{
+		AccountID: clearstreet.Int(0),
+	})
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
 func TestV1OmniAIEntitlementGetEntitlementsWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
@@ -97,6 +121,31 @@ func TestV1OmniAIEntitlementGetEntitlementsWithOptionalParams(t *testing.T) {
 	)
 	_, err := client.V1.OmniAI.Entitlements.GetEntitlements(context.TODO(), clearstreet.V1OmniAIEntitlementGetEntitlementsParams{
 		AccountID: clearstreet.Int(0),
+	})
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestV1OmniAIEntitlementOptOutEntitlements(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.OmniAI.Entitlements.OptOutEntitlements(context.TODO(), clearstreet.V1OmniAIEntitlementOptOutEntitlementsParams{
+		AccountIDs:       []int64{100019, 100021},
+		EntitlementCodes: []clearstreet.EntitlementCode{clearstreet.EntitlementCodeOmniAccountData},
 	})
 	if err != nil {
 		var apierr *clearstreet.Error
