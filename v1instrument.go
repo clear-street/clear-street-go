@@ -64,8 +64,8 @@ func (r *V1InstrumentService) GetInstruments(ctx context.Context, query V1Instru
 // List options contracts.
 //
 // Returns options contracts with options-specific metadata. Exactly one identifier
-// must be provided: `underlier`/`underlying_instrument_id` (list all contracts for
-// that underlier) or `contract_ids` (look up specific contracts directly).
+// must be provided: `root`/`underlying_instrument_id` (list all contracts for that
+// underlier) or `contract_ids` (look up specific contracts directly).
 // `expiry`/`contract_type` apply as filters in either case.
 func (r *V1InstrumentService) GetOptionContracts(ctx context.Context, query V1InstrumentGetOptionContractsParams, opts ...option.RequestOption) (res *V1InstrumentGetOptionContractsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -613,13 +613,16 @@ type V1InstrumentGetOptionContractsParams struct {
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
-	// Underlier symbol (e.g., AAPL, SPX)
+	// OSI option root symbol (e.g., AAPL, SPXW). Index roots also include their weekly
+	// series (e.g., SPX includes SPXW).
+	Root param.Opt[string] `query:"root,omitzero" json:"-"`
+	// Deprecated: use `root`. If both are sent, the values must match.
 	Underlier param.Opt[string] `query:"underlier,omitzero" json:"-"`
 	// Instrument identifier or symbol of the underlying equity/index
 	UnderlyingInstrumentID param.Opt[string] `query:"underlying_instrument_id,omitzero" json:"-"`
 	// Comma-separated contract instrument IDs (UUID) or OSI option symbols to look up
 	// directly, bypassing underlier expansion. Mutually exclusive with
-	// underlier/underlying_instrument_id; up to 100 values.
+	// root/underlying_instrument_id; up to 100 values.
 	ContractIDs []InstrumentIDOrSymbol `query:"contract_ids,omitzero" json:"-"`
 	// Filter by contract type: CALL or PUT
 	//

@@ -94,6 +94,7 @@ func TestV1InstrumentGetOptionContractsWithOptionalParams(t *testing.T) {
 		IsSettleOnOpen:         clearstreet.Bool(true),
 		PageSize:               clearstreet.Int(1),
 		PageToken:              clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+		Root:                   clearstreet.String("root"),
 		Underlier:              clearstreet.String("underlier"),
 		UnderlyingInstrumentID: clearstreet.String("x"),
 	})
