@@ -151,7 +151,7 @@ type AccountBalances struct {
 	AccountID int64 `json:"account_id" api:"required"`
 	// The total buying power available in the account: base buying power plus the open
 	// order adjustment, where base buying power is maintenance margin excess times the
-	// multiplier for intraday and initial margin excess times the multiplier for
+	// multiplier for intraday and overnight margin excess times the multiplier for
 	// overnight.
 	BuyingPower string `json:"buying_power" api:"required"`
 	// Currency identifier for all monetary values.
@@ -461,6 +461,10 @@ type MarginDetails struct {
 	MaintenanceMarginRequirement string `json:"maintenance_margin_requirement" api:"required"`
 	// Overnight session margin calculation details.
 	OvernightDetails MarginSessionDetails `json:"overnight_details" api:"required"`
+	// The difference between equity and the overnight margin requirement.
+	OvernightMarginExcess string `json:"overnight_margin_excess" api:"required"`
+	// The amount of equity required to hold current positions overnight.
+	OvernightMarginRequirement string `json:"overnight_margin_requirement" api:"required"`
 	// Optional top margin contributors, returned only when explicitly requested.
 	TopContributors []MarginTopContributor `json:"top_contributors"`
 	// Current usage totals. When a null/undefined value is observed, it indicates that
@@ -474,6 +478,8 @@ type MarginDetails struct {
 		MaintenanceMarginExcess      respjson.Field
 		MaintenanceMarginRequirement respjson.Field
 		OvernightDetails             respjson.Field
+		OvernightMarginExcess        respjson.Field
+		OvernightMarginRequirement   respjson.Field
 		TopContributors              respjson.Field
 		Usage                        respjson.Field
 		ExtraFields                  map[string]respjson.Field
@@ -510,8 +516,8 @@ func (r *MarginDetailsUsage) UnmarshalJSON(data []byte) error {
 type MarginSessionDetails struct {
 	// Maximum buying power available in the account during the session: base buying
 	// power plus the open order adjustment, where base buying power is maintenance
-	// margin excess times the multiplier for intraday and initial margin excess times
-	// the multiplier for overnight.
+	// margin excess times the multiplier for intraday and overnight margin excess
+	// times the multiplier for overnight.
 	BuyingPower string `json:"buying_power" api:"required"`
 	// Margin multiplier for the session: 4 during intraday sessions (pre-market,
 	// regular, and after-hours) and 2 during the overnight session.
@@ -538,6 +544,8 @@ type MarginTopContributor struct {
 	MaintenanceMarginRequirement string `json:"maintenance_margin_requirement" api:"required"`
 	// Net market value attributable to this underlying.
 	MarketValue string `json:"market_value" api:"required"`
+	// Overnight margin requirement attributable to this underlying.
+	OvernightMarginRequirement string `json:"overnight_margin_requirement" api:"required"`
 	// UUID of the underlying security contributing to margin requirement.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"required" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -545,6 +553,7 @@ type MarginTopContributor struct {
 		InitialMarginRequirement     respjson.Field
 		MaintenanceMarginRequirement respjson.Field
 		MarketValue                  respjson.Field
+		OvernightMarginRequirement   respjson.Field
 		UnderlyingInstrumentID       respjson.Field
 		ExtraFields                  map[string]respjson.Field
 		raw                          string
