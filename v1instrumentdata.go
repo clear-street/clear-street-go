@@ -122,6 +122,29 @@ func (r *V1InstrumentDataService) GetInstrumentCashFlowStatements(ctx context.Co
 	return res, err
 }
 
+// Retrieves earnings call transcripts for a specific instrument, newest fiscal
+// period first.
+//
+// Defaults: `page_size` is 1 and is capped at 5, because each transcript is large.
+// Send `event_date` with the `date` of an earnings event from the events endpoints
+// to fetch that event's transcript. The `date.gt`, `date.gte`, `date.lt`, and
+// `date.lte` filters compare the call date itself. An instrument without
+// transcripts returns an empty list.
+//
+// Pagination metadata does not include `total_items` or `total_pages` for this
+// endpoint. Use `next_page_token` to detect whether more results exist. The token
+// does not carry filters: send the same filters with every page request.
+func (r *V1InstrumentDataService) GetInstrumentEarningsTranscripts(ctx context.Context, instrumentID string, query V1InstrumentDataGetInstrumentEarningsTranscriptsParams, opts ...option.RequestOption) (res *V1InstrumentDataGetInstrumentEarningsTranscriptsResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	if instrumentID == "" {
+		err = errors.New("missing required instrument_id parameter")
+		return nil, err
+	}
+	path := fmt.Sprintf("v1/instruments/%s/earnings-transcripts", url.PathEscape(instrumentID))
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
 // Retrieves corporate events (earnings, dividends, splits, IPO) for an instrument,
 // grouped by event type. Filter to specific types via `event_types`.
 //
@@ -232,6 +255,16 @@ const (
 	FiscalPeriodTypeAnnual    FiscalPeriodType = "ANNUAL"
 	FiscalPeriodTypeTtm       FiscalPeriodType = "TTM"
 	FiscalPeriodTypeBiannual  FiscalPeriodType = "BIANNUAL"
+)
+
+// Fiscal quarter of a reporting period
+type FiscalQuarter string
+
+const (
+	FiscalQuarterQ1 FiscalQuarter = "Q1"
+	FiscalQuarterQ2 FiscalQuarter = "Q2"
+	FiscalQuarterQ3 FiscalQuarter = "Q3"
+	FiscalQuarterQ4 FiscalQuarter = "Q4"
 )
 
 // All-events payload grouped by date.
@@ -683,6 +716,10 @@ func (r *InstrumentDividendEvent) UnmarshalJSON(data []byte) error {
 type InstrumentEarnings struct {
 	// The date when the earnings report was published
 	Date time.Time `json:"date" api:"required" format:"date"`
+	// True when an earnings call transcript exists for this event. Fetch it with
+	// `GET /v1/instruments/{instrument_id}/earnings-transcripts?event_date=<date>`,
+	// where `<date>` is this event's `date`.
+	TranscriptAvailable bool `json:"transcript_available" api:"required"`
 	// The actual earnings per share (EPS) for the period When a null/undefined value
 	// is observed, it indicates that there is no available data.
 	EpsActual string `json:"eps_actual" api:"nullable"`
@@ -709,6 +746,7 @@ type InstrumentEarnings struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		Date                   respjson.Field
+		TranscriptAvailable    respjson.Field
 		EpsActual              respjson.Field
 		EpsEstimate            respjson.Field
 		EpsSurprisePercent     respjson.Field
@@ -726,6 +764,42 @@ func (r InstrumentEarnings) RawJSON() string { return r.JSON.raw }
 func (r *InstrumentEarnings) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// An earnings call transcript for one fiscal quarter.
+type InstrumentEarningsTranscript struct {
+	// The full text of the transcript
+	Content string `json:"content" api:"required"`
+	// The date of the earnings call
+	Date time.Time `json:"date" api:"required" format:"date"`
+	// The fiscal quarter of the call
+	//
+	// Any of "Q1", "Q2", "Q3", "Q4".
+	Period FiscalQuarter `json:"period" api:"required"`
+	// The type of fiscal period. Always `QUARTERLY`.
+	//
+	// Any of "QUARTERLY", "ANNUAL", "TTM", "BIANNUAL".
+	PeriodType FiscalPeriodType `json:"period_type" api:"required"`
+	// The fiscal year of the call
+	Year int64 `json:"year" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Content     respjson.Field
+		Date        respjson.Field
+		Period      respjson.Field
+		PeriodType  respjson.Field
+		Year        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r InstrumentEarningsTranscript) RawJSON() string { return r.JSON.raw }
+func (r *InstrumentEarningsTranscript) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type InstrumentEarningsTranscriptList []InstrumentEarningsTranscript
 
 // Unified envelope for the all-events response.
 type InstrumentEventEnvelope struct {
@@ -1282,6 +1356,23 @@ func (r *V1InstrumentDataGetInstrumentCashFlowStatementsResponse) UnmarshalJSON(
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1InstrumentDataGetInstrumentEarningsTranscriptsResponse struct {
+	Data InstrumentEarningsTranscriptList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1InstrumentDataGetInstrumentEarningsTranscriptsResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1InstrumentDataGetInstrumentEarningsTranscriptsResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1InstrumentDataGetInstrumentEventsResponse struct {
 	// Grouped instrument events by type
 	Data InstrumentEventsData `json:"data" api:"required"`
@@ -1428,6 +1519,85 @@ func (r V1InstrumentDataGetInstrumentCashFlowStatementsParams) URLQuery() (v url
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+type V1InstrumentDataGetInstrumentEarningsTranscriptsParams struct {
+	// Return only transcripts whose call date is within one day of this earnings event
+	// date (`YYYY-MM-DD`). Use an event's `date` to fetch that event's transcript.
+	EventDate param.Opt[time.Time] `query:"event_date,omitzero" format:"date" json:"-"`
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
+	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
+	// Only return the transcript for this fiscal year.
+	Year param.Opt[int64]                                           `query:"year,omitzero" json:"-"`
+	Date V1InstrumentDataGetInstrumentEarningsTranscriptsParamsDate `query:"date,omitzero" json:"-"`
+	// Only return the transcript for this fiscal quarter.
+	//
+	// Any of "Q1", "Q2", "Q3", "Q4".
+	Period V1InstrumentDataGetInstrumentEarningsTranscriptsParamsPeriod `query:"period,omitzero" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1InstrumentDataGetInstrumentEarningsTranscriptsParams]'s
+// query parameters as `url.Values`.
+func (r V1InstrumentDataGetInstrumentEarningsTranscriptsParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+type V1InstrumentDataGetInstrumentEarningsTranscriptsParamsDate struct {
+	// Return only rows where `date` is strictly after the given value. A bare
+	// `YYYY-MM-DD` date expands to the end of that day (UTC), so this matches from the
+	// start of the following day. See
+	// [Range filters](https://docs.clearstreet.com/guides/api-fundamentals#range-filters)
+	// for accepted formats, bare-date expansion, and combining bounds. Returns 400 if
+	// the resulting range is inverted.
+	Gt param.Opt[string] `query:"gt,omitzero" json:"-"`
+	// Return only rows where `date` is on or after the given value. A bare
+	// `YYYY-MM-DD` date expands to the start of that day (UTC). See
+	// [Range filters](https://docs.clearstreet.com/guides/api-fundamentals#range-filters)
+	// for accepted formats, bare-date expansion, and combining bounds. Returns 400 if
+	// the resulting range is inverted.
+	Gte param.Opt[string] `query:"gte,omitzero" json:"-"`
+	// Return only rows where `date` is strictly before the given value. A bare
+	// `YYYY-MM-DD` date expands to the start of that day (UTC). See
+	// [Range filters](https://docs.clearstreet.com/guides/api-fundamentals#range-filters)
+	// for accepted formats, bare-date expansion, and combining bounds. Returns 400 if
+	// the resulting range is inverted.
+	Lt param.Opt[string] `query:"lt,omitzero" json:"-"`
+	// Return only rows where `date` is on or before the given value. A bare
+	// `YYYY-MM-DD` date expands to the end of that day (UTC), so this matches through
+	// the end of that day. See
+	// [Range filters](https://docs.clearstreet.com/guides/api-fundamentals#range-filters)
+	// for accepted formats, bare-date expansion, and combining bounds. Returns 400 if
+	// the resulting range is inverted.
+	Lte param.Opt[string] `query:"lte,omitzero" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes
+// [V1InstrumentDataGetInstrumentEarningsTranscriptsParamsDate]'s query parameters
+// as `url.Values`.
+func (r V1InstrumentDataGetInstrumentEarningsTranscriptsParamsDate) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+// Only return the transcript for this fiscal quarter.
+type V1InstrumentDataGetInstrumentEarningsTranscriptsParamsPeriod string
+
+const (
+	V1InstrumentDataGetInstrumentEarningsTranscriptsParamsPeriodQ1 V1InstrumentDataGetInstrumentEarningsTranscriptsParamsPeriod = "Q1"
+	V1InstrumentDataGetInstrumentEarningsTranscriptsParamsPeriodQ2 V1InstrumentDataGetInstrumentEarningsTranscriptsParamsPeriod = "Q2"
+	V1InstrumentDataGetInstrumentEarningsTranscriptsParamsPeriodQ3 V1InstrumentDataGetInstrumentEarningsTranscriptsParamsPeriod = "Q3"
+	V1InstrumentDataGetInstrumentEarningsTranscriptsParamsPeriodQ4 V1InstrumentDataGetInstrumentEarningsTranscriptsParamsPeriod = "Q4"
+)
 
 type V1InstrumentDataGetInstrumentEventsParams struct {
 	// The start date for the query range, inclusive (YYYY-MM-DD).
