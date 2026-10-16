@@ -180,6 +180,15 @@ type Instrument struct {
 	// The percent of a short position's value you must post as margin When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
+	// How readily the instrument can be shorted: `EASY_TO_BORROW`, `HARD_TO_BORROW`,
+	// or `NOT_SHORTABLE`. Easy-to-borrow instruments can be shorted without a locate.
+	// A hard-to-borrow instrument is not easy to borrow but has locate inventory
+	// remaining and a float at or above the minimum for short sales; anything else is
+	// not shortable. Omitted for instruments that are not tradable equities. When a
+	// null/undefined value is observed, it indicates it does not apply.
+	//
+	// Any of "EASY_TO_BORROW", "HARD_TO_BORROW", "NOT_SHORTABLE".
+	ShortableAttribute ShortableAttribute `json:"shortable_attribute" api:"nullable"`
 	// Price bands this instrument quotes on, ascending. Absent when we have no
 	// schedule for it, which includes an option whose penny-program status our
 	// reference data never supplied.
@@ -209,6 +218,7 @@ type Instrument struct {
 		OptionsExpiryDates         respjson.Field
 		PreviousClose              respjson.Field
 		ShortMarginRate            respjson.Field
+		ShortableAttribute         respjson.Field
 		TickRules                  respjson.Field
 		ExtraFields                map[string]respjson.Field
 		raw                        string
@@ -279,6 +289,15 @@ type InstrumentCore struct {
 	// The percent of a short position's value you must post as margin When a
 	// null/undefined value is observed, it indicates that there is no available data.
 	ShortMarginRate string `json:"short_margin_rate" api:"nullable"`
+	// How readily the instrument can be shorted: `EASY_TO_BORROW`, `HARD_TO_BORROW`,
+	// or `NOT_SHORTABLE`. Easy-to-borrow instruments can be shorted without a locate.
+	// A hard-to-borrow instrument is not easy to borrow but has locate inventory
+	// remaining and a float at or above the minimum for short sales; anything else is
+	// not shortable. Omitted for instruments that are not tradable equities. When a
+	// null/undefined value is observed, it indicates it does not apply.
+	//
+	// Any of "EASY_TO_BORROW", "HARD_TO_BORROW", "NOT_SHORTABLE".
+	ShortableAttribute ShortableAttribute `json:"shortable_attribute" api:"nullable"`
 	// Price bands this instrument quotes on, ascending. Absent when we have no
 	// schedule for it, which includes an option whose penny-program status our
 	// reference data never supplied.
@@ -306,6 +325,7 @@ type InstrumentCore struct {
 		NotionalAdv              respjson.Field
 		PreviousClose            respjson.Field
 		ShortMarginRate          respjson.Field
+		ShortableAttribute       respjson.Field
 		TickRules                respjson.Field
 		ExtraFields              map[string]respjson.Field
 		raw                      string
@@ -440,6 +460,15 @@ func (r *OptionsContract) UnmarshalJSON(data []byte) error {
 }
 
 type OptionsContractList []OptionsContract
+
+// How readily a tradable equity can be shorted.
+type ShortableAttribute string
+
+const (
+	ShortableAttributeEasyToBorrow ShortableAttribute = "EASY_TO_BORROW"
+	ShortableAttributeHardToBorrow ShortableAttribute = "HARD_TO_BORROW"
+	ShortableAttributeNotShortable ShortableAttribute = "NOT_SHORTABLE"
+)
 
 // One band of an instrument's tick schedule. A price in the band is valid only if
 // it is a whole multiple of `tick_size`. Bands describe the instrument itself: on
