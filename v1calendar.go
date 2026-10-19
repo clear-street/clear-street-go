@@ -184,7 +184,7 @@ type MarketHoursDetail struct {
 	Date time.Time `json:"date" api:"required" format:"date"`
 	// Market type identifier
 	//
-	// Any of "us_equities", "us_options".
+	// Any of "us_equities", "us_options", "us_event_contracts".
 	Market MarketType `json:"market" api:"required"`
 	// Human-readable market name
 	MarketName string `json:"market_name" api:"required"`
@@ -262,8 +262,9 @@ func (r *MarketStatus) UnmarshalJSON(data []byte) error {
 type MarketType string
 
 const (
-	MarketTypeUsEquities MarketType = "us_equities"
-	MarketTypeUsOptions  MarketType = "us_options"
+	MarketTypeUsEquities       MarketType = "us_equities"
+	MarketTypeUsOptions        MarketType = "us_options"
+	MarketTypeUsEventContracts MarketType = "us_event_contracts"
 )
 
 // Session schedule with open and close timestamps
@@ -300,6 +301,10 @@ type TradingSessions struct {
 	// After-hours session schedule, null if not available When a null/undefined value
 	// is observed, it indicates it does not apply.
 	AfterHours SessionSchedule `json:"after_hours" api:"nullable"`
+	// Scheduled maintenance window. The market is closed inside it, even when it falls
+	// within another session. Null if none is scheduled for the day. When a
+	// null/undefined value is observed, it indicates it does not apply.
+	Maintenance SessionSchedule `json:"maintenance" api:"nullable"`
 	// Overnight session schedule (prior evening through early morning), null if not
 	// available When a null/undefined value is observed, it indicates it does not
 	// apply.
@@ -313,6 +318,7 @@ type TradingSessions struct {
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AfterHours  respjson.Field
+		Maintenance respjson.Field
 		Overnight   respjson.Field
 		PreMarket   respjson.Field
 		Regular     respjson.Field
@@ -448,9 +454,10 @@ func (r V1CalendarGetEconomicEventsCalendarParamsTimestamp) URLQuery() (v url.Va
 type V1CalendarGetMarketHoursCalendarParams struct {
 	// The date to query market hours for (YYYY-MM-DD). Defaults to today.
 	Date param.Opt[string] `query:"date,omitzero" json:"-"`
-	// Market type to query (us_equities, us_options). If omitted, returns all markets.
+	// Market type to query (us_equities, us_options, us_event_contracts). If omitted,
+	// returns us_equities and us_options.
 	//
-	// Any of "us_equities", "us_options".
+	// Any of "us_equities", "us_options", "us_event_contracts".
 	Market V1CalendarGetMarketHoursCalendarParamsMarket `query:"market,omitzero" json:"-"`
 	paramObj
 }
@@ -464,10 +471,12 @@ func (r V1CalendarGetMarketHoursCalendarParams) URLQuery() (v url.Values, err er
 	})
 }
 
-// Market type to query (us_equities, us_options). If omitted, returns all markets.
+// Market type to query (us_equities, us_options, us_event_contracts). If omitted,
+// returns us_equities and us_options.
 type V1CalendarGetMarketHoursCalendarParamsMarket string
 
 const (
-	V1CalendarGetMarketHoursCalendarParamsMarketUsEquities V1CalendarGetMarketHoursCalendarParamsMarket = "us_equities"
-	V1CalendarGetMarketHoursCalendarParamsMarketUsOptions  V1CalendarGetMarketHoursCalendarParamsMarket = "us_options"
+	V1CalendarGetMarketHoursCalendarParamsMarketUsEquities       V1CalendarGetMarketHoursCalendarParamsMarket = "us_equities"
+	V1CalendarGetMarketHoursCalendarParamsMarketUsOptions        V1CalendarGetMarketHoursCalendarParamsMarket = "us_options"
+	V1CalendarGetMarketHoursCalendarParamsMarketUsEventContracts V1CalendarGetMarketHoursCalendarParamsMarket = "us_event_contracts"
 )
