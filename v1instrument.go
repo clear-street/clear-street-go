@@ -156,6 +156,11 @@ type Instrument struct {
 	// The full name of the instrument or its issuer When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
+	// Why the instrument is `NOT_SHORTABLE`: every reason that applies, using the same
+	// codes as the `type` of the equivalent order-preview errors. Omitted unless
+	// `shortable_attribute` is `NOT_SHORTABLE`. When a null/undefined value is
+	// observed, it indicates it does not apply.
+	NotShortableReasons []NotShortableReason `json:"not_shortable_reasons" api:"nullable"`
 	// Notional average daily volume (ADV multiplied by the cax-adjusted close when
 	// present, the raw previous close otherwise). When a null/undefined value is
 	// observed, it indicates that there is no available data.
@@ -183,9 +188,9 @@ type Instrument struct {
 	// How readily the instrument can be shorted: `EASY_TO_BORROW`, `HARD_TO_BORROW`,
 	// or `NOT_SHORTABLE`. Easy-to-borrow instruments can be shorted without a locate.
 	// A hard-to-borrow instrument is not easy to borrow but has locate inventory
-	// remaining and a float at or above the minimum for short sales; anything else is
-	// not shortable. Omitted for instruments that are not tradable equities. When a
-	// null/undefined value is observed, it indicates it does not apply.
+	// remaining and supports short selling; anything else is not shortable. Omitted
+	// for instruments that are not tradable equities. When a null/undefined value is
+	// observed, it indicates it does not apply.
 	//
 	// Any of "EASY_TO_BORROW", "HARD_TO_BORROW", "NOT_SHORTABLE".
 	ShortableAttribute ShortableAttribute `json:"shortable_attribute" api:"nullable"`
@@ -213,6 +218,7 @@ type Instrument struct {
 		InstrumentType             respjson.Field
 		LongMarginRate             respjson.Field
 		Name                       respjson.Field
+		NotShortableReasons        respjson.Field
 		NotionalAdv                respjson.Field
 		OptionsContractExpiryDates respjson.Field
 		OptionsExpiryDates         respjson.Field
@@ -279,6 +285,11 @@ type InstrumentCore struct {
 	// The full name of the instrument or its issuer When a null/undefined value is
 	// observed, it indicates that there is no available data.
 	Name string `json:"name" api:"nullable"`
+	// Why the instrument is `NOT_SHORTABLE`: every reason that applies, using the same
+	// codes as the `type` of the equivalent order-preview errors. Omitted unless
+	// `shortable_attribute` is `NOT_SHORTABLE`. When a null/undefined value is
+	// observed, it indicates it does not apply.
+	NotShortableReasons []NotShortableReason `json:"not_shortable_reasons" api:"nullable"`
 	// Notional average daily volume (ADV multiplied by the cax-adjusted close when
 	// present, the raw previous close otherwise). When a null/undefined value is
 	// observed, it indicates that there is no available data.
@@ -292,9 +303,9 @@ type InstrumentCore struct {
 	// How readily the instrument can be shorted: `EASY_TO_BORROW`, `HARD_TO_BORROW`,
 	// or `NOT_SHORTABLE`. Easy-to-borrow instruments can be shorted without a locate.
 	// A hard-to-borrow instrument is not easy to borrow but has locate inventory
-	// remaining and a float at or above the minimum for short sales; anything else is
-	// not shortable. Omitted for instruments that are not tradable equities. When a
-	// null/undefined value is observed, it indicates it does not apply.
+	// remaining and supports short selling; anything else is not shortable. Omitted
+	// for instruments that are not tradable equities. When a null/undefined value is
+	// observed, it indicates it does not apply.
 	//
 	// Any of "EASY_TO_BORROW", "HARD_TO_BORROW", "NOT_SHORTABLE".
 	ShortableAttribute ShortableAttribute `json:"shortable_attribute" api:"nullable"`
@@ -322,6 +333,7 @@ type InstrumentCore struct {
 		InstrumentType           respjson.Field
 		LongMarginRate           respjson.Field
 		Name                     respjson.Field
+		NotShortableReasons      respjson.Field
 		NotionalAdv              respjson.Field
 		PreviousClose            respjson.Field
 		ShortMarginRate          respjson.Field
@@ -347,6 +359,14 @@ const (
 	ListingTypeStandard ListingType = "STANDARD"
 	ListingTypeFlex     ListingType = "FLEX"
 	ListingTypeOtc      ListingType = "OTC"
+)
+
+// Why an instrument cannot be shorted.
+type NotShortableReason string
+
+const (
+	NotShortableReasonInsufficientLocateInventory NotShortableReason = "INSUFFICIENT_LOCATE_INVENTORY"
+	NotShortableReasonUnsupportedSecurity         NotShortableReason = "UNSUPPORTED_SECURITY"
 )
 
 // An options expiry date, annotated with which settlement cycles have listed
