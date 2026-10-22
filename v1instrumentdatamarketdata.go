@@ -62,10 +62,12 @@ func (r *V1InstrumentDataMarketDataService) GetDailySummaries(ctx context.Contex
 
 // Get market data snapshots for one or more securities.
 //
-// Two targeting modes, mutually exclusive: `instrument_ids` (1-100 ids), or
+// Three targeting modes, mutually exclusive: `instrument_ids` (1-100 ids),
 // `underlying_instrument_id` + `expiry` together, which resolves the underlier's
 // option chain for that expiry and returns a snapshot for every contract in it
-// (uncapped).
+// (uncapped), or `event_codes` (1-100 event tickers), which returns a snapshot for
+// every market in those events in any status (uncapped). Unknown event codes are
+// ignored.
 func (r *V1InstrumentDataMarketDataService) GetSnapshots(ctx context.Context, query V1InstrumentDataMarketDataGetSnapshotsParams, opts ...option.RequestOption) (res *V1InstrumentDataMarketDataGetSnapshotsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/market-data/snapshot"
