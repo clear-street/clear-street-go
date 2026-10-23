@@ -448,28 +448,34 @@ type OptionsContract struct {
 	// Instrument ID of the underlying instrument, when available When a null/undefined
 	// value is observed, it indicates that there is no available data.
 	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
+	// Type of the underlying instrument, alongside `underlying_instrument_id` When a
+	// null/undefined value is observed, it indicates that there is no available data.
+	//
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	UnderlyingInstrumentType SecurityType `json:"underlying_instrument_type" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID                     respjson.Field
-		ContractType           respjson.Field
-		Currency               respjson.Field
-		Exchange               respjson.Field
-		ExerciseStyle          respjson.Field
-		Expiry                 respjson.Field
-		IsLiquidationOnly      respjson.Field
-		IsMarginable           respjson.Field
-		IsTradable             respjson.Field
-		ListingType            respjson.Field
-		Multiplier             respjson.Field
-		StrikePrice            respjson.Field
-		Symbol                 respjson.Field
-		IsSettleOnOpen         respjson.Field
-		LastTradeCutoff        respjson.Field
-		OpenInterest           respjson.Field
-		TickRules              respjson.Field
-		UnderlyingInstrumentID respjson.Field
-		ExtraFields            map[string]respjson.Field
-		raw                    string
+		ID                       respjson.Field
+		ContractType             respjson.Field
+		Currency                 respjson.Field
+		Exchange                 respjson.Field
+		ExerciseStyle            respjson.Field
+		Expiry                   respjson.Field
+		IsLiquidationOnly        respjson.Field
+		IsMarginable             respjson.Field
+		IsTradable               respjson.Field
+		ListingType              respjson.Field
+		Multiplier               respjson.Field
+		StrikePrice              respjson.Field
+		Symbol                   respjson.Field
+		IsSettleOnOpen           respjson.Field
+		LastTradeCutoff          respjson.Field
+		OpenInterest             respjson.Field
+		TickRules                respjson.Field
+		UnderlyingInstrumentID   respjson.Field
+		UnderlyingInstrumentType respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
 	} `json:"-"`
 }
 
