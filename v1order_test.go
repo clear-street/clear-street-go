@@ -178,6 +178,76 @@ func TestV1OrderGetOrdersWithOptionalParams(t *testing.T) {
 	}
 }
 
+func TestV1OrderPreviewOrders(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.Orders.PreviewOrders(
+		context.TODO(),
+		0,
+		clearstreet.V1OrderPreviewOrdersParams{
+			Preview: []clearstreet.NewOrderRequestParam{{
+				OrderType:      clearstreet.RequestOrderTypeLimit,
+				Quantity:       "100",
+				Side:           clearstreet.SideBuy,
+				TimeInForce:    clearstreet.RequestTimeInForceDay,
+				ID:             clearstreet.String("preview-1"),
+				ExpiresAt:      clearstreet.Time(time.Now()),
+				ExtendedHours:  clearstreet.Bool(true),
+				InstrumentID:   clearstreet.String("x"),
+				LimitOffset:    clearstreet.String("0.50"),
+				LimitPrice:     clearstreet.String("100.00"),
+				PositionIntent: clearstreet.RequestPositionEffectOpen,
+				StopPrice:      clearstreet.String("52.00"),
+				Strategy: clearstreet.OrderStrategyUnionParam{
+					OfOrderStrategyType: &clearstreet.OrderStrategyTypeParam{
+						Type: "SOR",
+					},
+				},
+				Symbol:             clearstreet.String("AAPL"),
+				TrailingOffset:     clearstreet.String("2.00"),
+				TrailingOffsetType: clearstreet.TrailingOffsetTypePrice,
+			}, {
+				OrderType:      clearstreet.RequestOrderTypeLimit,
+				Quantity:       "10",
+				Side:           clearstreet.SideBuy,
+				TimeInForce:    clearstreet.RequestTimeInForceDay,
+				ID:             clearstreet.String("preview-2"),
+				ExpiresAt:      clearstreet.Time(time.Now()),
+				ExtendedHours:  clearstreet.Bool(true),
+				InstrumentID:   clearstreet.String("x"),
+				LimitOffset:    clearstreet.String("0.50"),
+				LimitPrice:     clearstreet.String("250.00"),
+				PositionIntent: clearstreet.RequestPositionEffectOpen,
+				StopPrice:      clearstreet.String("52.00"),
+				Strategy: clearstreet.OrderStrategyUnionParam{
+					OfOrderStrategyType: &clearstreet.OrderStrategyTypeParam{
+						Type: "SOR",
+					},
+				},
+				Symbol:             clearstreet.String("TSLA"),
+				TrailingOffset:     clearstreet.String("2.00"),
+				TrailingOffsetType: clearstreet.TrailingOffsetTypePrice,
+			}},
+		},
+	)
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
 func TestV1OrderReplaceOrderWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {

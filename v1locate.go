@@ -41,8 +41,6 @@ func NewV1LocateService(opts ...option.RequestOption) (r V1LocateService) {
 	return
 }
 
-// > **Beta** — this endpoint may change before general availability.
-//
 // Fetch one locate by id, matched against the locate request id, locate id, and
 // client request id, across all days in force.
 func (r *V1LocateService) GetLocateByID(ctx context.Context, id string, query V1LocateGetLocateByIDParams, opts ...option.RequestOption) (res *V1LocateGetLocateByIDResponse, err error) {
@@ -56,8 +54,6 @@ func (r *V1LocateService) GetLocateByID(ctx context.Context, id string, query V1
 	return res, err
 }
 
-// > **Beta** — this endpoint may change before general availability.
-//
 // Fetch the cached locate borrow rate for one instrument. Rates refresh
 // periodically; `404` means no rate is currently cached for the instrument.
 func (r *V1LocateService) GetLocateRateByID(ctx context.Context, instrumentID InstrumentIDOrSymbol, opts ...option.RequestOption) (res *V1LocateGetLocateRateByIDResponse, err error) {
@@ -71,8 +67,6 @@ func (r *V1LocateService) GetLocateRateByID(ctx context.Context, instrumentID In
 	return res, err
 }
 
-// > **Beta** — this endpoint may change before general availability.
-//
 // Fetch the cached locate borrow rates for up to 1,000 instruments. The response
 // returns one row per requested instrument, in request order. Each row carries
 // either the `rate` or an `error` — a `404` when the instrument is unknown or has
@@ -85,8 +79,6 @@ func (r *V1LocateService) GetLocateRates(ctx context.Context, query V1LocateGetL
 	return res, err
 }
 
-// > **Beta** — this endpoint may change before general availability.
-//
 // List locates for the account on one effective date, which defaults to today's
 // New York calendar date. Filter by comma-separated statuses and instrument ids or
 // symbols.

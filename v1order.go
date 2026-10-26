@@ -96,6 +96,27 @@ func (r *V1OrderService) GetOrders(ctx context.Context, accountID int64, query V
 	return res, err
 }
 
+// Preview the impact of orders without submitting them. For each order the engine
+// evaluates every pre-trade risk check and projects the account's balances and
+// positions as if the order were fully filled — at the limit price for limit
+// orders and at the current reference price for market orders. Orders are
+// evaluated independently: they do not see each other's projected fills. Nothing
+// is submitted and no account state changes.
+//
+// The response carries one result per requested order, in request order. When the
+// request contains more than one order, every order must carry a unique `id`,
+// which is echoed on its result. An order that cannot be previewed gets an `error`
+// on its own result without affecting the rest of the batch; the response is still
+// `200 OK` — per-order outcomes live only in the rows, and non-2xx statuses are
+// reserved for request-level failures (invalid batch, authorization, engine
+// unavailable).
+func (r *V1OrderService) PreviewOrders(ctx context.Context, accountID int64, body V1OrderPreviewOrdersParams, opts ...option.RequestOption) (res *V1OrderPreviewOrdersResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := fmt.Sprintf("v1/accounts/%v/orders/preview", accountID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodPost, path, body, &res, opts...)
+	return res, err
+}
+
 // Replace an order with new parameters
 func (r *V1OrderService) ReplaceOrder(ctx context.Context, orderID string, params V1OrderReplaceOrderParams, opts ...option.RequestOption) (res *V1OrderReplaceOrderResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -462,6 +483,260 @@ func (r *OrderStrategy) UnmarshalJSON(data []byte) error {
 }
 
 type OrderList []Order
+
+// The projected impact of an order, as if it were submitted and fully filled.
+type OrderPreview struct {
+	// The account the order was previewed for.
+	AccountID int64 `json:"account_id" api:"required"`
+	// Monetary size of the previewed order.
+	Amount OrderPreviewAmount `json:"amount" api:"required"`
+	// Buying power before and after the order.
+	BuyingPower OrderPreviewDelta `json:"buying_power" api:"required"`
+	// Currency for all monetary values.
+	Currency string `json:"currency" api:"required"`
+	// Account equity before and after the order.
+	Equity OrderPreviewDelta `json:"equity" api:"required"`
+	// Risk-check errors that would prevent the order from being accepted. Empty when
+	// the order would pass every pre-trade risk check.
+	Errors []OrderPreviewError `json:"errors" api:"required"`
+	// Margin requirements and excess before and after the order.
+	MarginDetails OrderPreviewMarginDetails `json:"margin_details" api:"required"`
+	// Positions in the traded instruments before and after the order.
+	Positions []OrderPreviewPosition `json:"positions" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		AccountID     respjson.Field
+		Amount        respjson.Field
+		BuyingPower   respjson.Field
+		Currency      respjson.Field
+		Equity        respjson.Field
+		Errors        respjson.Field
+		MarginDetails respjson.Field
+		Positions     respjson.Field
+		ExtraFields   map[string]respjson.Field
+		raw           string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderPreview) RawJSON() string { return r.JSON.raw }
+func (r *OrderPreview) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Monetary size of the previewed order.
+type OrderPreviewAmount struct {
+	// Total cash impact of the order before estimated fees and commissions.
+	GrossAmount string `json:"gross_amount" api:"required"`
+	// Total cash impact of the order after estimated fees and commissions.
+	NetAmount string `json:"net_amount" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		GrossAmount respjson.Field
+		NetAmount   respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderPreviewAmount) RawJSON() string { return r.JSON.raw }
+func (r *OrderPreviewAmount) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Before/after values for one metric, as if the previewed order fully filled.
+type OrderPreviewDelta struct {
+	// The value with the previewed order also fully filled.
+	After string `json:"after" api:"required"`
+	// The value before the order, as the risk engine evaluates it: the account's open
+	// orders are projected as filled.
+	Before string `json:"before" api:"required"`
+	// The previewed order's isolated impact: `after - before`.
+	Change string `json:"change" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		After       respjson.Field
+		Before      respjson.Field
+		Change      respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderPreviewDelta) RawJSON() string { return r.JSON.raw }
+func (r *OrderPreviewDelta) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// OrderPreviewEntryUnion contains all possible properties and values from
+// [OrderPreviewEntryObject], [OrderPreviewEntryObject2].
+//
+// Use the methods beginning with 'As' to cast the union to one of its variants.
+type OrderPreviewEntryUnion struct {
+	// This field is from variant [OrderPreviewEntryObject].
+	Preview OrderPreview `json:"preview"`
+	ID      string       `json:"id"`
+	// This field is from variant [OrderPreviewEntryObject2].
+	Error shared.APIError `json:"error"`
+	JSON  struct {
+		Preview respjson.Field
+		ID      respjson.Field
+		Error   respjson.Field
+		raw     string
+	} `json:"-"`
+}
+
+func (u OrderPreviewEntryUnion) AsOrderPreviewEntryObject() (v OrderPreviewEntryObject) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u OrderPreviewEntryUnion) AsOrderPreviewEntryObject2() (v OrderPreviewEntryObject2) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+// Returns the unmodified JSON received from the API
+func (u OrderPreviewEntryUnion) RawJSON() string { return u.JSON.raw }
+
+func (r *OrderPreviewEntryUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The order was previewed successfully.
+type OrderPreviewEntryObject struct {
+	// The projected impact of the order.
+	Preview OrderPreview `json:"preview" api:"required"`
+	// The client-provided `id` of the order this entry belongs to, echoed from the
+	// request. Always present when the request contains more than one order, since ids
+	// are required there.
+	ID string `json:"id" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Preview     respjson.Field
+		ID          respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderPreviewEntryObject) RawJSON() string { return r.JSON.raw }
+func (r *OrderPreviewEntryObject) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The order could not be previewed. Shaped exactly like the top-level `error`
+// object on rejected submissions.
+type OrderPreviewEntryObject2 struct {
+	// Why this order's preview failed.
+	Error shared.APIError `json:"error" api:"required"`
+	// The client-provided `id` of the order this entry belongs to, echoed from the
+	// request. Always present when the request contains more than one order, since ids
+	// are required there.
+	ID string `json:"id" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Error       respjson.Field
+		ID          respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderPreviewEntryObject2) RawJSON() string { return r.JSON.raw }
+func (r *OrderPreviewEntryObject2) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type OrderPreviewEntryList []OrderPreviewEntryUnion
+
+// One pre-trade risk-check error the order would trigger, shaped like the
+// violation entries in `ApiError.details[]` on rejected submissions.
+type OrderPreviewError struct {
+	// Human-readable description of the error.
+	Description string `json:"description" api:"required"`
+	// Structured details for the error (stringified values), e.g. required and
+	// available amounts, and `leg_index`/`leg_symbol` for multileg leg errors.
+	Metadata map[string]string `json:"metadata" api:"required"`
+	// Stable error code.
+	Type string `json:"type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Description respjson.Field
+		Metadata    respjson.Field
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderPreviewError) RawJSON() string { return r.JSON.raw }
+func (r *OrderPreviewError) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Margin requirements and excess before and after the previewed order.
+type OrderPreviewMarginDetails struct {
+	// Initial margin excess.
+	InitialMarginExcess OrderPreviewDelta `json:"initial_margin_excess" api:"required"`
+	// Initial margin requirement.
+	InitialMarginRequirement OrderPreviewDelta `json:"initial_margin_requirement" api:"required"`
+	// Maintenance margin excess.
+	MaintenanceMarginExcess OrderPreviewDelta `json:"maintenance_margin_excess" api:"required"`
+	// Maintenance margin requirement.
+	MaintenanceMarginRequirement OrderPreviewDelta `json:"maintenance_margin_requirement" api:"required"`
+	// Overnight margin excess.
+	OvernightMarginExcess OrderPreviewDelta `json:"overnight_margin_excess" api:"required"`
+	// Overnight margin requirement.
+	OvernightMarginRequirement OrderPreviewDelta `json:"overnight_margin_requirement" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		InitialMarginExcess          respjson.Field
+		InitialMarginRequirement     respjson.Field
+		MaintenanceMarginExcess      respjson.Field
+		MaintenanceMarginRequirement respjson.Field
+		OvernightMarginExcess        respjson.Field
+		OvernightMarginRequirement   respjson.Field
+		ExtraFields                  map[string]respjson.Field
+		raw                          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderPreviewMarginDetails) RawJSON() string { return r.JSON.raw }
+func (r *OrderPreviewMarginDetails) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// One instrument's position before and after the previewed order. Only the traded
+// instruments appear; cash effects are carried by the monetary fields.
+type OrderPreviewPosition struct {
+	// The instrument's identifier.
+	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
+	// Net position quantity before and after the order.
+	Quantity OrderPreviewDelta `json:"quantity" api:"required"`
+	// The instrument's symbol.
+	Symbol string `json:"symbol" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		InstrumentID respjson.Field
+		Quantity     respjson.Field
+		Symbol       respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderPreviewPosition) RawJSON() string { return r.JSON.raw }
+func (r *OrderPreviewPosition) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 // Order status
 type OrderStatus string
@@ -1010,6 +1285,23 @@ func (r *V1OrderGetOrdersResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1OrderPreviewOrdersResponse struct {
+	Data OrderPreviewEntryList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1OrderPreviewOrdersResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1OrderPreviewOrdersResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1OrderReplaceOrderResponse struct {
 	// A trading order with its current state and execution details.
 	//
@@ -1247,6 +1539,18 @@ func (r V1OrderGetOrdersParamsUpdatedAt) URLQuery() (v url.Values, err error) {
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
+}
+
+type V1OrderPreviewOrdersParams struct {
+	Preview []NewOrderRequestParam
+	paramObj
+}
+
+func (r V1OrderPreviewOrdersParams) MarshalJSON() (data []byte, err error) {
+	return shimjson.Marshal(r.Preview)
+}
+func (r *V1OrderPreviewOrdersParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
 }
 
 type V1OrderReplaceOrderParams struct {
