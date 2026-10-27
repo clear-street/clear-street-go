@@ -194,9 +194,9 @@ type Instrument struct {
 	//
 	// Any of "EASY_TO_BORROW", "HARD_TO_BORROW", "NOT_SHORTABLE".
 	ShortableAttribute ShortableAttribute `json:"shortable_attribute" api:"nullable"`
-	// Price bands this instrument quotes on, ascending. Absent when we have no
-	// schedule for it, which includes an option whose penny-program status our
-	// reference data never supplied.
+	// Price bands this instrument quotes on, ascending. A price outside every band is
+	// not valid. Absent when we have no schedule for it, which includes an option
+	// whose penny-program status our reference data never supplied.
 	TickRules []TickRule `json:"tick_rules"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -309,9 +309,9 @@ type InstrumentCore struct {
 	//
 	// Any of "EASY_TO_BORROW", "HARD_TO_BORROW", "NOT_SHORTABLE".
 	ShortableAttribute ShortableAttribute `json:"shortable_attribute" api:"nullable"`
-	// Price bands this instrument quotes on, ascending. Absent when we have no
-	// schedule for it, which includes an option whose penny-program status our
-	// reference data never supplied.
+	// Price bands this instrument quotes on, ascending. A price outside every band is
+	// not valid. Absent when we have no schedule for it, which includes an option
+	// whose penny-program status our reference data never supplied.
 	TickRules []TickRule `json:"tick_rules"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -504,9 +504,8 @@ type TickRule struct {
 	StartPrice string `json:"start_price" api:"required"`
 	// Minimum price increment within the band.
 	TickSize string `json:"tick_size" api:"required"`
-	// Upper bound of the band, exclusive. Absent on the last band, which runs to
-	// infinity. When a null/undefined value is observed, it indicates it does not
-	// apply.
+	// Upper bound of the band, exclusive. Absent when the band runs to infinity. When
+	// a null/undefined value is observed, it indicates it does not apply.
 	EndPrice string `json:"end_price" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
