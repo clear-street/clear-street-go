@@ -352,12 +352,6 @@ type Order struct {
 	// Limit price (for LIMIT and STOP_LIMIT orders) When a null/undefined value is
 	// observed, it indicates it does not apply.
 	LimitPrice string `json:"limit_price" api:"nullable"`
-	// Parent order queue state, present when the order is awaiting release or
-	// released. When a null/undefined value is observed, it indicates it does not
-	// apply.
-	//
-	// Any of "AWAITING_RELEASE", "RELEASED".
-	QueueState QueueState `json:"queue_state" api:"nullable"`
 	// Scheduled release time for orders awaiting release. When a null/undefined value
 	// is observed, it indicates it does not apply.
 	ReleasesAt time.Time `json:"releases_at" api:"nullable" format:"date-time"`
@@ -428,7 +422,6 @@ type Order struct {
 		InstrumentType           respjson.Field
 		LimitOffset              respjson.Field
 		LimitPrice               respjson.Field
-		QueueState               respjson.Field
 		ReleasesAt               respjson.Field
 		StopPrice                respjson.Field
 		Strategy                 respjson.Field
@@ -1088,14 +1081,6 @@ const (
 	OrderTypeTrailingStop      OrderType = "TRAILING_STOP"
 	OrderTypeTrailingStopLimit OrderType = "TRAILING_STOP_LIMIT"
 	OrderTypeOther             OrderType = "OTHER"
-)
-
-// Parent order queue or hold state.
-type QueueState string
-
-const (
-	QueueStateAwaitingRelease QueueState = "AWAITING_RELEASE"
-	QueueStateReleased        QueueState = "RELEASED"
 )
 
 // Request to replace (modify) an existing order
