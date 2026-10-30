@@ -50,8 +50,13 @@ func NewV1OmniAIThreadService(opts ...option.RequestOption) (r V1OmniAIThreadSer
 // Poll the returned `response_id` via `GET /omni-ai/responses/{response_id}` for
 // assistant output.
 //
-// Only one response may be active per thread. Wait for it to reach a terminal
-// status before submitting another turn; otherwise this endpoint returns 409.
+// A message sent while another response is active is accepted, and its response is
+// `queued`. Omni reads the message at the next safe point of the active response.
+// The active response then ends `steered` if it showed text, or `merged` if it did
+// not, and the response for the newest message answers everything sent so far.
+// Earlier queued responses that it answers also end `merged`. Some requests, such
+// as research, do not steer: their responses, and the responses for messages sent
+// after them, start in order after the earlier responses end.
 //
 // The first accepted selected-account message links an unlinked thread. A linked
 // thread keeps its account regardless of omission or another selection. A changed
@@ -89,8 +94,14 @@ func (r *V1OmniAIThreadService) NewThread(ctx context.Context, body V1OmniAIThre
 // the returned page token to navigate history.
 //
 // In-progress assistant output is not included. Poll
-// `GET /omni-ai/responses/{response_id}` until the response reaches a terminal
-// status, then read its finalized message here.
+// `GET /omni-ai/threads/{thread_id}/response` and refresh messages when a response
+// ends to read its finalized message here. Some answers start without a request: a
+// response with no `user_message_id` presents a background result, such as a
+// subagent's report, so keep polling the thread response while the thread is open
+// rather than only after sending a message.
+//
+// Hide assistant messages with outcome `merged`. They have no content, and a later
+// answer covers their turn.
 func (r *V1OmniAIThreadService) GetMessages(ctx context.Context, threadID string, query V1OmniAIThreadGetMessagesParams, opts ...option.RequestOption) (res *V1OmniAIThreadGetMessagesResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
@@ -117,11 +128,11 @@ func (r *V1OmniAIThreadService) GetThreadByID(ctx context.Context, threadID stri
 	return res, err
 }
 
-// Look up the currently active response without knowing its `response_id`. Use
-// this endpoint when reopening a thread whose assistant turn may still be in
-// progress.
-//
-// An idle owned thread returns HTTP 200 with `data: null`.
+// Returns the running response, or else the next queued response. Poll it while a
+// thread is open to follow every response in order, including answers that start
+// without a request: a response with no `user_message_id` presents a background
+// result, such as a subagent's report. Refresh messages when any response ends. An
+// idle owned thread returns HTTP 200 with `data: null`.
 func (r *V1OmniAIThreadService) GetThreadResponse(ctx context.Context, threadID string, query V1OmniAIThreadGetThreadResponseParams, opts ...option.RequestOption) (res *V1OmniAIThreadGetThreadResponseResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if threadID == "" {
@@ -259,7 +270,11 @@ type Message struct {
 	CreatedAt time.Time      `json:"created_at" api:"required" format:"date-time"`
 	// Immutable terminal outcome for a finalized assistant message.
 	//
-	// Any of "completed", "errored", "canceled".
+	// `steered`: the message is complete as written; the user sent a newer message
+	// before it finished. `merged`: the message has no content, and a later answer
+	// covers its turn. Hide `merged` messages.
+	//
+	// Any of "completed", "errored", "canceled", "steered", "merged".
 	Outcome MessageOutcome `json:"outcome" api:"required"`
 	// Finalized message role in the public contract.
 	//
@@ -518,12 +533,18 @@ func (r *MessageContentPartContentPartCustom) UnmarshalJSON(data []byte) error {
 type MessageList []Message
 
 // Immutable terminal outcome for a finalized assistant message.
+//
+// `steered`: the message is complete as written; the user sent a newer message
+// before it finished. `merged`: the message has no content, and a later answer
+// covers its turn. Hide `merged` messages.
 type MessageOutcome string
 
 const (
 	MessageOutcomeCompleted MessageOutcome = "completed"
 	MessageOutcomeErrored   MessageOutcome = "errored"
 	MessageOutcomeCanceled  MessageOutcome = "canceled"
+	MessageOutcomeSteered   MessageOutcome = "steered"
+	MessageOutcomeMerged    MessageOutcome = "merged"
 )
 
 // Finalized message role in the public contract.

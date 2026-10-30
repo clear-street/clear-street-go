@@ -45,9 +45,14 @@ func NewV1OmniAIResponseService(opts ...option.RequestOption) (r V1OmniAIRespons
 	return
 }
 
-// Cancel a queued or running response. Cancellation is idempotent after the
-// response becomes terminal. A canceled turn still produces a finalized assistant
-// message with outcome `canceled` in the thread history.
+// Cancel a queued or running response. Canceling a running response (Stop) also
+// cancels every queued response in the thread that answers a user message.
+// Canceling a queued response (withdraw) cancels only that response; the running
+// response and other queued responses continue. Cancellation is idempotent after
+// the response becomes terminal. Each canceled response still produces a finalized
+// assistant message with outcome `canceled` in the thread history. Canceling a
+// response that ended `steered` or `merged` stops the response that continues its
+// work, with the same effect as Stop.
 //
 // Authorization uses the linked account before any cancellation.
 func (r *V1OmniAIResponseService) CancelResponse(ctx context.Context, responseID string, body V1OmniAIResponseCancelResponseParams, opts ...option.RequestOption) (res *V1OmniAIResponseCancelResponseResponse, err error) {
@@ -63,12 +68,15 @@ func (r *V1OmniAIResponseService) CancelResponse(ctx context.Context, responseID
 
 // Poll the current snapshot of an in-progress or completed assistant response.
 // While its status is `queued` or `running`, content may be partial and include
-// thinking parts. Continue polling until it becomes `succeeded`, `failed`, or
-// `canceled`.
+// thinking parts. Continue polling until it becomes `succeeded`, `failed`,
+// `canceled`, `steered`, or `merged`. Treat an unknown status as terminal. On
+// `steered` or `merged`, poll `GET /omni-ai/threads/{thread_id}/response` at once
+// for the response that continues the work.
 //
 // Once terminal, the finalized message is available through
-// `GET /omni-ai/threads/{thread_id}/messages`. Authorization uses the current
-// parent thread account, including for responses created before the account link.
+// `GET /omni-ai/threads/{thread_id}/messages`; refresh messages when a response
+// ends. Authorization uses the current parent thread account, including for
+// responses created before the account link.
 func (r *V1OmniAIResponseService) GetResponseByID(ctx context.Context, responseID string, query V1OmniAIResponseGetResponseByIDParams, opts ...option.RequestOption) (res *V1OmniAIResponseGetResponseByIDResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	if responseID == "" {
@@ -98,6 +106,8 @@ func (r *CancelResponsePayload) UnmarshalJSON(data []byte) error {
 
 // Shared sanitized error payload.
 type ErrorStatus struct {
+	// `FAILED`, or `execution_interrupted` when Omni lost the worker running the
+	// response; partial content is kept; send the message again.
 	Code    string `json:"code" api:"required"`
 	Message string `json:"message" api:"required"`
 	// When a null/undefined value is observed, it indicates it does not apply.
@@ -123,10 +133,16 @@ type Response struct {
 	ID string `json:"id" api:"required" format:"uuid"`
 	// Dynamic lifecycle status for a pollable response.
 	//
-	// Any of "queued", "running", "succeeded", "failed", "canceled".
-	Status        ResponseStatus `json:"status" api:"required"`
-	ThreadID      string         `json:"thread_id" api:"required" format:"uuid"`
-	UserMessageID string         `json:"user_message_id" api:"required" format:"uuid"`
+	// `succeeded`, `failed`, `canceled`, `steered` and `merged` are terminal.
+	// `steered`: the response ended as written because the user sent a newer message,
+	// and a later response in the thread continues the work. `merged`: the response
+	// ended without text, and a later response answers its message. Treat an unknown
+	// status as terminal.
+	//
+	// Any of "queued", "running", "succeeded", "failed", "canceled", "steered",
+	// "merged".
+	Status   ResponseStatus `json:"status" api:"required"`
+	ThreadID string         `json:"thread_id" api:"required" format:"uuid"`
 	// When a null/undefined value is observed, it indicates that there is no available
 	// data.
 	Content ResponseContent `json:"content" api:"nullable"`
@@ -134,15 +150,20 @@ type Response struct {
 	Error ErrorStatus `json:"error" api:"nullable"`
 	// When a null/undefined value is observed, it indicates it does not apply.
 	OutputMessageID string `json:"output_message_id" api:"nullable" format:"uuid"`
+	// The user message this response answers. Omitted when the response presents a
+	// background result, such as a subagent's report, and answers no user message; its
+	// output message then appears in the thread without a preceding request. When a
+	// null/undefined value is observed, it indicates it does not apply.
+	UserMessageID string `json:"user_message_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID              respjson.Field
 		Status          respjson.Field
 		ThreadID        respjson.Field
-		UserMessageID   respjson.Field
 		Content         respjson.Field
 		Error           respjson.Field
 		OutputMessageID respjson.Field
+		UserMessageID   respjson.Field
 		ExtraFields     map[string]respjson.Field
 		raw             string
 	} `json:"-"`
@@ -402,6 +423,12 @@ func (r *ResponseContentPartContentPartCustom) UnmarshalJSON(data []byte) error 
 }
 
 // Dynamic lifecycle status for a pollable response.
+//
+// `succeeded`, `failed`, `canceled`, `steered` and `merged` are terminal.
+// `steered`: the response ended as written because the user sent a newer message,
+// and a later response in the thread continues the work. `merged`: the response
+// ended without text, and a later response answers its message. Treat an unknown
+// status as terminal.
 type ResponseStatus string
 
 const (
@@ -410,6 +437,8 @@ const (
 	ResponseStatusSucceeded ResponseStatus = "succeeded"
 	ResponseStatusFailed    ResponseStatus = "failed"
 	ResponseStatusCanceled  ResponseStatus = "canceled"
+	ResponseStatusSteered   ResponseStatus = "steered"
+	ResponseStatusMerged    ResponseStatus = "merged"
 )
 
 type V1OmniAIResponseCancelResponseResponse struct {
