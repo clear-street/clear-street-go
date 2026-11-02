@@ -189,8 +189,9 @@ type Instrument struct {
 	// or `NOT_SHORTABLE`. Easy-to-borrow instruments can be shorted without a locate.
 	// A hard-to-borrow instrument is not easy to borrow but has locate inventory
 	// remaining and supports short selling; anything else is not shortable. Omitted
-	// for instruments that are not tradable equities. When a null/undefined value is
-	// observed, it indicates it does not apply.
+	// for instruments that are neither tradable equities nor event contracts. Event
+	// contracts are always `NOT_SHORTABLE`. When a null/undefined value is observed,
+	// it indicates it does not apply.
 	//
 	// Any of "EASY_TO_BORROW", "HARD_TO_BORROW", "NOT_SHORTABLE".
 	ShortableAttribute ShortableAttribute `json:"shortable_attribute" api:"nullable"`
@@ -304,8 +305,9 @@ type InstrumentCore struct {
 	// or `NOT_SHORTABLE`. Easy-to-borrow instruments can be shorted without a locate.
 	// A hard-to-borrow instrument is not easy to borrow but has locate inventory
 	// remaining and supports short selling; anything else is not shortable. Omitted
-	// for instruments that are not tradable equities. When a null/undefined value is
-	// observed, it indicates it does not apply.
+	// for instruments that are neither tradable equities nor event contracts. Event
+	// contracts are always `NOT_SHORTABLE`. When a null/undefined value is observed,
+	// it indicates it does not apply.
 	//
 	// Any of "EASY_TO_BORROW", "HARD_TO_BORROW", "NOT_SHORTABLE".
 	ShortableAttribute ShortableAttribute `json:"shortable_attribute" api:"nullable"`
