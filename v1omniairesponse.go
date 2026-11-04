@@ -51,8 +51,8 @@ func NewV1OmniAIResponseService(opts ...option.RequestOption) (r V1OmniAIRespons
 // response and other queued responses continue. Cancellation is idempotent after
 // the response becomes terminal. Each canceled response still produces a finalized
 // assistant message with outcome `canceled` in the thread history. Canceling a
-// response that ended `steered` or `merged` stops the response that continues its
-// work, with the same effect as Stop.
+// response that ended `steered` or `merged` follows its `continued_in_response_id`
+// and stops the response that continues its work, with the same effect as Stop.
 //
 // Authorization uses the linked account before any cancellation.
 func (r *V1OmniAIResponseService) CancelResponse(ctx context.Context, responseID string, body V1OmniAIResponseCancelResponseParams, opts ...option.RequestOption) (res *V1OmniAIResponseCancelResponseResponse, err error) {
@@ -70,8 +70,8 @@ func (r *V1OmniAIResponseService) CancelResponse(ctx context.Context, responseID
 // While its status is `queued` or `running`, content may be partial and include
 // thinking parts. Continue polling until it becomes `succeeded`, `failed`,
 // `canceled`, `steered`, or `merged`. Treat an unknown status as terminal. On
-// `steered` or `merged`, poll `GET /omni-ai/threads/{thread_id}/response` at once
-// for the response that continues the work.
+// `steered` or `merged`, poll the response in `continued_in_response_id` at once:
+// it continues the work.
 //
 // Once terminal, the finalized message is available through
 // `GET /omni-ai/threads/{thread_id}/messages`; refresh messages when a response
@@ -146,10 +146,20 @@ type Response struct {
 	// When a null/undefined value is observed, it indicates that there is no available
 	// data.
 	Content ResponseContent `json:"content" api:"nullable"`
+	// The response that continues the work of this response. Present only when
+	// `status` is `steered` or `merged`. Follow it to keep showing the answer. To stop
+	// that work, cancel it, or cancel this response: the server follows the link. When
+	// a null/undefined value is observed, it indicates it does not apply.
+	ContinuedInResponseID string `json:"continued_in_response_id" api:"nullable" format:"uuid"`
 	// When a null/undefined value is observed, it indicates it does not apply.
 	Error ErrorStatus `json:"error" api:"nullable"`
 	// When a null/undefined value is observed, it indicates it does not apply.
 	OutputMessageID string `json:"output_message_id" api:"nullable" format:"uuid"`
+	// The `seq` the output message has in the thread's message list. Present once the
+	// output message exists. Omitted while the response is `queued`. Use it to place a
+	// response that is still in progress among the listed messages. When a
+	// null/undefined value is observed, it indicates it does not apply.
+	OutputMessageSeq int64 `json:"output_message_seq" api:"nullable"`
 	// The user message this response answers. Omitted when the response presents a
 	// background result, such as a subagent's report, and answers no user message; its
 	// output message then appears in the thread without a preceding request. When a
@@ -157,15 +167,17 @@ type Response struct {
 	UserMessageID string `json:"user_message_id" api:"nullable" format:"uuid"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ID              respjson.Field
-		Status          respjson.Field
-		ThreadID        respjson.Field
-		Content         respjson.Field
-		Error           respjson.Field
-		OutputMessageID respjson.Field
-		UserMessageID   respjson.Field
-		ExtraFields     map[string]respjson.Field
-		raw             string
+		ID                    respjson.Field
+		Status                respjson.Field
+		ThreadID              respjson.Field
+		Content               respjson.Field
+		ContinuedInResponseID respjson.Field
+		Error                 respjson.Field
+		OutputMessageID       respjson.Field
+		OutputMessageSeq      respjson.Field
+		UserMessageID         respjson.Field
+		ExtraFields           map[string]respjson.Field
+		raw                   string
 	} `json:"-"`
 }
 
