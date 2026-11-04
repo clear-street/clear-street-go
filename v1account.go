@@ -203,6 +203,11 @@ type AccountBalances struct {
 	// The total market value of all short positions. When null/undefined, the value
 	// should be assumed to be zero. The field is omitted to simplify the response.
 	ShortMarketValue string `json:"short_market_value" api:"nullable"`
+	// The intraday special memorandum account (SMA) of the account holder. Omitted
+	// when no SMA is available for the current trade date, or when the account holder
+	// has more than one open account. When a null/undefined value is observed, it
+	// indicates that there is no available data.
+	Sma AccountBalancesSma `json:"sma" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		AccountID           respjson.Field
@@ -226,6 +231,7 @@ type AccountBalances struct {
 		MarginDetails       respjson.Field
 		Multiplier          respjson.Field
 		ShortMarketValue    respjson.Field
+		Sma                 respjson.Field
 		ExtraFields         map[string]respjson.Field
 		raw                 string
 	} `json:"-"`
@@ -234,6 +240,31 @@ type AccountBalances struct {
 // Returns the unmodified JSON received from the API
 func (r AccountBalances) RawJSON() string { return r.JSON.raw }
 func (r *AccountBalances) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// The intraday special memorandum account (SMA) of an account holder.
+//
+// The SMA belongs to the account holder, not to one account. The API returns it
+// only when the account holder has a single open account.
+type AccountBalancesSma struct {
+	// The time the SMA was calculated as of (UTC). During a trade date the API returns
+	// the last published value, so use this time to judge how current the value is.
+	Asof time.Time `json:"asof" api:"required" format:"date-time"`
+	// The SMA amount in the account currency. The value can be negative.
+	Value string `json:"value" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Asof        respjson.Field
+		Value       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r AccountBalancesSma) RawJSON() string { return r.JSON.raw }
+func (r *AccountBalancesSma) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
