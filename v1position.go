@@ -136,7 +136,7 @@ type Position struct {
 	InstrumentID string `json:"instrument_id" api:"required" format:"uuid"`
 	// Type of security
 	//
-	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
 	InstrumentType SecurityType `json:"instrument_type" api:"required"`
 	// The current market value of the position
 	MarketValue string `json:"market_value" api:"required"`
@@ -180,7 +180,7 @@ type Position struct {
 	// Type of the underlying instrument, alongside `underlying_instrument_id` When a
 	// null/undefined value is observed, it indicates it does not apply.
 	//
-	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
 	UnderlyingInstrumentType SecurityType `json:"underlying_instrument_type" api:"nullable"`
 	// The total unrealized profit or loss for this position based on current market
 	// value When a null/undefined value is observed, it indicates that there is no
@@ -559,7 +559,7 @@ type V1PositionGetPositionsParams struct {
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
 	InstrumentType V1PositionGetPositionsParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Field to sort by
 	//
@@ -586,10 +586,11 @@ func (r V1PositionGetPositionsParams) URLQuery() (v url.Values, err error) {
 type V1PositionGetPositionsParamsInstrumentType string
 
 const (
-	V1PositionGetPositionsParamsInstrumentTypeCommonStock V1PositionGetPositionsParamsInstrumentType = "COMMON_STOCK"
-	V1PositionGetPositionsParamsInstrumentTypeIndex       V1PositionGetPositionsParamsInstrumentType = "INDEX"
-	V1PositionGetPositionsParamsInstrumentTypeOption      V1PositionGetPositionsParamsInstrumentType = "OPTION"
-	V1PositionGetPositionsParamsInstrumentTypeCash        V1PositionGetPositionsParamsInstrumentType = "CASH"
+	V1PositionGetPositionsParamsInstrumentTypeCommonStock   V1PositionGetPositionsParamsInstrumentType = "COMMON_STOCK"
+	V1PositionGetPositionsParamsInstrumentTypeIndex         V1PositionGetPositionsParamsInstrumentType = "INDEX"
+	V1PositionGetPositionsParamsInstrumentTypeOption        V1PositionGetPositionsParamsInstrumentType = "OPTION"
+	V1PositionGetPositionsParamsInstrumentTypeCash          V1PositionGetPositionsParamsInstrumentType = "CASH"
+	V1PositionGetPositionsParamsInstrumentTypeEventContract V1PositionGetPositionsParamsInstrumentType = "EVENT_CONTRACT"
 )
 
 // Field to sort by

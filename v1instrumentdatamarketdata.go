@@ -62,12 +62,10 @@ func (r *V1InstrumentDataMarketDataService) GetDailySummaries(ctx context.Contex
 
 // Get market data snapshots for one or more securities.
 //
-// Three targeting modes, mutually exclusive: `instrument_ids` (1-100 ids),
+// Targeting modes are mutually exclusive: `instrument_ids` (1-100 ids), or
 // `underlying_instrument_id` + `expiry` together, which resolves the underlier's
 // option chain for that expiry and returns a snapshot for every contract in it
-// (uncapped), or `event_codes` (1-100 event tickers), which returns a snapshot for
-// every market in those events in any status (uncapped). Unknown event codes are
-// ignored.
+// (uncapped).
 func (r *V1InstrumentDataMarketDataService) GetSnapshots(ctx context.Context, query V1InstrumentDataMarketDataGetSnapshotsParams, opts ...option.RequestOption) (res *V1InstrumentDataMarketDataGetSnapshotsResponse, err error) {
 	opts = slices.Concat(r.options, opts)
 	path := "v1/market-data/snapshot"
@@ -485,6 +483,14 @@ type V1InstrumentDataMarketDataGetSnapshotsParams struct {
 	// chain. Must be provided together with `expiry`; mutually exclusive with
 	// `instrument_ids`.
 	UnderlyingInstrumentID param.Opt[string] `query:"underlying_instrument_id,omitzero" json:"-"`
+	// > **Alpha** — this parameter is experimental and may change or be removed at any
+	// > time.
+	//
+	// Comma-separated event tickers. Returns a snapshot for every market in those
+	// events, in any status, with no cap on the number of markets. Accepts 1 to 100
+	// codes; unknown codes are ignored. Mutually exclusive with `instrument_ids` and
+	// with `underlying_instrument_id` and `expiry`.
+	EventCodes []string `query:"event_codes,omitzero" json:"-"`
 	// Comma-separated instrument IDs (UUID) or symbols (equity tickers or OSI option
 	// symbols). Accepts 1 to 100 IDs; duplicate resolved ids collapse to a single row.
 	// Required unless `underlying_instrument_id` and `expiry` are provided; mutually

@@ -51,6 +51,7 @@ func TestV1InstrumentDataMarketDataGetSnapshotsWithOptionalParams(t *testing.T) 
 		option.WithAPIKey("My API Key"),
 	)
 	_, err := client.V1.InstrumentData.MarketData.GetSnapshots(context.TODO(), clearstreet.V1InstrumentDataMarketDataGetSnapshotsParams{
+		EventCodes:             []string{"string"},
 		Expiry:                 clearstreet.Time(time.Now()),
 		InstrumentIDs:          []clearstreet.InstrumentIDOrSymbol{"x"},
 		UnderlyingInstrumentID: clearstreet.String("x"),

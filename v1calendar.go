@@ -454,8 +454,7 @@ func (r V1CalendarGetEconomicEventsCalendarParamsTimestamp) URLQuery() (v url.Va
 type V1CalendarGetMarketHoursCalendarParams struct {
 	// The date to query market hours for (YYYY-MM-DD). Defaults to today.
 	Date param.Opt[string] `query:"date,omitzero" json:"-"`
-	// Market type to query (us_equities, us_options, us_event_contracts). If omitted,
-	// returns us_equities and us_options.
+	// Market type to query. If omitted, returns us_equities and us_options.
 	//
 	// Any of "us_equities", "us_options", "us_event_contracts".
 	Market V1CalendarGetMarketHoursCalendarParamsMarket `query:"market,omitzero" json:"-"`
@@ -471,8 +470,7 @@ func (r V1CalendarGetMarketHoursCalendarParams) URLQuery() (v url.Values, err er
 	})
 }
 
-// Market type to query (us_equities, us_options, us_event_contracts). If omitted,
-// returns us_equities and us_options.
+// Market type to query. If omitted, returns us_equities and us_options.
 type V1CalendarGetMarketHoursCalendarParamsMarket string
 
 const (

@@ -107,6 +107,127 @@ func TestV1InstrumentGetOptionContractsWithOptionalParams(t *testing.T) {
 	}
 }
 
+func TestV1InstrumentGetPredictionCategories(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.Instruments.GetPredictionCategories(context.TODO())
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestV1InstrumentGetPredictionEventsWithOptionalParams(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.Instruments.GetPredictionEvents(context.TODO(), clearstreet.V1InstrumentGetPredictionEventsParams{
+		Categories: clearstreet.String("categories"),
+		CloseAt: clearstreet.V1InstrumentGetPredictionEventsParamsCloseAt{
+			Gt:  clearstreet.String("gt"),
+			Gte: clearstreet.String("gte"),
+			Lt:  clearstreet.String("lt"),
+			Lte: clearstreet.String("lte"),
+		},
+		IncludeMarkets: clearstreet.Bool(true),
+		IncludeSettled: clearstreet.Bool(true),
+		MarketIDs:      clearstreet.String("market_ids"),
+		OpenAt: clearstreet.V1InstrumentGetPredictionEventsParamsOpenAt{
+			Gt:  clearstreet.String("gt"),
+			Gte: clearstreet.String("gte"),
+			Lt:  clearstreet.String("lt"),
+			Lte: clearstreet.String("lte"),
+		},
+		PageSize:      clearstreet.Int(1),
+		PageToken:     clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+		Search:        clearstreet.String("search"),
+		SeriesCodes:   clearstreet.String("series_codes"),
+		SortBy:        clearstreet.V1InstrumentGetPredictionEventsParamsSortByOpenAt,
+		SortDirection: clearstreet.V1InstrumentGetPredictionEventsParamsSortDirectionAsc,
+	})
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestV1InstrumentGetPredictionMarketsWithOptionalParams(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.Instruments.GetPredictionMarkets(context.TODO(), clearstreet.V1InstrumentGetPredictionMarketsParams{
+		EventCode: clearstreet.String("event_code"),
+		MarketIDs: clearstreet.String("market_ids"),
+		PageSize:  clearstreet.Int(1),
+		PageToken: clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+		Statuses:  clearstreet.String("statuses"),
+	})
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
+func TestV1InstrumentGetPredictionSeriesWithOptionalParams(t *testing.T) {
+	baseURL := "http://localhost:4010"
+	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {
+		baseURL = envURL
+	}
+	if !testutil.CheckTestServer(t, baseURL) {
+		return
+	}
+	client := clearstreet.NewClient(
+		option.WithBaseURL(baseURL),
+		option.WithAPIKey("My API Key"),
+	)
+	_, err := client.V1.Instruments.GetPredictionSeries(context.TODO(), clearstreet.V1InstrumentGetPredictionSeriesParams{
+		Categories: clearstreet.String("categories"),
+		PageSize:   clearstreet.Int(1),
+		PageToken:  clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+	})
+	if err != nil {
+		var apierr *clearstreet.Error
+		if errors.As(err, &apierr) {
+			t.Log(string(apierr.DumpRequest(true)))
+		}
+		t.Fatalf("err should be nil: %s", err.Error())
+	}
+}
+
 func TestV1InstrumentSearchInstrumentsWithOptionalParams(t *testing.T) {
 	baseURL := "http://localhost:4010"
 	if envURL, ok := os.LookupEnv("TEST_API_BASE_URL"); ok {

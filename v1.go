@@ -70,10 +70,11 @@ func NewV1Service(opts ...option.RequestOption) (r V1Service) {
 type SecurityType string
 
 const (
-	SecurityTypeCommonStock SecurityType = "COMMON_STOCK"
-	SecurityTypeIndex       SecurityType = "INDEX"
-	SecurityTypeOption      SecurityType = "OPTION"
-	SecurityTypeCash        SecurityType = "CASH"
+	SecurityTypeCommonStock   SecurityType = "COMMON_STOCK"
+	SecurityTypeIndex         SecurityType = "INDEX"
+	SecurityTypeOption        SecurityType = "OPTION"
+	SecurityTypeCash          SecurityType = "CASH"
+	SecurityTypeEventContract SecurityType = "EVENT_CONTRACT"
 )
 
 // Sort direction for sorted results

@@ -200,6 +200,8 @@ type AccountBalances struct {
 	// after-hours) and 2 during the overnight session. When a null/undefined value is
 	// observed, it indicates it does not apply.
 	Multiplier string `json:"multiplier" api:"nullable"`
+	// Prediction-market buying power in the same currency as the account balances.
+	PredictionMarket PredictionMarketBalances `json:"prediction_market"`
 	// The total market value of all short positions. When null/undefined, the value
 	// should be assumed to be zero. The field is omitted to simplify the response.
 	ShortMarketValue string `json:"short_market_value" api:"nullable"`
@@ -230,6 +232,7 @@ type AccountBalances struct {
 		WithdrawableCash    respjson.Field
 		MarginDetails       respjson.Field
 		Multiplier          respjson.Field
+		PredictionMarket    respjson.Field
 		ShortMarketValue    respjson.Field
 		Sma                 respjson.Field
 		ExtraFields         map[string]respjson.Field
@@ -671,6 +674,26 @@ type PortfolioHistorySegment struct {
 // Returns the unmodified JSON received from the API
 func (r PortfolioHistorySegment) RawJSON() string { return r.JSON.raw }
 func (r *PortfolioHistorySegment) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Prediction-market buying power in the same currency as the account balances.
+type PredictionMarketBalances struct {
+	// Unlevered prediction-market buying power from the shared cash pool, after order
+	// and withdrawal holds. This draws on the same funds as Securities buying power;
+	// the two values must not be added together.
+	BuyingPower string `json:"buying_power" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		BuyingPower respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r PredictionMarketBalances) RawJSON() string { return r.JSON.raw }
+func (r *PredictionMarketBalances) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 

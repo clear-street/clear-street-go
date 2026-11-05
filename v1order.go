@@ -171,7 +171,7 @@ type Execution struct {
 	// Type of the underlying instrument, alongside `underlying_instrument_id`. When a
 	// null/undefined value is observed, it indicates it does not apply.
 	//
-	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
 	UnderlyingInstrumentType SecurityType `json:"underlying_instrument_type" api:"nullable"`
 	// Venue where this fill occurred, as reported by that venue. Distinct from an
 	// order's `venue`, which is the routing destination. Codes are not normalized, so
@@ -344,7 +344,7 @@ type Order struct {
 	// reported individually in `legs[]`. When a null/undefined value is observed, it
 	// indicates it does not apply.
 	//
-	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
 	// Limit offset for trailing stop-limit orders (signed) When a null/undefined value
 	// is observed, it indicates it does not apply.
@@ -397,7 +397,7 @@ type Order struct {
 	// Type of the underlying instrument, alongside `underlying_instrument_id`. When a
 	// null/undefined value is observed, it indicates it does not apply.
 	//
-	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
 	UnderlyingInstrumentType SecurityType `json:"underlying_instrument_type" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -1332,7 +1332,7 @@ type V1OrderCancelAllOpenOrdersParams struct {
 	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" json:"-"`
 	// Filter by instrument type (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
 	InstrumentType V1OrderCancelAllOpenOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Filter by order side (BUY or SELL)
 	//
@@ -1359,10 +1359,11 @@ func (r V1OrderCancelAllOpenOrdersParams) URLQuery() (v url.Values, err error) {
 type V1OrderCancelAllOpenOrdersParamsInstrumentType string
 
 const (
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock V1OrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeIndex       V1OrderCancelAllOpenOrdersParamsInstrumentType = "INDEX"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOption      V1OrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
-	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCash        V1OrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCommonStock   V1OrderCancelAllOpenOrdersParamsInstrumentType = "COMMON_STOCK"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeIndex         V1OrderCancelAllOpenOrdersParamsInstrumentType = "INDEX"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeOption        V1OrderCancelAllOpenOrdersParamsInstrumentType = "OPTION"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeCash          V1OrderCancelAllOpenOrdersParamsInstrumentType = "CASH"
+	V1OrderCancelAllOpenOrdersParamsInstrumentTypeEventContract V1OrderCancelAllOpenOrdersParamsInstrumentType = "EVENT_CONTRACT"
 )
 
 // Filter by order side (BUY or SELL)
@@ -1448,7 +1449,7 @@ type V1OrderGetOrdersParams struct {
 	InstrumentIDs []InstrumentIDOrSymbol `query:"instrument_ids,omitzero" json:"-"`
 	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
 	//
-	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
 	InstrumentType V1OrderGetOrdersParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Comma-separated list of order identifiers. Each value may be an order's `id` or
 	// its `client_order_id`; only orders matching one of the given identifiers are
@@ -1481,10 +1482,11 @@ func (r V1OrderGetOrdersParams) URLQuery() (v url.Values, err error) {
 type V1OrderGetOrdersParamsInstrumentType string
 
 const (
-	V1OrderGetOrdersParamsInstrumentTypeCommonStock V1OrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
-	V1OrderGetOrdersParamsInstrumentTypeIndex       V1OrderGetOrdersParamsInstrumentType = "INDEX"
-	V1OrderGetOrdersParamsInstrumentTypeOption      V1OrderGetOrdersParamsInstrumentType = "OPTION"
-	V1OrderGetOrdersParamsInstrumentTypeCash        V1OrderGetOrdersParamsInstrumentType = "CASH"
+	V1OrderGetOrdersParamsInstrumentTypeCommonStock   V1OrderGetOrdersParamsInstrumentType = "COMMON_STOCK"
+	V1OrderGetOrdersParamsInstrumentTypeIndex         V1OrderGetOrdersParamsInstrumentType = "INDEX"
+	V1OrderGetOrdersParamsInstrumentTypeOption        V1OrderGetOrdersParamsInstrumentType = "OPTION"
+	V1OrderGetOrdersParamsInstrumentTypeCash          V1OrderGetOrdersParamsInstrumentType = "CASH"
+	V1OrderGetOrdersParamsInstrumentTypeEventContract V1OrderGetOrdersParamsInstrumentType = "EVENT_CONTRACT"
 )
 
 type V1OrderGetOrdersParamsUpdatedAt struct {
