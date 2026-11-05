@@ -557,6 +557,10 @@ type V1PositionGetPositionsParams struct {
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
 	// Comma-separated instrument identifiers
 	InstrumentIDs []string `query:"instrument_ids,omitzero" format:"uuid" json:"-"`
+	// Instrument type filter (e.g., COMMON_STOCK, OPTION)
+	//
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH".
+	InstrumentType V1PositionGetPositionsParamsInstrumentType `query:"instrument_type,omitzero" json:"-"`
 	// Field to sort by
 	//
 	// Any of "SYMBOL", "INSTRUMENT_TYPE", "QUANTITY", "MARKET_VALUE", "POSITION_TYPE",
@@ -577,6 +581,16 @@ func (r V1PositionGetPositionsParams) URLQuery() (v url.Values, err error) {
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
 	})
 }
+
+// Instrument type filter (e.g., COMMON_STOCK, OPTION)
+type V1PositionGetPositionsParamsInstrumentType string
+
+const (
+	V1PositionGetPositionsParamsInstrumentTypeCommonStock V1PositionGetPositionsParamsInstrumentType = "COMMON_STOCK"
+	V1PositionGetPositionsParamsInstrumentTypeIndex       V1PositionGetPositionsParamsInstrumentType = "INDEX"
+	V1PositionGetPositionsParamsInstrumentTypeOption      V1PositionGetPositionsParamsInstrumentType = "OPTION"
+	V1PositionGetPositionsParamsInstrumentTypeCash        V1PositionGetPositionsParamsInstrumentType = "CASH"
+)
 
 // Field to sort by
 type V1PositionGetPositionsParamsSortBy string

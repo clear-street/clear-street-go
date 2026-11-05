@@ -143,11 +143,12 @@ func TestV1PositionGetPositionsWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.V1PositionGetPositionsParams{
-			InstrumentIDs: []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
-			PageSize:      clearstreet.Int(1),
-			PageToken:     clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
-			SortBy:        clearstreet.V1PositionGetPositionsParamsSortBySymbol,
-			SortDirection: clearstreet.V1PositionGetPositionsParamsSortDirectionAsc,
+			InstrumentIDs:  []string{"182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e"},
+			InstrumentType: clearstreet.V1PositionGetPositionsParamsInstrumentTypeCommonStock,
+			PageSize:       clearstreet.Int(1),
+			PageToken:      clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),
+			SortBy:         clearstreet.V1PositionGetPositionsParamsSortBySymbol,
+			SortDirection:  clearstreet.V1PositionGetPositionsParamsSortDirectionAsc,
 		},
 	)
 	if err != nil {
