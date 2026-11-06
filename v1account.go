@@ -164,6 +164,12 @@ type AccountBalances struct {
 	BuyingPower string `json:"buying_power" api:"required"`
 	// Currency identifier for all monetary values.
 	Currency string `json:"currency" api:"required"`
+	// The session whose values the engine is applying to these balances.
+	// `buying_power`, `multiplier`, and `margin_details.usage` reflect this session. A
+	// closed market reports `overnight`.
+	//
+	// Any of "intraday", "overnight".
+	CurrentSession MarginSession `json:"current_session" api:"required"`
 	// Difference between current equity and start-of-day equity.
 	DailyChange string `json:"daily_change" api:"required"`
 	// Total profit or loss since start of day.
@@ -223,6 +229,7 @@ type AccountBalances struct {
 		AccountID           respjson.Field
 		BuyingPower         respjson.Field
 		Currency            respjson.Field
+		CurrentSession      respjson.Field
 		DailyChange         respjson.Field
 		DailyPnl            respjson.Field
 		DailyRealizedPnl    respjson.Field
@@ -578,6 +585,14 @@ func (r MarginDetailsUsage) RawJSON() string { return r.JSON.raw }
 func (r *MarginDetailsUsage) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
+
+// The margin session applied to an account's balances.
+type MarginSession string
+
+const (
+	MarginSessionIntraday  MarginSession = "intraday"
+	MarginSessionOvernight MarginSession = "overnight"
+)
 
 type MarginSessionDetails struct {
 	// Maximum buying power available in the account during the session: base buying
