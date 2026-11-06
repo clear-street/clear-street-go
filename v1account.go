@@ -72,6 +72,14 @@ func (r *V1AccountService) GetAccounts(ctx context.Context, query V1AccountGetAc
 	return res, err
 }
 
+// Results are paginated.
+func (r *V1AccountService) GetNonTradeActivities(ctx context.Context, accountID int64, query V1AccountGetNonTradeActivitiesParams, opts ...option.RequestOption) (res *V1AccountGetNonTradeActivitiesResponse, err error) {
+	opts = slices.Concat(r.options, opts)
+	path := fmt.Sprintf("v1/accounts/%v/non-trade-activities", accountID)
+	err = requestconfig.ExecuteNewRequest(ctx, http.MethodGet, path, query, &res, opts...)
+	return res, err
+}
+
 // Retrieves daily portfolio history for the specified account.
 func (r *V1AccountService) GetPortfolioHistory(ctx context.Context, accountID int64, query V1AccountGetPortfolioHistoryParams, opts ...option.RequestOption) (res *V1AccountGetPortfolioHistoryResponse, err error) {
 	opts = slices.Concat(r.options, opts)
@@ -447,6 +455,30 @@ func (r *AccountWithPersonalDetails) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// The states exposed by this endpoint.
+type ActivityState string
+
+const (
+	ActivityStateSettled   ActivityState = "settled"
+	ActivityStateCancelled ActivityState = "cancelled"
+)
+
+// Type of an activity.
+type ActivityType string
+
+const (
+	ActivityTypeMoneyMovement   ActivityType = "money_movement"
+	ActivityTypeInterest        ActivityType = "interest"
+	ActivityTypeFee             ActivityType = "fee"
+	ActivityTypeDividend        ActivityType = "dividend"
+	ActivityTypeOptionEvent     ActivityType = "option_event"
+	ActivityTypeTransfer        ActivityType = "transfer"
+	ActivityTypeCorporateAction ActivityType = "corporate_action"
+	ActivityTypeTaxWithholding  ActivityType = "tax_withholding"
+	ActivityTypeAdjustment      ActivityType = "adjustment"
+	ActivityTypeOther           ActivityType = "other"
+)
+
 // A postal address.
 type Address struct {
 	// City
@@ -614,6 +646,83 @@ const (
 	MarginTypeFuturesNlv                   MarginType = "FUTURES_NLV"
 	MarginTypeFuturesTotEq                 MarginType = "FUTURES_TOT_EQ"
 )
+
+type NonTradeActivity struct {
+	// ID for the activity, in UUID-v7 format.
+	ID string `json:"id" api:"required" format:"uuid"`
+	// Account ID
+	AccountID string `json:"account_id" api:"required"`
+	// Subtype within its `activity_type`.
+	ActivitySubtype string `json:"activity_subtype" api:"required"`
+	// Categorization for the activity.
+	//
+	// Any of "money_movement", "interest", "fee", "dividend", "option_event",
+	// "transfer", "corporate_action", "tax_withholding", "adjustment", "other".
+	ActivityType ActivityType `json:"activity_type" api:"required"`
+	// Cash amount change.
+	Amount string `json:"amount" api:"required"`
+	// The creation time at UTC, when this activity became part of the ledger
+	CreatedAt time.Time `json:"created_at" api:"required" format:"date-time"`
+	// Currency of the cash amount. Always USD for now.
+	Currency string `json:"currency" api:"required"`
+	// Effective date for the activity
+	EffectiveDate time.Time `json:"effective_date" api:"required" format:"date"`
+	// The security type.
+	//
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
+	InstrumentType SecurityType `json:"instrument_type" api:"required"`
+	// Memo
+	Memo string `json:"memo" api:"required"`
+	// Quantity change in the instrument.
+	Qty string `json:"qty" api:"required"`
+	// State for this activity.
+	//
+	// Any of "settled", "cancelled".
+	State ActivityState `json:"state" api:"required"`
+	// Reference ID for the record that is being cancelled. Present only on records
+	// where the activity state is 'cancelled'. The contents of this fields points at
+	// the reference_id of the original record that is being cancelled by this record.
+	CancelledReferenceID string `json:"cancelled_reference_id" api:"nullable"`
+	// Instrument identifier. Omitted when the activity has no single resolvable
+	// instrument.
+	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
+	// Reference ID for the activity, in ULID format. Present only on records where
+	// activity state is 'settled'. When a activity is cancelled, the cancelation
+	// record is pointing at this reference_id.
+	ReferenceID string `json:"reference_id" api:"nullable"`
+	// Symbol of the instrument. Omitted when the activity has no single resolvable
+	// instrument.
+	Symbol string `json:"symbol" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		ID                   respjson.Field
+		AccountID            respjson.Field
+		ActivitySubtype      respjson.Field
+		ActivityType         respjson.Field
+		Amount               respjson.Field
+		CreatedAt            respjson.Field
+		Currency             respjson.Field
+		EffectiveDate        respjson.Field
+		InstrumentType       respjson.Field
+		Memo                 respjson.Field
+		Qty                  respjson.Field
+		State                respjson.Field
+		CancelledReferenceID respjson.Field
+		InstrumentID         respjson.Field
+		ReferenceID          respjson.Field
+		Symbol               respjson.Field
+		ExtraFields          map[string]respjson.Field
+		raw                  string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r NonTradeActivity) RawJSON() string { return r.JSON.raw }
+func (r *NonTradeActivity) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+type NonTradeActivityList []NonTradeActivity
 
 type PortfolioHistoryResponse struct {
 	Segments []PortfolioHistorySegment `json:"segments" api:"required"`
@@ -796,6 +905,23 @@ func (r *V1AccountGetAccountsResponse) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+type V1AccountGetNonTradeActivitiesResponse struct {
+	Data NonTradeActivityList `json:"data" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Data        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	shared.BaseResponse
+}
+
+// Returns the unmodified JSON received from the API
+func (r V1AccountGetNonTradeActivitiesResponse) RawJSON() string { return r.JSON.raw }
+func (r *V1AccountGetNonTradeActivitiesResponse) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 type V1AccountGetPortfolioHistoryResponse struct {
 	Data PortfolioHistoryResponse `json:"data" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
@@ -864,6 +990,25 @@ type V1AccountGetAccountsParams struct {
 // URLQuery serializes [V1AccountGetAccountsParams]'s query parameters as
 // `url.Values`.
 func (r V1AccountGetAccountsParams) URLQuery() (v url.Values, err error) {
+	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
+		ArrayFormat:  apiquery.ArrayQueryFormatComma,
+		NestedFormat: apiquery.NestedQueryFormatBrackets,
+	})
+}
+
+type V1AccountGetNonTradeActivitiesParams struct {
+	// The number of items to return per page. Only used when page_token is not
+	// provided.
+	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
+	// Token for retrieving the next or previous page of results. Contains encoded
+	// pagination state; when provided, page_size is ignored.
+	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
+	paramObj
+}
+
+// URLQuery serializes [V1AccountGetNonTradeActivitiesParams]'s query parameters as
+// `url.Values`.
+func (r V1AccountGetNonTradeActivitiesParams) URLQuery() (v url.Values, err error) {
 	return apiquery.MarshalWithSettings(r, apiquery.QuerySettings{
 		ArrayFormat:  apiquery.ArrayQueryFormatComma,
 		NestedFormat: apiquery.NestedQueryFormatBrackets,
