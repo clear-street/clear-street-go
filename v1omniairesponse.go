@@ -165,6 +165,11 @@ type Response struct {
 	// output message then appears in the thread without a preceding request. When a
 	// null/undefined value is observed, it indicates it does not apply.
 	UserMessageID string `json:"user_message_id" api:"nullable" format:"uuid"`
+	// The `seq` the user message has in the thread's message list. Present exactly
+	// when `user_message_id` is present. Use it to place the sent prompt among the
+	// listed messages before a list refresh includes it. When a null/undefined value
+	// is observed, it indicates it does not apply.
+	UserMessageSeq int64 `json:"user_message_seq" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		ID                    respjson.Field
@@ -176,6 +181,7 @@ type Response struct {
 		OutputMessageID       respjson.Field
 		OutputMessageSeq      respjson.Field
 		UserMessageID         respjson.Field
+		UserMessageSeq        respjson.Field
 		ExtraFields           map[string]respjson.Field
 		raw                   string
 	} `json:"-"`

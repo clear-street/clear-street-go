@@ -225,13 +225,18 @@ type CreateMessageResponse struct {
 	ResponseID    string `json:"response_id" api:"required" format:"uuid"`
 	ThreadID      string `json:"thread_id" api:"required" format:"uuid"`
 	UserMessageID string `json:"user_message_id" api:"required" format:"uuid"`
+	// The `seq` the user message has in the thread's message list. Always present. Use
+	// it to place the sent prompt among the listed messages before a list refresh
+	// includes it.
+	UserMessageSeq int64 `json:"user_message_seq" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ResponseID    respjson.Field
-		ThreadID      respjson.Field
-		UserMessageID respjson.Field
-		ExtraFields   map[string]respjson.Field
-		raw           string
+		ResponseID     respjson.Field
+		ThreadID       respjson.Field
+		UserMessageID  respjson.Field
+		UserMessageSeq respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
 	} `json:"-"`
 }
 
@@ -246,13 +251,18 @@ type CreateThreadResponse struct {
 	ResponseID    string `json:"response_id" api:"required" format:"uuid"`
 	ThreadID      string `json:"thread_id" api:"required" format:"uuid"`
 	UserMessageID string `json:"user_message_id" api:"required" format:"uuid"`
+	// The `seq` the user message has in the thread's message list. Always present. Use
+	// it to place the sent prompt among the listed messages before a list refresh
+	// includes it.
+	UserMessageSeq int64 `json:"user_message_seq" api:"required"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		ResponseID    respjson.Field
-		ThreadID      respjson.Field
-		UserMessageID respjson.Field
-		ExtraFields   map[string]respjson.Field
-		raw           string
+		ResponseID     respjson.Field
+		ThreadID       respjson.Field
+		UserMessageID  respjson.Field
+		UserMessageSeq respjson.Field
+		ExtraFields    map[string]respjson.Field
+		raw            string
 	} `json:"-"`
 }
 
