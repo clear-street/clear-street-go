@@ -824,8 +824,9 @@ func (r *PredictionMarketBalances) UnmarshalJSON(data []byte) error {
 // Risk settings for an account
 type RiskSettings struct {
 	// The maximum notional value available to the account. On update, a value must be
-	// 0 or greater, and `null` clears the limit. When a null/undefined value is
-	// observed, it indicates that there is no available data.
+	// 0 or greater, `null` clears the limit, and omitting the field leaves the limit
+	// unchanged. When a null/undefined value is observed, it indicates that there is
+	// no available data.
 	MaxNotional string `json:"max_notional" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
@@ -853,8 +854,9 @@ func (r RiskSettings) ToParam() RiskSettingsParam {
 // Risk settings for an account
 type RiskSettingsParam struct {
 	// The maximum notional value available to the account. On update, a value must be
-	// 0 or greater, and `null` clears the limit. When a null/undefined value is
-	// observed, it indicates that there is no available data.
+	// 0 or greater, `null` clears the limit, and omitting the field leaves the limit
+	// unchanged. When a null/undefined value is observed, it indicates that there is
+	// no available data.
 	MaxNotional param.Opt[string] `json:"max_notional,omitzero"`
 	paramObj
 }
