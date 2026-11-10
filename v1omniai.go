@@ -378,12 +378,17 @@ func (r *OpenEntitlementConsentAction) UnmarshalJSON(data []byte) error {
 }
 
 // Action to open a stock screener with filters.
+//
+// `filters`, `sorts` and `columns` use the same shapes as the
+// `POST /saved-screeners` request body, so a client can save the screener the user
+// is looking at by forwarding them unchanged.
 type OpenScreenerAction struct {
-	// Filter criteria for the screener
-	Filters []ScreenerFilter `json:"filters" api:"required"`
-	// Optional field/column selection for screener results. When a null/undefined
-	// value is observed, it indicates it does not apply.
-	Columns []string `json:"columns" api:"nullable"`
+	// Filter criteria for the screener.
+	Filters []SearchFilter `json:"filters" api:"required"`
+	// Optional field/column selection for screener results. Absent means the default
+	// column set. When a null/undefined value is observed, it indicates it does not
+	// apply.
+	Columns []FieldRef `json:"columns" api:"nullable"`
 	// Interaction-tracking identity. Absent on messages created before tracking. When
 	// a null/undefined value is observed, it indicates that there is no available
 	// data.
@@ -391,22 +396,18 @@ type OpenScreenerAction struct {
 	// Optional page size. When a null/undefined value is observed, it indicates it
 	// does not apply.
 	PageSize int64 `json:"page_size" api:"nullable"`
-	// Optional sort field for screener rows. When a null/undefined value is observed,
-	// it indicates it does not apply.
-	SortBy string `json:"sort_by" api:"nullable"`
-	// Optional sort direction (`ASC` or `DESC`). When a null/undefined value is
-	// observed, it indicates it does not apply.
-	SortDirection string `json:"sort_direction" api:"nullable"`
+	// Optional sort specification. Absent means the screener's default order. When a
+	// null/undefined value is observed, it indicates it does not apply.
+	Sorts []SortSpec `json:"sorts" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		Filters       respjson.Field
-		Columns       respjson.Field
-		ItemID        respjson.Field
-		PageSize      respjson.Field
-		SortBy        respjson.Field
-		SortDirection respjson.Field
-		ExtraFields   map[string]respjson.Field
-		raw           string
+		Filters     respjson.Field
+		Columns     respjson.Field
+		ItemID      respjson.Field
+		PageSize    respjson.Field
+		Sorts       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
 	} `json:"-"`
 }
 
