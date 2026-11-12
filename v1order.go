@@ -156,6 +156,12 @@ type Execution struct {
 	// whose legs are reported individually in `legs[]`. When a null/undefined value is
 	// observed, it indicates it does not apply.
 	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
+	// > **Alpha** — this field is experimental and may change or be removed at any
+	// > time.
+	//
+	// Individual legs of a strategy-level multileg fill. Omitted for single-security
+	// and individual-leg fills.
+	Legs []ExecutionLeg `json:"legs"`
 	// Fill price. `null` for multileg fills, whose price lives only at the leg level.
 	// When a null/undefined value is observed, it indicates it does not apply.
 	Price string `json:"price" api:"nullable"`
@@ -186,6 +192,7 @@ type Execution struct {
 		Side                     respjson.Field
 		TransactionTime          respjson.Field
 		InstrumentID             respjson.Field
+		Legs                     respjson.Field
 		Price                    respjson.Field
 		Symbol                   respjson.Field
 		UnderlyingInstrumentID   respjson.Field
@@ -199,6 +206,64 @@ type Execution struct {
 // Returns the unmodified JSON received from the API
 func (r Execution) RawJSON() string { return r.JSON.raw }
 func (r *Execution) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// One leg of a strategy-level multileg execution.
+type ExecutionLeg struct {
+	// Fill price for this leg.
+	Price string `json:"price" api:"required"`
+	// This leg's ratio quantity within the strategy.
+	Ratio string `json:"ratio" api:"required"`
+	// Side of this leg's fill.
+	//
+	// Any of "BUY", "SELL".
+	Side Side `json:"side" api:"required"`
+	// Trading symbol for this leg.
+	Symbol string `json:"symbol" api:"required"`
+	// Instrument identifier for this leg. `null` when the leg's instrument could not
+	// be resolved from its reported symbol. When a null/undefined value is observed,
+	// it indicates it does not apply.
+	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
+	// Type of security for this leg. `null` when the leg's instrument could not be
+	// resolved from its reported symbol. When a null/undefined value is observed, it
+	// indicates it does not apply.
+	//
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
+	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
+	// Underlying instrument identifier for this leg. `null` when the leg is not an
+	// option, or its underlier could not be resolved. When a null/undefined value is
+	// observed, it indicates it does not apply.
+	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
+	// Type of this leg's underlying instrument, alongside `underlying_instrument_id`.
+	// When a null/undefined value is observed, it indicates it does not apply.
+	//
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
+	UnderlyingInstrumentType SecurityType `json:"underlying_instrument_type" api:"nullable"`
+	// Venue where this leg's fill occurred, as reported by that venue. Lives per-leg
+	// rather than only at the top level (see [`Execution::venue`]) because a
+	// strategy's legs can each fill on a different venue. When a null/undefined value
+	// is observed, it indicates that there is no available data.
+	Venue string `json:"venue" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Price                    respjson.Field
+		Ratio                    respjson.Field
+		Side                     respjson.Field
+		Symbol                   respjson.Field
+		InstrumentID             respjson.Field
+		InstrumentType           respjson.Field
+		UnderlyingInstrumentID   respjson.Field
+		UnderlyingInstrumentType respjson.Field
+		Venue                    respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ExecutionLeg) RawJSON() string { return r.JSON.raw }
+func (r *ExecutionLeg) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -346,6 +411,11 @@ type Order struct {
 	//
 	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
 	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
+	// > **Alpha** — this field is experimental and may change or be removed at any
+	// > time.
+	//
+	// Individual legs of a multileg strategy order. Omitted for single-leg orders.
+	Legs []OrderLeg `json:"legs"`
 	// Limit offset for trailing stop-limit orders (signed) When a null/undefined value
 	// is observed, it indicates it does not apply.
 	LimitOffset string `json:"limit_offset" api:"nullable"`
@@ -420,6 +490,7 @@ type Order struct {
 		ExtendedHours            respjson.Field
 		InstrumentID             respjson.Field
 		InstrumentType           respjson.Field
+		Legs                     respjson.Field
 		LimitOffset              respjson.Field
 		LimitPrice               respjson.Field
 		ReleasesAt               respjson.Field
@@ -472,6 +543,68 @@ type OrderStrategy struct {
 // Returns the unmodified JSON received from the API
 func (r OrderStrategy) RawJSON() string { return r.JSON.raw }
 func (r *OrderStrategy) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// One leg of a multileg strategy order.
+type OrderLeg struct {
+	// This leg's ratio quantity within the strategy.
+	Ratio string `json:"ratio" api:"required"`
+	// Side of this leg (BUY or SELL).
+	//
+	// Any of "BUY", "SELL".
+	Side Side `json:"side" api:"required"`
+	// Average fill price for this leg across its executions, as reported by the venue
+	// (FIX 6 on an individual-leg 442=2 execution report). `null` when the leg has no
+	// fills (no data), not `0`. When a null/undefined value is observed, it indicates
+	// that there is no available data.
+	AverageFillPrice string `json:"average_fill_price" api:"nullable"`
+	// Instrument identifier for this leg. `null` when the leg's instrument could not
+	// be resolved. When a null/undefined value is observed, it indicates it does not
+	// apply.
+	InstrumentID string `json:"instrument_id" api:"nullable" format:"uuid"`
+	// Type of security for this leg. `null` when the leg's instrument could not be
+	// resolved. When a null/undefined value is observed, it indicates it does not
+	// apply.
+	//
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
+	InstrumentType SecurityType `json:"instrument_type" api:"nullable"`
+	// Client-attested open/close intent for this leg. When a null/undefined value is
+	// observed, it indicates it does not apply.
+	//
+	// Any of "OPEN", "CLOSE".
+	PositionEffect RequestPositionEffect `json:"position_effect" api:"nullable"`
+	// Trading symbol for this leg. `null` when the leg's instrument could not be
+	// resolved. When a null/undefined value is observed, it indicates it does not
+	// apply.
+	Symbol string `json:"symbol" api:"nullable"`
+	// Instrument ID of this leg's underlying instrument. Populated only for option
+	// legs. When a null/undefined value is observed, it indicates it does not apply.
+	UnderlyingInstrumentID string `json:"underlying_instrument_id" api:"nullable" format:"uuid"`
+	// Type of this leg's underlying instrument, alongside `underlying_instrument_id`.
+	// When a null/undefined value is observed, it indicates it does not apply.
+	//
+	// Any of "COMMON_STOCK", "INDEX", "OPTION", "CASH", "EVENT_CONTRACT".
+	UnderlyingInstrumentType SecurityType `json:"underlying_instrument_type" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Ratio                    respjson.Field
+		Side                     respjson.Field
+		AverageFillPrice         respjson.Field
+		InstrumentID             respjson.Field
+		InstrumentType           respjson.Field
+		PositionEffect           respjson.Field
+		Symbol                   respjson.Field
+		UnderlyingInstrumentID   respjson.Field
+		UnderlyingInstrumentType respjson.Field
+		ExtraFields              map[string]respjson.Field
+		raw                      string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r OrderLeg) RawJSON() string { return r.JSON.raw }
+func (r *OrderLeg) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -1434,6 +1567,12 @@ type V1OrderGetOrderByIDParams struct {
 type V1OrderGetOrdersParams struct {
 	// The start date and time for the query range, inclusive (ISO 8601 format)
 	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
+	// > **Alpha** — this parameter is experimental and may change or be removed at any
+	// > time.
+	//
+	// Filter by whether the order is a multileg strategy. Omitted returns all orders;
+	// true returns only multileg orders; false excludes them.
+	IsMultiLeg param.Opt[bool] `query:"is_multi_leg,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
@@ -1529,7 +1668,7 @@ func (r V1OrderGetOrdersParamsUpdatedAt) URLQuery() (v url.Values, err error) {
 }
 
 type V1OrderPreviewOrdersParams struct {
-	Preview []NewOrderRequestParam
+	Preview []V1OrderPreviewOrdersParamsPreviewUnion
 	paramObj
 }
 
@@ -1537,6 +1676,85 @@ func (r V1OrderPreviewOrdersParams) MarshalJSON() (data []byte, err error) {
 	return shimjson.Marshal(r.Preview)
 }
 func (r *V1OrderPreviewOrdersParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type V1OrderPreviewOrdersParamsPreviewUnion struct {
+	OfV1OrderPreviewOrderssPreviewNewOrderMultilegRequest *V1OrderPreviewOrdersParamsPreviewNewOrderMultilegRequest `json:",omitzero,inline"`
+	OfNewOrderRequest                                     *NewOrderRequestParam                                     `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u V1OrderPreviewOrdersParamsPreviewUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfV1OrderPreviewOrderssPreviewNewOrderMultilegRequest, u.OfNewOrderRequest)
+}
+func (u *V1OrderPreviewOrdersParamsPreviewUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+// Request to submit a new multileg order strategy.
+//
+// The properties Legs, OrderType, TimeInForce are required.
+type V1OrderPreviewOrdersParamsPreviewNewOrderMultilegRequest struct {
+	// Legs that compose the strategy.
+	Legs []V1OrderPreviewOrdersParamsPreviewNewOrderMultilegRequestLeg `json:"legs,omitzero" api:"required"`
+	// Type of order (currently MARKET or LIMIT for multileg strategy submission)
+	//
+	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
+	// "TRAILING_STOP_LIMIT".
+	OrderType RequestOrderType `json:"order_type,omitzero" api:"required"`
+	// Time in force
+	//
+	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
+	// "GOOD_TILL_DATE", "AT_OPEN", "AT_CLOSE".
+	TimeInForce RequestTimeInForce `json:"time_in_force,omitzero" api:"required"`
+	// Optional client-provided unique ID (idempotency). Required to be unique per
+	// account.
+	ID param.Opt[string] `json:"id,omitzero"`
+	// Strategy price, required for LIMIT orders.
+	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
+	// Optional strategy-level quantity. Multiplies leg quantities. Defaults to 1.
+	Quantity param.Opt[string] `json:"quantity,omitzero"`
+	paramObj
+}
+
+func (r V1OrderPreviewOrdersParamsPreviewNewOrderMultilegRequest) MarshalJSON() (data []byte, err error) {
+	type shadow V1OrderPreviewOrdersParamsPreviewNewOrderMultilegRequest
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1OrderPreviewOrdersParamsPreviewNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A single leg in a multileg strategy request.
+//
+// The properties Ratio, Side are required.
+type V1OrderPreviewOrdersParamsPreviewNewOrderMultilegRequestLeg struct {
+	// Ratio for the leg.
+	Ratio string `json:"ratio" api:"required"`
+	// Leg side (BUY or SELL).
+	//
+	// Any of "BUY", "SELL".
+	Side Side `json:"side,omitzero" api:"required"`
+	// Optional leg reference identifier.
+	ID param.Opt[string] `json:"id,omitzero"`
+	// Trading symbol (e.g. "AAPL" or OSI symbol for options)
+	InstrumentID param.Opt[string] `json:"instrument_id,omitzero"`
+	// Required. Open/close intent for this leg.
+	//
+	// Any of "OPEN", "CLOSE".
+	PositionIntent RequestPositionEffect `json:"position_intent,omitzero"`
+	paramObj
+}
+
+func (r V1OrderPreviewOrdersParamsPreviewNewOrderMultilegRequestLeg) MarshalJSON() (data []byte, err error) {
+	type shadow V1OrderPreviewOrdersParamsPreviewNewOrderMultilegRequestLeg
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1OrderPreviewOrdersParamsPreviewNewOrderMultilegRequestLeg) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -1557,7 +1775,7 @@ func (r *V1OrderReplaceOrderParams) UnmarshalJSON(data []byte) error {
 }
 
 type V1OrderSubmitOrdersParams struct {
-	Orders []NewOrderRequestParam
+	Orders []V1OrderSubmitOrdersParamsOrderUnion
 	paramObj
 }
 
@@ -1565,5 +1783,84 @@ func (r V1OrderSubmitOrdersParams) MarshalJSON() (data []byte, err error) {
 	return shimjson.Marshal(r.Orders)
 }
 func (r *V1OrderSubmitOrdersParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Only one field can be non-zero.
+//
+// Use [param.IsOmitted] to confirm if a field is set.
+type V1OrderSubmitOrdersParamsOrderUnion struct {
+	OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest `json:",omitzero,inline"`
+	OfNewOrderRequest                                  *NewOrderRequestParam                                  `json:",omitzero,inline"`
+	paramUnion
+}
+
+func (u V1OrderSubmitOrdersParamsOrderUnion) MarshalJSON() ([]byte, error) {
+	return param.MarshalUnion(u, u.OfV1OrderSubmitOrderssOrderNewOrderMultilegRequest, u.OfNewOrderRequest)
+}
+func (u *V1OrderSubmitOrdersParamsOrderUnion) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, u)
+}
+
+// Request to submit a new multileg order strategy.
+//
+// The properties Legs, OrderType, TimeInForce are required.
+type V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest struct {
+	// Legs that compose the strategy.
+	Legs []V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg `json:"legs,omitzero" api:"required"`
+	// Type of order (currently MARKET or LIMIT for multileg strategy submission)
+	//
+	// Any of "MARKET", "LIMIT", "STOP", "STOP_LIMIT", "TRAILING_STOP",
+	// "TRAILING_STOP_LIMIT".
+	OrderType RequestOrderType `json:"order_type,omitzero" api:"required"`
+	// Time in force
+	//
+	// Any of "DAY", "GOOD_TILL_CANCEL", "IMMEDIATE_OR_CANCEL", "FILL_OR_KILL",
+	// "GOOD_TILL_DATE", "AT_OPEN", "AT_CLOSE".
+	TimeInForce RequestTimeInForce `json:"time_in_force,omitzero" api:"required"`
+	// Optional client-provided unique ID (idempotency). Required to be unique per
+	// account.
+	ID param.Opt[string] `json:"id,omitzero"`
+	// Strategy price, required for LIMIT orders.
+	LimitPrice param.Opt[string] `json:"limit_price,omitzero"`
+	// Optional strategy-level quantity. Multiplies leg quantities. Defaults to 1.
+	Quantity param.Opt[string] `json:"quantity,omitzero"`
+	paramObj
+}
+
+func (r V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest) MarshalJSON() (data []byte, err error) {
+	type shadow V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequest) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// A single leg in a multileg strategy request.
+//
+// The properties Ratio, Side are required.
+type V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg struct {
+	// Ratio for the leg.
+	Ratio string `json:"ratio" api:"required"`
+	// Leg side (BUY or SELL).
+	//
+	// Any of "BUY", "SELL".
+	Side Side `json:"side,omitzero" api:"required"`
+	// Optional leg reference identifier.
+	ID param.Opt[string] `json:"id,omitzero"`
+	// Trading symbol (e.g. "AAPL" or OSI symbol for options)
+	InstrumentID param.Opt[string] `json:"instrument_id,omitzero"`
+	// Required. Open/close intent for this leg.
+	//
+	// Any of "OPEN", "CLOSE".
+	PositionIntent RequestPositionEffect `json:"position_intent,omitzero"`
+	paramObj
+}
+
+func (r V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) MarshalJSON() (data []byte, err error) {
+	type shadow V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1OrderSubmitOrdersParamsOrderNewOrderMultilegRequestLeg) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
