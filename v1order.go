@@ -152,6 +152,14 @@ type Execution struct {
 	Side Side `json:"side" api:"required"`
 	// Transaction timestamp in nanosecond precision (UTC).
 	TransactionTime time.Time `json:"transaction_time" api:"required" format:"date-time"`
+	// Fees charged to the account, broken out by kind.
+	//
+	// Amounts are in the instrument's currency, at the full precision the venue
+	// reports. Statements round each fill's fee to the cent, so they can differ by a
+	// fraction of a cent. A positive amount is charged to the account; a negative
+	// amount is a rebate. New kinds of fee are added as new optional fields, and
+	// `total` always includes them.
+	Fees Fees `json:"fees"`
 	// Unique instrument identifier. `null` when this is a strategy-level multileg fill
 	// whose legs are reported individually in `legs[]`. When a null/undefined value is
 	// observed, it indicates it does not apply.
@@ -191,6 +199,7 @@ type Execution struct {
 		Quantity                 respjson.Field
 		Side                     respjson.Field
 		TransactionTime          respjson.Field
+		Fees                     respjson.Field
 		InstrumentID             respjson.Field
 		Legs                     respjson.Field
 		Price                    respjson.Field
@@ -268,6 +277,34 @@ func (r *ExecutionLeg) UnmarshalJSON(data []byte) error {
 }
 
 type ExecutionList []Execution
+
+// Fees charged to the account, broken out by kind.
+//
+// Amounts are in the instrument's currency, at the full precision the venue
+// reports. Statements round each fill's fee to the cent, so they can differ by a
+// fraction of a cent. A positive amount is charged to the account; a negative
+// amount is a rebate. New kinds of fee are added as new optional fields, and
+// `total` always includes them.
+type Fees struct {
+	// Sum of every fee component, including kinds this API version does not break out.
+	Total string `json:"total" api:"required"`
+	// Fee charged by the execution venue. When a null/undefined value is observed, it
+	// indicates it does not apply.
+	ExchangeFee string `json:"exchange_fee" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Total       respjson.Field
+		ExchangeFee respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r Fees) RawJSON() string { return r.JSON.raw }
+func (r *Fees) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
 
 type InstrumentIDOrSymbol = string
 
@@ -401,6 +438,14 @@ type Order struct {
 	ExpiresAt time.Time `json:"expires_at" api:"nullable" format:"date-time"`
 	// Whether the order is eligible for extended-hours trading.
 	ExtendedHours bool `json:"extended_hours" api:"nullable"`
+	// Fees charged to the account, broken out by kind.
+	//
+	// Amounts are in the instrument's currency, at the full precision the venue
+	// reports. Statements round each fill's fee to the cent, so they can differ by a
+	// fraction of a cent. A positive amount is charged to the account; a negative
+	// amount is a rebate. New kinds of fee are added as new optional fields, and
+	// `total` always includes them.
+	Fees Fees `json:"fees"`
 	// Instrument identifier for the traded instrument. `null` when the order is a
 	// multileg strategy whose legs are reported individually in `legs[]`. When a
 	// null/undefined value is observed, it indicates it does not apply.
@@ -488,6 +533,7 @@ type Order struct {
 		Details                  respjson.Field
 		ExpiresAt                respjson.Field
 		ExtendedHours            respjson.Field
+		Fees                     respjson.Field
 		InstrumentID             respjson.Field
 		InstrumentType           respjson.Field
 		Legs                     respjson.Field
