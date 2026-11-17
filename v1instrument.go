@@ -228,6 +228,10 @@ type Instrument struct {
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Indicates if the instrument is marginable
 	IsMarginable bool `json:"is_marginable" api:"required"`
+	// Indicates if the instrument is a new issue (e.g. an IPO) that may not yet have a
+	// quote, trade or previous close. See `indicative_price` on the market data
+	// snapshot.
+	IsNewIssue bool `json:"is_new_issue" api:"required"`
 	// Indicates if the instrument is a publicly traded partnership (PTP). PTP sales
 	// are subject to a 10% withholding tax for non-US tax residents.
 	IsPtp bool `json:"is_ptp" api:"required"`
@@ -312,6 +316,7 @@ type Instrument struct {
 		IsFractionable             respjson.Field
 		IsLiquidationOnly          respjson.Field
 		IsMarginable               respjson.Field
+		IsNewIssue                 respjson.Field
 		IsPtp                      respjson.Field
 		IsShortProhibited          respjson.Field
 		IsThresholdSecurity        respjson.Field
@@ -357,6 +362,10 @@ type InstrumentCore struct {
 	IsLiquidationOnly bool `json:"is_liquidation_only" api:"required"`
 	// Indicates if the instrument is marginable
 	IsMarginable bool `json:"is_marginable" api:"required"`
+	// Indicates if the instrument is a new issue (e.g. an IPO) that may not yet have a
+	// quote, trade or previous close. See `indicative_price` on the market data
+	// snapshot.
+	IsNewIssue bool `json:"is_new_issue" api:"required"`
 	// Indicates if the instrument is a publicly traded partnership (PTP). PTP sales
 	// are subject to a 10% withholding tax for non-US tax residents.
 	IsPtp bool `json:"is_ptp" api:"required"`
@@ -427,6 +436,7 @@ type InstrumentCore struct {
 		IsFractionable           respjson.Field
 		IsLiquidationOnly        respjson.Field
 		IsMarginable             respjson.Field
+		IsNewIssue               respjson.Field
 		IsPtp                    respjson.Field
 		IsShortProhibited        respjson.Field
 		IsThresholdSecurity      respjson.Field

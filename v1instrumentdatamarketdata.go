@@ -181,6 +181,10 @@ type MarketDataSnapshot struct {
 	// for options whose Greeks have not yet been observed When a null/undefined value
 	// is observed, it indicates that there is no available data.
 	Greeks SnapshotGreeks `json:"greeks" api:"nullable"`
+	// Indicative price for a new issue, in USD. Present only while the instrument is a
+	// new issue with no quote, trade or previous close. When a null/undefined value is
+	// observed, it indicates that there is no available data.
+	IndicativePrice string `json:"indicative_price" api:"nullable"`
 	// Most recent quote if available. When a null/undefined value is observed, it
 	// indicates that there is no available data.
 	LastQuote SnapshotQuote `json:"last_quote" api:"nullable"`
@@ -204,6 +208,7 @@ type MarketDataSnapshot struct {
 		Symbol              respjson.Field
 		CumulativeVolume    respjson.Field
 		Greeks              respjson.Field
+		IndicativePrice     respjson.Field
 		LastQuote           respjson.Field
 		LastTrade           respjson.Field
 		Name                respjson.Field
