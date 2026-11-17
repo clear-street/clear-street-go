@@ -700,12 +700,22 @@ func (r *OrderPreview) UnmarshalJSON(data []byte) error {
 type OrderPreviewAmount struct {
 	// Total cash impact of the order before estimated fees and commissions.
 	GrossAmount string `json:"gross_amount" api:"required"`
-	// Total cash impact of the order after estimated fees and commissions.
+	// Total cash impact of the order after estimated fees and commissions:
+	// `gross_amount` with `fees.total` applied.
 	NetAmount string `json:"net_amount" api:"required"`
+	// Fees charged to the account, broken out by kind.
+	//
+	// Amounts are in the instrument's currency, at the full precision the venue
+	// reports. Statements round each fill's fee to the cent, so they can differ by a
+	// fraction of a cent. A positive amount is charged to the account; a negative
+	// amount is a rebate. New kinds of fee are added as new optional fields, and
+	// `total` always includes them.
+	Fees Fees `json:"fees"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
 		GrossAmount respjson.Field
 		NetAmount   respjson.Field
+		Fees        respjson.Field
 		ExtraFields map[string]respjson.Field
 		raw         string
 	} `json:"-"`
