@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.17.0](https://github.com/clear-street/clear-street-go/compare/v0.16.0...v0.17.0) (2026-11-19)
+
+
+### Features
+
+* **api:** api update ([de1a624](https://github.com/clear-street/clear-street-go/commit/de1a624fc79ed9cfedeb45a94a41c5cfe0218f5b))
+
 ## [0.16.0](https://github.com/clear-street/clear-street-go/compare/v0.15.0...v0.16.0) (2026-11-17)
 
 
