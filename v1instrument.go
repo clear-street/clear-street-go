@@ -482,6 +482,7 @@ type NotShortableReason string
 const (
 	NotShortableReasonInsufficientLocateInventory NotShortableReason = "INSUFFICIENT_LOCATE_INVENTORY"
 	NotShortableReasonUnsupportedSecurity         NotShortableReason = "UNSUPPORTED_SECURITY"
+	NotShortableReasonInstrumentNotShortable      NotShortableReason = "INSTRUMENT_NOT_SHORTABLE"
 )
 
 // An options expiry date, annotated with which settlement cycles have listed
