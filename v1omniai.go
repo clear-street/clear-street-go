@@ -284,6 +284,24 @@ func (r *ContentPartThinkingPayload) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// Model-composed UI content part. Present only when the turn declared `RENDER_UI`.
+type ContentPartUiPayload struct {
+	// Model-composed UI, built only from Omni's built-in component catalog.
+	Payload UiPayload `json:"payload" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Payload     respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r ContentPartUiPayload) RawJSON() string { return r.JSON.raw }
+func (r *ContentPartUiPayload) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
 // Chart represented by explicit data series.
 type DataChart struct {
 	Series []ChartSeries `json:"series"`
@@ -946,5 +964,53 @@ type SuggestedActionsPayload struct {
 // Returns the unmodified JSON received from the API
 func (r SuggestedActionsPayload) RawJSON() string { return r.JSON.raw }
 func (r *SuggestedActionsPayload) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// One node of a composed UI tree.
+type UiNode struct {
+	// Catalog component name.
+	Type string `json:"type" api:"required"`
+	// Nested nodes (each shaped like this one), only where the component's `children`
+	// allows them. Typed as generic objects so the schema is not self-referential,
+	// which SDK generators handle poorly.
+	Children []any `json:"children"`
+	// Props that satisfy the component's `props_schema`. Omitted when the component
+	// has none.
+	Props any `json:"props"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		Children    respjson.Field
+		Props       respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r UiNode) RawJSON() string { return r.JSON.raw }
+func (r *UiNode) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Model-composed UI, built only from Omni's built-in component catalog.
+type UiPayload struct {
+	// Root of the component tree.
+	Root UiNode `json:"root" api:"required"`
+	// Stable identifier of this UI within the message.
+	UiID string `json:"ui_id" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Root        respjson.Field
+		UiID        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r UiPayload) RawJSON() string { return r.JSON.raw }
+func (r *UiPayload) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }

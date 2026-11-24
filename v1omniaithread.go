@@ -340,7 +340,7 @@ func (r *MessageContent) UnmarshalJSON(data []byte) error {
 // MessageContentPartUnion contains all possible properties and values from
 // [MessageContentPartContentPartText],
 // [MessageContentPartContentPartStructuredAction],
-// [MessageContentPartContentPartChart],
+// [MessageContentPartContentPartChart], [MessageContentPartContentPartUi],
 // [MessageContentPartContentPartSuggestedActions],
 // [MessageContentPartContentPartCustom].
 //
@@ -359,7 +359,8 @@ type MessageContentPartUnion struct {
 	ClickedItemIDs []string `json:"clicked_item_ids"`
 	// This field is from variant [MessageContentPartContentPartStructuredAction].
 	ItemID string `json:"item_id"`
-	// This field is a union of [ChartPayload], [SuggestedActionsPayload], [any]
+	// This field is a union of [ChartPayload], [UiPayload], [SuggestedActionsPayload],
+	// [any]
 	Payload MessageContentPartUnionPayload `json:"payload"`
 	JSON    struct {
 		Text           respjson.Field
@@ -385,6 +386,11 @@ func (u MessageContentPartUnion) AsContentPartStructuredAction() (v MessageConte
 }
 
 func (u MessageContentPartUnion) AsContentPartChart() (v MessageContentPartContentPartChart) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u MessageContentPartUnion) AsContentPartUi() (v MessageContentPartContentPartUi) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
@@ -427,6 +433,10 @@ type MessageContentPartUnionPayload struct {
 	DataChart DataChart `json:"dataChart"`
 	// This field is from variant [ChartPayload].
 	ItemID string `json:"itemId"`
+	// This field is from variant [UiPayload].
+	Root UiNode `json:"root"`
+	// This field is from variant [UiPayload].
+	UiID string `json:"ui_id"`
 	// This field is from variant [SuggestedActionsPayload].
 	ClickedItemIDs []string `json:"clickedItemIds"`
 	JSON           struct {
@@ -436,6 +446,8 @@ type MessageContentPartUnionPayload struct {
 		ActionButtons                     respjson.Field
 		DataChart                         respjson.Field
 		ItemID                            respjson.Field
+		Root                              respjson.Field
+		UiID                              respjson.Field
 		ClickedItemIDs                    respjson.Field
 		raw                               string
 	} `json:"-"`
@@ -499,6 +511,26 @@ type MessageContentPartContentPartChart struct {
 // Returns the unmodified JSON received from the API
 func (r MessageContentPartContentPartChart) RawJSON() string { return r.JSON.raw }
 func (r *MessageContentPartContentPartChart) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// > **Alpha** — this variant is experimental and may change or be removed at any
+// > time.
+type MessageContentPartContentPartUi struct {
+	// Any of "ui".
+	Type string `json:"type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	ContentPartUiPayload
+}
+
+// Returns the unmodified JSON received from the API
+func (r MessageContentPartContentPartUi) RawJSON() string { return r.JSON.raw }
+func (r *MessageContentPartContentPartUi) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -757,7 +789,7 @@ type V1OmniAIThreadNewMessageParams struct {
 	// another account is selected.
 	AccountID param.Opt[int64] `json:"account_id,omitzero"`
 	// Any of "PREFILL_ORDER", "OPEN_CHART", "OPEN_SCREENER",
-	// "OPEN_ENTITLEMENT_CONSENT".
+	// "OPEN_ENTITLEMENT_CONSENT", "RENDER_UI".
 	Capabilities []string `json:"capabilities,omitzero"`
 	// Snapshots for this instant-chat message. Omission does not remove earlier
 	// attachments.
@@ -787,7 +819,7 @@ type V1OmniAIThreadNewThreadParams struct {
 	// Deep-insights target payload.
 	Target V1OmniAIThreadNewThreadParamsTarget `json:"target,omitzero"`
 	// Any of "PREFILL_ORDER", "OPEN_CHART", "OPEN_SCREENER",
-	// "OPEN_ENTITLEMENT_CONSENT".
+	// "OPEN_ENTITLEMENT_CONSENT", "RENDER_UI".
 	Capabilities []string `json:"capabilities,omitzero"`
 	// Snapshots for the first instant-chat message. Omit to attach no new context.
 	Context TurnContextParam `json:"context,omitzero"`

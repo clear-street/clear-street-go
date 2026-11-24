@@ -213,7 +213,7 @@ func (r *ResponseContent) UnmarshalJSON(data []byte) error {
 // ResponseContentPartUnion contains all possible properties and values from
 // [ResponseContentPartContentPartText], [ResponseContentPartContentPartThinking],
 // [ResponseContentPartContentPartStructuredAction],
-// [ResponseContentPartContentPartChart],
+// [ResponseContentPartContentPartChart], [ResponseContentPartContentPartUi],
 // [ResponseContentPartContentPartSuggestedActions],
 // [ResponseContentPartContentPartCustom].
 //
@@ -234,7 +234,8 @@ type ResponseContentPartUnion struct {
 	ClickedItemIDs []string `json:"clicked_item_ids"`
 	// This field is from variant [ResponseContentPartContentPartStructuredAction].
 	ItemID string `json:"item_id"`
-	// This field is a union of [ChartPayload], [SuggestedActionsPayload], [any]
+	// This field is a union of [ChartPayload], [UiPayload], [SuggestedActionsPayload],
+	// [any]
 	Payload ResponseContentPartUnionPayload `json:"payload"`
 	JSON    struct {
 		Text           respjson.Field
@@ -266,6 +267,11 @@ func (u ResponseContentPartUnion) AsContentPartStructuredAction() (v ResponseCon
 }
 
 func (u ResponseContentPartUnion) AsContentPartChart() (v ResponseContentPartContentPartChart) {
+	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
+	return
+}
+
+func (u ResponseContentPartUnion) AsContentPartUi() (v ResponseContentPartContentPartUi) {
 	apijson.UnmarshalRoot(json.RawMessage(u.JSON.raw), &v)
 	return
 }
@@ -308,6 +314,10 @@ type ResponseContentPartUnionPayload struct {
 	DataChart DataChart `json:"dataChart"`
 	// This field is from variant [ChartPayload].
 	ItemID string `json:"itemId"`
+	// This field is from variant [UiPayload].
+	Root UiNode `json:"root"`
+	// This field is from variant [UiPayload].
+	UiID string `json:"ui_id"`
 	// This field is from variant [SuggestedActionsPayload].
 	ClickedItemIDs []string `json:"clickedItemIds"`
 	JSON           struct {
@@ -317,6 +327,8 @@ type ResponseContentPartUnionPayload struct {
 		ActionButtons                     respjson.Field
 		DataChart                         respjson.Field
 		ItemID                            respjson.Field
+		Root                              respjson.Field
+		UiID                              respjson.Field
 		ClickedItemIDs                    respjson.Field
 		raw                               string
 	} `json:"-"`
@@ -399,6 +411,26 @@ type ResponseContentPartContentPartChart struct {
 // Returns the unmodified JSON received from the API
 func (r ResponseContentPartContentPartChart) RawJSON() string { return r.JSON.raw }
 func (r *ResponseContentPartContentPartChart) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// > **Alpha** — this variant is experimental and may change or be removed at any
+// > time.
+type ResponseContentPartContentPartUi struct {
+	// Any of "ui".
+	Type string `json:"type" api:"required"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Type        respjson.Field
+		ExtraFields map[string]respjson.Field
+		raw         string
+	} `json:"-"`
+	ContentPartUiPayload
+}
+
+// Returns the unmodified JSON received from the API
+func (r ResponseContentPartContentPartUi) RawJSON() string { return r.JSON.raw }
+func (r *ResponseContentPartContentPartUi) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
