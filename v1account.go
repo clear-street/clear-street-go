@@ -1014,12 +1014,22 @@ func (r V1AccountGetAccountsParams) URLQuery() (v url.Values, err error) {
 }
 
 type V1AccountGetNonTradeActivitiesParams struct {
+	// The start date and time for the query range, inclusive (ISO 8601 format)
+	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
 	// provided.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
 	PageToken param.Opt[string] `query:"page_token,omitzero" format:"byte" json:"-"`
+	// The end date and time for the query range, inclusive (ISO 8601 format)
+	To param.Opt[time.Time] `query:"to,omitzero" format:"date-time" json:"-"`
+	// Filter by activity type(s). Comma-delimited list. Example:
+	// `activity_type=dividend,fee`.
+	//
+	// Any of "money_movement", "interest", "fee", "dividend", "option_event",
+	// "transfer", "corporate_action", "tax_withholding", "adjustment", "other".
+	ActivityType []string `query:"activity_type,omitzero" json:"-"`
 	paramObj
 }
 
