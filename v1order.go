@@ -137,6 +137,82 @@ func (r *V1OrderService) SubmitOrders(ctx context.Context, accountID int64, body
 	return res, err
 }
 
+// Effective action inherited from the parent order, with a NO-relative fill price.
+// This is the order's classification, not a per-fill open/close accounting
+// attribution.
+type EventContractExecution struct {
+	// BUY or SELL of `contract_side`, inherited from the parent classification.
+	//
+	// Any of "BUY", "SELL".
+	Action Side `json:"action" api:"required"`
+	// Contract the parent order's effective action buys or sells.
+	//
+	// Any of "YES", "NO".
+	ContractSide EventContractSide `json:"contract_side" api:"required"`
+	// Contract payout minus the existing YES fill price. Omitted when payout data is
+	// unavailable. When a null/undefined value is observed, it indicates that there is
+	// no available data.
+	NoPrice string `json:"no_price" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Action       respjson.Field
+		ContractSide respjson.Field
+		NoPrice      respjson.Field
+		ExtraFields  map[string]respjson.Field
+		raw          string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EventContractExecution) RawJSON() string { return r.JSON.raw }
+func (r *EventContractExecution) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Effective action from the recorded order classification, with NO-relative
+// prices. Existing top-level side and prices retain their YES-based meaning.
+type EventContractOrder struct {
+	// BUY or SELL of `contract_side`, recorded when the order was classified.
+	//
+	// Any of "BUY", "SELL".
+	Action Side `json:"action" api:"required"`
+	// Contract the effective action buys or sells.
+	//
+	// Any of "YES", "NO".
+	ContractSide EventContractSide `json:"contract_side" api:"required"`
+	// Contract payout minus the existing YES average fill price. Omitted before any
+	// fill or when payout data is unavailable. When a null/undefined value is
+	// observed, it indicates that there is no available data.
+	NoAverageFillPrice string `json:"no_average_fill_price" api:"nullable"`
+	// Contract payout minus the existing YES limit price. Omitted for market orders or
+	// when payout data is unavailable. When a null/undefined value is observed, it
+	// indicates that there is no available data.
+	NoLimitPrice string `json:"no_limit_price" api:"nullable"`
+	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
+	JSON struct {
+		Action             respjson.Field
+		ContractSide       respjson.Field
+		NoAverageFillPrice respjson.Field
+		NoLimitPrice       respjson.Field
+		ExtraFields        map[string]respjson.Field
+		raw                string
+	} `json:"-"`
+}
+
+// Returns the unmodified JSON received from the API
+func (r EventContractOrder) RawJSON() string { return r.JSON.raw }
+func (r *EventContractOrder) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Contract represented by the recorded order action.
+type EventContractSide string
+
+const (
+	EventContractSideYes EventContractSide = "YES"
+	EventContractSideNo  EventContractSide = "NO"
+)
+
 // Represents a single fill of an order for an account.
 type Execution struct {
 	// Unique identifier for this execution report.
@@ -152,6 +228,10 @@ type Execution struct {
 	Side Side `json:"side" api:"required"`
 	// Transaction timestamp in nanosecond precision (UTC).
 	TransactionTime time.Time `json:"transaction_time" api:"required" format:"date-time"`
+	// Effective action inherited from the parent order, with a NO-relative fill price.
+	// This is the order's classification, not a per-fill open/close accounting
+	// attribution.
+	EventContract EventContractExecution `json:"event_contract"`
 	// Fees charged to the account, broken out by kind.
 	//
 	// Amounts are in the instrument's currency, at the full precision the venue
@@ -199,6 +279,7 @@ type Execution struct {
 		Quantity                 respjson.Field
 		Side                     respjson.Field
 		TransactionTime          respjson.Field
+		EventContract            respjson.Field
 		Fees                     respjson.Field
 		InstrumentID             respjson.Field
 		Legs                     respjson.Field
@@ -432,6 +513,9 @@ type Order struct {
 	AverageFillPrice string `json:"average_fill_price" api:"nullable"`
 	// Contains execution, rejection or cancellation details, if any
 	Details []string `json:"details"`
+	// Effective action from the recorded order classification, with NO-relative
+	// prices. Existing top-level side and prices retain their YES-based meaning.
+	EventContract EventContractOrder `json:"event_contract"`
 	// Timestamp when the order will expire (UTC). Present when time_in_force is
 	// GOOD_TILL_DATE. When a null/undefined value is observed, it indicates it does
 	// not apply.
@@ -531,6 +615,7 @@ type Order struct {
 		Venue                    respjson.Field
 		AverageFillPrice         respjson.Field
 		Details                  respjson.Field
+		EventContract            respjson.Field
 		ExpiresAt                respjson.Field
 		ExtendedHours            respjson.Field
 		Fees                     respjson.Field
