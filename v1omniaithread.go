@@ -874,7 +874,8 @@ type V1OmniAIThreadGetMessagesParams struct {
 	// account is selected; empty values and the string null are invalid.
 	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -931,7 +932,8 @@ type V1OmniAIThreadGetThreadsParams struct {
 	// account is selected; empty values and the string null are invalid.
 	AccountID param.Opt[int64] `query:"account_id,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.

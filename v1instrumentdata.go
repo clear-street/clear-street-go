@@ -1430,7 +1430,8 @@ type V1InstrumentDataGetAllInstrumentEventsParams struct {
 	// The start date for the query range, inclusive (YYYY-MM-DD).
 	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -1477,7 +1478,8 @@ type V1InstrumentDataGetInstrumentBalanceSheetStatementsParams struct {
 	// The start date for the query range, inclusive (YYYY-MM-DD).
 	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -1501,7 +1503,8 @@ type V1InstrumentDataGetInstrumentCashFlowStatementsParams struct {
 	// The start date for the query range, inclusive (YYYY-MM-DD).
 	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -1525,7 +1528,8 @@ type V1InstrumentDataGetInstrumentEarningsTranscriptsParams struct {
 	// date (`YYYY-MM-DD`). Use an event's `date` to fetch that event's transcript.
 	EventDate param.Opt[time.Time] `query:"event_date,omitzero" format:"date" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -1623,7 +1627,8 @@ type V1InstrumentDataGetInstrumentIncomeStatementsParams struct {
 	// The start date for the query range, inclusive (YYYY-MM-DD).
 	FromDate param.Opt[string] `query:"from_date,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.

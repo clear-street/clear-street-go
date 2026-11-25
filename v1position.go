@@ -550,7 +550,8 @@ func (r V1PositionGetPositionInstructionsParams) URLQuery() (v url.Values, err e
 
 type V1PositionGetPositionsParams struct {
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.

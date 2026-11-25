@@ -1085,7 +1085,8 @@ type V1InstrumentGetInstrumentsParams struct {
 	// Filter by threshold security status
 	IsThresholdSecurity param.Opt[bool] `query:"is_threshold_security,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -1127,7 +1128,8 @@ type V1InstrumentGetOptionContractsParams struct {
 	// contracts, false for normal (PM) contracts. Omit to return both.
 	IsSettleOnOpen param.Opt[bool] `query:"is_settle_on_open,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -1184,7 +1186,8 @@ type V1InstrumentGetPredictionEventsParams struct {
 	// are reported: `207`, or `404` when none match.
 	MarketIDs param.Opt[string] `query:"market_ids,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -1323,7 +1326,8 @@ type V1InstrumentGetPredictionMarketsParams struct {
 	// exclusive with `event_code`.
 	MarketIDs param.Opt[string] `query:"market_ids,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -1349,7 +1353,8 @@ type V1InstrumentGetPredictionSeriesParams struct {
 	// case.
 	Categories param.Opt[string] `query:"categories,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -1384,7 +1389,7 @@ type V1InstrumentSearchInstrumentsParams struct {
 	// in ranking).
 	IncludePtp param.Opt[bool] `query:"include_ptp,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 or above the maximum is rejected.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.

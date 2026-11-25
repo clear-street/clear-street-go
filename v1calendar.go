@@ -390,7 +390,8 @@ type V1CalendarGetEconomicEventsCalendarParams struct {
 	// Defaults to `US` when omitted.
 	Country param.Opt[string] `query:"country,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.

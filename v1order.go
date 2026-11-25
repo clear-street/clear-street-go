@@ -1670,7 +1670,8 @@ type V1OrderGetExecutionsParams struct {
 	// The start date and time for the query range, inclusive (ISO 8601 format)
 	From param.Opt[time.Time] `query:"from,omitzero" format:"date-time" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
@@ -1715,7 +1716,8 @@ type V1OrderGetOrdersParams struct {
 	// true returns only multileg orders; false excludes them.
 	IsMultiLeg param.Opt[bool] `query:"is_multi_leg,omitzero" json:"-"`
 	// The number of items to return per page. Only used when page_token is not
-	// provided.
+	// provided. A value of 0 is rejected; a value above the maximum is treated as the
+	// maximum.
 	PageSize param.Opt[int64] `query:"page_size,omitzero" json:"-"`
 	// Token for retrieving the next or previous page of results. Contains encoded
 	// pagination state; when provided, page_size is ignored.
