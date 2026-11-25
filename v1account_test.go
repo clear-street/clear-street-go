@@ -168,8 +168,9 @@ func TestV1AccountPatchAccountByIDWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.V1AccountPatchAccountByIDParams{
-			Risk: clearstreet.RiskSettingsParam{
-				MaxNotional: clearstreet.String("5000000.00"),
+			Risk: clearstreet.V1AccountPatchAccountByIDParamsRisk{
+				MarginMultiplier: clearstreet.MarginMultiplier1,
+				MaxNotional:      clearstreet.String("5000000.00"),
 			},
 		},
 	)

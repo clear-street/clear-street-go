@@ -4,7 +4,6 @@ package clearstreet
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -586,6 +585,14 @@ func (r *MarginDetailsUsage) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
+// The leverage of a Reg T margin account.
+type MarginMultiplier string
+
+const (
+	MarginMultiplier1 MarginMultiplier = "1"
+	MarginMultiplier4 MarginMultiplier = "4"
+)
+
 // The margin session applied to an account's balances.
 type MarginSession string
 
@@ -823,6 +830,11 @@ func (r *PredictionMarketBalances) UnmarshalJSON(data []byte) error {
 
 // Risk settings for an account
 type RiskSettings struct {
+	// When a null/undefined value is observed, it indicates that there is no available
+	// data.
+	//
+	// Any of "1", "4".
+	MarginMultiplier MarginMultiplier `json:"margin_multiplier" api:"nullable"`
 	// The maximum notional value available to the account. On update, a value must be
 	// 0 or greater, `null` clears the limit, and omitting the field leaves the limit
 	// unchanged. When a null/undefined value is observed, it indicates that there is
@@ -830,42 +842,16 @@ type RiskSettings struct {
 	MaxNotional string `json:"max_notional" api:"nullable"`
 	// JSON contains metadata for fields, check presence with [respjson.Field.Valid].
 	JSON struct {
-		MaxNotional respjson.Field
-		ExtraFields map[string]respjson.Field
-		raw         string
+		MarginMultiplier respjson.Field
+		MaxNotional      respjson.Field
+		ExtraFields      map[string]respjson.Field
+		raw              string
 	} `json:"-"`
 }
 
 // Returns the unmodified JSON received from the API
 func (r RiskSettings) RawJSON() string { return r.JSON.raw }
 func (r *RiskSettings) UnmarshalJSON(data []byte) error {
-	return apijson.UnmarshalRoot(data, r)
-}
-
-// ToParam converts this RiskSettings to a RiskSettingsParam.
-//
-// Warning: the fields of the param type will not be present. ToParam should only
-// be used at the last possible moment before sending a request. Test for this with
-// RiskSettingsParam.Overrides()
-func (r RiskSettings) ToParam() RiskSettingsParam {
-	return param.Override[RiskSettingsParam](json.RawMessage(r.RawJSON()))
-}
-
-// Risk settings for an account
-type RiskSettingsParam struct {
-	// The maximum notional value available to the account. On update, a value must be
-	// 0 or greater, `null` clears the limit, and omitting the field leaves the limit
-	// unchanged. When a null/undefined value is observed, it indicates that there is
-	// no available data.
-	MaxNotional param.Opt[string] `json:"max_notional,omitzero"`
-	paramObj
-}
-
-func (r RiskSettingsParam) MarshalJSON() (data []byte, err error) {
-	type shadow RiskSettingsParam
-	return param.MarshalObject(r, (*shadow)(&r))
-}
-func (r *RiskSettingsParam) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
 
@@ -1063,7 +1049,7 @@ func (r V1AccountGetPortfolioHistoryParams) URLQuery() (v url.Values, err error)
 
 type V1AccountPatchAccountByIDParams struct {
 	// Risk settings for the account
-	Risk RiskSettingsParam `json:"risk,omitzero"`
+	Risk V1AccountPatchAccountByIDParamsRisk `json:"risk,omitzero"`
 	paramObj
 }
 
@@ -1072,5 +1058,28 @@ func (r V1AccountPatchAccountByIDParams) MarshalJSON() (data []byte, err error) 
 	return param.MarshalObject(r, (*shadow)(&r))
 }
 func (r *V1AccountPatchAccountByIDParams) UnmarshalJSON(data []byte) error {
+	return apijson.UnmarshalRoot(data, r)
+}
+
+// Risk settings for the account
+type V1AccountPatchAccountByIDParamsRisk struct {
+	// The maximum notional value available to the account: 0 or greater. `null` clears
+	// the limit.
+	MaxNotional param.Opt[string] `json:"max_notional,omitzero"`
+	// The margin multiplier of a Reg T margin account: `"1"` for cash only, `"4"` for
+	// full Reg T margin. Only a Reg T margin account may set it. `"4"` replaces a
+	// `"1"` the account chose, never a limit Clear Street set, so the response can
+	// give `"1"` after a request for `"4"`. It cannot be `null`.
+	//
+	// Any of "1", "4".
+	MarginMultiplier MarginMultiplier `json:"margin_multiplier,omitzero"`
+	paramObj
+}
+
+func (r V1AccountPatchAccountByIDParamsRisk) MarshalJSON() (data []byte, err error) {
+	type shadow V1AccountPatchAccountByIDParamsRisk
+	return param.MarshalObject(r, (*shadow)(&r))
+}
+func (r *V1AccountPatchAccountByIDParamsRisk) UnmarshalJSON(data []byte) error {
 	return apijson.UnmarshalRoot(data, r)
 }
