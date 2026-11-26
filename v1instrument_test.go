@@ -164,6 +164,7 @@ func TestV1InstrumentGetPredictionEventsWithOptionalParams(t *testing.T) {
 		SeriesCodes:   clearstreet.String("series_codes"),
 		SortBy:        clearstreet.V1InstrumentGetPredictionEventsParamsSortByOpenAt,
 		SortDirection: clearstreet.V1InstrumentGetPredictionEventsParamsSortDirectionAsc,
+		Statuses:      clearstreet.String("statuses"),
 	})
 	if err != nil {
 		var apierr *clearstreet.Error

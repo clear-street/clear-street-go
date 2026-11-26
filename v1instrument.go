@@ -114,6 +114,16 @@ func (r *V1InstrumentService) GetPredictionCategories(ctx context.Context, opts 
 // `search`, and `sort_by`. Such a request that takes longer than 30 seconds fails
 // with `504`; narrow `search` or the filters and try again.
 //
+// `statuses` keeps events in any listed lifecycle state, judged over all of an
+// event's markets, not only listable ones: `ACTIVE` events have an open market,
+// `UPCOMING` events have only markets that open in the future, and `SETTLED`
+// events have only settled markets. Events in none of those states, such as events
+// awaiting settlement, match no value. Unrecognized values are ignored; a list
+// with none recognized returns no events. Listing `UPCOMING` or `SETTLED` reads
+// every market, as `include_settled=true` does: `title`, `categories`, the open
+// and close times, and the other filters then count paused and settled markets
+// too. A request listing `SETTLED` also has the 30 second limit.
+//
 // `open_at.*` and `close_at.*` bound an event's open and close time, which are the
 // earliest across its listable markets, and `sort_by` uses the same times.
 //
@@ -1199,9 +1209,16 @@ type V1InstrumentGetPredictionEventsParams struct {
 	// `sort_by`, orders by relevance, closest spellings first.
 	Search param.Opt[string] `query:"search,omitzero" json:"-"`
 	// Comma-separated series codes. Keeps events of those series, ignoring case.
-	SeriesCodes param.Opt[string]                            `query:"series_codes,omitzero" json:"-"`
-	CloseAt     V1InstrumentGetPredictionEventsParamsCloseAt `query:"close_at,omitzero" json:"-"`
-	OpenAt      V1InstrumentGetPredictionEventsParamsOpenAt  `query:"open_at,omitzero" json:"-"`
+	SeriesCodes param.Opt[string] `query:"series_codes,omitzero" json:"-"`
+	// Comma-separated lifecycle statuses to keep: `ACTIVE` (a market is open),
+	// `UPCOMING` (every market opens in the future), `SETTLED` (every market is
+	// settled). Keeps events matching any listed status, judged over all of an event's
+	// markets. Listing `UPCOMING` or `SETTLED` counts every market of an event, as
+	// `include_settled` does. A request listing `SETTLED` that takes longer than 30
+	// seconds fails with `504`. Unrecognized values are ignored.
+	Statuses param.Opt[string]                            `query:"statuses,omitzero" json:"-"`
+	CloseAt  V1InstrumentGetPredictionEventsParamsCloseAt `query:"close_at,omitzero" json:"-"`
+	OpenAt   V1InstrumentGetPredictionEventsParamsOpenAt  `query:"open_at,omitzero" json:"-"`
 	// Sort key. Defaults to relevance when `search` is set, else the event code. Ties
 	// break on event code ascending.
 	//
