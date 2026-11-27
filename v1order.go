@@ -786,7 +786,8 @@ type OrderPreviewAmount struct {
 	// Total cash impact of the order before estimated fees and commissions.
 	GrossAmount string `json:"gross_amount" api:"required"`
 	// Total cash impact of the order after estimated fees and commissions:
-	// `gross_amount` with `fees.total` applied.
+	// `gross_amount` with `fees.total` applied. For an order that receives cash, a
+	// negative value means its estimated fees exceed what it receives.
 	NetAmount string `json:"net_amount" api:"required"`
 	// Fees charged to the account, broken out by kind.
 	//
