@@ -107,7 +107,7 @@ func TestV1AccountGetNonTradeActivitiesWithOptionalParams(t *testing.T) {
 		context.TODO(),
 		0,
 		clearstreet.V1AccountGetNonTradeActivitiesParams{
-			ActivityType: []string{"money_movement"},
+			ActivityType: []string{"MONEY_MOVEMENT"},
 			From:         clearstreet.Time(time.Now()),
 			PageSize:     clearstreet.Int(1),
 			PageToken:    clearstreet.String("U3RhaW5sZXNzIHJvY2tz"),

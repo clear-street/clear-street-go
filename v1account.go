@@ -465,24 +465,24 @@ func (r *AccountWithPersonalDetails) UnmarshalJSON(data []byte) error {
 type ActivityState string
 
 const (
-	ActivityStateSettled   ActivityState = "settled"
-	ActivityStateCancelled ActivityState = "cancelled"
+	ActivityStateSettled   ActivityState = "SETTLED"
+	ActivityStateCancelled ActivityState = "CANCELLED"
 )
 
 // Type of an activity.
 type ActivityType string
 
 const (
-	ActivityTypeMoneyMovement   ActivityType = "money_movement"
-	ActivityTypeInterest        ActivityType = "interest"
-	ActivityTypeFee             ActivityType = "fee"
-	ActivityTypeDividend        ActivityType = "dividend"
-	ActivityTypeOptionEvent     ActivityType = "option_event"
-	ActivityTypeTransfer        ActivityType = "transfer"
-	ActivityTypeCorporateAction ActivityType = "corporate_action"
-	ActivityTypeTaxWithholding  ActivityType = "tax_withholding"
-	ActivityTypeAdjustment      ActivityType = "adjustment"
-	ActivityTypeOther           ActivityType = "other"
+	ActivityTypeMoneyMovement   ActivityType = "MONEY_MOVEMENT"
+	ActivityTypeInterest        ActivityType = "INTEREST"
+	ActivityTypeFee             ActivityType = "FEE"
+	ActivityTypeDividend        ActivityType = "DIVIDEND"
+	ActivityTypeOptionEvent     ActivityType = "OPTION_EVENT"
+	ActivityTypeTransfer        ActivityType = "TRANSFER"
+	ActivityTypeCorporateAction ActivityType = "CORPORATE_ACTION"
+	ActivityTypeTaxWithholding  ActivityType = "TAX_WITHHOLDING"
+	ActivityTypeAdjustment      ActivityType = "ADJUSTMENT"
+	ActivityTypeOther           ActivityType = "OTHER"
 )
 
 // A postal address.
@@ -678,8 +678,8 @@ type NonTradeActivity struct {
 	ActivitySubtype string `json:"activity_subtype" api:"required"`
 	// Categorization for the activity.
 	//
-	// Any of "money_movement", "interest", "fee", "dividend", "option_event",
-	// "transfer", "corporate_action", "tax_withholding", "adjustment", "other".
+	// Any of "MONEY_MOVEMENT", "INTEREST", "FEE", "DIVIDEND", "OPTION_EVENT",
+	// "TRANSFER", "CORPORATE_ACTION", "TAX_WITHHOLDING", "ADJUSTMENT", "OTHER".
 	ActivityType ActivityType `json:"activity_type" api:"required"`
 	// Cash amount change.
 	Amount string `json:"amount" api:"required"`
@@ -699,7 +699,7 @@ type NonTradeActivity struct {
 	Qty string `json:"qty" api:"required"`
 	// State for this activity.
 	//
-	// Any of "settled", "cancelled".
+	// Any of "SETTLED", "CANCELLED".
 	State ActivityState `json:"state" api:"required"`
 	// Reference ID for the record that is being cancelled. Present only on records
 	// where the activity state is 'cancelled'. The contents of this fields points at
@@ -1015,8 +1015,8 @@ type V1AccountGetNonTradeActivitiesParams struct {
 	// Filter by activity type(s). Comma-delimited list. Example:
 	// `activity_type=dividend,fee`.
 	//
-	// Any of "money_movement", "interest", "fee", "dividend", "option_event",
-	// "transfer", "corporate_action", "tax_withholding", "adjustment", "other".
+	// Any of "MONEY_MOVEMENT", "INTEREST", "FEE", "DIVIDEND", "OPTION_EVENT",
+	// "TRANSFER", "CORPORATE_ACTION", "TAX_WITHHOLDING", "ADJUSTMENT", "OTHER".
 	ActivityType []string `query:"activity_type,omitzero" json:"-"`
 	paramObj
 }
