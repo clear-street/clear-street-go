@@ -79,7 +79,9 @@ func (r *NewsInstrument) UnmarshalJSON(data []byte) error {
 
 // A single news item and its associated instruments.
 type NewsItem struct {
-	// Instruments associated with this news item.
+	// Instruments associated with this news item. The requested instrument is listed
+	// too when the item matched it through another share class or cross-listing of the
+	// same issuer.
 	Instruments []NewsInstrument `json:"instruments" api:"required"`
 	// Classification of the item.
 	//
@@ -171,7 +173,8 @@ type V1InstrumentDataNewsGetNewsParams struct {
 	SearchQuery param.Opt[string] `query:"search_query,omitzero" json:"-"`
 	// Inclusive end timestamp. Accepts `YYYY-MM-DD` or RFC3339 datetime.
 	To param.Opt[string] `query:"to,omitzero" json:"-"`
-	// Comma-delimited instrument identifiers to filter by.
+	// Comma-delimited instrument identifiers to filter by. Matches include news tagged
+	// to the other share classes and cross-listings of the same issuer.
 	InstrumentIDs []string `query:"instrument_ids,omitzero" json:"-"`
 	// Filter by news type.
 	//
